@@ -47,6 +47,31 @@ positions (ISO 3741:2010 clause 9.1.5, Eq. 21):
 Both methods cover the one-third-octave bands from 100 Hz to 10 kHz (clause
 8.1). Octave-band, A-weighted and total levels follow ISO 3741 Annex F, which
 reuses the ISO 3744 Annex E A-weighting band corrections.
+
+A noise burst or a transient emission is described by the **sound energy
+level** :math:`L_J = 10 \log_{10}(J/J_0)`, :math:`J_0 = 1` pJ (clause 3.18),
+and clause 9.2 determines it by the same two methods with the single event
+time-integrated sound pressure level :math:`L_E` (clause 3.4) in place of the
+time-averaged :math:`L_p`: the :math:`N_\mathrm{e}` events at each position
+are reduced to the level of one event (Eq. 22 or Eq. 23), each position is
+corrected for its background by :math:`K_{1i}` (Eq. 25, 26) as in 9.1.2, the
+positions are energy-averaged (Eq. 27), and the room enters through the same
+bracket as Eq. (20) or the same reference source as Eq. (21):
+
+.. math::
+
+   L_J = \overline{L_E(\text{ST})} + \left[ 10 \log_{10}\frac{A}{A_0}
+   + 4.34 \frac{A}{S} + 10 \log_{10}\!\left( 1 + \frac{S c}{8 V f} \right)
+   + C_1 + C_2 - 6 \right] \tag{Eq. 30}
+
+   L_J = L_W(\text{RSS}) + \left( \overline{L_E(\text{ST})}
+   - \overline{L_p(\text{RSS})} \right) + C_2 \tag{Eq. 31}
+
+For a source steady over the whole interval :math:`T`, clause 3.4 NOTE 1
+gives :math:`L_E = L_{p,T} + 10 \log_{10}(T/T_0)`, :math:`T_0 = 1` s, and
+so :math:`L_J = L_W + 10 \log_{10}(T/T_0)`. Annex F sums the one-third-octave
+levels into octave bands (Eq. F.1, F.4) and A-weights them (Eq. F.2, F.5)
+alike for the two quantities.
 """
 
 from __future__ import annotations
@@ -66,6 +91,7 @@ from .._internal.levels_math import energy_mean, energy_sum
 from .._internal.validation import (
     check_engine,
     require_choice,
+    require_positive,
     require_ranks,
     require_same_length,
 )
@@ -73,7 +99,9 @@ from ._shared import (
     _PS0,
     SoundPowerWarning,
     _a_weighting_corrections,
+    _background_exposure,
     _c2_correction,
+    _single_event_mean,
     _validate_meteorology,
 )
 
@@ -95,6 +123,24 @@ _MIN_MIC_POSITIONS = 6
 _MIN_POSITIONS_FOR_SM = 2
 #: Maximum admissible inter-position deviation sM (ISO 3741:2010, 8.4.2.2, Eq. 10).
 _SM_CRITERION_DB = 1.5
+#: The diffuse-field constant of Eq. (20)/(30), in dB: the -6 dB that turns
+#: the mean-square pressure and the Sabine absorption area into a power against
+#: the two reference quantities (ISO 3741:2010, 9.1.4).
+_DIFFUSE_FIELD_CONSTANT_DB = -6.0
+#: The Sabine constant 55,26 of A = (55,26/c)(V/T60) and the 4,34 = 10 lg e of
+#: the first-order Eyring term (ISO 3741:2010, 9.1.4).
+_SABINE_CONSTANT = 55.26
+_EYRING_TERM_DB = 4.34
+#: Table F.1 of ISO 3741:2010 (= ISO 3744 Table E.1): the nominal one-third-
+#: octave mid-band frequencies, k = 1 (50 Hz) to k = 24 (10 kHz), grouped
+#: three per octave so that octave i = 1 (63 Hz) to 8 (8 kHz) is the sum over
+#: k = 3i-2 to 3i (Eq. F.1/F.4).
+_THIRD_OCTAVE_NOMINAL: tuple[int, ...] = (
+    50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630,
+    800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000,
+)  # fmt: skip
+_OCTAVE_NOMINAL: tuple[int, ...] = (63, 125, 250, 500, 1000, 2000, 4000, 8000)
+_THIRDS_PER_OCTAVE = 3
 
 
 @dataclass(frozen=True)
@@ -457,6 +503,122 @@ def _position_sampling_warnings(levels: np.ndarray, stacklevel: int) -> None:
             )
 
 
+@dataclass(frozen=True)
+class _DirectTerms:
+    """The level-free part of Eq. (20)/(30), and the quantities it is made of.
+
+    ``bracket`` is what the mean room level is raised by to become ``LW``
+    (Eq. 20) or ``LJ`` (Eq. 30); the other fields are the per-band Sabine
+    absorption area ``A``, the Waterhouse term, the corrections ``C1``/``C2``
+    and the speed of sound the result reports.
+    """
+
+    absorption_area: np.ndarray
+    waterhouse_correction: np.ndarray
+    c1: float
+    c2: float
+    speed_of_sound: float
+    bracket: np.ndarray
+
+
+def _room_inputs(
+    volume: float, surface_area: float, temperature: float, static_pressure: float
+) -> None:
+    """Refuse a room or a climate the direct method cannot be evaluated in."""
+    if volume <= 0 or surface_area <= 0:
+        msg = "'volume' and 'surface_area' must be positive."
+        raise ValueError(msg)
+    _validate_meteorology(temperature, static_pressure)
+
+
+def _band_inputs(
+    n_bands: int, t60: float | np.ndarray, frequencies: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """The per-band ``T60`` and mid-band frequencies, one value per band."""
+    freqs = np.asarray(frequencies, dtype=np.float64)
+    t60_arr = np.broadcast_to(np.asarray(t60, dtype=np.float64), (n_bands,)).copy()
+    if freqs.shape != (n_bands,):
+        msg = "'frequencies' length must match the number of bands."
+        raise ValueError(msg)
+    if np.any(t60_arr <= 0.0):
+        msg = "'t60' values must be positive."
+        raise ValueError(msg)
+    if np.any(freqs <= 0.0):
+        msg = "'frequencies' must be positive."
+        raise ValueError(msg)
+    return t60_arr, freqs
+
+
+def _direct_terms(
+    t60_arr: np.ndarray,
+    volume: float,
+    surface_area: float,
+    freqs: np.ndarray,
+    temperature: float,
+    static_pressure: float,
+) -> _DirectTerms:
+    r"""Evaluate the bracket of Eq. (20)/(30) for a room, a climate and its bands.
+
+    :math:`A = (55.26/c)(V/T_{60})`, :math:`c = 20.05\sqrt{273 + \theta}`, the
+    Waterhouse term :math:`10 \log_{10}(1 + Sc/(8Vf))` and the meteorological
+    corrections ``C1``/``C2`` (ISO 3741:2010, clause 9.1.4).
+    """
+    c = _speed_of_sound(temperature)
+    c1 = _c1_correction(temperature, static_pressure)
+    c2 = _c2_correction(temperature, static_pressure)
+    absorption = (_SABINE_CONSTANT / c) * (volume / t60_arr)
+    waterhouse = 10.0 * np.log10(1.0 + surface_area * c / (8.0 * volume * freqs))
+    bracket = (
+        10.0 * np.log10(absorption / _A0)
+        + _EYRING_TERM_DB * (absorption / surface_area)
+        + waterhouse
+        + c1
+        + c2
+        + _DIFFUSE_FIELD_CONSTANT_DB
+    )
+    return _DirectTerms(
+        absorption_area=np.asarray(absorption, dtype=np.float64),
+        waterhouse_correction=np.asarray(waterhouse, dtype=np.float64),
+        c1=c1,
+        c2=c2,
+        speed_of_sound=c,
+        bracket=np.asarray(bracket, dtype=np.float64),
+    )
+
+
+def _comparison_inputs(
+    n_bands: int,
+    levels_ref: np.ndarray,
+    lw_ref: np.ndarray,
+    frequencies: np.ndarray | None,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray | None]:
+    """The reference source's mean room level, its known ``LW`` and the bands.
+
+    :return: ``(Lp(RSS), LW(RSS), frequencies or None)``, each spanning the
+        ``n_bands`` of the source under test.
+    :raises ValueError: if the reference levels, ``lw_ref`` or ``frequencies``
+        do not span the same bands as the source under test.
+    """
+    lp_rss = _mean_level(levels_ref)
+    lw_rss = np.asarray(lw_ref, dtype=np.float64)
+    if lp_rss.shape != (n_bands,) or lw_rss.shape != (n_bands,):
+        msg = "'levels', 'levels_ref' and 'lw_ref' must span the same bands."
+        raise ValueError(msg)
+    freqs = None if frequencies is None else np.asarray(frequencies, dtype=np.float64)
+    if freqs is not None and freqs.shape != (n_bands,):
+        msg = "'frequencies' length must match the number of bands."
+        raise ValueError(msg)
+    return lp_rss, lw_rss, freqs
+
+
+def _require_frequencies(freqs: np.ndarray | None, name: str) -> np.ndarray:
+    """The band centres the frequency-dependent ``K1`` criterion needs."""
+    if freqs is None:
+        msg = f"'frequencies' are required to apply '{name}'."
+        raise ValueError(msg)
+    return freqs
+
+
 def _a_weighted_total(
     sound_power_level: np.ndarray, frequencies: np.ndarray | None
 ) -> float:
@@ -522,23 +684,10 @@ def sound_power_reverberation(
     :param static_pressure: Static pressure ``ps`` in the room, in kilopascals.
     :return: :class:`ReverberationSoundPowerResult`.
     """
-    if volume <= 0 or surface_area <= 0:
-        msg = "'volume' and 'surface_area' must be positive."
-        raise ValueError(msg)
-    _validate_meteorology(temperature, static_pressure)
+    _room_inputs(volume, surface_area, temperature, static_pressure)
     mean_level = _mean_level(levels)
     n_bands = mean_level.shape[0]
-    freqs = np.asarray(frequencies, dtype=np.float64)
-    t60_arr = np.broadcast_to(np.asarray(t60, dtype=np.float64), (n_bands,)).copy()
-    if freqs.shape != (n_bands,):
-        msg = "'frequencies' length must match the number of bands."
-        raise ValueError(msg)
-    if np.any(t60_arr <= 0.0):
-        msg = "'t60' values must be positive."
-        raise ValueError(msg)
-    if np.any(freqs <= 0.0):
-        msg = "'frequencies' must be positive."
-        raise ValueError(msg)
+    t60_arr, freqs = _band_inputs(n_bands, t60, frequencies)
 
     _room_qualification_warnings(levels, t60_arr, volume, surface_area, freqs)
 
@@ -547,33 +696,21 @@ def sound_power_reverberation(
     else:
         k1 = np.zeros(n_bands, dtype=np.float64)
 
-    c = _speed_of_sound(temperature)
-    c1 = _c1_correction(temperature, static_pressure)
-    c2 = _c2_correction(temperature, static_pressure)
-    absorption = (55.26 / c) * (volume / t60_arr)
-    waterhouse = 10.0 * np.log10(1.0 + surface_area * c / (8.0 * volume * freqs))
-
-    lw = (
-        mean_level
-        + 10.0 * np.log10(absorption / _A0)
-        + 4.34 * (absorption / surface_area)
-        + waterhouse
-        + c1
-        + c2
-        - 6.0
+    terms = _direct_terms(
+        t60_arr, volume, surface_area, freqs, temperature, static_pressure
     )
-    lw = np.asarray(lw, dtype=np.float64)
+    lw = np.asarray(mean_level + terms.bracket, dtype=np.float64)
 
     return ReverberationSoundPowerResult(
         frequencies=freqs,
         sound_power_level=lw,
         mean_pressure_level=mean_level,
-        absorption_area=np.asarray(absorption, dtype=np.float64),
-        waterhouse_correction=np.asarray(waterhouse, dtype=np.float64),
+        absorption_area=terms.absorption_area,
+        waterhouse_correction=terms.waterhouse_correction,
         background_correction=k1,
-        c1=c1,
-        c2=c2,
-        speed_of_sound=c,
+        c1=terms.c1,
+        c2=terms.c2,
+        speed_of_sound=terms.speed_of_sound,
         sound_power_level_a=_a_weighted_total(lw, freqs),
         method="direct",
     )
@@ -621,17 +758,8 @@ def sound_power_comparison(
     """
     _validate_meteorology(temperature, static_pressure)
     lp_st = _mean_level(levels)
-    lp_rss = _mean_level(levels_ref)
-    lw_rss = np.asarray(lw_ref, dtype=np.float64)
     n_bands = lp_st.shape[0]
-    if lp_rss.shape != (n_bands,) or lw_rss.shape != (n_bands,):
-        msg = "'levels', 'levels_ref' and 'lw_ref' must span the same bands."
-        raise ValueError(msg)
-
-    freqs = None if frequencies is None else np.asarray(frequencies, dtype=np.float64)
-    if freqs is not None and freqs.shape != (n_bands,):
-        msg = "'frequencies' length must match the number of bands."
-        raise ValueError(msg)
+    lp_rss, lw_rss, freqs = _comparison_inputs(n_bands, levels_ref, lw_ref, frequencies)
 
     # Microphone-sampling advisories (<6 positions, sM > 1,5 dB) apply to the
     # per-position measurement of the source under test, exactly as in the
@@ -641,15 +769,10 @@ def sound_power_comparison(
 
     k1_st = np.zeros(n_bands, dtype=np.float64)
     if background_levels is not None:
-        if freqs is None:
-            msg = "'frequencies' are required to apply 'background_levels'."
-            raise ValueError(msg)
-        lp_st, k1_st = _background_corrected_mean(levels, background_levels, freqs)
-    if background_levels_ref is not None:
-        if freqs is None:
-            msg = "'frequencies' are required to apply 'background_levels_ref'."
-            raise ValueError(msg)
-        lp_rss, _ = _background_corrected_mean(levels_ref, background_levels_ref, freqs)
+        lp_st, k1_st = _background_corrected_mean(
+            levels, background_levels, _require_frequencies(freqs, "background_levels")
+        )
+    lp_rss = _reference_source_level(lp_rss, levels_ref, background_levels_ref, freqs)
 
     c2 = _c2_correction(temperature, static_pressure)
     lw = np.asarray(lw_rss + (lp_st - lp_rss + c2), dtype=np.float64)
@@ -668,3 +791,454 @@ def sound_power_comparison(
         sound_power_level_a=_a_weighted_total(lw, freqs),
         method="comparison",
     )
+
+
+def _reference_source_level(
+    lp_rss: np.ndarray,
+    levels_ref: np.ndarray,
+    background_levels_ref: np.ndarray | None,
+    freqs: np.ndarray | None,
+) -> np.ndarray:
+    """The reference source's mean room level, background-corrected if asked.
+
+    The reference sound source runs steadily, so its correction is the
+    time-averaged one of 9.1.2 (Eq. 14/15 before Eq. 17) in both the sound
+    power and the sound energy comparison.
+    """
+    if background_levels_ref is None:
+        return lp_rss
+    corrected, _ = _background_corrected_mean(
+        levels_ref,
+        background_levels_ref,
+        _require_frequencies(freqs, "background_levels_ref"),
+    )
+    return corrected
+
+
+# ---------------------------------------------------------------------------
+# Sound energy level of a noise burst or transient emission (ISO 3741 clause
+# 9.2, Annex F)
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class ReverberationSoundEnergyResult:
+    r"""Result of an ISO 3741:2010 reverberation-room sound energy level
+    determination (clause 9.2).
+
+    ``sound_energy_level`` is the per-band ``LJ`` (Eq. 30 direct method, Eq. 31
+    comparison method), under reference meteorological conditions as both
+    equations state it. ``mean_event_level`` is the mean corrected single event
+    time-integrated level in the room :math:`\overline{L_E(\text{ST})}`
+    (Eq. 27). ``absorption_area``, ``waterhouse_correction``, ``c1``, ``c2``,
+    ``speed_of_sound`` and ``background_correction`` are what they are in
+    :class:`ReverberationSoundPowerResult`, the background correction being
+    the per-band shift of the mean level after each position was corrected by
+    its own ``K1i`` (Eq. 25/26). ``sound_energy_level_a`` is the A-weighted
+    total ``LJA`` (Annex F Eq. F.5), computed only when ``frequencies`` are
+    supplied (``NaN`` for several bands without them; equal to ``LJ`` for a
+    single band). ``method`` is ``'direct'`` or ``'comparison'``. ``events``
+    is the number of single sound emission events :math:`N_\mathrm{e}` the
+    levels were reduced from, or ``None`` when the caller supplied the mean
+    single event level of one event; ``integration_time`` is the interval
+    :math:`T` of the single event levels, in seconds, or ``None`` when no
+    background correction needed it.
+    """
+
+    frequencies: np.ndarray | None
+    sound_energy_level: np.ndarray
+    mean_event_level: np.ndarray
+    absorption_area: np.ndarray
+    waterhouse_correction: np.ndarray
+    background_correction: np.ndarray
+    c1: float
+    c2: float
+    speed_of_sound: float
+    sound_energy_level_a: float
+    method: str
+    events: int | None
+    integration_time: float | None
+
+    def __post_init__(self) -> None:
+        """Reject a determination whose per-band quantities disagree.
+
+        The pins are those of :class:`ReverberationSoundPowerResult`: the
+        figure draws one bar per band of ``sound_energy_level`` and every
+        other per-band column is read beside it, and ``method`` names the
+        equation the level came from. ``events`` and ``integration_time`` are
+        pinned as well, because a count of events below one or a
+        non-positive interval describes no measurement the standard defines.
+
+        :raises ValueError: if any per-band quantity disagrees with the rest,
+            ``method`` is neither ``'direct'`` nor ``'comparison'``,
+            ``events`` is below one or ``integration_time`` is not positive.
+        """
+        require_choice(self.method, "method", ("direct", "comparison"))
+        if self.events is not None and self.events < 1:
+            msg = (
+                "ReverberationSoundEnergyResult: 'events' must be at least 1; "
+                f"got {self.events!r}."
+            )
+            raise ValueError(msg)
+        if self.integration_time is not None:
+            require_positive(self.integration_time, "integration_time")
+        require_ranks(
+            self,
+            frequencies=1,
+            sound_energy_level=1,
+            mean_event_level=1,
+            absorption_area=1,
+            waterhouse_correction=1,
+            background_correction=1,
+        )
+        require_same_length(
+            self,
+            "frequencies",
+            "sound_energy_level",
+            "mean_event_level",
+            "absorption_area",
+            "waterhouse_correction",
+            "background_correction",
+        )
+
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Plot the LJ spectrum with the A-weighted total annotated.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+        """
+        from .._i18n import check_language
+        from .._plot.emission import plot_sound_energy
+
+        check_language(language)
+        return plot_sound_energy(self, ax=ax, language=language, **kwargs)
+
+
+def _room_event_levels(
+    levels: np.ndarray, events: int | None
+) -> tuple[np.ndarray, int | None]:
+    """The mean single event level of one event behind the three input forms.
+
+    A 3-D ``(Ne, NM, NB)`` array holds one event per entry of its first axis
+    and is reduced by Eq. (22); a 1-D or 2-D array with ``events`` is one
+    measurement encompassing that many events and is reduced by Eq. (23); a
+    1-D or 2-D array without ``events`` is the mean single event level of one
+    event, already formed (per position, or already averaged over the room).
+
+    :param levels: The levels, in decibels.
+    :param events: ``None``, or the number of events one measurement holds.
+    :return: The 1-D or 2-D levels and the event count they rest on
+        (``None`` when the caller supplied the means).
+    :raises ValueError: for a rank other than 1 to 3, non-finite levels, or a
+        per-event array given together with ``events``.
+    """
+    arr = np.asarray(levels, dtype=np.float64)
+    if arr.ndim == 3:  # noqa: PLR2004
+        if events is not None:
+            msg = (
+                "'levels' already carries one entry per event on its first axis; "
+                "'events' applies to one measurement encompassing several events "
+                "(ISO 3741:2010 Eq. 23), not to per-event levels."
+            )
+            raise ValueError(msg)
+        count = int(arr.shape[0])
+        return _single_event_mean(arr, None, name="levels", stacklevel=4), count
+    if arr.ndim not in (1, 2):
+        msg = (
+            "'levels' must be a 1D spectrum, a 2D (positions, bands) array or a "
+            "3D (events, positions, bands) array of single event levels."
+        )
+        raise ValueError(msg)
+    if events is None:
+        if not np.all(np.isfinite(arr)):
+            msg = "'levels' must contain only finite values."
+            raise ValueError(msg)
+        return arr, None
+    return _single_event_mean(arr, events, name="levels", stacklevel=4), int(events)
+
+
+def sound_energy_reverberation(
+    levels: np.ndarray,
+    t60: float | np.ndarray,
+    volume: float,
+    surface_area: float,
+    frequencies: np.ndarray,
+    *,
+    events: int | None = None,
+    background_levels: np.ndarray | None = None,
+    integration_time: float | None = None,
+    temperature: float = 23.0,
+    static_pressure: float = 101.325,
+) -> ReverberationSoundEnergyResult:
+    r"""Sound energy level in a reverberation room, direct method (ISO 3741:2010
+    clause 9.2.4).
+
+    ``levels`` holds the single event time-integrated sound pressure levels
+    :math:`L'_{Ei(\mathrm{ST})}` measured through a period that encompasses the
+    whole of the event, its decay included (clause 8.5.1; a moving microphone
+    is not permitted for non-repetitive impulsive noise): a 1D per-band
+    spectrum already averaged over the room, a 2D ``(NM, NB)`` array of one
+    event's level at each position, a 3D ``(Ne, NM, NB)`` array of the
+    :math:`N_\mathrm{e}` events measured one at a time (reduced by Eq. 22), or
+    a 1D/2D level of one measurement encompassing ``events`` successive events
+    (reduced by Eq. 23). Each position is corrected for its background by
+    :math:`K_{1i}` (Eq. 25/26, the frequency-dependent criterion of 9.1.2),
+    the positions are energy-averaged (Eq. 27) and the sound energy level in
+    each band follows Eq. (30):
+
+    .. math::
+
+       L_J = \overline{L_E(\text{ST})} + \left[ 10 \log_{10}\frac{A}{A_0}
+       + 4.34 \frac{A}{S} + 10 \log_{10}\!\left( 1 + \frac{S c}{8 V f} \right)
+       + C_1 + C_2 - 6 \right]
+
+    with every term of the bracket exactly as in :func:`sound_power_reverberation`
+    (Eq. 20), so the level is stated under the reference meteorological
+    conditions of clause 4. The background is the time-averaged level the
+    standard has measured over the same integration time :math:`T` as the
+    events (clause 9.2.2), and it is compared as its exposure over that
+    :math:`T`, :math:`L_{pi(\mathrm{B})} + 10 \log_{10}(T/T_0)` (clause 3.4
+    NOTE 1), so that the energies Eq. (25) subtracts share one reference;
+    ``integration_time`` is therefore required with ``background_levels``.
+
+    :param levels: Single event levels, in decibels, in one of the four forms
+        above.
+    :param t60: Reverberation time ``T60`` per band, in seconds (scalar or
+        one value per band).
+    :param volume: Reverberation-room volume ``V``, in cubic metres.
+    :param surface_area: Total room surface area ``S``, in square metres.
+    :param frequencies: One-third-octave band mid-frequencies, Hz (required:
+        the Waterhouse term and the ``K1`` criterion need them).
+    :param events: The number of events ``Ne`` one measurement encompasses
+        (Eq. 23); ``None`` when ``levels`` is per event or already the mean
+        of one event.
+    :param background_levels: Time-averaged background levels for ``K1``:
+        per-position ``(NM, NB)`` (or a single ``(NB,)`` spectrum used at every
+        position) with per-position ``levels``, applied per position before
+        the energy average; with 1D ``levels`` a single ``K1`` from the averaged
+        spectra approximates the per-position procedure.
+    :param integration_time: The interval ``T`` of the single event levels, in
+        seconds; required with ``background_levels``.
+    :param temperature: Air temperature ``theta`` in the room, in degrees Celsius.
+    :param static_pressure: Static pressure ``ps`` in the room, in kilopascals.
+    :return: :class:`ReverberationSoundEnergyResult` (``method='direct'``).
+    :raises ValueError: for a malformed or non-finite level array, a
+        non-physical room or climate, a background without its
+        ``integration_time``, or mismatched band counts.
+    """
+    _room_inputs(volume, surface_area, temperature, static_pressure)
+    event_levels, event_count = _room_event_levels(levels, events)
+    if integration_time is not None:
+        integration_time = require_positive(integration_time, "integration_time")
+    mean_level = _mean_level(event_levels)
+    n_bands = mean_level.shape[0]
+    t60_arr, freqs = _band_inputs(n_bands, t60, frequencies)
+
+    _room_qualification_warnings(event_levels, t60_arr, volume, surface_area, freqs)
+
+    if background_levels is not None:
+        exposure = _background_exposure(background_levels, integration_time)
+        mean_level, k1 = _background_corrected_mean(event_levels, exposure, freqs)
+    else:
+        k1 = np.zeros(n_bands, dtype=np.float64)
+
+    terms = _direct_terms(
+        t60_arr, volume, surface_area, freqs, temperature, static_pressure
+    )
+    lj = np.asarray(mean_level + terms.bracket, dtype=np.float64)
+
+    return ReverberationSoundEnergyResult(
+        frequencies=freqs,
+        sound_energy_level=lj,
+        mean_event_level=mean_level,
+        absorption_area=terms.absorption_area,
+        waterhouse_correction=terms.waterhouse_correction,
+        background_correction=k1,
+        c1=terms.c1,
+        c2=terms.c2,
+        speed_of_sound=terms.speed_of_sound,
+        sound_energy_level_a=_a_weighted_total(lj, freqs),
+        method="direct",
+        events=event_count,
+        integration_time=integration_time,
+    )
+
+
+def sound_energy_comparison(
+    levels: np.ndarray,
+    levels_ref: np.ndarray,
+    lw_ref: np.ndarray,
+    *,
+    frequencies: np.ndarray | None = None,
+    events: int | None = None,
+    background_levels: np.ndarray | None = None,
+    integration_time: float | None = None,
+    background_levels_ref: np.ndarray | None = None,
+    temperature: float = 23.0,
+    static_pressure: float = 101.325,
+) -> ReverberationSoundEnergyResult:
+    r"""Sound energy level in a reverberation room, comparison method
+    (ISO 3741:2010 clause 9.2.5).
+
+    A reference sound source of known per-band sound power ``lw_ref`` runs
+    steadily at the same microphone positions as the source under test, whose
+    single event levels ``levels`` take any of the forms
+    :func:`sound_energy_reverberation` accepts. The sound energy level in each
+    band follows Eq. (31):
+
+    .. math::
+
+       L_J = L_W(\text{RSS}) + \left( \overline{L_E(\text{ST})}
+       - \overline{L_p(\text{RSS})} \right) + C_2
+
+    where :math:`\overline{L_E(\text{ST})}` is the mean corrected single event
+    level of the source under test (Eq. 27), :math:`\overline{L_p(\text{RSS})}`
+    the mean corrected time-averaged level of the reference source (Eq. 17) and
+    ``C2`` the radiation-impedance correction. The room terms and ``C1`` cancel
+    between the two sources exactly as in :func:`sound_power_comparison`. The
+    source under test is background-corrected as in
+    :func:`sound_energy_reverberation` (its background compared as an exposure
+    over ``integration_time``); the reference source, being steady, by the
+    time-averaged correction of 9.1.2.
+
+    :param levels: Single event levels of the source under test, in decibels.
+    :param levels_ref: Mean room SPL per band (1D) or ``(NM, NB)`` per-position
+        time-averaged levels of the reference sound source, in decibels.
+    :param lw_ref: Known sound power level ``LW(RSS)`` per band, in decibels,
+        under the meteorological conditions of the test.
+    :param frequencies: Band mid-frequencies (Hz) for the ``K1`` criterion and
+        the A-weighted total.
+    :param events: The number of events ``Ne`` one measurement encompasses
+        (Eq. 23); ``None`` when ``levels`` is per event or already the mean
+        of one event.
+    :param background_levels: Time-averaged background levels for the ``K1``
+        correction of ``levels`` (per position, or a single spectrum).
+    :param integration_time: The interval ``T`` of the single event levels, in
+        seconds; required with ``background_levels``.
+    :param background_levels_ref: Background levels matching ``levels_ref``.
+    :param temperature: Air temperature ``theta`` in the room, in degrees Celsius.
+    :param static_pressure: Static pressure ``ps`` in the room, in kilopascals.
+    :return: :class:`ReverberationSoundEnergyResult` (``method='comparison'``).
+    :raises ValueError: for a malformed or non-finite level array, a
+        non-physical climate, a background without its ``integration_time``
+        or without ``frequencies``, or mismatched band counts.
+    """
+    _validate_meteorology(temperature, static_pressure)
+    event_levels, event_count = _room_event_levels(levels, events)
+    if integration_time is not None:
+        integration_time = require_positive(integration_time, "integration_time")
+    le_st = _mean_level(event_levels)
+    n_bands = le_st.shape[0]
+    lp_rss, lw_rss, freqs = _comparison_inputs(n_bands, levels_ref, lw_ref, frequencies)
+
+    _position_sampling_warnings(event_levels, stacklevel=2)
+
+    k1_st = np.zeros(n_bands, dtype=np.float64)
+    if background_levels is not None:
+        exposure = _background_exposure(background_levels, integration_time)
+        le_st, k1_st = _background_corrected_mean(
+            event_levels, exposure, _require_frequencies(freqs, "background_levels")
+        )
+    lp_rss = _reference_source_level(lp_rss, levels_ref, background_levels_ref, freqs)
+
+    c2 = _c2_correction(temperature, static_pressure)
+    lj = np.asarray(lw_rss + (le_st - lp_rss) + c2, dtype=np.float64)
+
+    nan_band = np.full(n_bands, np.nan, dtype=np.float64)
+    return ReverberationSoundEnergyResult(
+        frequencies=freqs,
+        sound_energy_level=lj,
+        mean_event_level=le_st,
+        absorption_area=nan_band,
+        waterhouse_correction=nan_band,
+        background_correction=k1_st,
+        c1=float("nan"),
+        c2=c2,
+        speed_of_sound=_speed_of_sound(temperature),
+        sound_energy_level_a=_a_weighted_total(lj, freqs),
+        method="comparison",
+        events=event_count,
+        integration_time=integration_time,
+    )
+
+
+def octave_band_levels(
+    levels: np.ndarray, frequencies: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    r"""Octave-band levels from one-third-octave band levels (ISO 3741 Annex F).
+
+    The level in the :math:`i`-th octave band, :math:`1 \le i \le 8` for the
+    mid-band frequencies 63 Hz to 8 kHz, is the energy sum of the three
+    one-third-octave bands :math:`k = 3i-2` to :math:`3i` of Table F.1 that
+    make it up, for sound power levels (Eq. F.1) and sound energy levels
+    (Eq. F.4) alike:
+
+    .. math::
+
+       L_{Ji} = 10 \log_{10} \sum_{k=3i-2}^{3i} 10^{0.1 L_{Jk}}
+
+    Every octave the input touches must be supplied whole: Table F.1 numbers
+    the one-third-octave bands from :math:`k = 1` at 50 Hz, so the 63 Hz
+    octave is the 50, 63 and 80 Hz thirds and the 8 kHz octave the 6,3, 8 and
+    10 kHz thirds, and a band whose triplet is incomplete cannot be summed.
+
+    :param levels: Band levels in decibels, with the bands on the last axis
+        (``(NB,)``, or ``(..., NB)`` for several spectra at once).
+    :param frequencies: The ``NB`` nominal one-third-octave mid-band
+        frequencies of ``levels``, in hertz, from 50 Hz to 10 kHz.
+    :return: ``(octave mid-band frequencies, octave-band levels)``, the
+        frequencies ascending and the levels with the octaves on the last
+        axis.
+    :raises ValueError: for a frequency outside Table F.1, a repeated
+        frequency, an octave whose three thirds are not all present, or
+        levels that do not carry one value per frequency.
+    """
+    freqs = np.asarray(frequencies, dtype=np.float64)
+    if freqs.ndim != 1 or freqs.size == 0:
+        msg = (
+            "'frequencies' must be a non-empty 1-D array of nominal "
+            "one-third-octave mid-band frequencies."
+        )
+        raise ValueError(msg)
+    arr = np.asarray(levels, dtype=np.float64)
+    if arr.ndim == 0 or arr.shape[-1] != freqs.size:
+        msg = (
+            "'levels' must carry one value per band of 'frequencies' on its last axis."
+        )
+        raise ValueError(msg)
+    if not np.all(np.isfinite(arr)):
+        msg = "'levels' must contain only finite values."
+        raise ValueError(msg)
+    columns: dict[int, list[int]] = {}
+    for column, f in enumerate(freqs):
+        nominal = round(float(f))
+        if nominal not in _THIRD_OCTAVE_NOMINAL:
+            msg = (
+                "'frequencies' must be nominal one-third-octave mid-band "
+                f"frequencies from 50 Hz to 10 kHz (ISO 3741:2010 Table F.1); got {f:g}."
+            )
+            raise ValueError(msg)
+        # Table F.1 counts k from 1 at 50 Hz; octave i holds k = 3i-2 .. 3i.
+        k = _THIRD_OCTAVE_NOMINAL.index(nominal) + 1
+        octave = (k + _THIRDS_PER_OCTAVE - 1) // _THIRDS_PER_OCTAVE
+        members = columns.setdefault(octave, [])
+        if column in members or any(round(float(freqs[j])) == nominal for j in members):
+            msg = f"'frequencies' must not repeat a band; {nominal} Hz appears twice."
+            raise ValueError(msg)
+        members.append(column)
+    for octave, members in columns.items():
+        if len(members) != _THIRDS_PER_OCTAVE:
+            msg = (
+                "'frequencies' must supply the three one-third-octave bands of "
+                "every octave it touches (ISO 3741:2010 Eq. F.1, k = 3i-2 to 3i); "
+                f"the {_OCTAVE_NOMINAL[octave - 1]} Hz octave has {len(members)}."
+            )
+            raise ValueError(msg)
+    order = sorted(columns)
+    octave_freqs = np.array([_OCTAVE_NOMINAL[i - 1] for i in order], dtype=np.float64)
+    summed = np.stack(
+        [energy_sum(arr[..., columns[i]], axis=-1) for i in order], axis=-1
+    )
+    return octave_freqs, np.asarray(summed, dtype=np.float64)

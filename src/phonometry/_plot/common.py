@@ -40,7 +40,7 @@ if TYPE_CHECKING:
         ImpactRatingResult,
         WeightedRatingResult,
     )
-    from ..emission.sound_power import SoundPowerResult
+    from ..emission.sound_power import SoundEnergyResult, SoundPowerResult
     from ..emission.sound_power_anechoic import PrecisionSoundPowerResult
     from ..emission.sound_power_intensity import (
         PrecisionIntensityResult,
@@ -49,7 +49,10 @@ if TYPE_CHECKING:
     from ..emission.sound_power_intensity_points import (
         DiscretePointIntensityResult,
     )
-    from ..emission.sound_power_reverberation import ReverberationSoundPowerResult
+    from ..emission.sound_power_reverberation import (
+        ReverberationSoundEnergyResult,
+        ReverberationSoundPowerResult,
+    )
     from ..room.acoustics import RoomAcousticsResult
 
 _INSTALL_HINT = (
@@ -1082,8 +1085,10 @@ def _draw_decay_times(
 
 def _sound_power_designation(
     result: SoundPowerResult
+    | SoundEnergyResult
     | PrecisionSoundPowerResult
     | ReverberationSoundPowerResult
+    | ReverberationSoundEnergyResult
     | SoundPowerIntensityResult
     | PrecisionIntensityResult
     | DiscretePointIntensityResult,
@@ -1108,6 +1113,12 @@ def _sound_power_designation(
     the Part 2 result, so without one it fell past every branch to the
     enveloping-surface fallback and an ISO 9614-3 determination was captioned
     with the pressure methods it is not.
+
+    The two sound energy results are captioned with the standard of the
+    sound power result they mirror: the reverberation-room single-event
+    determination is clause 9.2 of the same ISO 3741, and the
+    enveloping-surface one is clause 8.3 of ISO 3744 (clause 8.4 of ISO
+    3746), which is the fallback.
     """
     from ..emission.sound_power_anechoic import PrecisionSoundPowerResult
     from ..emission.sound_power_intensity import (
@@ -1115,9 +1126,14 @@ def _sound_power_designation(
         SoundPowerIntensityResult,
     )
     from ..emission.sound_power_intensity_points import DiscretePointIntensityResult
-    from ..emission.sound_power_reverberation import ReverberationSoundPowerResult
+    from ..emission.sound_power_reverberation import (
+        ReverberationSoundEnergyResult,
+        ReverberationSoundPowerResult,
+    )
 
-    if isinstance(result, ReverberationSoundPowerResult):
+    if isinstance(
+        result, (ReverberationSoundPowerResult, ReverberationSoundEnergyResult)
+    ):
         return "ISO 3741"
     if isinstance(result, DiscretePointIntensityResult):
         return "ISO 9614-1"
