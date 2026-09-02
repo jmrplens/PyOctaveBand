@@ -511,6 +511,22 @@ _ES_EXACT = {
     "Amplitude [dB]": "Amplitud [dB]",
     "Level [dB]": "Nivel [dB]",
     "Time [s]": "Tiempo [s]",
+    # sound_energy_burst (ISO 3744 clause 8.3): a burst's L_E against a
+    # steady source, and the L_J spectrum of the burst.
+    "impact burst": "ráfaga de impacto",
+    "steady source, $L_p$ = 80 dB": "fuente estacionaria, $L_p$ = 80 dB",
+    "window $T$ = 10 s": "ventana $T$ = 10 s",
+    "burst: all of its $L_E$ = 90.0 dB\nis in the first second": (
+        "ráfaga: todo su $L_E$ = 90,0 dB\nestá en el primer segundo"
+    ),
+    "steady: $L_E$ = $L_p$ + 10 lg($T/T_0$)\n= 80 + 10 = 90.0 dB at $T$": (
+        "estacionaria: $L_E$ = $L_p$ + 10 lg($T/T_0$)\n= 80 + 10 = 90,0 dB en $T$"
+    ),
+    "Single event level $L_E(t)$ [dB]": "Nivel de suceso aislado $L_E(t)$ [dB]",
+    "One burst and one steady source, the same energy in $T$": (
+        "Una ráfaga y una fuente estacionaria, la misma energía en $T$"
+    ),
+    "Sound energy level $L_J$ [dB]": "Nivel de energía acústica $L_J$ [dB]",
     "Amplitude": "Amplitud",
     "Error [dB]": "Error [dB]",
     "Group delay [ms]": "Retardo de grupo [ms]",
@@ -4582,6 +4598,16 @@ _ES_PATTERNS = [
         (
             r"Potencia acústica en cámara reverberante (ISO 3741)  "
             r"$L_{W\\!\\mathrm{A}}$ = \1,\2 dB(A)"
+        ),
+    ),
+    (
+        (
+            r"^Sound energy level of the burst \(ISO 3744\)  "
+            r"\$L_\{J\\!\\mathrm\{A\}\}\$ = (\d+)\.(\d+) dB\(A\)$"
+        ),
+        (
+            r"Nivel de energía acústica de la ráfaga (ISO 3744)  "
+            r"$L_{J\\!\\mathrm{A}}$ = \1,\2 dB(A)"
         ),
     ),
     (

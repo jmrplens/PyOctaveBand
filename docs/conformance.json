@@ -3,12 +3,12 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 595,
-    "passing": 595,
+    "checks": 600,
+    "passing": 600,
     "failing": 0,
     "domains": 59,
     "standards": 375,
-    "citations": 531,
+    "citations": 536,
     "designations": 116,
     "sources": 84
   },
@@ -115,8 +115,8 @@
     {
       "id": "intensity-sound-power",
       "title": "Intensity & sound power",
-      "checks": 26,
-      "passing": 26
+      "checks": 31,
+      "passing": 31
     },
     {
       "id": "building-prediction-uncertainty",
@@ -2932,6 +2932,36 @@
         "label": "0 dB error"
       },
       "computed": {
+        "value": 0.0
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 9,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-3744-2010-eq-23-clause-3-4-note-1/sound-energy-level-of-a-source-steady-over-t-10-s-is-lw-10-lg-t-t0",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3744",
+        "edition": "2010",
+        "clause": "Eq. 23 / clause 3.4 NOTE 1",
+        "cite": "ISO 3744:2010 Eq. 23 / clause 3.4 NOTE 1"
+      },
+      "quantity": "Sound energy level of a source steady over T = 10 s is LW + 10 lg(T/T0)",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "LJ - LW = 10 dB, 0 dB error"
+      },
+      "computed": {
         "value": 1.42e-14
       },
       "unit": "dB",
@@ -2943,6 +2973,123 @@
         "value": 1.42e-14
       },
       "precision": 9,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-3744-2010-eq-20/one-measurement-encompassing-ne-5-events-is-10-lg-5-above-one-event",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3744",
+        "edition": "2010",
+        "clause": "Eq. 20",
+        "cite": "ISO 3744:2010 Eq. 20"
+      },
+      "quantity": "One measurement encompassing Ne = 5 events is 10 lg 5 above one event",
+      "kind": "scalar",
+      "expected": {
+        "value": 6.989700043360188
+      },
+      "computed": {
+        "value": 6.9897
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": -8.88e-16
+      },
+      "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-3741-2010-eq-30/reverberation-room-sound-energy-level-inverts-to-a-known-lj",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3741",
+        "edition": "2010",
+        "clause": "Eq. 30",
+        "cite": "ISO 3741:2010 Eq. 30"
+      },
+      "quantity": "Reverberation-room sound energy level inverts to a known LJ",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "0 dB error"
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 9,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-3741-2010-eq-f-4/three-equal-one-third-octave-bands-sum-to-an-octave-level-10-lg-3-higher",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3741",
+        "edition": "2010",
+        "clause": "Eq. F.4",
+        "cite": "ISO 3741:2010 Eq. F.4"
+      },
+      "quantity": "Three equal one-third-octave bands sum to an octave level 10 lg 3 higher",
+      "kind": "scalar",
+      "expected": {
+        "value": 4.771212547196624
+      },
+      "computed": {
+        "value": 4.771213
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": 1.78e-15
+      },
+      "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "intensity-sound-power/iso-3744-2010-annex-g-h-4-2-7/c1-c2-of-eq-g-1-g-3-vanish-at-120-m-altitude-and-23-c",
+      "domain": "intensity-sound-power",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3744",
+        "edition": "2010",
+        "clause": "Annex G / H.4.2.7",
+        "cite": "ISO 3744:2010 Annex G / H.4.2.7"
+      },
+      "quantity": "C1 + C2 of Eq. (G.1)/(G.3) vanish at 120 m altitude and 23 C",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": -5e-05
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.001
+      },
+      "deviation": {
+        "value": -5e-05
+      },
+      "precision": 5,
       "verdict": "pass"
     },
     {

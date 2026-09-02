@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 595 numerical conformance checks against 375 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 600 numerical conformance checks against 375 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 595 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 59 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 600 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 59 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -266,9 +266,13 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/)
 - [Sound Power in the Reverberation Room (ISO 3741)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/)
 - [Sound Power in Situ by Comparison (ISO 3747)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-in-situ/)
+- [Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/)
+
+### Sound intensity and sound power from it
+
+- [Overview](https://jmrplens.github.io/phonometry/devices/emission/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-devices-emission-intensity.txt)
 - [Sound Power by Intensity Scanning (ISO 9614-2 / ISO 9614-3)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/)
 - [Sound Intensity (p-p method)](https://jmrplens.github.io/phonometry/devices/emission/intensity/)
-- [Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/)
 
 ### Electroacoustics
 
@@ -368,6 +372,7 @@ One file per area, each small enough to fetch whole. `llms-full.txt` is the comp
 - [Underwater acoustics](https://jmrplens.github.io/phonometry/llms/llms-underwater.txt)
 - [Sources and devices](https://jmrplens.github.io/phonometry/llms/llms-devices.txt)
 - [Sound power and intensity](https://jmrplens.github.io/phonometry/llms/llms-devices-emission.txt)
+- [Sound intensity and sound power from it](https://jmrplens.github.io/phonometry/llms/llms-devices-emission-intensity.txt)
 - [Electroacoustics](https://jmrplens.github.io/phonometry/llms/llms-devices-electroacoustics.txt)
 - [Broadcast](https://jmrplens.github.io/phonometry/llms/llms-devices-broadcast.txt)
 - [Noise control](https://jmrplens.github.io/phonometry/llms/llms-devices-noise-control.txt)
@@ -15308,9 +15313,11 @@ judged against.
   method and declaring the noise emission per ISO 4871.
 - [Sound Power by Pressure Methods](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/):
   the enveloping surface of ISO 3744/3746 and the precision anechoic grade of
-  ISO 3745.
+  ISO 3745, and the sound energy level of a burst over the ISO 3744/3746
+  enveloping surface.
 - [Sound Power in the Reverberation Room](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/):
-  the direct and comparison methods of ISO 3741.
+  the direct and comparison methods of ISO 3741, for sound power and for the
+  sound energy of a single event.
 - [Sound Power in Situ by Comparison](https://jmrplens.github.io/phonometry/devices/emission/sound-power-in-situ/):
   the ISO 3747 engineering and survey comparison against a reference sound
   source in a reverberant environment, for the machine that cannot leave its
@@ -17101,8 +17108,12 @@ and clean the surface level with the background-noise correction $K_1$ and
 the environmental correction $K_2$. The **precision method** of ISO 3745
 moves the same idea into a qualified anechoic or hemi-anechoic room, where a
 fixed microphone array samples the free field directly and the grade-1
-corrections are meteorological rather than environmental. The closing
-section renders the determination as the accredited-style test fiche. Which
+corrections are meteorological rather than environmental. Section 3 renders
+the determination as the accredited-style test fiche, and section 4 turns the
+enveloping surface of ISO 3744 and ISO 3746 on a source that does not run
+steadily at all, the noise burst whose descriptor is the sound energy level
+$L_J$ of clause 8.3. That route is theirs alone: ISO 3745 defines no sound
+energy level. Which
 route fits which job, and the reverberation-room and intensity alternatives,
 are weighed in [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/).
 
@@ -17557,6 +17568,113 @@ anechoic determination: no $K_2$ at all, a 6.28 m² hemisphere instead of a
 the reproducibility one.*
 
 
+## 4. Sound energy level of a burst (clause 8.3)
+
+Everything above describes a source that runs steadily for the whole averaging
+interval: Eq. 18 reports a *rate* of energy flow. A press stroke, a door slam or
+a pneumatic exhaust radiates its energy in a fraction of a second and then
+stops, so the standard gives it the **sound energy level**
+$L_J = 10\log_{10}(J/J_0)$, $J = \int P(t)\,\mathrm{d}t$, $J_0 = 1$ pJ (clauses
+3.22 and 3.23), and determines it (clause 8.3; clause 8.4 of ISO 3746 for the
+survey grade) by the chain of section 1 with the **single event time-integrated
+sound pressure level** $L_E = 10\log_{10}[\int p^2\,\mathrm{d}t / E_0]$,
+$E_0 = (20\ \mu\text{Pa})^2$ s (clause 3.4), in place of $L_p$: measured
+through a window that encompasses the whole burst at every position at once
+(no traversing microphone, clause 8.3.1), energy-averaged over the positions
+(clause 8.3.3), corrected by the same $K_1$ (Eq. 21) and $K_2$ (Eq. 22) and
+closed by the surface term (Eq. 23):
+
+$$
+L_J = \overline{L'_E} - K_1 - K_2 + 10\log_{10}\frac{S}{S_0}.
+$$
+
+The two quantities meet on a steady source: over a window of duration $T$ the
+integral of a constant $p^2$ is $T p^2$, so $L_E = L_{p,T} + 10\log_{10}(T/T_0)$,
+$T_0 = 1$ s (clause 3.4 NOTE 1), and $L_J = L_W + 10\log_{10}(T/T_0)$. That
+identity is what the figure draws and what the library's tests pin the sound
+energy chain to, field by field.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_energy_burst_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_energy_burst.svg" alt="Two panels. Left, the running single event level of an impact burst and of a steady 80 dB source through a 10 s window: the burst starts at 2 s and its curve is flat at 90 dB within about a second, the steady source climbs as 10 lg(t/T0) and reaches the same 90 dB at the dashed line T = 10 s. Right, seven octave-band bars from 125 Hz to 8 kHz of the burst's sound energy level over a 2 m hemisphere, rising from 95 dB at 125 Hz to 103.5 dB at 1 kHz and falling to 91 dB at 8 kHz, with the A-weighted total of 107.7 dB(A) in the title" width="96%"></picture>
+
+*Left, the running single event level of an impact burst and of a steady 80 dB
+source through a 10 s window: the burst's 90 dB is all there within a second of
+the impact, the steady source climbs as $10\log_{10}(t/T_0)$ and reaches the
+same 90 dB at $T$. Right, the octave-band $L_J$ of the same press stroke over a
+2 m hemisphere, with the A-weighted total in the title.*
+
+The standard asks for at least **five** events (clause 8.3.1), one at a time or
+as one reading that spans them all, and reduces both to the level of one event
+at each position: the energy average of the $N_\mathrm{e}$ readings (Eq. 19) or
+the one reading less $10\log_{10} N_\mathrm{e}$ (Eq. 20). `sound_energy_pressure`
+takes `levels_positions` as a `(Ne, NM, NB)` array of the events one at a time,
+an `(NM, NB)` reading with `events=Ne`, or the `(NM, NB)` mean already formed;
+`mean_single_event_level` is the same reduction on its own. The background is
+the time-averaged level measured over the same window (clause 8.3.1), and it is
+compared as its exposure over that window, $L_{p(\mathrm{B})} + 10\log_{10}(T/T_0)$,
+so that the energies Eq. 21 subtracts share one reference (the two levels are
+re $E_0 = p_0^2 \cdot 1$ s and re $p_0^2$ respectively; the
+[errata registry](https://jmrplens.github.io/phonometry/reference/errata/) records the reading); `integration_time` is
+therefore required with `background_levels`, and the criteria and clamp are
+section 1's.
+
+```python
+import numpy as np
+from phonometry import emission
+
+# A press stroke measured at the 10 hemisphere positions of ISO 3744 (r = 2 m),
+# five strokes one at a time: (events, positions, bands), octaves 125 Hz - 8 kHz.
+bands = np.array([125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
+stroke = np.array([84.0, 88.0, 91.0, 92.0, 90.0, 86.0, 80.0])   # single event levels, dB
+rng = np.random.default_rng(83)
+events = stroke + rng.normal(0.0, 0.8, size=(5, 10, bands.size))
+
+burst = emission.sound_energy_pressure(
+    events, "hemisphere", radius=2.0,
+    background_levels=np.full((10, bands.size), 62.0),   # time-averaged over the same 10 s
+    integration_time=10.0, frequencies=bands,
+    room=emission.RoomEnvironment(reverberation_time=1.2, volume=900.0),   # -> K2
+)
+print(burst.events)                                        # 5 (Eq. 19 over the first axis)
+print(round(float(burst.environmental_correction[0]), 2))  # K2 = 2.64 dB
+print(np.round(burst.sound_energy_level, 1))               # per-band LJ, peaking at 103.5 dB at 1 kHz
+print(round(burst.sound_energy_level_a, 1))                # LJA = 107.7 dB(A)
+
+# The section 1 measurement read as a 10 s window: LJ = LW + 10 lg(T/T0) exactly.
+octaves_hz = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000])
+rng = np.random.default_rng(0)
+ten_positions = np.array([70.0, 74.0, 78.0, 80.0, 79.0, 76.0, 72.0, 66.0]) + rng.normal(0.0, 0.5, size=(10, 8))
+quiet = np.full((10, 8), 55.0)
+workshop = emission.RoomEnvironment(reverberation_time=0.6, volume=300.0)
+steady = emission.sound_power_pressure(
+    ten_positions, "hemisphere", radius=1.5, reflecting_planes=1,
+    background_levels=quiet, frequencies=octaves_hz, room=workshop,
+)
+ten_seconds = emission.sound_energy_pressure(
+    ten_positions + 10.0, "hemisphere", radius=1.5, reflecting_planes=1,
+    background_levels=quiet, integration_time=10.0, frequencies=octaves_hz, room=workshop,
+)
+print(np.round(ten_seconds.sound_energy_level - steady.sound_power_level, 6))   # 10.0 in every band
+
+# Annex G: a determination at 1 200 m and 8 C carried to 101.325 kPa and 23 C (Eq. G.3).
+corr = emission.reference_atmosphere_correction(8.0, altitude=1200.0)
+print(round(corr.static_pressure, 1), round(corr.total, 2))   # 87.7 kPa, C1 + C2 = 0.68 dB
+lj_ref = burst.sound_energy_level + corr.total
+
+burst.plot()   # LJ per band, LJA in the title (needs matplotlib)
+```
+
+Eq. 23 holds for the meteorological conditions of the test; above 500 m of
+altitude or below 10 °C clause 8.3.6 requires the Annex G correction
+$L_{J\mathrm{ref,atm}} = L_J + C_1 + C_2$ (Eq. G.3), which
+`reference_atmosphere_correction` evaluates from the temperature and the static
+pressure, or from the altitude through Eq. G.2. `sound_energy_pressure` takes the
+surface, position and room arguments of `sound_power_pressure` plus `events`,
+`background_levels` with `integration_time`, and returns a `SoundEnergyResult`
+(`sound_energy_level`, `surface_event_level`, `mean_event_level`,
+`background_correction`, `environmental_correction`, `directivity_index`,
+`surface_area`, `sound_energy_level_a`, `uncertainty`, `grade`, `events`,
+`integration_time`) with `.plot()`.
+
 ## See also
 
 - [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing among the seven determination
@@ -17616,12 +17734,21 @@ hemi-anechoic rooms*: the Clause 8 power level, the per-position background
 correction (Eq. 11), the meteorological corrections and the standardized
 microphone arrays of section 2.
 
+The sound energy level $L_J$ of a noise burst over the same enveloping
+surface is section 4: `sound_energy_pressure` (ISO 3744 clause 8.3, ISO 3746
+clause 8.4) with `mean_single_event_level` (Eq. 19/20) and the Annex G
+correction of `reference_atmosphere_correction` (Eq. G.1/G.3).
+
 **Not covered.** Neither method performs the facility qualification it assumes:
 ISO 3745's free-field qualification of the anechoic or hemi-anechoic
 environment is taken for granted, and ISO 3744's $K_2$ validity only warns.
 ISO 3744 **Annex G**, the correction to reference meteorological conditions
-required above 500 m of altitude or below 10 °C (clause 8.2.5), is not applied
-either: `sound_power_pressure` takes no temperature or pressure argument. The
+required above 500 m of altitude or below 10 °C (clauses 8.2.5 and 8.3.6), is
+evaluated by `reference_atmosphere_correction` but never applied inside a
+determination: `sound_power_pressure` and `sound_energy_pressure` take no
+temperature or pressure argument, and the sum is added by hand. ISO 3745
+defines no sound energy level of its own, so a burst in the precision anechoic
+room has no route here. The
 $C_3$ meteorological correction of ISO 3745 needs an air-absorption coefficient
 the caller supplies through `air_absorption_coefficient=`; this module does not
 compute it from **ISO 9613-1** itself.
@@ -17643,8 +17770,9 @@ the laboratory route of choice for steady, broadband sources small enough to
 travel to a qualified room. This guide covers the direct method through the
 Sabine absorption area, the Waterhouse and meteorological corrections, the
 comparison method against a reference sound source, the qualification
-warnings and the accredited-style test fiche. Which route fits which job,
-and the pressure and intensity alternatives, are weighed in
+warnings, the accredited-style test fiche and, in section 3, the sound energy
+level $L_J$ that the same two methods give a single event. Which route fits
+which job, and the pressure and intensity alternatives, are weighed in
 [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/).
 
 ## 1. Reverberation room, precision grade (ISO 3741)
@@ -17779,8 +17907,7 @@ result still returns. Those coarse advisory criteria are the only checks
 made: the reverberation-room qualification itself (Annex C/D,
 eigenfrequency counting or a reference-source comparison) is assumed, not
 performed. The sound energy level $L_J$ of clause 9.2, the single-event
-counterpart of $L_W$ defined in the same clauses, is not implemented
-either, so an impulsive or single-event source falls outside this guide.
+counterpart of $L_W$ defined in the same clauses, is section 3.
 
 ### `sound_power_reverberation()` parameters
 
@@ -17882,6 +18009,96 @@ repository. Click the preview to open the PDF:
 an ISO 3741 precision-grade direct-method determination with the Waterhouse and
 $C_1$/$C_2$ corrections and the boxed $L_{W\mathrm{A}}$.*
 
+
+## 3. Sound energy level of a single event (clause 9.2)
+
+Both methods above report a rate of energy flow, so a machine that fires once
+and falls silent has no $L_W$ to determine. Clause 9.2 gives it the **sound
+energy level** $L_J = 10\log_{10}(J/J_0)$, $J_0 = 1$ pJ (clause 3.18), by the
+same two routes with the single event time-integrated sound pressure level
+$L_E$ (clause 3.4) in place of $L_p$: Eq. 30 is Eq. 20 with
+$\overline{L_E(\text{ST})}$ where $\overline{L_p(\text{ST})}$ stood, and Eq. 31
+is Eq. 21 likewise,
+
+$$
+L_J = \overline{L_E(\text{ST})} + \left[10\log_{10}\frac{A}{A_0} + 4.34\ \frac{A}{S}
++ 10\log_{10}\left(1 + \frac{S c}{8 V f}\right) + C_1 + C_2 - 6\right], \qquad
+L_J = L_W(\text{RSS}) + \left(\overline{L_E(\text{ST})} - \overline{L_p(\text{RSS})}\right) + C_2 .
+$$
+
+The measurement is clause 8.5: at least five events at each position, one at a
+time or as one reading encompassing them all, through an interval that contains
+the whole event including its decay, and no moving microphone for a
+non-repetitive impulse. Clause 9.2.1 reduces both readings to the level of one
+event (Eq. 22, the energy mean of $N_\mathrm{e}$ readings, or Eq. 23, one
+reading less $10\log_{10} N_\mathrm{e}$), clause 9.2.2 corrects each position
+for its own background by the frequency-dependent criterion of 9.1.2
+(Eq. 25/26), and clause 9.2.3 energy-averages the corrected positions
+(Eq. 27). The background is the time-averaged level measured over the same
+integration time $T$ as the events, compared as its exposure over that window,
+$L_{pi(\mathrm{B})} + 10\log_{10}(T/T_0)$, so that the energies Eq. 25
+subtracts share one reference; `integration_time` is therefore required with
+`background_levels` (the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/) records the
+reading). Annex F then forms the octave-band levels (Eq. F.4, the energy sum of
+the three thirds of Table F.1 per octave, `octave_band_levels`) and the
+A-weighted total (Eq. F.5, `sound_energy_level_a`).
+
+```python
+import numpy as np
+from phonometry import emission
+
+# Five door slams recorded at the six positions of the room of section 1, one at
+# a time: (events, positions, bands), the 21 one-third octaves 100 Hz - 10 kHz.
+thirds = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250,
+                   1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000], dtype=float)
+t60_thirds = np.full(thirds.size, 2.0)
+slam = np.linspace(88.0, 76.0, thirds.size)      # single event level, dB re E0
+rng = np.random.default_rng(3741)
+slams = slam + rng.normal(0.0, 0.6, size=(5, 6, thirds.size))
+
+slam_lj = emission.sound_energy_reverberation(
+    slams, t60_thirds, volume=200.0, surface_area=220.0, frequencies=thirds,
+    background_levels=np.full(thirds.size, 45.0),   # time-averaged over the same 4 s
+    integration_time=4.0, temperature=20.0, static_pressure=101.0,
+)
+print(slam_lj.events, slam_lj.method)                    # 5 direct
+print(np.round(slam_lj.sound_energy_level[:3], 1))       # [96.  94.9 94.2] dB re 1 pJ
+print(round(slam_lj.sound_energy_level_a, 1))            # LJA = 99.0 dB(A)
+
+# Comparison method: the reference source of section 1, run steadily.
+slam_cmp = emission.sound_energy_comparison(
+    slams, lp_rss, lw_rss, frequencies=thirds, temperature=20.0,
+)
+print(round(float(slam_cmp.sound_energy_level[0]), 1), slam_cmp.method)   # 95.0 comparison
+
+# Annex F octave bands, and the identity with the steady chain (LJ = LW + 10 lg(T/T0)).
+octaves, lj_octave = emission.octave_band_levels(slam_lj.sound_energy_level, thirds)
+print(octaves)                        # [ 125.  250.  500. 1000. 2000. 4000. 8000.]
+lp_thirds = np.linspace(80.0, 70.0, thirds.size)     # the mean room SPL of section 1
+steady = emission.sound_power_reverberation(
+    lp_thirds, t60_thirds, volume=200.0, surface_area=220.0, frequencies=thirds,
+    temperature=20.0, static_pressure=101.0,
+)
+ten_seconds = emission.sound_energy_reverberation(
+    lp_thirds + 10.0, t60_thirds, volume=200.0, surface_area=220.0, frequencies=thirds,
+    temperature=20.0, static_pressure=101.0,
+)
+print(np.round(ten_seconds.sound_energy_level - steady.sound_power_level, 6)[:3])   # 10.0
+
+slam_lj.plot()   # LJ per one-third octave, LJA in the title (needs matplotlib)
+```
+
+`sound_energy_reverberation` takes the room arguments of
+`sound_power_reverberation` and `sound_energy_comparison` the reference-source
+arguments of `sound_power_comparison`, both plus `events`, `background_levels`
+with `integration_time`; they return a `ReverberationSoundEnergyResult`
+(`sound_energy_level`, `mean_event_level`, `absorption_area`,
+`waterhouse_correction`, `background_correction`, `c1`, `c2`,
+`speed_of_sound`, `sound_energy_level_a`, `method`, `events`,
+`integration_time`) with `.plot()`, the same `NaN` fields for the comparison
+method as its sound power twin, and the same qualification warnings. The
+single event results carry no `.report()` fiche, and the averaging over several
+source positions of Eq. 24 is left to the caller.
 
 ## See also
 
@@ -18264,9 +18481,14 @@ ISO 3741, ISO 3745, ISO 3747, ISO 9614-1/-2/-3, ISO/TS 7849-1/-2) are covered
 in their method guides.
 
 **Not covered.** Two members of the ISO 3740 family are not implemented at
-all — ISO 3743-1 and ISO 3743-2 — and the sound *energy* level $L_J$ of a
-single event is determined only by the in situ comparison of ISO 3747, in
-[Sound Power in Situ by Comparison](https://jmrplens.github.io/phonometry/devices/emission/sound-power-in-situ/). The emission sound pressure level $L_{p\mathrm{A}}$
+all: ISO 3743-1 and ISO 3743-2. The sound *energy* level $L_J$ of a single
+event is covered for the rest, each on its own page: for ISO 3744 and ISO 3746
+on the [pressure-methods](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/#4-sound-energy-level-of-a-burst-clause-83)
+page, for ISO 3741 on the
+[reverberation-room](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/#3-sound-energy-level-of-a-single-event-clause-92)
+page, and for ISO 3747 in
+[Sound Power in Situ by Comparison](https://jmrplens.github.io/phonometry/devices/emission/sound-power-in-situ/). ISO 3745 defines
+none. The emission sound pressure level $L_{p\mathrm{A}}$
 that stands beside $L_{W\mathrm{A}}$ in a declaration is consumed here, never
 determined: ISO 11201, ISO 11202 and ISO 11204 are outside the library. Of
 ISO 4871, only the clause 6.2 single-machine verification is evaluated; the
@@ -35501,6 +35723,11 @@ documents, one page per module.
 | `environmental_correction` | `function` | **Environmental correction K2 (ISO 3744 Eq. A.2).**<br>• `surface_area` S [m²]<br>• `absorption_area` A, or `reverberation_time`+`volume`, or `mean_absorption_coefficient`+`room_surface` | `k2 = emission.environmental_correction(14.1, reverberation_time=0.6, volume=300)`<br><br>• K2 [dB] |
 | `SoundPowerResult` | `dataclass` | **Surface-pressure sound power.**<br>• `sound_power_level` [dB]<br>• `surface_pressure_level`, `mean_pressure_level` [dB]<br>• `background_correction`, `environmental_correction` [dB]<br>• `directivity_index` [dB] `(NM, NB)`<br>• `surface_area` [m²]<br>• `sound_power_level_a` [dB]<br>• `uncertainty` [dB]<br>• `grade`<br>• `declare(...)` → `NoiseEmissionDeclaration` | `res.sound_power_level, res.sound_power_level_a` |
 | `RoomEnvironment` | `dataclass` | **Room data behind K2 (ISO 3744 Annex A), for `sound_power_pressure`.**<br>• `absorption_area` A [m²]<br>• `reverberation_time` T [s] + `volume` V [m³] (Eq. A.3)<br>• `mean_absorption_coefficient` α + `room_surface` Sv [m²] (Eq. A.7)<br>All Default: None; the empty environment is a free field (K2 = 0) | `RoomEnvironment(reverberation_time=0.6, volume=300)` |
+| `sound_energy_pressure` | `function` | **Sound energy level LJ of a burst from surface single event levels (ISO 3744 8.3 / ISO 3746 8.4).**<br>• `levels_positions`: (NM, NB) single event levels, or (Ne, NM, NB) per event [dB]<br>• `surface`, `radius` / `dimensions`+`distance`, `reflecting_planes`: as `sound_power_pressure`<br>• `events`: Ne encompassed by one reading (Eq. 20)<br>• `background_levels` [dB] + `integration_time` T [s] (required together): K1 over the same window<br>• `frequencies` [Hz]: for LJA<br>• `room`: `RoomEnvironment` for K2<br>• `grade`, `omc_uncertainty` | `lj = emission.sound_energy_pressure(events, 'hemisphere', radius=2.0, frequencies=f)`<br><br>• `SoundEnergyResult` |
+| `SoundEnergyResult` | `dataclass` | **Surface single-event sound energy.**<br>• `frequencies` [Hz] (or `None`)<br>• `sound_energy_level` [dB re 1 pJ]<br>• `surface_event_level`, `mean_event_level` [dB]<br>• `background_correction`, `environmental_correction` [dB]<br>• `directivity_index` (NM, NB)<br>• `surface_area` [m²]<br>• `sound_energy_level_a` [dB]<br>• `uncertainty` [dB], `grade`<br>• `events` (a count)<br>• `integration_time` [s] | `lj.sound_energy_level, lj.sound_energy_level_a` |
+| `mean_single_event_level` | `function` | **Level of one event from Ne events (ISO 3744 Eq. 19/20).**<br>• `levels`: per-event levels on the first axis (Eq. 19), or one reading of `events` events (Eq. 20) [dB]<br>• `events`: Ne of one reading (Default: None) | `emission.mean_single_event_level(per_event)`<br>`emission.mean_single_event_level(reading, events=5)` |
+| `reference_atmosphere_correction` | `function` | **Annex G corrections C1, C2 to 101.325 kPa and 23 °C (ISO 3744 Eq. G.1/G.3).**<br>• `temperature` [°C]<br>• `static_pressure` [kPa], or `altitude` [m] via Eq. G.2 | `corr = emission.reference_atmosphere_correction(8.0, altitude=1200.0)`<br><br>• `ReferenceAtmosphereCorrection` |
+| `ReferenceAtmosphereCorrection` | `dataclass` | **The two Annex G corrections.**<br>• `c1`, `c2`, `total` [dB]<br>• `static_pressure` [kPa], `temperature` [°C] | `lj_ref = lj.sound_energy_level + corr.total` |
 | `OperatingModeDeclaration` | `dataclass` | **ISO 4871 dual-number values for one operating mode.**<br>• `mode`: column label<br>• `sound_power_level` L_WA [dB re 1 pW]<br>• `sound_power_uncertainty` K_WA [dB]<br>• `emission_pressure_level` L_pA, `emission_pressure_uncertainty` K_pA [dB] (optional)<br>• `verification_level` L_1 [dB] (optional)<br>• `declared_sound_power_level`: L_WAd = L_WA + K_WA (3.15)<br>• `verified`: L_1 ≤ L_WAd (6.2, combined form)<br>• `verified_dual`: L_1 ≤ round(L_WA) + round(K_WA) (6.2, dual-number form) | `OperatingModeDeclaration('Mode 1', 88.0, 2.0)` |
 | `DeclarationForm` | `constant` | **The `form` literal of `NoiseEmissionDeclaration` (ISO 4871 clause 6).**<br>• `'dual-number'`: L_WA and K_WA declared as a pair (Default)<br>• `'single-number'`: the declared L_WAd alone | `NoiseEmissionDeclaration(modes, form='single-number')` |
 | `NoiseEmissionDeclaration` | `dataclass` | **ISO 4871:1996 noise emission declaration (machinery).**<br>• `modes`: `OperatingModeDeclaration` per mode<br>• `machine`, `operating_conditions` (clause 5)<br>• `noise_test_code`, `basic_standards` (clause 5 b)<br>• `form`: 'dual-number' (Default) / 'single-number'<br>• `.report(path, ...)`: ISO 4871 fiche → PDF | `NoiseEmissionDeclaration((m1, m2), machine='...').report('iso4871.pdf')` |
@@ -35513,6 +35740,10 @@ documents, one page per module.
 | `InSituSoundPowerResult` | `dataclass` | **In situ comparison result (ISO 3747).**<br>• `frequencies` [Hz]<br>• `sound_power_level` / `sound_energy_level` [dB] (the other NaN)<br>• `mean_source_level`, `mean_reference_level`, `reference_levels`, `reference_power_level` [dB]<br>• `background_correction` (n, bands), `background_correction_ref` (m, n, bands) [dB]<br>• `background_requirement_met` per band<br>• `c2` [dB], `grade`, `sigma_r0`, `sigma_omc`, `sigma_tot`, `expanded_uncertainty`, `coverage_factor`<br>• `sound_power_level_a` / `sound_energy_level_a` [dB], `quantity`<br>• `.sound_power_level_ref`, `.sound_energy_level_ref` (Annex C)<br>• `.plot()` | `res.sound_power_level, res.background_requirement_met` |
 | `excess_sound_pressure_level` | `function` | **Excess of sound pressure level over the free field ΔLf (ISO 3747 Eq. A.1).**<br>• `level` Lp(RSS),r [dB], `lw_ref` LW(RSS) [dB], `distance` r [m]; broadcast | `emission.excess_sound_pressure_level(76.5, 92.5, 3.0)  # 4.54 dB` |
 | `static_pressure_from_altitude` | `function` | **Static pressure from the site altitude (ISO 3747 Eq. C.2).**<br>• `altitude` Ha [m] | `emission.static_pressure_from_altitude(640.0)  # 93.87 kPa` |
+| `sound_energy_reverberation` | `function` | **Reverberation-room LJ of a single event, direct (ISO 3741 9.2.4, Eq. 30).**<br>• `levels`: single event levels, 1D, (NM, NB) or (Ne, NM, NB) [dB]<br>• `t60` [s], `volume` V [m³], `surface_area` S [m²], `frequencies` [Hz]<br>• `events`: Ne of one reading (Eq. 23)<br>• `background_levels` [dB] + `integration_time` T [s]: per-position K1i over the same window<br>• `temperature`, `static_pressure` | `lj = emission.sound_energy_reverberation(slams, t60, 200, 220, f)`<br><br>• `ReverberationSoundEnergyResult` |
+| `sound_energy_comparison` | `function` | **Reverberation-room LJ of a single event, comparison (ISO 3741 9.2.5, Eq. 31).**<br>• `levels`: single event levels of the source under test<br>• `levels_ref`, `lw_ref`: the steady reference source<br>• `frequencies`, `events`, `background_levels` + `integration_time`, `background_levels_ref`<br>• `temperature`, `static_pressure` | `lj = emission.sound_energy_comparison(slams, lp_ref, lw_ref, frequencies=f)`<br><br>• `ReverberationSoundEnergyResult` (method='comparison') |
+| `ReverberationSoundEnergyResult` | `dataclass` | **Reverberation-room sound energy of a single event.**<br>• `frequencies` [Hz] (or `None`)<br>• `sound_energy_level` [dB re 1 pJ]<br>• `mean_event_level` [dB]<br>• `absorption_area` [m²], `waterhouse_correction` [dB]<br>• `background_correction`, `c1`, `c2` [dB]<br>• `speed_of_sound` [m/s]<br>• `sound_energy_level_a` [dB]<br>• `method`, `events` (a count)<br>• `integration_time` [s] | `lj.sound_energy_level, lj.method` |
+| `octave_band_levels` | `function` | **Octave-band levels from one-third-octave bands (ISO 3741 Annex F, Eq. F.1/F.4).**<br>• `levels` [dB], bands on the last axis<br>• `frequencies` [Hz]: nominal thirds 50 Hz to 10 kHz, complete triplets per octave | `octaves, lj_oct = emission.octave_band_levels(lj.sound_energy_level, f)` |
 | `sound_power_intensity` | `function` | **Sound power by intensity scanning (ISO 9614-2).**<br>• `normal_intensity`: (N_seg, N_bands) [W/m²]<br>• `areas`: segment Si [m²]<br>• `normal_intensity_2`: 2nd sweep (criterion 3)<br>• `pressure_levels`: for FpI<br>• `pressure_residual_index`: δpI0 [dB]<br>• `frequencies` [Hz]<br>• `band_type`: 'third' (Default)/'octave'<br>• `grade`: 'engineering'/'survey'<br>• `repeatability_limit`: override s | `ir = emission.sound_power_intensity(scan1, areas, frequencies=f, band_type='octave')`<br><br>• `SoundPowerIntensityResult` |
 | `SoundPowerIntensityResult` | `dataclass` | **Scanning sound power.**<br>• `partial_power`, `partial_power_level`<br>• `sound_power` [W], `sound_power_level` [dB] (NaN where `negative_band`)<br>• `negative_band`: per-band bool (True where P ≤ 0)<br>• `surface_pressure_intensity_index` (FpI)<br>• `negative_partial_power_index` (F+/-)<br>• `repeatability`, `dynamic_capability_index` (Ld)<br>• `achieved_grade`<br>• `surface_area`, `sound_power_level_a`, `grade` | `ir.sound_power_level, ir.achieved_grade` |
 | `sound_power_intensity_points` | `function` | **Sound power at discrete points (ISO 9614-1).**<br>• `normal_intensity`: (N, N_bands) signed Ini [W/m²]<br>• `areas`: segment Si [m²]<br>• `pressure_levels`: Lpi for F2/F3<br>• `pressure_residual_index`: δpI0 [dB] (criterion 1)<br>• `temporal_intensity`: M short-time samples (F1)<br>• `frequencies` [Hz] (criterion 2, Table B.2)<br>• `band_type`: 'third' (Default)/'octave'<br>• `grade`: 'precision'/'engineering' (Default)/'survey' | `dp = emission.sound_power_intensity_points(i_n, areas, frequencies=f, band_type='octave')`<br><br>• `DiscretePointIntensityResult` |
@@ -36365,7 +36596,7 @@ documents, one page per module.
 | `TonalityWarning` | `warning class` | **Tonality advisory.**<br>Emitted for biased tonality estimates (e.g. coarse FFT resolution) | `warnings.simplefilter('error', TonalityWarning)` |
 | `STIWarning` | `warning class` | **STI/STIPA advisory.**<br>Emitted for suspect speech-intelligibility measurements or inputs | `warnings.simplefilter('error', STIWarning)` |
 | `__version__` | `str` | **Package version string.**<br>(no parameters) | `phonometry.__version__  # '3.3.0'` |
-| `.plot()` | `method` | **One-line canonical figure on every result object (soft matplotlib dependency).**<br>Available on `ZwickerLoudness`, `MooreGlasbergLoudness`, `MooreGlasbergTimeVaryingLoudness`, `EcmaLoudness`, `EcmaTonality`, `EcmaRoughness`, `PsychoacousticAnnoyanceResult`, `FluctuationStrengthResult`, `ProgramLoudnessResult`, `KWeightingResponse`, `STIResult`, `SIIResult`, `SIIProcedure`, `StandardSpeechSpectrum`, `NCResult`, `RCResult`, `AgeThresholdResult`, `NiptsResult`, `HtlanResult`, `ImpulseProminenceResult`, `ImpulsiveSoundResult`, `MultipleShockResult`, `ImpulseResponseResult`, `DecayCurve`, `RoomAcousticsResult`, `ReverberationResult`, `ReverberationModelResult`, `DynamicStiffnessResult`, `MobilityResult`, `TransferStiffnessResult`, `VibrationSoundPowerResult`, `StructureBornePowerResult`, `InstalledSourceResult`, `WeightedRatingResult`, `ImpactRatingResult`, `FacadeInsulationResult`, `LabAirborneInsulationResult`, `LabImpactInsulationResult`, `SoundPowerResult`, `ReverberationSoundPowerResult`, `InSituSoundPowerResult`, `SoundPowerIntensityResult`, `PrecisionSoundPowerResult`, `PrecisionIntensityResult`, `IntensityResult`, `UncertaintyResult`, `AbsorptionRatingResult`, `ScatteringResult`, `DiffusionResult`, `DiffusionSpectrum`, `InsituAbsorptionResult`, `WeightingResponse`, `WeightedSpectrum`, `Signal` and `DailyVibrationExposure`.<br>• `ax`: existing Axes, or None to build a fresh figure (Default: None)<br>• returns the Matplotlib `Axes` (an array of Axes for multi-panel figures); never calls `plt.show()`<br>• needs matplotlib (`pip install phonometry[plot]`) | `res.plot()`<br>`decay_curve(ir, fs).plot()` |
+| `.plot()` | `method` | **One-line canonical figure on every result object (soft matplotlib dependency).**<br>Available on `ZwickerLoudness`, `MooreGlasbergLoudness`, `MooreGlasbergTimeVaryingLoudness`, `EcmaLoudness`, `EcmaTonality`, `EcmaRoughness`, `PsychoacousticAnnoyanceResult`, `FluctuationStrengthResult`, `ProgramLoudnessResult`, `KWeightingResponse`, `STIResult`, `SIIResult`, `SIIProcedure`, `StandardSpeechSpectrum`, `NCResult`, `RCResult`, `AgeThresholdResult`, `NiptsResult`, `HtlanResult`, `ImpulseProminenceResult`, `ImpulsiveSoundResult`, `MultipleShockResult`, `ImpulseResponseResult`, `DecayCurve`, `RoomAcousticsResult`, `ReverberationResult`, `ReverberationModelResult`, `DynamicStiffnessResult`, `MobilityResult`, `TransferStiffnessResult`, `VibrationSoundPowerResult`, `StructureBornePowerResult`, `InstalledSourceResult`, `WeightedRatingResult`, `ImpactRatingResult`, `FacadeInsulationResult`, `LabAirborneInsulationResult`, `LabImpactInsulationResult`, `SoundPowerResult`, `SoundEnergyResult`, `ReverberationSoundPowerResult`, `ReverberationSoundEnergyResult`, `InSituSoundPowerResult`, `SoundPowerIntensityResult`, `PrecisionSoundPowerResult`, `PrecisionIntensityResult`, `IntensityResult`, `UncertaintyResult`, `AbsorptionRatingResult`, `ScatteringResult`, `DiffusionResult`, `DiffusionSpectrum`, `InsituAbsorptionResult`, `WeightingResponse`, `WeightedSpectrum`, `Signal` and `DailyVibrationExposure`.<br>• `ax`: existing Axes, or None to build a fresh figure (Default: None)<br>• returns the Matplotlib `Axes` (an array of Axes for multi-panel figures); never calls `plt.show()`<br>• needs matplotlib (`pip install phonometry[plot]`) | `res.plot()`<br>`decay_curve(ir, fs).plot()` |
 
 ## Notes
 
@@ -50668,7 +50899,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 595 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 600 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -51035,7 +51266,7 @@ sample from the metrology core:
 | IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()`; IEC 61252:2025 has since superseded this print, and the transcription still targets the 1993+A2 text | `tests/signals/test_levels.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-595 numerical conformance checks across 59 domains and 375 standards, covering
+600 numerical conformance checks across 59 domains and 375 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise

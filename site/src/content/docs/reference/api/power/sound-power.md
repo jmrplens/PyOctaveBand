@@ -56,6 +56,29 @@ but is coarser: fewer microphone positions (clause 8.2.1), a background
 criterion of 3 dB instead of 6 dB (clause 8.4.1) and validity up to
 $K_{2\mathrm{A}} \le 7$ dB instead of 4 dB (clause 4.3).
 
+A noise burst or a transient emission has no steady power to report, and both
+standards describe it by the **sound energy level** $L_J = 10 \log_{10} (J/J_0)$ instead, $J = \int P(t)\,\mathrm{d}t$ in joules and
+$J_0 = 1$ pJ (ISO 3744:2010 clauses 3.22 and 3.23). Its determination
+(clause 8.3; ISO 3746:2010 clause 8.4) is the chain above with the single
+event time-integrated sound pressure level $L_E = 10 \log_{10}\!\left[ \int p^2\,\mathrm{d}t / E_0\right]$, $E_0 = (20\ \mu\mathrm{Pa})^2\, \mathrm{s}$ (clause 3.4), in place of the time-averaged $L_p$: the
+$N_\mathrm{e}$ events at each position are combined into the level of one
+event (Eq. 19 or Eq. 20), the positions are averaged as in 8.2.2 (Eq. 12), the
+background and the environment are corrected by the same $K_1$ and
+$K_2$ (Eq. 21, 22) and the surface term closes it:
+
+$$
+L_J = \overline{L_E} + 10 \log_{10}\frac{S}{S_0} \tag{Eq. 23}
+$$
+
+For a source that is steady over the whole interval $T$, clause 3.4
+NOTE 1 gives $L_E = L_{p,T} + 10 \log_{10}(T/T_0)$ with $T_0 = 1$
+s, so $L_J = L_W + 10 \log_{10}(T/T_0)$: the energy a steady source
+radiates in $T$ seconds. Annex E carries the band levels to the
+A-weighted $L_{J\mathrm{A}}$ with the same $C_k$ as $L_{W\mathrm{A}}$
+(Eq. E.2), and Annex G refers either level to the reference atmosphere with
+the corrections $C_1 + C_2$ (Eq. G.1, G.3), required above 500 m of
+altitude or below 10 degrees C (clauses 8.2.5 and 8.3.6).
+
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## background_noise_correction
@@ -137,6 +160,55 @@ with that shape; scalar inputs return a scalar, unchanged.
 
 **Returns:** `K2` in decibels; a scalar for scalar inputs, otherwise an array per band.
 
+## mean_single_event_level
+
+```python
+mean_single_event_level(
+    levels: np.ndarray,
+    *,
+    events: int | None = None,
+) -> np.ndarray
+```
+
+Mean single event time-integrated level of one event (ISO 3744 Eq. 19/20).
+
+Two ways of measuring $N_\mathrm{e}$ sound emission events reach the
+same quantity, the single event time-integrated sound pressure level of
+*one* event at a microphone position. Measured one at a time
+(`events=None`), the first axis of `levels` holds one entry per event
+and the mean is their energy average, ISO 3744:2010 Eq. (19):
+
+$$
+L'_{Ei(\mathrm{ST})} = 10 \log_{10}\!\left[ \frac{1}{N_\mathrm{e}} \sum_{q=1}^{N_\mathrm{e}} 10^{0.1 L'_{Ei,q(\mathrm{ST})}} \right]
+$$
+
+Measured as one level that encompasses $N_\mathrm{e}$ successive
+events (`events` $= N_\mathrm{e}$), the level of one event is the
+measurement less $10 \log_{10} N_\mathrm{e}$, Eq. (20):
+
+$$
+L'_{Ei(\mathrm{ST})} = L'_{Ei,N_\mathrm{e}(\mathrm{ST})} - 10 \log_{10} N_\mathrm{e}
+$$
+
+ISO 3746:2010 Eq. (16)/(17) and ISO 3741:2010 Eq. (22)/(23) print the
+same pair. Both modes require at least five events (clause 8.3.1); fewer
+are accepted with a [`SoundPowerWarning`](/phonometry/reference/api/power/sound-power/#soundpowerwarning).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `levels` | With `events=None`, the per-event levels in decibels with the events on the first axis (`(Ne,)`, `(Ne, NB)` or `(Ne, NM, NB)`); otherwise the one measurement encompassing `events` events, of any shape. |
+| `events` | `None` when each entry of the first axis is one event, else the number of events the single measurement encompasses. |
+
+**Returns:** The level of one event, in decibels: `levels` less its first axis for `events=None`, the shape of `levels` otherwise.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for non-finite levels, an empty first axis or a non-positive `events`. |
+
 ## measurement_positions
 
 ```python
@@ -206,6 +278,84 @@ arrays it accepts directly.
 
 **Returns:** The 3-D axes.
 
+## reference_atmosphere_correction
+
+```python
+reference_atmosphere_correction(
+    temperature: float,
+    static_pressure: float | None = None,
+    *,
+    altitude: float | None = None,
+) -> ReferenceAtmosphereCorrection
+```
+
+Corrections to reference meteorological conditions (ISO 3744 Annex G).
+
+A sound power or sound energy level determined by Eq. (18) or Eq. (23)
+holds for the meteorological conditions at the time and place of the test.
+Above 500 m of altitude or below 10 degrees C the standard requires it to
+be carried to the reference static pressure 101.325 kPa and air
+temperature 23.0 degrees C (clauses 8.2.5 and 8.3.6) by adding
+
+$$
+C_1 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s},0}} + 5 \log_{10}\frac{273.15 + \theta}{\theta_0}, \qquad C_2 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s},0}} + 15 \log_{10}\frac{273.15 + \theta}{\theta_1}
+$$
+
+with $\theta_0 = 314$ K and $\theta_1 = 296$ K, so that
+$L_{W\mathrm{ref,atm}} = L_W + C_1 + C_2$ (Eq. G.1) and
+$L_{J\mathrm{ref,atm}} = L_J + C_1 + C_2$ (Eq. G.3). $C_1$
+accounts for the different reference quantities of the pressure and power
+decibels through the characteristic impedance of the air, and is omitted
+when $K_2$ came from the absolute comparison test of A.2;
+$C_2$ is the radiation-impedance correction of a monopole, a mean
+value for other sources. Where the static pressure was not measured it is
+estimated from the altitude of the site by Eq. (G.2),
+$p_\mathrm{s} = p_{\mathrm{s},0}(1 - aH_\mathrm{a})^b$, with
+$a = 2.2560 \times 10^{-5}$ m^-1 and $b = 5.2553$.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `temperature` | Air temperature `theta` at the test, in degrees C. |
+| `static_pressure` | Static pressure `ps` at the test, in kilopascals; give this or `altitude`. |
+| `altitude` | Altitude `Ha` of the test site, in metres, from which `ps` is estimated by Eq. (G.2) when it was not measured. |
+
+**Returns:** [`ReferenceAtmosphereCorrection`](/phonometry/reference/api/power/sound-power/#referenceatmospherecorrection) with `c1`, `c2`, their `total` and the static pressure used.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | if neither or both of `static_pressure` and `altitude` are given, or either is out of range, or `temperature` is not above absolute zero. |
+
+## ReferenceAtmosphereCorrection
+
+```python
+ReferenceAtmosphereCorrection(
+    c1: float,
+    c2: float,
+    static_pressure: float,
+    temperature: float,
+)
+```
+
+The two Annex G corrections to reference meteorological conditions.
+
+`c1` is the reference-quantity correction and `c2` the
+radiation-impedance correction of ISO 3744:2010 Annex G, both in
+decibels; `total` is their sum, the whole of what Eq. (G.1) adds to
+$L_W$ and Eq. (G.3) to $L_J$. `static_pressure` is the
+$p_\mathrm{s}$ the corrections were evaluated at, in kilopascals,
+whether it was measured or estimated from the altitude by Eq. (G.2), and
+`temperature` the air temperature $\theta$, in degrees Celsius.
+
+### ReferenceAtmosphereCorrection.total
+
+*property*
+
+`c1 + c2`, in decibels: the correction Eq. (G.1)/(G.3) applies.
+
 ## RoomEnvironment
 
 ```python
@@ -240,6 +390,92 @@ per band with that shape.
 | `volume` | Room volume `V` (m^3), with `reverberation_time`. |
 | `mean_absorption_coefficient` | `alpha` in (0, 1], scalar or per band, with `room_surface` (Eq. A.7). |
 | `room_surface` | Room boundary area `Sv` (m^2), with `alpha`. |
+
+## sound_energy_pressure
+
+```python
+sound_energy_pressure(
+    levels_positions: np.ndarray,
+    surface: Surface,
+    *,
+    radius: float | None = None,
+    dimensions: tuple[float, float, float] | None = None,
+    distance: float | None = None,
+    reflecting_planes: int = 1,
+    events: int | None = None,
+    background_levels: np.ndarray | None = None,
+    integration_time: float | None = None,
+    frequencies: np.ndarray | None = None,
+    room: RoomEnvironment | None = None,
+    grade: Grade = 'engineering',
+    omc_uncertainty: float = 0.0,
+) -> SoundEnergyResult
+```
+
+Sound energy level of a noise burst from surface single event levels
+(ISO 3744:2010 clause 8.3, ISO 3746:2010 clause 8.4).
+
+The single event time-integrated sound pressure levels
+$L'_{Ei(\mathrm{ST})}$ are measured simultaneously at every
+microphone position through a period that encompasses the full burst
+(clause 8.3.1; a traversing microphone is not permitted). `levels_positions`
+is either the `(NM, NB)` mean single event level of one event at each
+position, a `(Ne, NM, NB)` array of the $N_\mathrm{e}$ events measured
+one at a time (reduced by Eq. 19), or the `(NM, NB)` level of one
+measurement encompassing `events` successive events (reduced by Eq. 20).
+The positions are then energy-averaged as in 8.2.2 (clause 8.3.3), the
+surface level is corrected for background noise and for the test
+environment and the surface term added:
+
+$$
+L_J = 10 \log_{10}\!\left[ \frac{1}{N_\mathrm{M}} \sum_i 10^{0.1 L'_{Ei(\mathrm{ST})}} \right] - K_1 - K_2 + 10 \log_{10}\frac{S}{S_0} \tag{Eq. 22, 23}
+$$
+
+$K_1$ follows Eq. (21) with the same criteria as the time-averaged
+path ([`background_noise_correction`](/phonometry/reference/api/power/sound-power/#background_noise_correction): 6 dB to 15 dB engineering, 3 dB
+to 10 dB survey, clamped below the lower criterion with a
+[`SoundPowerWarning`](/phonometry/reference/api/power/sound-power/#soundpowerwarning)), and $K_2$ the room data in `room`
+(Annex A). The background is the time-averaged level the standard has
+measured over the same integration time $T$ as the events, and it
+is compared as its exposure over that $T$,
+$L_{p(\mathrm{B})} + 10 \log_{10}(T/T_0)$ (clause 3.4 NOTE 1), so
+that the energies Eq. (21) subtracts share one reference; this is why
+`integration_time` is required whenever `background_levels` is given.
+The surface area `S` comes from the geometry exactly as in
+[`sound_power_pressure`](/phonometry/reference/api/power/sound-power/#sound_power_pressure), and so do the minimum number of positions,
+the A-weighted total (Annex E, Eq. E.2) and the expanded uncertainty,
+which clause 9.1 Eq. (24) makes the same for $L_J$ as for
+$L_W$.
+
+The level holds for the meteorological conditions of the test; above
+500 m of altitude or below 10 degrees C add the Annex G correction of
+[`reference_atmosphere_correction`](/phonometry/reference/api/power/sound-power/#reference_atmosphere_correction) (Eq. G.3).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `levels_positions` | Single event levels, in decibels: `(NM, NB)` means, `(Ne, NM, NB)` per-event levels, or `(NM, NB)` of one measurement of `events` events. |
+| `surface` | `'hemisphere'` or `'box'`. |
+| `radius` | Hemisphere radius `r` (metres), for `surface='hemisphere'`. |
+| `dimensions` | Reference box `(l1, l2, l3)` (metres), for `'box'`. |
+| `distance` | Measurement distance `d` (metres), for `'box'`. |
+| `reflecting_planes` | Number of reflecting planes (1, 2 or 3). |
+| `events` | The number of events `Ne` one measurement encompasses (Eq. 20); `None` when `levels_positions` is per event or already the mean of one event. |
+| `background_levels` | `(NM, NB)` time-averaged background levels for `K1`, or a single spectrum `(NB,)` / `(1, NB)` broadcast to every position; measured over the same interval as the events. |
+| `integration_time` | The interval `T` of the single event levels, in seconds; required with `background_levels`. |
+| `frequencies` | Band mid-band frequencies (Hz) for the A-weighted total. |
+| `room` | Room absorption data behind `K2` ([`RoomEnvironment`](/phonometry/reference/api/power/sound-power/#roomenvironment)); `None` is a room with no data at all, i.e. a free field ($K_2 = 0$). |
+| `grade` | `'engineering'` (ISO 3744) or `'survey'` (ISO 3746). |
+| `omc_uncertainty` | `sigma_omc` (dB), operating/mounting instability. |
+
+**Returns:** [`SoundEnergyResult`](/phonometry/reference/api/power/sound-power/#soundenergyresult).
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a malformed or non-finite level array, a geometry that does not describe the surface, too few positions, a background without its `integration_time`, or a mismatched `frequencies` length. |
 
 ## sound_power_pressure
 
@@ -295,6 +531,66 @@ sound power level is combined via ISO 3744 Annex E.
 | `omc_uncertainty` | `sigma_omc` (dB), operating/mounting instability. |
 
 **Returns:** [`SoundPowerResult`](/phonometry/reference/api/power/sound-power/#soundpowerresult).
+
+## SoundEnergyResult
+
+```python
+SoundEnergyResult(
+    frequencies: np.ndarray | None,
+    sound_energy_level: np.ndarray,
+    surface_event_level: np.ndarray,
+    mean_event_level: np.ndarray,
+    background_correction: np.ndarray,
+    environmental_correction: np.ndarray,
+    directivity_index: np.ndarray,
+    surface_area: float,
+    sound_energy_level_a: float,
+    uncertainty: float,
+    grade: str,
+    events: int | None,
+    integration_time: float | None,
+)
+```
+
+Result of a sound energy level determination from surface single event
+levels (ISO 3744:2010 clause 8.3, ISO 3746:2010 clause 8.4).
+
+`sound_energy_level` is the per-band `LJ` (ISO 3744 Eq. 23);
+`surface_event_level` the surface single event time-integrated sound
+pressure level $\overline{L_E}$ after the K1/K2 corrections (Eq. 22);
+`mean_event_level` the raw energy-averaged level
+$\overline{L'_E}(\mathrm{ST})$ over the positions (clause 8.3.3, as
+Eq. 12). `background_correction` (K1, Eq. 21) and
+`environmental_correction` (K2) are per band. `sound_energy_level_a` is
+the A-weighted total `LJA` (Eq. E.2), computed only when `frequencies`
+are supplied; for a single band it equals `LJ`, and for several bands
+without `frequencies` it is `NaN` (A-weighting needs the band centres).
+`directivity_index` is the apparent directivity index per microphone
+position and band, shape `(NM, NB)`, formed from the single event levels
+exactly as clause 3.24 allows. `uncertainty` is the expanded uncertainty
+$U = 2\sqrt{\sigma_{\mathrm{R}0}^2 + \sigma_\mathrm{omc}^2}$ (95 %),
+which clause 9.1 Eq. (24) makes the same for `LJ` as for `LW`.
+`events` is the number of single sound emission events $N_\mathrm{e}$
+the levels were reduced from, or `None` when the caller supplied the
+per-position mean single event levels directly; `integration_time` is
+the interval $T$ of the single event levels, in seconds, or `None`
+when no background correction needed it.
+
+### SoundEnergyResult.plot()
+
+```python
+SoundEnergyResult.plot(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Plot the LJ spectrum with the A-weighted total annotated.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
 
 ## SoundPowerResult
 

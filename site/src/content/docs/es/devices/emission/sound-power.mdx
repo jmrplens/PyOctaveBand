@@ -281,9 +281,14 @@ abarca un número entero de ciclos, y el ciclo pasa entonces a formar parte de l
 condición de funcionamiento declarada. Para un suceso aislado — una carrera de
 prensa, un portazo — el descriptor no es $L_W$ sino el **nivel de energía
 acústica $L_J$**, la misma integral de superficie tomada sobre el suceso en vez
-de por segundo, definido en los mismos apartados de la ISO 3741, la ISO 3744, la
-ISO 3745 y la ISO 3746, y determinado aquí solo por la comparación in situ de la
-ISO 3747, en [Potencia acústica in situ por comparación](/phonometry/es/devices/emission/sound-power-in-situ/#2-fuentes-impulsivas-el-nivel-de-energía-acústica-ec-13-a-20).
+de por segundo, definido en los mismos apartados de la ISO 3741, la ISO 3744 y
+la ISO 3746 y determinado por `sound_energy_pressure` sobre la [superficie
+envolvente](/phonometry/es/devices/emission/sound-power-pressure/#4-nivel-de-energía-acústica-de-una-ráfaga-apartado-83),
+por `sound_energy_reverberation`, o por `sound_energy_comparison` contra una
+fuente de referencia, en la [cámara
+reverberante](/phonometry/es/devices/emission/sound-power-reverberation/#4-nivel-de-energía-acústica-de-un-suceso-aislado-apartado-92)
+y por `sound_energy_in_situ` allí donde la máquina trabaja, en [Potencia
+acústica in situ por comparación](/phonometry/es/devices/emission/sound-power-in-situ/#2-fuentes-impulsivas-el-nivel-de-energía-acústica-ec-13-a-20).
 La prueba práctica: si el nivel
 ponderado A en un micrófono fijo se mueve más de unos pocos decibelios durante
 el tiempo de promediado, la fuente no es estacionaria para estos métodos.
@@ -476,11 +481,13 @@ acústica](/phonometry/es/devices/emission/intensity/), junto a los indicadores
 de campo del Anexo A que presta a las partes de barrido, y la vía
 de velocidad superficial en [Potencia acústica a partir de la
 vibración](/phonometry/es/devices/emission/vibration-sound-power/), y la
-comparación in situ de ISO 3747, con su nivel de *energía* acústica $L_J$
-para sucesos aislados, en
-[Potencia acústica in situ por comparación](/phonometry/es/devices/emission/sound-power-in-situ/).
-La ISO 3743-1 y la ISO 3743-2, los miembros restantes de la familia ISO 3740,
-no están implementadas, ni lo está $L_J$ en los demás miembros. El nivel de presión acústica de emisión $L_{p\mathrm{A}}$ que
+comparación in situ de ISO 3747 en [Potencia acústica in situ por
+comparación](/phonometry/es/devices/emission/sound-power-in-situ/). La
+ISO 3743-1 y la ISO 3743-2, los miembros restantes de la familia ISO 3740, no
+están implementadas. El nivel de *energía* acústica $L_J$ de un suceso aislado
+sí lo está, para la ISO 3744, la ISO 3746, la ISO 3741 y la ISO 3747, cada una
+en su propia página; la ISO 3745 no define ninguno.
+El nivel de presión acústica de emisión $L_{p\mathrm{A}}$ que
 acompaña a $L_{W\mathrm{A}}$ en una declaración se consume, no se determina: la ISO
 11201, la ISO 11202 y la ISO 11204 quedan fuera de la biblioteca. Los
 criterios de lote del apartado 6.3 de ISO 4871 no se evalúan — solo la

@@ -1,6 +1,6 @@
 ---
 title: "Potencia acústica por métodos de presión"
-description: "El nivel de potencia acústica LW a partir de la presión acústica: los métodos de superficie envolvente de ingeniería (ISO 3744) y de inspección (ISO 3746) con las correcciones K1 de fondo y K2 de entorno, el método de precisión de ISO 3745 en cámara anecoica o semianecoica cualificada con sus mallas fijas de micrófonos y correcciones meteorológicas, y la ficha de ensayo de estilo acreditado."
+description: "El nivel de potencia acústica LW a partir de la presión acústica: los métodos de superficie envolvente de ingeniería (ISO 3744) y de inspección (ISO 3746) con las correcciones K1 de fondo y K2 de entorno, el método de precisión de ISO 3745 en cámara anecoica o semianecoica cualificada con sus mallas fijas de micrófonos y correcciones meteorológicas, la ficha de ensayo de estilo acreditado, y el nivel de energía acústica LJ de una ráfaga a partir de niveles de suceso aislado sobre la misma superficie."
 references:
   - type: book
     authors: ["Beranek, L. L.", "Mellow, T. J."]
@@ -50,8 +50,12 @@ con la corrección de ruido de fondo $K_1$ y la corrección de entorno $K_2$.
 El **método de precisión** de ISO 3745 traslada la misma idea a una cámara
 anecoica o semianecoica cualificada, donde una malla fija de micrófonos
 muestrea directamente el campo libre y las correcciones de grado 1 son
-meteorológicas en lugar de ambientales. La sección final presenta la
-determinación como ficha de ensayo de estilo acreditado. Qué vía encaja con
+meteorológicas en lugar de ambientales. La sección 3 presenta la
+determinación como ficha de ensayo de estilo acreditado, y la sección 4 vuelve
+la superficie envolvente de ISO 3744 e ISO 3746 hacia una fuente que no
+funciona de forma estacionaria en absoluto, la ráfaga de ruido cuyo descriptor
+es el nivel de energía acústica $L_J$ del apartado 8.3. Esa vía es solo suya:
+ISO 3745 no define ningún nivel de energía acústica. Qué vía encaja con
 qué trabajo, y las alternativas de cámara reverberante e intensidad, se
 sopesan en [Potencia acústica](/phonometry/es/devices/emission/sound-power/).
 
@@ -361,10 +365,18 @@ el **Anexo G, que es normativo** — el mismo tipo de término que las secciones
 ISO 3741 e ISO 3745 escriben explícitamente como $C_1$ y $C_2$. Su tamaño: el
 apartado H.4.2.7 dice que por debajo de 500 m no hace falta ninguna corrección
 meteorológica ni de impedancia de radiación, que a 120 m y 23 °C la corrección
-es nula y que a 500 m llega a 0,6 dB. `sound_power_pressure` no implementa
+es nula y que a 500 m llega a 0,6 dB. Dos de esas tres cosas se sostienen. El
+Anexo G, que es el texto normativo al que remite ese mismo apartado, sitúa la
+corrección en 0,394 dB a 500 m y 23,0 °C, y el cero de 120 m sale exacto, que es
+lo que demuestra que sus ecuaciones se están leyendo como la norma pretende. Los
+0,6 dB son una errata de imprenta, y queda registrada con su aritmética en el
+[registro de erratas](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.es.md). `sound_power_pressure` no implementa
 ningún término así y no admite argumento alguno de temperatura o presión, de
 modo que una determinación en una planta de montaña o al aire libre en invierno
-necesita aplicar a mano la corrección del Anexo G.
+añade después la corrección del Anexo G: `reference_atmosphere_correction`
+evalúa $C_1 + C_2$ a partir de la temperatura y la presión estática (o de la
+altitud, mediante la Ec. G.2), y la sección 4 la muestra aplicada, ya que la
+Ec. G.1 la suma a $L_W$ exactamente como la Ec. G.3 la suma a $L_J$.
 
 ### Parámetros de `sound_power_pressure()`
 
@@ -851,6 +863,255 @@ result.report(
 />
 
 
+## 4. Nivel de energía acústica de una ráfaga (apartado 8.3)
+
+Todo lo anterior describe una fuente que funciona de forma estacionaria durante
+todo el intervalo de promediado: la Ec. 18 da un *ritmo* de flujo de energía, y
+caracteriza a la máquina solo mientras la máquina es invariante en el tiempo.
+Una carrera de prensa, un portazo o un escape neumático radian su energía en
+una fracción de segundo y luego se detienen, así que la norma les da una
+magnitud propia, el **nivel de energía acústica**
+
+$$
+L_J = 10\log_{10}\frac{J}{J_0}, \qquad J = \int_{t_1}^{t_2} P(t)\,\mathrm{d}t, \qquad J_0 = 1\ \text{pJ}
+$$
+
+(apartados 3.22 y 3.23): la energía que radia el suceso, en decibelios re 1 pJ,
+en lugar de la potencia que no tiene. Su determinación (apartado 8.3, y
+apartado 8.4 de ISO 3746 para el grado de inspección) es la cadena de la
+sección 1 con una sustitución. Cada micrófono registra el **nivel de presión
+acústica de suceso aislado integrado en el tiempo**
+
+$$
+L_E = 10\log_{10}\left[\frac{\int_{t_1}^{t_2} p^2(t)\,\mathrm{d}t}{E_0}\right], \qquad E_0 = (20\ \mu\text{Pa})^2\ \text{s}
+$$
+
+(apartado 3.4) a través de una ventana que abarca toda la ráfaga, en todas las
+posiciones a la vez (no se permite un micrófono en desplazamiento, apartado
+8.3.1), y $L_E$ va después a donde iba $L_p$: el promedio energético sobre las
+posiciones de 8.2.2 (apartado 8.3.3), la corrección de fondo $K_1$ (Ec. 21) y
+la corrección de entorno $K_2$ (Ec. 22), el término de superficie (Ec. 23):
+
+$$
+L_J = \overline{L'_E} - K_1 - K_2 + 10\log_{10}\frac{S}{S_0}.
+$$
+
+Las dos magnitudes se encuentran en una fuente estacionaria. Sobre una ventana
+de duración $T$ la integral de un $p^2$ constante es $T p^2$, así que
+$L_E = L_{p,T} + 10\log_{10}(T/T_0)$ con $T_0 = 1$ s (apartado 3.4, NOTA 1),
+y la energía que una fuente estacionaria radia en $T$ segundos es
+$L_J = L_W + 10\log_{10}(T/T_0)$: una máquina de 90 dB que funciona 10 s ha
+emitido $L_J = 100$ dB. Esa identidad es lo que dibuja la figura de abajo, y
+aquello a lo que los propios tests de la biblioteca anclan la cadena de energía
+acústica, campo a campo.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_energy_burst_es.svg" alt="Dos paneles. A la izquierda, el nivel de suceso aislado acumulado de una ráfaga de impacto y de una fuente estacionaria de 80 dB a lo largo de una ventana de 10 s: la ráfaga empieza a los 2 s y su curva queda plana en 90 dB en cosa de un segundo, la fuente estacionaria sube como 10 lg(t/T0) y alcanza los mismos 90 dB en la línea discontinua T = 10 s; dos rótulos dicen que todos los 90 dB de la ráfaga están en el primer segundo y que el L_E de la fuente estacionaria es L_p más 10 lg(T/T0), 80 más 10. A la derecha, siete barras de banda de octava de 125 Hz a 8 kHz del nivel de energía acústica de la ráfaga sobre una semiesfera de 2 m, que suben de 95 dB a 125 Hz hasta 103,5 dB a 1 kHz y bajan a 91 dB a 8 kHz, con el total ponderado A de 107,7 dB(A) en el título" width="96%" />
+
+*A la izquierda, el nivel de suceso aislado acumulado de una ráfaga de impacto
+y de una fuente estacionaria de 80 dB a lo largo de una ventana de 10 s: los
+90 dB de la ráfaga están todos ahí en el primer segundo tras el impacto, la
+fuente estacionaria sube como $10\log_{10}(t/T_0)$ y alcanza los mismos 90 dB
+en $T$. A la derecha, el $L_J$ por bandas de octava de la misma carrera de
+prensa medida sobre una semiesfera de 2 m, con el total ponderado A en el
+título.*
+
+```python
+import numpy as np
+from phonometry import emission
+
+# Una carrera de prensa medida en las 10 posiciones de la semiesfera de ISO 3744
+# (r = 2 m), cinco carreras una a una: (sucesos, posiciones, bandas), octavas 125 Hz - 8 kHz.
+bands = np.array([125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
+stroke = np.array([84.0, 88.0, 91.0, 92.0, 90.0, 86.0, 80.0])   # niveles de suceso aislado, dB
+rng = np.random.default_rng(83)
+events = stroke + rng.normal(0.0, 0.8, size=(5, 10, bands.size))
+
+burst = emission.sound_energy_pressure(
+    events, "hemisphere", radius=2.0,
+    background_levels=np.full((10, bands.size), 62.0),   # promediado en los mismos 10 s
+    integration_time=10.0, frequencies=bands,
+    room=emission.RoomEnvironment(reverberation_time=1.2, volume=900.0),   # -> K2
+)
+print(burst.events)                                        # 5 (Ec. 19 sobre el primer eje)
+print(round(float(burst.environmental_correction[0]), 2))  # K2 = 2.64 dB
+print(np.round(burst.sound_energy_level, 1))               # LJ por banda, máximo 103.5 dB en 1 kHz
+print(round(burst.sound_energy_level_a, 1))                # LJA = 107.7 dB(A)
+
+burst.plot()   # LJ por banda, LJA en el título (requiere matplotlib)
+```
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# Izquierda: el nivel de suceso aislado acumulado de las dos fuentes. La ráfaga
+# decae con una constante de tiempo de 0,35 s y guarda una exposición de 90 dB;
+# la fuente estacionaria es de 80 dB, así que alcanza los mismos 90 dB en T = 10 s.
+p0_sq = (20e-6) ** 2
+e0 = p0_sq * 1.0
+t = np.linspace(0.0, 10.0, 4001)
+dt = t[1] - t[0]
+burst_p2 = np.where(t >= 2.0, (e0 * 1e9 / 0.35) * np.exp(-(t - 2.0) / 0.35), 0.0)
+steady_p2 = np.full_like(t, p0_sq * 1e8)
+fig, (axl, axr) = plt.subplots(1, 2, figsize=(12.5, 5.4))
+with np.errstate(divide="ignore"):
+    axl.plot(t, 10 * np.log10(np.cumsum(burst_p2) * dt / e0), label="ráfaga de impacto")
+    axl.plot(t, 10 * np.log10(np.cumsum(steady_p2) * dt / e0), label="estacionaria, 80 dB")
+axl.set(xlabel="Tiempo [s]", ylabel="Nivel de suceso aislado LE(t) [dB]", ylim=(60, 94))
+axl.legend()
+
+# Derecha: el espectro de LJ es el resultado calculado arriba.
+burst.plot(ax=axr, language="es")
+plt.show()
+```
+
+</details>
+
+### Cinco sucesos, uno a uno o todos a la vez
+
+La norma pide al menos **cinco** sucesos (apartado 8.3.1), medidos uno a uno o
+como una sola lectura que los abarque todos, y reduce ambos casos al nivel de
+*un* suceso en cada posición: el promedio energético de las $N_\mathrm{e}$
+lecturas individuales,
+
+$$
+L'_{Ei} = 10\log_{10}\left[\frac{1}{N_\mathrm{e}}\sum_{q=1}^{N_\mathrm{e}} 10^{0.1 L'_{Ei,q}}\right]
+\qquad \text{(Ec. 19)},
+$$
+
+o la lectura única menos los $10\log_{10} N_\mathrm{e}$ de los sucesos que
+contiene,
+
+$$
+L'_{Ei} = L'_{Ei,N_\mathrm{e}} - 10\log_{10} N_\mathrm{e} \qquad \text{(Ec. 20)}.
+$$
+
+`sound_energy_pressure` admite las tres formas en que llega `levels_positions`:
+un array `(Ne, NM, NB)` de los sucesos medidos uno a uno (Ec. 19, como en el
+fragmento anterior), una lectura `(NM, NB)` de una sola medición que abarca
+`events=Ne` sucesos (Ec. 20), o el nivel medio de suceso aislado `(NM, NB)` ya
+formado. Menos de cinco sucesos se aceptan con un `SoundPowerWarning`, y
+`mean_single_event_level` expone la misma reducción por sí sola:
+
+```python
+five_at_once = emission.mean_single_event_level(np.full((10, 1), 97.0), events=5)
+print(round(float(five_at_once[0, 0]), 2))          # 90.01 dB: 97 - 10 lg 5 (Ec. 20)
+one_by_one = emission.mean_single_event_level(np.array([89.0, 91.0, 90.0, 90.5, 89.5]))
+print(round(float(one_by_one), 2))               # 90.06 dB: la media energética (Ec. 19)
+```
+
+### El fondo se compara sobre la misma ventana
+
+El apartado 8.3.1 hace medir el fondo como nivel *promediado en el tiempo*
+sobre el mismo tiempo de integración $T$ que los sucesos, y la Ec. 21 forma
+$K_1$ a partir de $\Delta L_E = \overline{L'_E} - \overline{L_{p(\mathrm{B})}}$.
+Esos dos niveles no comparten referencia: $L_E$ es una energía re
+$E_0 = p_0^2 \cdot 1$ s y $L_p$ una presión cuadrática media re $p_0^2$, y
+$K_1$ resta una energía de otra. La energía que el fondo aporta a una ventana
+de $T$ segundos es su propia exposición sobre esa ventana,
+$L_{p(\mathrm{B})} + 10\log_{10}(T/T_0)$ (la misma identidad de la NOTA 1),
+así que eso es lo que `sound_energy_pressure` compara con el nivel del suceso,
+y por eso `integration_time` es obligatorio siempre que se da
+`background_levels`. Leído al pie de la letra, un fondo de 62 dB bajo una
+ráfaga de 78 dB en una ventana de 10 s parecería 16 dB por debajo y no
+recibiría corrección; como energía son 72 dB, el margen es el criterio de
+ingeniería de 6 dB, y $K_1$ es sus 1,26 dB completos. El [registro de
+erratas](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.es.md)
+recoge la lectura. Con el fondo en su sitio, los criterios y el tope son los de
+la sección 1: de 6 dB a 15 dB para el grado de ingeniería, de 3 dB a 10 dB
+para el grado de inspección de ISO 3746, y un `SoundPowerWarning` cuando una
+banda cae por debajo.
+
+```python
+# 62 dB promediados en 10 s son 72 dB re E0; una ráfaga de 78 dB queda entonces 6 dB por encima.
+k1 = emission.sound_energy_pressure(
+    np.full((10, 1), 78.0), "hemisphere", radius=2.0,
+    background_levels=np.full(1, 62.0), integration_time=10.0,
+).background_correction
+print(round(float(k1[0]), 2))    # K1 = 1.26 dB, el valor en el criterio de 6 dB
+```
+
+La identidad con la sección 1 se cumple entonces hasta el último dígito. Las
+mismas diez posiciones, fondo y sala, con todos los niveles subidos
+$10\log_{10}(T/T_0)$ para una ventana de 10 s, dan un $L_J$ exactamente 10 dB
+por encima de $L_W$ en todas las bandas, y los mismos $K_1$, $K_2$ e
+incertidumbre expandida, que el apartado 9.1 (Ec. 24) hace comunes a ambas
+magnitudes:
+
+```python
+# La medición de la sección 1 leída como ventana de 10 s: LJ = LW + 10 lg(T/T0) exactamente.
+octaves_hz = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000])
+rng = np.random.default_rng(0)
+ten_positions = np.array([70.0, 74.0, 78.0, 80.0, 79.0, 76.0, 72.0, 66.0]) + rng.normal(0.0, 0.5, size=(10, 8))
+quiet = np.full((10, 8), 55.0)
+workshop = emission.RoomEnvironment(reverberation_time=0.6, volume=300.0)
+steady = emission.sound_power_pressure(
+    ten_positions, "hemisphere", radius=1.5, reflecting_planes=1,
+    background_levels=quiet, frequencies=octaves_hz, room=workshop,
+)
+ten_seconds = emission.sound_energy_pressure(
+    ten_positions + 10.0, "hemisphere", radius=1.5, reflecting_planes=1,
+    background_levels=quiet, integration_time=10.0, frequencies=octaves_hz, room=workshop,
+)
+print(np.round(ten_seconds.sound_energy_level - steady.sound_power_level, 6))   # 10.0 en todas las bandas
+print(round(ten_seconds.sound_energy_level_a - steady.sound_power_level_a, 6))  # 10.0
+```
+
+### Condiciones meteorológicas de referencia (Anexo G)
+
+La Ec. 23 vale para las condiciones meteorológicas del ensayo, y por encima de
+500 m de altitud o por debajo de 10 °C el apartado 8.3.6 exige llevar el nivel
+a los 101,325 kPa y 23,0 °C de referencia mediante el Anexo G,
+$L_{J\mathrm{ref,atm}} = L_J + C_1 + C_2$ (Ec. G.3), con
+
+$$
+C_1 = -10\log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s},0}} + 5\log_{10}\frac{273{,}15 + \theta}{\theta_0}, \qquad
+C_2 = -10\log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s},0}} + 15\log_{10}\frac{273{,}15 + \theta}{\theta_1},
+$$
+
+$\theta_0 = 314$ K y $\theta_1 = 296$ K. $C_1$ es la corrección de magnitud de
+referencia a través de la impedancia característica del aire (se omite cuando
+$K_2$ salió del ensayo de comparación absoluta de A.2), $C_2$ la corrección de
+impedancia de radiación de un monopolo. Cuando la presión estática no se
+midió, la Ec. G.2 la estima a partir de la altitud,
+$p_\mathrm{s} = p_{\mathrm{s},0}(1 - aH_\mathrm{a})^b$. La comprobación de
+H.4.2.7 de que la corrección se anula a 120 m y 23 °C se cumple hasta la
+diezmilésima de decibelio.
+
+```python
+# Una determinación a 1 200 m y 8 C, llevada a 101.325 kPa y 23 C (Ec. G.3).
+corr = emission.reference_atmosphere_correction(8.0, altitude=1200.0)
+print(round(corr.static_pressure, 1))    # 87.7 kPa, de la Ec. G.2
+print(round(corr.c1, 3), round(corr.c2, 3), round(corr.total, 2))   # 0.386 0.291 0.68 dB
+lj_ref = burst.sound_energy_level + corr.total    # Ec. G.3; la Ec. G.1 suma lo mismo a LW
+```
+
+### Parámetros de `sound_energy_pressure()`
+
+| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `levels_positions` | array 2D o 3D | dB | `(NM, NB)` o `(Ne, NM, NB)` | Niveles de suceso aislado: por suceso en el primer eje (Ec. 19), una lectura de `events` sucesos (Ec. 20), o la media de un suceso |
+| `surface`, `radius`, `dimensions`, `distance`, `reflecting_planes` | como en la sección 1 | | | La misma superficie de medición y los mismos mínimos de posiciones |
+| `events` | int o None | | `>= 1`, por defecto `None` | $N_\mathrm{e}$ abarcados por una lectura (Ec. 20); al menos 5 sin aviso |
+| `background_levels` | array 2D o espectro | dB | `(NM, NB)`, o `(NB,)` / `(1, NB)` | Fondo promediado en el tiempo sobre la misma ventana; activa $K_1$ (Ec. 21) |
+| `integration_time` | float | s | > 0, obligatorio con `background_levels` | La ventana $T$; el fondo se compara como su exposición $L_{p(\mathrm{B})} + 10\log_{10}(T/T_0)$ |
+| `frequencies` | array 1D | Hz | centros de banda nominales | Activa $L_{J\mathrm{A}}$ (Ec. E.2) |
+| `room` | `RoomEnvironment` o None | | por defecto `None` (campo libre) | Los datos de sala tras $K_2$, como en la sección 1 |
+| `grade` | str | | `'engineering'` (por defecto) / `'survey'` | Apartado 8.3 de ISO 3744 frente a apartado 8.4 de ISO 3746 |
+| `omc_uncertainty` | float | dB | por defecto `0.0` | $\sigma_\text{omc}$, incorporada a $U$ como para $L_W$ |
+
+Devuelve un `SoundEnergyResult`: `sound_energy_level` ($L_J$ por banda),
+`surface_event_level` ($\overline{L_E}$ tras $K_1$/$K_2$, Ec. 22),
+`mean_event_level` ($\overline{L'_E}$), `background_correction`/
+`environmental_correction`, `directivity_index` (por posición y banda),
+`surface_area`, `sound_energy_level_a` ($L_{J\mathrm{A}}$), `uncertainty`,
+`grade`, `events` ($N_\mathrm{e}$, o `None` cuando se aportaron las medias) e
+`integration_time`. `reference_atmosphere_correction(temperature,
+static_pressure=…, altitude=…)` devuelve un `ReferenceAtmosphereCorrection`
+con `c1`, `c2`, su `total` y la `static_pressure` empleada.
+
 ## Qué cubre esta guía
 
 <Scope>
@@ -865,17 +1126,28 @@ fijas de los Anexos D/E (`precision_positions`), la corrección de fondo por
 posición (`precision_background_correction`, Ec. 11), las correcciones
 meteorológicas $C_1$/$C_2$/$C_3$ y la incertidumbre expandida del apartado
 10.5 (`precision_uncertainty`). Ambos resultados presentan la ficha de
-potencia acústica de estilo acreditado mediante `.report()`.
+potencia acústica de estilo acreditado mediante `.report()`. El nivel de
+energía acústica $L_J$ de una ráfaga de ruido sobre la misma superficie
+envolvente (`sound_energy_pressure`, apartado 8.3 de ISO 3744 y apartado 8.4
+de ISO 3746): los niveles de suceso aislado de $N_\mathrm{e}$ sucesos uno a uno
+o en una sola lectura (`mean_single_event_level`, Ec. 19/20), el $K_1$ de la
+Ec. 21 con el fondo comparado sobre la misma ventana, $K_2$, la Ec. 23 y el
+$L_{J\mathrm{A}}$ del Anexo E, y la corrección del Anexo G a las condiciones
+meteorológicas de referencia (`reference_atmosphere_correction`, Ec. G.1/G.3).
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="No cubierto">
 Ninguno de los dos métodos ejecuta el ensayo de cualificación del recinto: la
 cualificación de campo libre de la cámara anecoica o semianecoica de ISO 3745
 se da por supuesta, no se realiza, y la validez de $K_2$ en ISO 3744 solo
-emite avisos. Tampoco se aplica la corrección del **Anexo G** de ISO 3744 a
-las condiciones meteorológicas de referencia, exigida por encima de 500 m de
-altitud o por debajo de 10 °C (apartado 8.2.5): `sound_power_pressure` no
-admite argumento de temperatura ni de presión. La corrección meteorológica
+emite avisos. La corrección del **Anexo G** de ISO 3744 a las condiciones
+meteorológicas de referencia, exigida por encima de 500 m de altitud o por
+debajo de 10 °C (apartados 8.2.5 y 8.3.6), la evalúa
+`reference_atmosphere_correction` pero nunca se aplica dentro de una
+determinación: `sound_power_pressure` y `sound_energy_pressure` no admiten
+argumento de temperatura ni de presión, y la suma se añade a mano. ISO 3745
+no define un nivel de energía acústica propio, así que una ráfaga en la cámara
+anecoica de precisión no tiene aquí ninguna vía. La corrección meteorológica
 $C_3$ de ISO 3745 necesita un coeficiente de absorción del aire que aporta
 quien llama (`air_absorption_coefficient=`); este módulo no lo calcula a
 partir de ISO 9613-1. La elección entre las siete vías, y la declaración ISO

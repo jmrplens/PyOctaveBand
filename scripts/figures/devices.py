@@ -1306,6 +1306,139 @@ def generate_sound_power_reverberation_result(output_dir: str) -> None:
     plt.close()
 
 
+def generate_sound_energy_burst(output_dir: str) -> None:
+    """ISO 3744 8.3: how a burst's L_E accumulates, and the L_J spectrum it gives."""
+    print("Generating sound_energy_burst.svg...")
+    from phonometry import emission
+
+    # --- left: the running single event level of two very different sources.
+    # A press stroke, an impact whose mean-square pressure decays with a
+    # 0,35 s time constant, is measured through a T = 10 s window beside a
+    # steady 80 dB source. The burst is sized so that its whole exposure is
+    # 90 dB; the steady source reaches the same 90 dB at T because
+    # L_E = L_p + 10 lg(T/T0) (ISO 3744 clause 3.4 NOTE 1). Same energy in the
+    # window, same L_J: which is what the sound energy level is for.
+    p0_sq = (20.0e-6) ** 2  # (20 uPa)^2
+    e0 = p0_sq * 1.0  # E0 = (20 uPa)^2 s
+    window = 10.0
+    onset, tau = 2.0, 0.35
+    t = np.linspace(0.0, window, 4001)
+    burst_exposure = e0 * 10.0 ** (90.0 / 10.0)  # L_E = 90 dB, all of it
+    burst_p_sq = np.where(
+        t >= onset, (burst_exposure / tau) * np.exp(-(t - onset) / tau), 0.0
+    )
+    steady_p_sq = np.full_like(t, p0_sq * 10.0 ** (80.0 / 10.0))  # L_p = 80 dB
+    dt = t[1] - t[0]
+    with np.errstate(divide="ignore"):
+        burst_le = 10.0 * np.log10(np.cumsum(burst_p_sq) * dt / e0)
+        steady_le = 10.0 * np.log10(np.cumsum(steady_p_sq) * dt / e0)
+
+    # --- right: the same press stroke over an ISO 3744 hemisphere. Ten
+    # positions on r = 2 m over one reflecting plane, five strokes measured one
+    # at a time (Eq. 19), a 62 dB time-averaged background over the same
+    # 10 s window, and a workshop of V = 900 m3, T = 1,2 s behind K2.
+    freqs = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+    base = np.array([84.0, 88.0, 91.0, 92.0, 90.0, 86.0, 80.0])
+    rng = np.random.default_rng(83)
+    events = base[None, None, :] + rng.normal(0.0, 0.8, (5, 10, freqs.size))
+    result = emission.sound_energy_pressure(
+        events,
+        "hemisphere",
+        radius=2.0,
+        reflecting_planes=1,
+        background_levels=np.full((10, freqs.size), 62.0),
+        integration_time=window,
+        frequencies=freqs,
+        room=emission.RoomEnvironment(reverberation_time=1.2, volume=900.0),
+    )
+    lj = np.asarray(result.sound_energy_level)
+    lja = float(result.sound_energy_level_a)
+
+    fig, (axl, axr) = plt.subplots(1, 2, figsize=(12.5, 5.4), width_ratios=(1.15, 1.0))
+
+    axl.plot(t, burst_le, color=COLOR_PRIMARY, linewidth=2.2, label="impact burst")
+    axl.plot(
+        t,
+        steady_le,
+        color=COLOR_SECONDARY,
+        linewidth=2.2,
+        label="steady source, $L_p$ = 80 dB",
+    )
+    axl.axvline(window, color=COLOR_MUTED, linestyle="--", linewidth=1.2, zorder=1)
+    axl.text(
+        window - 0.15,
+        93.3,
+        "window $T$ = 10 s",
+        ha="right",
+        va="top",
+        fontsize=9.5,
+        color=COLOR_FG,
+    )
+    chip = {
+        "boxstyle": "round,pad=0.4",
+        "facecolor": COLOR_PANEL,
+        "edgecolor": COLOR_GRID,
+    }
+    arrow = {"arrowstyle": "->", "color": COLOR_FG, "linewidth": 1.0}
+    axl.annotate(
+        "burst: all of its $L_E$ = 90.0 dB\nis in the first second",
+        xy=(onset + 1.0, float(np.interp(onset + 1.0, t, burst_le))),
+        xytext=(3.9, 82.0),
+        ha="left",
+        va="center",
+        fontsize=9.5,
+        color=COLOR_FG,
+        arrowprops=arrow,
+        bbox=chip,
+    )
+    axl.annotate(
+        "steady: $L_E$ = $L_p$ + 10 lg($T/T_0$)\n= 80 + 10 = 90.0 dB at $T$",
+        xy=(9.0, float(np.interp(9.0, t, steady_le))),
+        xytext=(7.7, 73.0),
+        ha="center",
+        va="center",
+        fontsize=9.5,
+        color=COLOR_FG,
+        arrowprops=arrow,
+        bbox=chip,
+    )
+    axl.set_xlim(0.0, window + 0.6)
+    axl.set_ylim(60.0, 94.0)
+    axl.set_xticks(np.arange(0, 11, 2))
+    axl.set_xlabel("Time [s]")
+    axl.set_ylabel("Single event level $L_E(t)$ [dB]")
+    axl.set_title("One burst and one steady source, the same energy in $T$", pad=12)
+    axl.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    axl.set_axisbelow(True)
+    axl.legend(loc="lower right", fontsize=9)
+
+    positions = np.arange(freqs.size, dtype=float)
+    axr.bar(
+        positions,
+        lj,
+        width=0.7,
+        color=COLOR_PRIMARY,
+        edgecolor=COLOR_FG,
+        linewidth=0.7,
+        zorder=3,
+    )
+    axr.set_xticks(positions)
+    axr.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
+    axr.set_xlabel(LABEL_FREQ_HZ)
+    axr.set_ylabel("Sound energy level $L_J$ [dB]")
+    axr.set_ylim(0.0, float(np.max(lj)) + 8.0)
+    axr.set_title(
+        "Sound energy level of the burst (ISO 3744)  "
+        f"$L_{{J\\!\\mathrm{{A}}}}$ = {lja:.1f} dB(A)",
+        pad=12,
+    )
+    axr.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    axr.set_axisbelow(True)
+    plt.tight_layout()
+    save_figure(output_dir, "sound_energy_burst.svg")
+    plt.close()
+
+
 def generate_sound_power_intensity_result(output_dir: str) -> None:
     """ISO 9614-2: intensity-scanning LW spectrum from segment sweeps."""
     print("Generating sound_power_intensity_result.png...")

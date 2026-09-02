@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from ..emission.intensity_compliance import (
         IntensityInstrumentComplianceResult,
     )
-    from ..emission.sound_power import SoundPowerResult
+    from ..emission.sound_power import SoundEnergyResult, SoundPowerResult
     from ..emission.sound_power_anechoic import PrecisionSoundPowerResult
     from ..emission.sound_power_in_situ import InSituSoundPowerResult
     from ..emission.sound_power_intensity import (
@@ -42,7 +42,10 @@ if TYPE_CHECKING:
     from ..emission.sound_power_intensity_points import (
         DiscretePointIntensityResult,
     )
-    from ..emission.sound_power_reverberation import ReverberationSoundPowerResult
+    from ..emission.sound_power_reverberation import (
+        ReverberationSoundEnergyResult,
+        ReverberationSoundPowerResult,
+    )
     from ..emission.vibration_sound_power import VibrationSoundPowerResult
 
 #: Shared frequency-axis label of the spectral renderers.
@@ -74,6 +77,7 @@ _STRINGS: dict[str, str] = {
     _YLABEL_LW: "Nivel de potencia acústica $L_W$ [dB]",
     _YLABEL_LJ: "Nivel de energía acústica $L_J$ [dB]",
     "sound power spectrum": "espectro de potencia acústica",
+    "sound energy spectrum": "espectro de energía acústica",
     "In situ sound power spectrum (ISO 3747)": "Espectro de potencia acústica in situ (ISO 3747)",
     "In situ sound energy spectrum (ISO 3747)": "Espectro de energía acústica in situ (ISO 3747)",
     "Upper bound: background margin below 6 dB": "Cota superior: margen de fondo inferior a 6 dB",
@@ -202,6 +206,66 @@ def plot_sound_power(
             label=_t("Non-positive band", language),
         )
     if np.any(neg) or "label" in kwargs:
+        ax.legend(loc="best", fontsize="small")
+    ax.grid(True, axis="y", alpha=0.3)
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_sound_energy(
+    result: SoundEnergyResult | ReverberationSoundEnergyResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    r"""Sound energy level spectrum with the A-weighted total annotated.
+
+    The sound energy counterpart of :func:`plot_sound_power`, for the two
+    single-event determinations,
+    :class:`~phonometry.emission.sound_power.SoundEnergyResult` (ISO 3744
+    clause 8.3 / ISO 3746 clause 8.4) and
+    :class:`~phonometry.emission.sound_power_reverberation.ReverberationSoundEnergyResult`
+    (ISO 3741 clause 9.2): one bar per band of :math:`L_J`, the standard the
+    result came from in the title and :math:`L_{J\mathrm{A}}` beside it when
+    the band centres were supplied. Neither determination flags an
+    undeterminable band, so nothing is hatched.
+
+    :param result: One of the two sound-energy results named above.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the band :meth:`~matplotlib.axes.Axes.bar`.
+    :return: The axes.
+    """
+    from .._i18n import format_number, localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    lj = np.asarray(result.sound_energy_level, dtype=np.float64)
+    freqs = result.frequencies
+    if freqs is None:
+        positions = _band_axis(
+            ax,
+            [f"{_t('Band', language)} {i + 1}" for i in range(lj.size)],
+            xlabel=_t("Band", language),
+            language=language,
+        )
+    else:
+        positions = _band_axis(
+            ax, np.asarray(freqs, dtype=np.float64), language=language
+        )
+    kwargs.setdefault("color", _C_PRIMARY)
+    ax.bar(positions, lj, **kwargs)
+
+    ax.set_ylabel(_t("Sound energy level $L_J$ [dB]", language))
+    designation = _sound_power_designation(result)
+    lja = float(result.sound_energy_level_a)
+    title = f"{designation} {_t('sound energy spectrum', language)}"
+    if np.isfinite(lja):
+        title += (
+            "  ($L_{J\\mathrm{A}}$ = "
+            f"{format_number(lja, language, decimals=1)} dB(A))"
+        )
+    ax.set_title(title)
+    if "label" in kwargs:
         ax.legend(loc="best", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)

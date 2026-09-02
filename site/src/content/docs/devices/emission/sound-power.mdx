@@ -267,9 +267,14 @@ admissible when the averaging time spans a whole number of cycles, and the cycle
 then becomes part of the declared operating condition. For a single event — one
 press stroke, one door slam — the descriptor is not $L_W$ at all but the **sound
 energy level $L_J$**, the same surface integral taken over the event rather than
-per second, defined in the same clauses of ISO 3741, ISO 3744, ISO 3745 and
-ISO 3746, and determined here only by the in situ comparison of ISO 3747, in
-[Sound Power in Situ by Comparison](/phonometry/devices/emission/sound-power-in-situ/#2-impulsive-sources-the-sound-energy-level-eq-13-to-20).
+per second, defined in the same clauses of ISO 3741, ISO 3744 and ISO 3746 and
+determined by `sound_energy_pressure` over the [enveloping
+surface](/phonometry/devices/emission/sound-power-pressure/#4-sound-energy-level-of-a-burst-clause-83),
+by `sound_energy_reverberation`, or `sound_energy_comparison` against a
+reference source, in the [reverberation
+room](/phonometry/devices/emission/sound-power-reverberation/#4-sound-energy-level-of-a-single-event-clause-92),
+and by `sound_energy_in_situ` where the machine works, in [Sound Power in Situ
+by Comparison](/phonometry/devices/emission/sound-power-in-situ/#2-impulsive-sources-the-sound-energy-level-eq-13-to-20).
 The practical test: if the A-weighted level
 at a fixed microphone moves by more than a few decibels over the averaging time,
 the source is not steady for these methods.
@@ -454,10 +459,12 @@ Intensity](/phonometry/devices/emission/intensity/), beside the Annex A field
 indicators it lends the scanning parts, and the surface-velocity route in
 [Sound power from surface
 vibration](/phonometry/devices/emission/vibration-sound-power/), and the in
-situ comparison of ISO 3747, with its sound *energy* level $L_J$ for single
-events, in [Sound Power in Situ by Comparison](/phonometry/devices/emission/sound-power-in-situ/).
-ISO 3743-1 and ISO 3743-2, the remaining members of the ISO 3740 family, are
-not implemented, and neither is $L_J$ under the other members. The emission sound pressure level $L_{p\mathrm{A}}$ that
+situ comparison of ISO 3747 in [Sound Power in Situ by
+Comparison](/phonometry/devices/emission/sound-power-in-situ/). ISO 3743-1 and
+ISO 3743-2, the remaining members of the ISO 3740 family, are not implemented.
+The sound *energy* level $L_J$ of a single event is covered for ISO 3744,
+ISO 3746, ISO 3741 and ISO 3747, each on its own page; ISO 3745 defines none.
+The emission sound pressure level $L_{p\mathrm{A}}$ that
 stands beside $L_{W\mathrm{A}}$ in a declaration is consumed, not determined: ISO
 11201, ISO 11202 and ISO 11204 are outside the library. ISO 4871's batch
 criteria of clause 6.3 are not evaluated — only the clause 6.2 single-machine

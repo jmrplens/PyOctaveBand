@@ -33,6 +33,14 @@ clause 9.1.4 and ISO 3747:2010 Annex C print the same expression,
 digit for digit, so the guard on the two meteorological inputs and the
 correction itself live here once.
 
+The single event time-integrated levels of the sound energy determinations
+meet here too: ISO 3744:2010 Eq. (19)/(20), ISO 3746:2010 Eq. (16)/(17) and
+ISO 3741:2010 Eq. (22)/(23) are one pair of equations printed three times,
+the energy mean of :math:`N_\mathrm{e}` events measured one at a time and
+the :math:`-10 \log_{10} N_\mathrm{e}` of one measurement that encompasses
+them all, so :func:`_single_event_mean` is transcribed once and the method
+modules call it.
+
 The reference area :math:`S_0 = 1` m^2 of the :math:`10 \log_{10}(S/S_0)`
 surface term, the two accuracy grades the methods share (``'engineering'``,
 grade 2 of ISO 3744 and ISO 9614-2, and ``'survey'``, grade 3 of ISO 3746 and
@@ -44,10 +52,13 @@ import another method to get them.
 
 from __future__ import annotations
 
+import warnings
 from typing import Literal, cast
 
 import numpy as np
 
+from .._internal.levels_math import energy_mean
+from .._internal.validation import require_positive
 from .._internal.warnings import PhonometryWarning
 
 _S0 = 1.0  #: Reference area, in square metres (ISO 3744, 8.2.5).
@@ -60,6 +71,36 @@ _THETA1 = 296.0
 #: Temperature floor in degC: sqrt(273 + theta) of the speed-of-sound formula
 #: c = 20.05*sqrt(273 + theta) is zero or complex at or below it (ISO 3741, 9.1.4).
 _ROUNDED_ABS_ZERO_C = -273.0
+
+#: Reference duration, in seconds, of the single event time-integrated sound
+#: pressure level: L_E = L_p,T + 10 lg(T/T0) (ISO 3744:2010, 3.4 NOTE 1).
+_T0 = 1.0
+#: Fewest single sound emission events a sound energy determination rests
+#: on, whether measured one at a time or in one measurement encompassing
+#: them all (ISO 3744:2010 8.3.1, ISO 3746:2010 8.4.1, ISO 3741:2010 8.5.1).
+_MIN_EVENTS = 5
+
+
+def _validate_event_count(events: object, owner: str) -> None:
+    """Refuse a count of events that is not a whole number of them.
+
+    The entry points already refuse it, but a result can also be built
+    directly or rebuilt with :func:`dataclasses.replace`, and a count of 2,5
+    events describes no measurement the standard defines. ``bool`` is refused
+    on its own because it is an ``int`` in Python and ``True`` would otherwise
+    pass as one event. Rejecting a wrong type here rather than letting the
+    comparison below raise keeps the promise the docstring makes, which is a
+    ``ValueError`` and not a ``TypeError``.
+    """
+    if events is None:
+        return
+    if isinstance(events, bool) or not isinstance(events, (int, np.integer)):
+        msg = f"{owner}: 'events' must be a whole number of events; got {events!r}."
+        raise ValueError(msg)
+    if int(events) < 1:
+        msg = f"{owner}: 'events' must be at least 1; got {events!r}."
+        raise ValueError(msg)
+
 
 Grade = Literal["engineering", "survey"]
 
@@ -173,3 +214,107 @@ def _check_grade(grade: str) -> Grade:
         msg = "'grade' must be 'engineering' or 'survey'."
         raise ValueError(msg)
     return cast(Grade, grade)
+
+
+def _single_event_mean(
+    levels: np.ndarray, events: int | None, *, name: str, stacklevel: int
+) -> np.ndarray:
+    r"""Mean single event time-integrated level of one event, per position.
+
+    ISO 3744:2010 Eq. (19)/(20), printed again as ISO 3746:2010 Eq. (16)/(17)
+    and ISO 3741:2010 Eq. (22)/(23). With ``events`` ``None`` the first axis
+    of ``levels`` holds the :math:`N_\mathrm{e}` events measured one at a
+    time and the mean is the energy average over that axis:
+
+    .. math::
+
+       L'_{Ei(\mathrm{ST})} = 10 \log_{10}\!\left[ \frac{1}{N_\mathrm{e}}
+       \sum_{q=1}^{N_\mathrm{e}} 10^{0.1 L'_{Ei,q(\mathrm{ST})}} \right]
+       \tag{Eq. 19}
+
+    With ``events`` :math:`= N_\mathrm{e}` the whole of ``levels`` is one
+    measurement that encompasses :math:`N_\mathrm{e}` successive events, and
+    the level of one event is that measurement less :math:`10 \log_{10}
+    N_\mathrm{e}`:
+
+    .. math::
+
+       L'_{Ei(\mathrm{ST})} = L'_{Ei,N_\mathrm{e}(\mathrm{ST})}
+       - 10 \log_{10} N_\mathrm{e} \tag{Eq. 20}
+
+    Both standards ask for at least five events in either mode; fewer is
+    accepted with a :class:`SoundPowerWarning`, the determination then being
+    below the count the method is written for.
+
+    :param levels: Per-event levels with the events on the first axis
+        (``events`` ``None``), or the one measurement of ``events`` events.
+    :param events: ``None`` for one event per entry of the first axis, else
+        the number of events one measurement encompasses.
+    :param name: The caller's parameter name, for the error messages.
+    :param stacklevel: Where the warning is reported.
+    :return: The mean level of one event, one axis fewer than ``levels`` when
+        ``events`` is ``None``, the same shape otherwise.
+    :raises ValueError: for non-finite levels, an empty event axis or a
+        non-positive ``events``.
+    """
+    arr = np.asarray(levels, dtype=np.float64)
+    if not np.all(np.isfinite(arr)):
+        msg = f"'{name}' must contain only finite values."
+        raise ValueError(msg)
+    if events is None:
+        if arr.ndim == 0 or arr.shape[0] == 0:
+            msg = f"'{name}' must carry one entry per single event on its first axis."
+            raise ValueError(msg)
+        count = int(arr.shape[0])
+        mean = energy_mean(arr, axis=0)
+    else:
+        if isinstance(events, bool) or not isinstance(events, (int, np.integer)):
+            msg = "'events' must be an integer: the number of events one measurement encompasses."
+            raise ValueError(msg)
+        if events < 1:
+            msg = "'events' must be a positive integer."
+            raise ValueError(msg)
+        count = int(events)
+        mean = arr - 10.0 * np.log10(count)
+    if count < _MIN_EVENTS:
+        warnings.warn(
+            f"Only {count} single event(s); the sound energy determination "
+            f"requires at least {_MIN_EVENTS} (ISO 3744:2010 8.3.1, ISO "
+            "3741:2010 8.5.1).",
+            SoundPowerWarning,
+            stacklevel=stacklevel,
+        )
+    return np.asarray(mean, dtype=np.float64)
+
+
+def _background_exposure(
+    background_levels: np.ndarray, integration_time: float | None
+) -> np.ndarray:
+    r"""The background's single event time-integrated level over ``T``.
+
+    The correction Eq. (21) subtracts one energy from another, and the two
+    must be referred to the same quantity: the event level is
+    :math:`\int p^2\,\mathrm{d}t` re :math:`E_0 = p_0^2 \cdot 1` s, so the
+    time-averaged background level the standard has measured over the same
+    interval :math:`T` enters as its own exposure over :math:`T`,
+    :math:`L_{p(\mathrm{B})} + 10 \log_{10}(T/T_0)` (clause 3.4 NOTE 1).
+
+    :param background_levels: Time-averaged background levels, in decibels.
+    :param integration_time: The interval ``T`` of the single event levels,
+        in seconds; required.
+    :return: The background exposure levels over ``T``, in decibels.
+    :raises ValueError: if ``integration_time`` is missing or not positive.
+    """
+    if integration_time is None:
+        msg = (
+            "'integration_time' (the interval T of the single event levels, in "
+            "seconds) is required with 'background_levels': the background is "
+            "compared as its exposure over the same T (ISO 3744:2010 8.3.4, ISO 3741:2010 9.2.2)."
+        )
+        raise ValueError(msg)
+    t = require_positive(integration_time, "integration_time")
+    bg = np.asarray(background_levels, dtype=np.float64)
+    if not np.all(np.isfinite(bg)):
+        msg = "'background_levels' must contain only finite values."
+        raise ValueError(msg)
+    return np.asarray(bg + 10.0 * np.log10(t / _T0), dtype=np.float64)

@@ -12,8 +12,12 @@ and clean the surface level with the background-noise correction $K_1$ and
 the environmental correction $K_2$. The **precision method** of ISO 3745
 moves the same idea into a qualified anechoic or hemi-anechoic room, where a
 fixed microphone array samples the free field directly and the grade-1
-corrections are meteorological rather than environmental. The closing
-section renders the determination as the accredited-style test fiche. Which
+corrections are meteorological rather than environmental. Section 3 renders
+the determination as the accredited-style test fiche, and section 4 turns the
+enveloping surface of ISO 3744 and ISO 3746 on a source that does not run
+steadily at all, the noise burst whose descriptor is the sound energy level
+$L_J$ of clause 8.3. That route is theirs alone: ISO 3745 defines no sound
+energy level. Which
 route fits which job, and the reverberation-room and intensity alternatives,
 are weighed in [Sound Power](sound-power.md).
 
@@ -468,6 +472,113 @@ anechoic determination: no $K_2$ at all, a 6.28 m² hemisphere instead of a
 the reproducibility one.*
 
 
+## 4. Sound energy level of a burst (clause 8.3)
+
+Everything above describes a source that runs steadily for the whole averaging
+interval: Eq. 18 reports a *rate* of energy flow. A press stroke, a door slam or
+a pneumatic exhaust radiates its energy in a fraction of a second and then
+stops, so the standard gives it the **sound energy level**
+$L_J = 10\log_{10}(J/J_0)$, $J = \int P(t)\,\mathrm{d}t$, $J_0 = 1$ pJ (clauses
+3.22 and 3.23), and determines it (clause 8.3; clause 8.4 of ISO 3746 for the
+survey grade) by the chain of section 1 with the **single event time-integrated
+sound pressure level** $L_E = 10\log_{10}[\int p^2\,\mathrm{d}t / E_0]$,
+$E_0 = (20\ \mu\text{Pa})^2$ s (clause 3.4), in place of $L_p$: measured
+through a window that encompasses the whole burst at every position at once
+(no traversing microphone, clause 8.3.1), energy-averaged over the positions
+(clause 8.3.3), corrected by the same $K_1$ (Eq. 21) and $K_2$ (Eq. 22) and
+closed by the surface term (Eq. 23):
+
+$$
+L_J = \overline{L'_E} - K_1 - K_2 + 10\log_{10}\frac{S}{S_0}.
+$$
+
+The two quantities meet on a steady source: over a window of duration $T$ the
+integral of a constant $p^2$ is $T p^2$, so $L_E = L_{p,T} + 10\log_{10}(T/T_0)$,
+$T_0 = 1$ s (clause 3.4 NOTE 1), and $L_J = L_W + 10\log_{10}(T/T_0)$. That
+identity is what the figure draws and what the library's tests pin the sound
+energy chain to, field by field.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_energy_burst_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_energy_burst.svg" alt="Two panels. Left, the running single event level of an impact burst and of a steady 80 dB source through a 10 s window: the burst starts at 2 s and its curve is flat at 90 dB within about a second, the steady source climbs as 10 lg(t/T0) and reaches the same 90 dB at the dashed line T = 10 s. Right, seven octave-band bars from 125 Hz to 8 kHz of the burst's sound energy level over a 2 m hemisphere, rising from 95 dB at 125 Hz to 103.5 dB at 1 kHz and falling to 91 dB at 8 kHz, with the A-weighted total of 107.7 dB(A) in the title" width="96%"></picture>
+
+*Left, the running single event level of an impact burst and of a steady 80 dB
+source through a 10 s window: the burst's 90 dB is all there within a second of
+the impact, the steady source climbs as $10\log_{10}(t/T_0)$ and reaches the
+same 90 dB at $T$. Right, the octave-band $L_J$ of the same press stroke over a
+2 m hemisphere, with the A-weighted total in the title.*
+
+The standard asks for at least **five** events (clause 8.3.1), one at a time or
+as one reading that spans them all, and reduces both to the level of one event
+at each position: the energy average of the $N_\mathrm{e}$ readings (Eq. 19) or
+the one reading less $10\log_{10} N_\mathrm{e}$ (Eq. 20). `sound_energy_pressure`
+takes `levels_positions` as a `(Ne, NM, NB)` array of the events one at a time,
+an `(NM, NB)` reading with `events=Ne`, or the `(NM, NB)` mean already formed;
+`mean_single_event_level` is the same reduction on its own. The background is
+the time-averaged level measured over the same window (clause 8.3.1), and it is
+compared as its exposure over that window, $L_{p(\mathrm{B})} + 10\log_{10}(T/T_0)$,
+so that the energies Eq. 21 subtracts share one reference (the two levels are
+re $E_0 = p_0^2 \cdot 1$ s and re $p_0^2$ respectively; the
+[errata registry](../../ERRATA.md) records the reading); `integration_time` is
+therefore required with `background_levels`, and the criteria and clamp are
+section 1's.
+
+```python
+import numpy as np
+from phonometry import emission
+
+# A press stroke measured at the 10 hemisphere positions of ISO 3744 (r = 2 m),
+# five strokes one at a time: (events, positions, bands), octaves 125 Hz - 8 kHz.
+bands = np.array([125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
+stroke = np.array([84.0, 88.0, 91.0, 92.0, 90.0, 86.0, 80.0])   # single event levels, dB
+rng = np.random.default_rng(83)
+events = stroke + rng.normal(0.0, 0.8, size=(5, 10, bands.size))
+
+burst = emission.sound_energy_pressure(
+    events, "hemisphere", radius=2.0,
+    background_levels=np.full((10, bands.size), 62.0),   # time-averaged over the same 10 s
+    integration_time=10.0, frequencies=bands,
+    room=emission.RoomEnvironment(reverberation_time=1.2, volume=900.0),   # -> K2
+)
+print(burst.events)                                        # 5 (Eq. 19 over the first axis)
+print(round(float(burst.environmental_correction[0]), 2))  # K2 = 2.64 dB
+print(np.round(burst.sound_energy_level, 1))               # per-band LJ, peaking at 103.5 dB at 1 kHz
+print(round(burst.sound_energy_level_a, 1))                # LJA = 107.7 dB(A)
+
+# The section 1 measurement read as a 10 s window: LJ = LW + 10 lg(T/T0) exactly.
+octaves_hz = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000])
+rng = np.random.default_rng(0)
+ten_positions = np.array([70.0, 74.0, 78.0, 80.0, 79.0, 76.0, 72.0, 66.0]) + rng.normal(0.0, 0.5, size=(10, 8))
+quiet = np.full((10, 8), 55.0)
+workshop = emission.RoomEnvironment(reverberation_time=0.6, volume=300.0)
+steady = emission.sound_power_pressure(
+    ten_positions, "hemisphere", radius=1.5, reflecting_planes=1,
+    background_levels=quiet, frequencies=octaves_hz, room=workshop,
+)
+ten_seconds = emission.sound_energy_pressure(
+    ten_positions + 10.0, "hemisphere", radius=1.5, reflecting_planes=1,
+    background_levels=quiet, integration_time=10.0, frequencies=octaves_hz, room=workshop,
+)
+print(np.round(ten_seconds.sound_energy_level - steady.sound_power_level, 6))   # 10.0 in every band
+
+# Annex G: a determination at 1 200 m and 8 C carried to 101.325 kPa and 23 C (Eq. G.3).
+corr = emission.reference_atmosphere_correction(8.0, altitude=1200.0)
+print(round(corr.static_pressure, 1), round(corr.total, 2))   # 87.7 kPa, C1 + C2 = 0.68 dB
+lj_ref = burst.sound_energy_level + corr.total
+
+burst.plot()   # LJ per band, LJA in the title (needs matplotlib)
+```
+
+Eq. 23 holds for the meteorological conditions of the test; above 500 m of
+altitude or below 10 °C clause 8.3.6 requires the Annex G correction
+$L_{J\mathrm{ref,atm}} = L_J + C_1 + C_2$ (Eq. G.3), which
+`reference_atmosphere_correction` evaluates from the temperature and the static
+pressure, or from the altitude through Eq. G.2. `sound_energy_pressure` takes the
+surface, position and room arguments of `sound_power_pressure` plus `events`,
+`background_levels` with `integration_time`, and returns a `SoundEnergyResult`
+(`sound_energy_level`, `surface_event_level`, `mean_event_level`,
+`background_correction`, `environmental_correction`, `directivity_index`,
+`surface_area`, `sound_energy_level_a`, `uncertainty`, `grade`, `events`,
+`integration_time`) with `.plot()`.
+
 ## See also
 
 - [Sound Power](sound-power.md): choosing among the seven determination
@@ -527,12 +638,21 @@ hemi-anechoic rooms*: the Clause 8 power level, the per-position background
 correction (Eq. 11), the meteorological corrections and the standardized
 microphone arrays of section 2.
 
+The sound energy level $L_J$ of a noise burst over the same enveloping
+surface is section 4: `sound_energy_pressure` (ISO 3744 clause 8.3, ISO 3746
+clause 8.4) with `mean_single_event_level` (Eq. 19/20) and the Annex G
+correction of `reference_atmosphere_correction` (Eq. G.1/G.3).
+
 **Not covered.** Neither method performs the facility qualification it assumes:
 ISO 3745's free-field qualification of the anechoic or hemi-anechoic
 environment is taken for granted, and ISO 3744's $K_2$ validity only warns.
 ISO 3744 **Annex G**, the correction to reference meteorological conditions
-required above 500 m of altitude or below 10 °C (clause 8.2.5), is not applied
-either: `sound_power_pressure` takes no temperature or pressure argument. The
+required above 500 m of altitude or below 10 °C (clauses 8.2.5 and 8.3.6), is
+evaluated by `reference_atmosphere_correction` but never applied inside a
+determination: `sound_power_pressure` and `sound_energy_pressure` take no
+temperature or pressure argument, and the sum is added by hand. ISO 3745
+defines no sound energy level of its own, so a burst in the precision anechoic
+room has no route here. The
 $C_3$ meteorological correction of ISO 3745 needs an air-absorption coefficient
 the caller supplies through `air_absorption_coefficient=`; this module does not
 compute it from **ISO 9613-1** itself.

@@ -1,6 +1,6 @@
 ---
 title: "Sound Power in the Reverberation Room"
-description: "The ISO 3741 precision determination of the sound power level in a qualified reverberation room: the direct method through the Sabine absorption area with the Waterhouse and C1/C2 meteorological corrections, the comparison method against a reference sound source, the qualification warnings and the accredited-style test fiche."
+description: "The ISO 3741 precision determination of the sound power level in a qualified reverberation room: the direct method through the Sabine absorption area with the Waterhouse and C1/C2 meteorological corrections, the comparison method against a reference sound source, the qualification warnings, the accredited-style test fiche, and the sound energy level LJ of a burst by the same two methods."
 references:
   - type: book
     authors: ["Beranek, L. L.", "Mellow, T. J."]
@@ -34,8 +34,9 @@ the laboratory route of choice for steady, broadband sources small enough to
 travel to a qualified room. This guide covers the direct method through the
 Sabine absorption area, the Waterhouse and meteorological corrections, the
 comparison method against a reference sound source, the qualification
-warnings and the accredited-style test fiche. Which route fits which job,
-and the pressure and intensity alternatives, are weighed in
+warnings, the accredited-style test fiche and, in section 4, the sound energy
+level $L_J$ that the same two methods give a single event. Which route fits
+which job, and the pressure and intensity alternatives, are weighed in
 [Sound Power](/phonometry/devices/emission/sound-power/).
 
 ## 1. Reverberation room, precision grade (ISO 3741)
@@ -52,8 +53,8 @@ noise test code says what that costs in uncertainty), so that it does not load
 the field it is being measured in, and it must be steady over the measurement
 interval: Eq. 20 energy-averages and reports a rate of energy flow, so it
 characterises the machine only if the machine is time-invariant while it is
-running. A single event — one press stroke, one door slam — is described by the
-sound energy level $L_J$ of clause 9.2 instead, which is not implemented here.
+running. A single event, one press stroke or one door slam, is described by the
+sound energy level $L_J$ of clause 9.2 instead, which section 4 covers.
 
 The background must lie at least **6 dB** below the source level in the
 one-third-octave bands at and below 200 Hz and at and above 6,3 kHz, and at
@@ -452,6 +453,131 @@ repository; click the preview to open the PDF.
 />
 
 
+## 4. Sound energy level of a single event (clause 9.2)
+
+Both methods above energy-average the room level and report a rate of energy
+flow, so a machine that fires once and falls silent has no $L_W$ to determine.
+Clause 9.2 gives it the **sound energy level** $L_J = 10\log_{10}(J/J_0)$,
+$J_0 = 1$ pJ (clause 3.18), and determines it by the same two routes with the
+single event time-integrated sound pressure level $L_E$ (clause 3.4) in place of
+the time-averaged $L_p$: Eq. 30 is Eq. 20 with $\overline{L_E(\text{ST})}$ where
+$\overline{L_p(\text{ST})}$ stood, and Eq. 31 is Eq. 21 likewise,
+
+$$
+L_J = \overline{L_E(\text{ST})} + \left[10\log_{10}\frac{A}{A_0} + 4.34\ \frac{A}{S}
++ 10\log_{10}\left(1 + \frac{S c}{8 V f}\right) + C_1 + C_2 - 6\right], \qquad
+L_J = L_W(\text{RSS}) + \left(\overline{L_E(\text{ST})} - \overline{L_p(\text{RSS})}\right) + C_2 .
+$$
+
+The measurement is clause 8.5: at least **five** events at each of the six
+positions, either one at a time or as one reading encompassing them all, through
+an interval that contains every significant part of the event *including its
+decay*, and no moving microphone for a non-repetitive impulse. Clause 9.2.1
+reduces both readings to the level of one event at each position (Eq. 22, the
+energy mean of $N_\mathrm{e}$ single readings, or Eq. 23, one reading less
+$10\log_{10} N_\mathrm{e}$; `mean_single_event_level` on the
+[pressure-methods page](/phonometry/devices/emission/sound-power-pressure/#five-events-one-at-a-time-or-all-at-once)
+is the same pair). Clause 9.2.2 corrects each position for its own background
+by the frequency-dependent criterion of 9.1.2 (Eq. 25/26), and clause 9.2.3
+energy-averages the corrected positions (Eq. 27). The background is the
+time-averaged level measured over the same integration time $T$ as the events,
+and it is compared as its exposure over that window,
+$L_{pi(\mathrm{B})} + 10\log_{10}(T/T_0)$, so that the energies Eq. 25 subtracts
+share one reference; `integration_time` is therefore required with
+`background_levels`. The reasons are spelled out on the pressure-methods page
+and in the [errata registry](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md).
+
+`sound_energy_reverberation` and `sound_energy_comparison` take `levels` in the
+forms the sound power functions take, plus one: a 3D `(Ne, NM, NB)` array of the
+events measured one at a time, or a 1D/2D reading with `events=Ne` for one
+measurement of several. The room of section 1 and the reference source of
+section 2 serve for both:
+
+```python
+import numpy as np
+from phonometry import emission
+
+# Five door slams recorded at the six positions of the room of section 1, one at
+# a time: (events, positions, bands), the 21 one-third octaves 100 Hz - 10 kHz.
+thirds = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250,
+                   1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000], dtype=float)
+t60_thirds = np.full(thirds.size, 2.0)
+slam = np.linspace(88.0, 76.0, thirds.size)      # single event level, dB re E0
+rng = np.random.default_rng(3741)
+slams = slam + rng.normal(0.0, 0.6, size=(5, 6, thirds.size))
+
+slam_lj = emission.sound_energy_reverberation(
+    slams, t60_thirds, volume=200.0, surface_area=220.0, frequencies=thirds,
+    background_levels=np.full(thirds.size, 45.0),   # time-averaged over the same 4 s
+    integration_time=4.0, temperature=20.0, static_pressure=101.0,
+)
+print(slam_lj.events, slam_lj.method)                    # 5 direct
+print(np.round(slam_lj.sound_energy_level[:3], 1))       # [96.  94.9 94.2] dB re 1 pJ
+print(round(slam_lj.sound_energy_level_a, 1))            # LJA = 99.0 dB(A)
+
+# Comparison method: the reference source of section 2, run steadily.
+slam_cmp = emission.sound_energy_comparison(
+    slams, lp_rss, lw_rss, frequencies=thirds, temperature=20.0,
+)
+print(round(float(slam_cmp.sound_energy_level[0]), 1), slam_cmp.method)   # 95.0 comparison
+
+slam_lj.plot()   # LJ per one-third octave, LJA in the title (needs matplotlib)
+```
+
+The identity with the steady chain is exact here too: the mean room level of
+section 1 read as a 10 s window, $L_E = L_p + 10\log_{10}(T/T_0)$ at every
+position, gives $L_J = L_W + 10$ dB in every band through the same absorption
+area, Waterhouse term and $C_1$/$C_2$, which is why Eq. 30 states $L_J$ under
+the reference meteorological conditions exactly as Eq. 20 states $L_W$:
+
+```python
+lp_thirds = np.linspace(80.0, 70.0, thirds.size)     # the mean room SPL of section 1
+steady = emission.sound_power_reverberation(
+    lp_thirds, t60_thirds, volume=200.0, surface_area=220.0, frequencies=thirds,
+    temperature=20.0, static_pressure=101.0,
+)
+ten_seconds = emission.sound_energy_reverberation(
+    lp_thirds + 10.0, t60_thirds, volume=200.0, surface_area=220.0, frequencies=thirds,
+    temperature=20.0, static_pressure=101.0,
+)
+print(np.round(ten_seconds.sound_energy_level - steady.sound_power_level, 6)[:3])   # 10.0
+```
+
+### Octave bands and the A-weighted total (Annex F)
+
+Both methods are defined on one-third-octave bands, and Annex F forms the
+octave-band and A-weighted levels afterwards, for sound power (Eq. F.1, F.2) and
+sound energy (Eq. F.4, F.5) alike. The A-weighted total is the
+`sound_energy_level_a` of every result above; the octave bands are the energy
+sum of the three thirds $k = 3i - 2$ to $3i$ that Table F.1 assigns to octave
+$i$, numbered from $k = 1$ at 50 Hz, which `octave_band_levels` applies to any
+band spectrum whose thirds come in complete triplets:
+
+```python
+octaves, lj_octave = emission.octave_band_levels(slam_lj.sound_energy_level, thirds)
+print(octaves)                        # [ 125.  250.  500. 1000. 2000. 4000. 8000.]
+print(np.round(lj_octave, 1))         # 99.8 dB down to 87.7 dB, three thirds summed per octave
+```
+
+### `sound_energy_reverberation()` and `sound_energy_comparison()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `levels` | 1D, 2D or 3D array | dB | per band, `(NM, NB)` or `(Ne, NM, NB)` | Single event levels: per event on the first axis (Eq. 22), one reading of `events` events (Eq. 23), or the mean of one event |
+| `t60`, `volume`, `surface_area`, `frequencies` | as in section 1 | | | Direct method only. `frequencies` is required there; the comparison method takes it only when `background_levels` is given, since the correction is per band |
+| `levels_ref`, `lw_ref`, `background_levels_ref` | as in section 2 | | | Comparison method only; the reference source is steady and keeps the 9.1.2 correction |
+| `events` | int or None | | `>= 1`, default `None` | $N_\mathrm{e}$ encompassed by one reading (Eq. 23); at least 5 without a warning |
+| `background_levels` | 1D or 2D array | dB | matches `levels` | Time-averaged background over the same window; per-position $K_{1i}$ (Eq. 25/26) |
+| `integration_time` | float | s | > 0, required with `background_levels` | The window $T$; the background is compared as $L_{pi(\mathrm{B})} + 10\log_{10}(T/T_0)$ |
+| `temperature`, `static_pressure` | float | °C, kPa | defaults `23.0`, `101.325` | Set $c$, $C_1$, $C_2$ as in section 1 |
+
+Both return a `ReverberationSoundEnergyResult` (`sound_energy_level`,
+`mean_event_level`, `absorption_area`, `waterhouse_correction`,
+`background_correction`, `c1`, `c2`, `speed_of_sound`, `sound_energy_level_a`,
+`method`, `events`, `integration_time`), with the same `NaN` fields for the
+comparison method as its sound power twin, and the same qualification
+warnings.
+
 ## What this guide covers
 
 <Scope>
@@ -462,14 +588,19 @@ boundary correction and the $C_1$/$C_2$ meteorological corrections, and the
 comparison method against a reference sound source (`sound_power_comparison`,
 Eq. 21), both with per-band background correction and the Annex F A-weighted
 total, rendered as the accredited-style sound-power fiche through `.report()`.
+The sound energy level $L_J$ of a single event by the same two methods
+(`sound_energy_reverberation`, Eq. 30; `sound_energy_comparison`, Eq. 31):
+the $N_\mathrm{e}$ events reduced to one (Eq. 22/23), the per-position $K_{1i}$
+of Eq. 25 with the background compared over the same window, the Eq. 27 mean,
+and the Annex F octave-band (`octave_band_levels`, Eq. F.1/F.4) and A-weighted
+(Eq. F.2/F.5) levels.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="Not covered">
-The sound energy level $L_J$ of clause 9.2, the single-event counterpart of
-$L_W$ defined in the same clauses, is not implemented, so an impulsive or
-single-event source falls outside this guide. Neither is the Annex F
-octave-band summation, so octave results have to be summed from the
-one-third-octave band powers by hand. The reverberation-room qualification
+The single event results carry no `.report()` fiche, and the averaging over
+several source positions of Eq. 24 (and Eq. 13 for $L_W$) is left to the
+caller, who supplies levels already averaged over the positions of clause
+8.4.2.4. The reverberation-room qualification
 itself (Annex C/D, eigenfrequency counting or a reference-source comparison)
 is assumed, not performed; the library only warns on the coarse advisory
 criteria ISO 3741 states explicitly (the Table 1 minimum volume, the $V/S$

@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**595/595 conformance checks pass** across 59 domains and 375 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**600/600 conformance checks pass** across 59 domains and 375 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -278,7 +278,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>Intensity &amp; sound power</b>: 100% (26/26)</summary>
+<summary><b>Intensity &amp; sound power</b>: 100% (31/31)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -292,6 +292,11 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 4871:1996 clause 3.15 / Annex B | Declared L_WAd = L_WA + K_WA (Annex B, L_WA=88, K_WA=2) | 90 dB (+/-0 dB) | 90 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 4871:1996 clause 6.2 | Single-machine verification boundary L_1 <= L_WAd | L_1=90 verified, L_1=91 rejected (L_WAd=90) | 90->True, 91->False | boundary L_1 = L_WAd | - | ![Pass][cv-pass] Pass |
 | ISO 3741:2010 Eq. 20 | Reverberation-room method inverts to a known LW | 0 dB error | 0 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3744:2010 Eq. 23 / clause 3.4 NOTE 1 | Sound energy level of a source steady over T = 10 s is LW + 10 lg(T/T0) | LJ - LW = 10 dB, 0 dB error | 0 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3744:2010 Eq. 20 | One measurement encompassing Ne = 5 events is 10 lg 5 above one event | 6.9897 dB (+/-0 dB) | 6.9897 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3741:2010 Eq. 30 | Reverberation-room sound energy level inverts to a known LJ | 0 dB error | 0 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3741:2010 Eq. F.4 | Three equal one-third-octave bands sum to an octave level 10 lg 3 higher | 4.771213 dB (+/-0 dB) | 4.771213 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3744:2010 Annex G / H.4.2.7 | C1 + C2 of Eq. (G.1)/(G.3) vanish at 120 m altitude and 23 C | 0 dB (+/-0.001 dB) | -0.00005 dB | -0.00005 dB | 5 % | ![Pass][cv-pass] Pass |
 | ISO 9614-1:1993 Table B.2 | Criterion-2 factor C per band and grade, and the A-weighted grade-3 value | 59 tabulated values of C reproduced | max absolute deviation 0.000 | 0 | 0 % | ![Pass][cv-pass] Pass |
 | ISO 9614-1:1993 Table 2 | Standard deviation s of the determination per band and grade | 59 tabulated values of s reproduced | max absolute deviation 0.000 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 9614-1:1993 Table B.1 | Error factor Delta: 0,20 and 0,29 for all bands, 0,60 A-weighted | precision (all bands) = 0.2; engineering (all bands) = 0.29; survey (A-weighted) = 0.6 | precision (all bands) = 0.2; engineering (all bands) = 0.29; survey (A-weighted) = 0.6 | exact | 0 % | ![Pass][cv-pass] Pass |

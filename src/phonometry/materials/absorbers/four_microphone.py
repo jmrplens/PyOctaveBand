@@ -116,7 +116,7 @@ def air_density_astm(
 
     :param temperature: Room temperature ``T``, in **degrees Celsius**.
     :param atmospheric_pressure: Atmospheric pressure ``P``, in kilopascals
-        (default 101,325 kPa).
+        (default 101.325 kPa).
     :return: Air density ``rho``, in kilograms per cubic metre.
     """
     t = np.asarray(temperature, dtype=np.float64)

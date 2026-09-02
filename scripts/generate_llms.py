@@ -313,21 +313,35 @@ def _area_members() -> dict[str, list[str]]:
 
 
 #: Manual carve-outs from a folder's own shard, for a folder whose guides are
-#: still over the fetch budget after subgroup splitting. Today that is only
-#: ``buildings/insulation``: ten guides and no further folder to divide by,
-#: since it has no subgroups of its own (unlike ``buildings/rooms`` or
-#: ``buildings/design``, which already get a shard each above). The split
-#: follows how the folder's own overview already groups its pages by hand
-#: (``docs/buildings/insulation/index.md``: "Laboratory.", "Field.", "Ratings
-#: and the envelope."); the leaf names are its guide filenames and the label
-#: mirrors that heading. The carved-out shard has no page of its own, so its
-#: Overview link still resolves to the parent folder (see _shard_folders and
-#: _shard_label below).
+#: still over the fetch budget after subgroup splitting. Two folders need one,
+#: both because they have no subgroups of their own to divide by (unlike
+#: ``buildings/rooms`` or ``buildings/design``, which already get a shard each
+#: above). Each split follows a grouping the domain already makes rather than
+#: a cut chosen to fit the budget, so a reader fetching one shard gets a
+#: coherent set of guides and not an arbitrary half.
+#:
+#: ``buildings/insulation`` has ten guides, and its own overview groups them by
+#: hand (``docs/buildings/insulation/index.md``: "Laboratory.", "Field.",
+#: "Ratings and the envelope.").
+#:
+#: ``devices/emission`` has seven, and the family sorts its determination
+#: routes by the quantity actually measured: sound pressure, sound intensity,
+#: and the surface velocity of the casing. The intensity pair carves out.
+#:
+#: In both, the leaf names are guide filenames and the label mirrors the
+#: heading. The carved-out shard has no page of its own, so its Overview link
+#: still resolves to the parent folder (see _shard_folders and _shard_label
+#: below).
 MANUAL_SPLITS: dict[str, tuple[str, str, tuple[str, ...]]] = {
     "buildings/insulation": (
         "buildings-insulation-ratings",
         "Insulation ratings and the envelope",
         ("insulation-ratings", "facade-insulation", "spanish-building-code"),
+    ),
+    "devices/emission": (
+        "devices-emission-intensity",
+        "Sound intensity and sound power from it",
+        ("intensity", "sound-power-intensity"),
     ),
 }
 
@@ -595,11 +609,21 @@ def build_llms_txt(version: str, shard_slugs: tuple[str, ...]) -> str:
         # therefore which shard, each run of guides belongs to: a client that
         # wants the full text of one part should not have to infer the shard
         # from the URL path.
-        seen_groups: set[str] = set()
+        #
+        # The runs are emitted shard by shard rather than in the folder's own
+        # reading order, because a heading claims everything under it until the
+        # next one. Walking the reading order and switching heading on first
+        # sight of a new shard put a guide of the parent shard under a carved
+        # out heading whenever the carve-out was not the tail of that order,
+        # which is how the surface-velocity route came to sit under a heading
+        # about sound intensity. Within each run the reading order is kept.
+        grouped: dict[str, list[str]] = {}
         for route in routes:
-            group = shard_of.get(route, slug)
-            if group != slug and group not in seen_groups:
-                seen_groups.add(group)
+            grouped.setdefault(shard_of.get(route, slug), []).append(route)
+        for group in [slug, *(g for g in grouped if g != slug)]:
+            if group not in grouped:
+                continue
+            if group != slug:
                 folder = _shard_folders().get(group, group)
                 lines += [
                     "",
@@ -610,8 +634,9 @@ def build_llms_txt(version: str, shard_slugs: tuple[str, ...]) -> str:
                         f"[full text]({SITE_URL}/llms/llms-{group}.txt)"
                     ),
                 ]
-            if entry := link(route):
-                lines.append(entry)
+            for route in grouped[group]:
+                if entry := link(route):
+                    lines.append(entry)
         lines.append("")
 
     lines += [

@@ -1768,6 +1768,90 @@ in the same order.
   when it falls short.
 - **Status:** unreported (national translation, not the issuing body's text).
 
+## ISO 3744:2010, 8.3.4, Equation (21) (a time-integrated level compared with a time-averaged one)
+
+- **Location:** clause 8.3.4, Equation (21) and the symbol list beneath it
+  (PDF page 31, printed p. 25) of ISO 3744:2010, read against the definitions
+  of clauses 3.3 and 3.4 (PDF page 9, printed p. 3). The same construction is
+  printed as ISO 3741:2010 Equation (25) (PDF page 33, printed p. 24, with its
+  symbol list on PDF page 34, printed p. 25) as ISO 3747:2010 Equation
+  (14) (PDF pages 22 and 23, printed pp. 13 and 14), and as ISO 3746:2010
+  Equation (15) in clause 8.4.2 (PDF page 25, printed p. 16), which is the
+  survey-grade route the library takes for `grade='survey'`.
+- **The print:** $K_1 = -10 \lg\left(1 - 10^{-0{,}1\,\Delta L_E}\right)$ dB
+  with $\Delta L_E = \overline{L'_{E(\mathrm{ST})}} - \overline{L_{p(\mathrm{B})}}$,
+  where $\overline{L'_{E(\mathrm{ST})}}$ "is the mean frequency-band or
+  A-weighted single event time-integrated sound pressure level" and
+  $\overline{L_{p(\mathrm{B})}}$ "is the mean frequency-band or A-weighted
+  time-averaged sound pressure level of the background noise", followed by
+  "The integration time $T = t_2 - t_1$ and other measurement parameters shall
+  be the same for the measurement of the single event time-integrated sound
+  pressure level $L'_{Ei(\mathrm{ST})}$ and of the background noise level
+  $L_{pi(\mathrm{B})}$."
+- **The problem:** the two levels do not share a reference quantity, and the
+  correction subtracts one energy from another. By clause 3.4, $L_E$ is
+  $\int_{t_1}^{t_2} p^2\,\mathrm{d}t$ re $E_0 = (20\ \mu\text{Pa})^2\,\text{s}$;
+  by clause 3.3, $L_{p,T}$ is $\frac{1}{T}\int_{t_1}^{t_2} p^2\,\mathrm{d}t$
+  re $p_0^2$. Their difference is a ratio of energies only when $T = 1$ s. Over
+  the common interval $T$ the background contributes the energy
+  $L_{p(\mathrm{B})} + 10 \lg(T/T_0)$ (the identity of clause 3.4 NOTE 1), so
+  the printed $\Delta L_E$ exceeds the signal-to-background energy ratio by
+  $10 \lg(T/T_0)$ and $K_1$ is under-estimated for every $T > 1$ s: a burst
+  whose energy is 6 dB above the background's in a 10 s interval reads as
+  16 dB above it and earns no correction, where the criterion of 8.2.3 puts
+  $K_1$ at its largest admissible value, 1,3 dB. The twin chain of 8.2, where
+  both levels are time-averaged, has no such term, and 8.3.3 requires the
+  single event levels to be averaged "in the same way as for the
+  time-averaged sound pressure levels described in 8.2.2", so the intended
+  reading is the one under which the two chains coincide for a source that is
+  steady over $T$, $L_J = L_W + 10 \lg(T/T_0)$, and that is the reading under
+  which the insistence on one integration time for both measurements does any
+  work.
+- **Evidence:** Verified on PDF page 31 (printed p. 25) of ISO 3744:2010 for
+  the equation and its symbol list, and on PDF page 9 (printed p. 3) for the
+  definitions of clauses 3.3 and 3.4 with NOTE 1; the same construction read
+  on PDF pages 33 and 34 (printed pp. 24 and 25) of BS EN ISO 3741:2010 and on
+  PDF pages 22 and 23 (printed pp. 13 and 14) of BS EN ISO 3747:2010.
+- **Library behaviour:** `sound_energy_pressure`, `sound_energy_reverberation`
+  and `sound_energy_comparison` compare the background as its exposure over
+  the same interval, $L_{p(\mathrm{B})} + 10 \lg(T/T_0)$, and require
+  `integration_time` with the background of the source under test, which is
+  the one compared against an event level. The reference source of
+  `sound_energy_comparison` is steady, so `background_levels_ref` is corrected
+  by the time-averaged rule of 9.1.2 instead and takes no window; the criteria and the
+  clamp of 8.2.3 (and of 9.1.2 in ISO 3741) are then applied to that margin.
+  `tests/emission/test_sound_energy.py` pins $K_1 = 1{,}2563$ dB for a 78 dB
+  burst over a 62 dB background in a 10 s window, and
+  $L_J = L_W + 10 \lg(T/T_0)$ field by field on both families; the
+  conformance report carries the identity as "ISO 3744:2010 Eq. 23 / clause
+  3.4 NOTE 1".
+- **Status:** unreported.
+
+## ISO 3744:2010, 8.3.4 (the correction named K_1i in the text and K_1 in Equation (21))
+
+- **Location:** clause 8.3.4, first sentence and Equation (21) (PDF page 31,
+  printed p. 25).
+- **The print:** "The background noise correction, $K_{1i}$, shall be
+  calculated using Equation (21):" followed by
+  $K_1 = -10 \lg\left(1 - 10^{-0{,}1\,\Delta L_E}\right)$ dB with $\Delta L_E$
+  formed from the two means over the measurement surface,
+  $\overline{L'_{E(\mathrm{ST})}}$ and $\overline{L_{p(\mathrm{B})}}$.
+- **The problem:** the sentence names a per-position correction and the
+  equation defines a single one from surface means. The twin clause 8.2.3
+  names $K_1$ in both places and forms it from the same surface means
+  (Equation (16)), and 8.3.5 subtracts the unsubscripted $K_1$ in Equation
+  (22). The subscript is the per-microphone convention of ISO 3741:2010
+  clauses 9.1.2 and 9.2.2 ($K_{1i}$, Equations (14) and (25)), where each
+  position is corrected before the average, and does not belong to this
+  clause.
+- **Evidence:** Verified on PDF page 31 (printed p. 25) of ISO 3744:2010,
+  against clause 8.2.3 on PDF page 29 (printed p. 23).
+- **Library behaviour:** `sound_energy_pressure` forms one $K_1$ per band from
+  the surface means, as Equation (21) prints it and as `sound_power_pressure`
+  does for Equation (16); no per-position correction is applied in the
+  ISO 3744 chain. No change was required.
+- **Status:** unreported.
+
 ## ISO/PAS 1996-3:2022, Clause 5 (cross-references of r and d)
 
 - **Location:** Clause 5, Formula (2), the definitions of the symbols of the
@@ -1792,6 +1876,40 @@ in the same order.
   onset rate by 3 and the level difference by 2 (`predicted_prominence` in
   [`impulsive_sound.py`](../src/phonometry/environment/assessment/impulsive_sound.py)),
   which is also the NT ACOU 112:2002 form the PAS carries over.
+- **Status:** unreported.
+
+## ISO 3744:2010, H.4.2.7 (the altitude correction and the divisor under it)
+
+- **Location:** Annex H (informative), H.4.2.7 "Meteorological and radiation
+  impedance corrections", the paragraph that sizes $u_{C_1+C_2}$ from the
+  Annex G correction.
+- **The print:** "At 120 m altitude and 23 °C the correction is zero and at
+  500 m altitude the correction is 0,6 dB. Assuming a triangular distribution
+  for this uncertainty, the standard deviation is
+  $s_\mathrm{met} = 0{,}6/\sqrt{6} = 0{,}3\ \mathrm{dB}$."
+- **The problem:** two independent defects in one sentence pair.
+  (a) Annex G, which is normative and which this paragraph points at, gives
+  $C_1 + C_2 = 0{,}394$ dB at 500 m and 23,0 °C, not 0,6 dB. The reading is
+  self-validating: the same two equations give $-4{,}6 \times 10^{-5}$ dB at
+  120 m and 23,0 °C, which is the "zero" the same sentence prints, so the
+  constants and the temperature terms are being read as the standard intends.
+  0,6 dB is reached at about 697 m at 23,0 °C, or at 500 m only if the air is
+  at 30,1 °C.
+  (b) $0{,}6/\sqrt{6} = 0{,}245$, not 0,3. The quotient does not give the
+  result printed beside it: 0,3 dB is exactly $0{,}6/2$, so either the divisor
+  or the result is wrong. For a triangular distribution of half-width $a$ the
+  standard deviation is $a/\sqrt{6}$, which is the divisor the sentence names.
+- **Evidence:** H.4.2.7 read on PDF page 82 (printed p. 73), against Annex G
+  Equations (G.1) and (G.2) with $a = 2{,}2560 \times 10^{-5}$ m$^{-1}$,
+  $b = 5{,}2553$, $\theta_0 = 314$ K and $\theta_1 = 296$ K on PDF pages 73 and
+  74 (printed pp. 64 and 65), all of BS EN ISO 3744:2010. Both values were
+  recomputed from the printed equations alone.
+- **Library behaviour:** the Annex H uncertainty budget is not modelled, so no
+  published number depends on either figure. The Annex G correction itself is
+  evaluated from Equations (G.1) and (G.2) by
+  [`reference_atmosphere_correction`](../src/phonometry/emission/sound_power.py),
+  and the conformance check "ISO 3744:2010 Annex G / H.4.2.7" pins the half of
+  the paragraph that is right: the correction vanishes at 120 m and 23 °C.
 - **Status:** unreported.
 
 ## ISO 9613-2:1996, Table 2 (15 °C / 80 % / 1 kHz cell)

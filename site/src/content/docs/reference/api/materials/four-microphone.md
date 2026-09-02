@@ -50,7 +50,7 @@ $\rho = 1.290 \, \frac{P}{101.325} \, \frac{273.15}{273.15 + T}$.
 | Name | Description |
 | :--- | :--- |
 | `temperature` | Room temperature `T`, in **degrees Celsius**. |
-| `atmospheric_pressure` | Atmospheric pressure `P`, in kilopascals (default 101,325 kPa). |
+| `atmospheric_pressure` | Atmospheric pressure `P`, in kilopascals (default 101.325 kPa). |
 
 **Returns:** Air density `rho`, in kilograms per cubic metre.
 
