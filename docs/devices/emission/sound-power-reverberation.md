@@ -289,14 +289,17 @@ import numpy as np
 from phonometry import emission
 
 # Five door slams recorded at the six positions of the room of section 1, one at
-# a time: (events, positions, bands), one-third octaves 100 Hz - 10 kHz.
-slam = np.linspace(88.0, 76.0, freqs.size)      # single event level, dB re E0
+# a time: (events, positions, bands), the 21 one-third octaves 100 Hz - 10 kHz.
+thirds = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250,
+                   1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000], dtype=float)
+t60_thirds = np.full(thirds.size, 2.0)
+slam = np.linspace(88.0, 76.0, thirds.size)      # single event level, dB re E0
 rng = np.random.default_rng(3741)
-slams = slam + rng.normal(0.0, 0.6, size=(5, 6, freqs.size))
+slams = slam + rng.normal(0.0, 0.6, size=(5, 6, thirds.size))
 
 slam_lj = emission.sound_energy_reverberation(
-    slams, t60, volume=200.0, surface_area=220.0, frequencies=freqs,
-    background_levels=np.full(freqs.size, 45.0),   # time-averaged over the same 4 s
+    slams, t60_thirds, volume=200.0, surface_area=220.0, frequencies=thirds,
+    background_levels=np.full(thirds.size, 45.0),   # time-averaged over the same 4 s
     integration_time=4.0, temperature=20.0, static_pressure=101.0,
 )
 print(slam_lj.events, slam_lj.method)                    # 5 direct
@@ -305,18 +308,23 @@ print(round(slam_lj.sound_energy_level_a, 1))            # LJA = 99.0 dB(A)
 
 # Comparison method: the reference source of section 1, run steadily.
 slam_cmp = emission.sound_energy_comparison(
-    slams, lp_rss, lw_rss, frequencies=freqs, temperature=20.0,
+    slams, lp_rss, lw_rss, frequencies=thirds, temperature=20.0,
 )
 print(round(float(slam_cmp.sound_energy_level[0]), 1), slam_cmp.method)   # 95.0 comparison
 
 # Annex F octave bands, and the identity with the steady chain (LJ = LW + 10 lg(T/T0)).
-octaves, lj_octave = emission.octave_band_levels(slam_lj.sound_energy_level, freqs)
+octaves, lj_octave = emission.octave_band_levels(slam_lj.sound_energy_level, thirds)
 print(octaves)                        # [ 125.  250.  500. 1000. 2000. 4000. 8000.]
-ten_seconds = emission.sound_energy_reverberation(
-    lp + 10.0, t60, volume=200.0, surface_area=220.0, frequencies=freqs,
+lp_thirds = np.linspace(80.0, 70.0, thirds.size)     # the mean room SPL of section 1
+steady = emission.sound_power_reverberation(
+    lp_thirds, t60_thirds, volume=200.0, surface_area=220.0, frequencies=thirds,
     temperature=20.0, static_pressure=101.0,
 )
-print(np.round(ten_seconds.sound_energy_level - rev.sound_power_level, 6)[:3])   # 10.0
+ten_seconds = emission.sound_energy_reverberation(
+    lp_thirds + 10.0, t60_thirds, volume=200.0, surface_area=220.0, frequencies=thirds,
+    temperature=20.0, static_pressure=101.0,
+)
+print(np.round(ten_seconds.sound_energy_level - steady.sound_power_level, 6)[:3])   # 10.0
 
 slam_lj.plot()   # LJ per one-third octave, LJA in the title (needs matplotlib)
 ```

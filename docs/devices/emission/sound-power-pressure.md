@@ -538,16 +538,24 @@ burst = emission.sound_energy_pressure(
 )
 print(burst.events)                                        # 5 (Eq. 19 over the first axis)
 print(round(float(burst.environmental_correction[0]), 2))  # K2 = 2.64 dB
-print(np.round(burst.sound_energy_level, 1))               # per-band LJ, 95.1 ... 90.8 dB
+print(np.round(burst.sound_energy_level, 1))               # per-band LJ, 95.1 dB down to 90.8 dB
 print(round(burst.sound_energy_level_a, 1))                # LJA = 107.7 dB(A)
 
 # The section 1 measurement read as a 10 s window: LJ = LW + 10 lg(T/T0) exactly.
-ten_seconds = emission.sound_energy_pressure(
-    levels + 10.0, "hemisphere", radius=1.5, reflecting_planes=1,
-    background_levels=background, integration_time=10.0, frequencies=freqs,
-    room=emission.RoomEnvironment(reverberation_time=0.6, volume=300.0),
+octaves_hz = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000])
+rng = np.random.default_rng(0)
+ten_positions = np.array([70.0, 74.0, 78.0, 80.0, 79.0, 76.0, 72.0, 66.0]) + rng.normal(0.0, 0.5, size=(10, 8))
+quiet = np.full((10, 8), 55.0)
+workshop = emission.RoomEnvironment(reverberation_time=0.6, volume=300.0)
+steady = emission.sound_power_pressure(
+    ten_positions, "hemisphere", radius=1.5, reflecting_planes=1,
+    background_levels=quiet, frequencies=octaves_hz, room=workshop,
 )
-print(np.round(ten_seconds.sound_energy_level - res.sound_power_level, 6))   # 10.0 in every band
+ten_seconds = emission.sound_energy_pressure(
+    ten_positions + 10.0, "hemisphere", radius=1.5, reflecting_planes=1,
+    background_levels=quiet, integration_time=10.0, frequencies=octaves_hz, room=workshop,
+)
+print(np.round(ten_seconds.sound_energy_level - steady.sound_power_level, 6))   # 10.0 in every band
 
 # Annex G: a determination at 1 200 m and 8 C carried to 101.325 kPa and 23 C (Eq. G.3).
 corr = emission.reference_atmosphere_correction(8.0, altitude=1200.0)
