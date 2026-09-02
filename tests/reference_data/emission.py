@@ -174,3 +174,121 @@ ISO9614_1_TABLE_B3: list[tuple[str, tuple[str, ...]]] = [
         ("d",),
     ),
 ]
+
+# ---------------------------------------------------------------------------
+# ISO 5136:2003 (as reproduced in BS EN ISO 5136:2009), sound power radiated
+# into a duct by fans, in-duct method. Every value below was read from the
+# rendered page of the PDF (the printed folio is the PDF page index minus 10);
+# the decimal comma of the print is written as a point.
+# ---------------------------------------------------------------------------
+#: The 27 nominal one-third-octave bands of Annex C Table C.1 (PDF page 44,
+#: printed p. 34), j = 1 (50 Hz) to j_max = 27 (20 kHz), in hertz.
+ISO5136_BANDS: tuple[int, ...] = (
+    50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000,
+    1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500,
+    16000, 20000,
+)  # fmt: skip
+#: Table C.1, the A-weighting C_j "according to IEC 60651", dB, one per band
+#: of ISO5136_BANDS.
+ISO5136_TABLE_C1: tuple[float, ...] = (
+    -30.2, -26.2, -22.5, -19.1, -16.1, -13.4, -10.9, -8.6, -6.6, -4.8, -3.2,
+    -1.9, -0.8, 0.0, 0.6, 1.0, 1.2, 1.3, 1.2, 1.0, 0.5, -0.1, -1.1, -2.5,
+    -4.3, -6.6, -9.3,
+)  # fmt: skip
+#: Table 2 (PDF page 17, printed p. 7), "Values of the standard deviation of
+#: reproducibility for the sampling tube": the printed rows, two of which are
+#: ranges ("80 to 100", "125 to 4 000"), as (lowest band, highest band,
+#: sigma_R in dB).
+ISO5136_TABLE_2_SIGMA_R: tuple[tuple[int, int, float], ...] = (
+    (50, 50, 3.5),
+    (63, 63, 3.0),
+    (80, 100, 2.5),
+    (125, 4000, 2.0),
+    (5000, 5000, 2.5),
+    (6300, 6300, 3.0),
+    (8000, 8000, 3.5),
+    (10000, 10000, 4.0),
+)
+#: Table 3 (PDF page 18, printed p. 8), "Extrapolated values" of sigma_R above
+#: 10 kHz, dB, which clause 4 suggests for bands that are "not considered part
+#: of this International Standard".
+ISO5136_TABLE_3_SIGMA_R: tuple[tuple[int, float], ...] = (
+    (12500, 4.5),
+    (16000, 5.0),
+    (20000, 5.5),
+)
+#: Annex D, Eqs (D.1) to (D.3) (PDF page 45, printed p. 35): for d = 0,5 m
+#: at 1 000 Hz, C3,4 = (1,85 + 0,038 U) dB, which the print evaluates to
+#: "≈ 2,4 dB" at U = 15 m/s (outlet duct) and "≈ 1,3 dB" at U = -15 m/s
+#: (inlet duct); the two products are exactly 2,42 and 1,28.
+ISO5136_ANNEX_D_A0 = 1.85  # dB
+ISO5136_ANNEX_D_A1 = 0.038  # dB s/m
+ISO5136_ANNEX_D_DIAMETER = 0.5  # m
+ISO5136_ANNEX_D_FREQUENCY = 1000.0  # Hz
+ISO5136_ANNEX_D_OUTLET: tuple[float, float] = (15.0, 2.4)  # (U, printed C3,4)
+ISO5136_ANNEX_D_INLET: tuple[float, float] = (-15.0, 1.3)  # (U, printed C3,4)
+#: Table D.1 (PDF pages 45 and 46, printed pp. 35 and 36), "Value of
+#: correction C3,4 in decibels for d = 0,5 m and different flow velocities U":
+#: the six columns are U = 5, -5, 15, -15, 30 and -30 m/s, the 27 rows are the
+#: bands of ISO5136_BANDS. Transcribed as printed, to the printed 0,1 dB; the
+#: page prints "2", "0" and "16" for cells the text layer carries as "2,0",
+#: "0,0" and "16,0". The two cells of the worked example, 1 000 Hz at
+#: +/-15 m/s, are the ones the print frames in bold.
+ISO5136_TABLE_D1_VELOCITIES: tuple[float, ...] = (5.0, -5.0, 15.0, -15.0, 30.0, -30.0)
+ISO5136_TABLE_D1: tuple[tuple[float, ...], ...] = (
+    (0.1, -0.2, 0.4, -0.5, 0.8, -0.9),  # 50 Hz
+    (0.1, -0.2, 0.4, -0.5, 0.8, -0.9),  # 63 Hz
+    (0.1, -0.2, 0.4, -0.5, 0.8, -0.9),  # 80 Hz
+    (0.1, -0.2, 0.4, -0.5, 0.8, -0.9),  # 100 Hz
+    (0.1, -0.2, 0.4, -0.5, 0.8, -0.9),  # 125 Hz
+    (0.1, -0.2, 0.4, -0.5, 0.8, -0.9),  # 160 Hz
+    (0.1, -0.2, 0.4, -0.5, 0.8, -0.9),  # 200 Hz
+    (0.1, -0.2, 0.4, -0.5, 0.8, -0.9),  # 250 Hz
+    (-0.5, -0.8, -0.2, -1.1, 0.2, -1.5),  # 315 Hz
+    (-0.3, -0.6, 0.0, -0.9, 0.5, -1.3),  # 400 Hz
+    (-0.2, -0.5, 0.2, -0.8, 0.6, -1.2),  # 500 Hz
+    (0.2, -0.1, 0.6, -0.4, 1.1, -0.9),  # 630 Hz
+    (1.2, 0.9, 1.6, 0.5, 2.1, 0.0),  # 800 Hz
+    (2.0, 1.7, 2.4, 1.3, 3.0, 0.7),  # 1 000 Hz
+    (2.8, 2.4, 3.3, 2.0, 4.0, 1.4),  # 1 250 Hz
+    (3.4, 2.9, 4.0, 2.4, 4.9, 1.7),  # 1 600 Hz
+    (4.0, 3.3, 4.7, 2.7, 5.8, 1.8),  # 2 000 Hz
+    (4.5, 3.7, 5.4, 2.9, 6.9, 1.9),  # 2 500 Hz
+    (5.2, 4.1, 6.5, 3.1, 8.4, 2.1),  # 3 150 Hz
+    (6.2, 4.9, 7.7, 3.8, 10.2, 2.8),  # 4 000 Hz
+    (6.8, 5.3, 8.7, 4.2, 11.8, 3.2),  # 5 000 Hz
+    (7.9, 6.1, 10.1, 4.7, 13.7, 3.8),  # 6 300 Hz
+    (9.3, 7.0, 12.2, 5.6, 16.2, 4.9),  # 8 000 Hz
+    (10.5, 7.6, 13.9, 5.9, 17.9, 5.6),  # 10 000 Hz
+    (11.6, 8.0, 16.0, 6.7, 19.5, 6.4),  # 12 500 Hz
+    (13.1, 8.7, 18.2, 7.5, 21.2, 7.3),  # 16 000 Hz
+    (14.8, 9.4, 20.2, 8.4, 23.6, 7.9),  # 20 000 Hz
+)
+#: Half of the last printed place of Table D.1: a cell reproduces when the
+#: polynomial lands within it of the printed value. Four cells of the 50 Hz to
+#: 250 Hz rows sit exactly on a decimal half (0,085; -0,185; 0,355; -0,455)
+#: and are printed rounded away from zero, so the comparison is a tolerance,
+#: not a rounding rule.
+ISO5136_TABLE_D1_TOLERANCE_DB = 0.05
+#: Clause 1.1 (PDF page 11, printed p. 1): the maximum mean flow velocity at
+#: the microphone head per shield, m/s, and the test-duct diameter range, m.
+ISO5136_MAX_VELOCITY: dict[str, float] = {
+    "foam-ball": 15.0,
+    "nose-cone": 20.0,
+    "sampling-tube": 40.0,
+}
+ISO5136_DUCT_DIAMETER_RANGE: tuple[float, float] = (0.15, 2.0)
+#: Clause 5.3.3.4 NOTE and the footnote of Tables A.1 to A.6 (PDF pages 28
+#: and 35 to 40): the sampling-tube coefficients extend to |U| <= 60 m/s for
+#: information only.
+ISO5136_SAMPLING_TUBE_INFORMATIVE_VELOCITY = 60.0
+#: Clause 5.3.4.3 (PDF page 29, printed p. 19): Eq. (8) and its "under normal
+#: conditions, c = 340 m/s".
+ISO5136_C_NORMAL = 340.0
+#: Clause 8.2 (PDF pages 33 and 34, printed pp. 23 and 24): S0 = 1 m^2 and
+#: (rho c)_0 = 400 N s/m^3 of Eq. (12).
+ISO5136_S0 = 1.0
+ISO5136_RHO_C_0 = 400.0
+#: Clause 9.2 (PDF page 34, printed p. 24): the expanded uncertainty at 95 %
+#: coverage is twice the standard deviation of reproducibility of clause 4.
+ISO5136_COVERAGE_FACTOR = 2.0

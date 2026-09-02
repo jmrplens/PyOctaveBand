@@ -849,3 +849,168 @@ def _chk_iso3747_excess_level() -> Outcome:
     free = lw - 11.0 - 20.0 * math.log10(r)
     computed = ph.emission.excess_sound_pressure_level(free + 7.0, lw, r)
     return numeric(7.0, float(computed), 1e-12, unit="dB", places=6)
+
+
+# ---------------------------------------------------------------------------
+# ISO 5136:2003, sound power radiated into a duct by fans (in-duct method)
+# ---------------------------------------------------------------------------
+@register(
+    "Intensity & sound power",
+    "ISO 5136:2003 Table D.1",
+    "C3,4 of the sampling tube for d = 0,5 m at U = +/-5, +/-15, +/-30 m/s, 27 bands",
+)
+def _chk_iso5136_table_d1() -> Outcome:
+    """All 162 printed cells against Eq. (7) with the Table A.4 coefficients.
+
+    The table prints to 0,1 dB, so the budget is half of that; four cells of
+    the low bands sit exactly on a decimal half and are printed rounded away
+    from zero, which is what puts the worst cell at 0,045 dB.
+    """
+    worst = 0.0
+    for band, row in zip(ref.ISO5136_BANDS, ref.ISO5136_TABLE_D1, strict=True):
+        for velocity, printed in zip(ref.ISO5136_TABLE_D1_VELOCITIES, row, strict=True):
+            computed = float(
+                ph.emission.flow_modal_correction(
+                    [float(band)], velocity, ref.ISO5136_ANNEX_D_DIAMETER
+                )[0]
+            )
+            worst = max(worst, abs(computed - printed))
+    n = len(ref.ISO5136_BANDS) * len(ref.ISO5136_TABLE_D1_VELOCITIES)
+    return numeric(
+        0.0,
+        worst,
+        ref.ISO5136_TABLE_D1_TOLERANCE_DB,
+        unit="dB",
+        places=3,
+        expected_label=f"{n} tabulated values reproduced to the printed 0,1 dB",
+        computed_label=f"max absolute deviation {worst:.3f} dB",
+    )
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 5136:2003 Eqs (D.2)/(D.3)",
+    "Worked example: C3,4 = (1,85 + 0,038 U) dB at 1 kHz, U = +15 and -15 m/s",
+)
+def _chk_iso5136_annex_d_example() -> Outcome:
+    """The two framed cells of the example, to the exact product.
+
+    1,85 + 0,038 x 15 = 2,42 dB (printed "approx. 2,4") and
+    1,85 + 0,038 x (-15) = 1,28 dB (printed "approx. 1,3").
+    """
+    worst = 0.0
+    for velocity, _printed in (ref.ISO5136_ANNEX_D_OUTLET, ref.ISO5136_ANNEX_D_INLET):
+        exact = ref.ISO5136_ANNEX_D_A0 + ref.ISO5136_ANNEX_D_A1 * velocity
+        computed = float(
+            ph.emission.flow_modal_correction(
+                [ref.ISO5136_ANNEX_D_FREQUENCY], velocity, ref.ISO5136_ANNEX_D_DIAMETER
+            )[0]
+        )
+        worst = max(worst, abs(computed - exact))
+    return numeric(
+        0.0,
+        worst,
+        1e-9,
+        unit="dB",
+        places=9,
+        expected_label="2,42 dB at +15 m/s and 1,28 dB at -15 m/s reproduced",
+        computed_label=f"max absolute deviation {worst:.1e} dB",
+    )
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 5136:2003 Eq. (8)",
+    "Nose-cone / foam-ball correction 10 lg[1/(1 - U/c)^2] at U = 20 m/s, c = 340 m/s",
+)
+def _chk_iso5136_eq8() -> Outcome:
+    """The convective term written out: -20 lg(1 - 20/340) = 0,52658 dB."""
+    expected = -20.0 * math.log10(1.0 - 20.0 / ref.ISO5136_C_NORMAL)
+    computed = float(
+        ph.emission.flow_modal_correction(
+            [1000.0], 20.0, ref.ISO5136_ANNEX_D_DIAMETER, shield="nose-cone"
+        )[0]
+    )
+    return numeric(expected, computed, 1e-9, unit="dB", places=5)
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 5136:2003 Eq. (12)",
+    "Plane-wave relation LW - Lp = 10 lg(S/S0) - 10 lg(rho c/400), d = 0,5 m",
+)
+def _chk_iso5136_eq12() -> Outcome:
+    """The two terms of Eq. (12) written out against the result's own rho c.
+
+    S = pi x 0,5^2 / 4 = 0,196350 m^2, 10 lg S = -7,0691 dB; the duct air at
+    20 degC and 101,325 kPa has rho c = 413,25 N s/m^3 (1,2041 kg/m^3 times
+    343,20 m/s), so the impedance term is -0,1415 dB and the whole bracket
+    -7,2106 dB.
+    """
+    res = ph.emission.sound_power_in_duct(
+        np.full((3, 1), 80.0), [1000.0], ref.ISO5136_ANNEX_D_DIAMETER, 0.0
+    )
+    area = math.pi * ref.ISO5136_ANNEX_D_DIAMETER**2 / 4.0
+    rho = 101325.0 / (287.05 * 293.15)
+    c = 20.05 * math.sqrt(273.0 + 20.0)
+    expected = 10.0 * math.log10(area / ref.ISO5136_S0) - 10.0 * math.log10(
+        rho * c / ref.ISO5136_RHO_C_0
+    )
+    computed = float(res.sound_power_level[0] - res.corrected_pressure_level[0])
+    return numeric(expected, computed, 1e-6, unit="dB", places=4)
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 5136:2003 Table 2 / Table 3",
+    "Reproducibility sigma_R per band, 50 Hz to 10 kHz, and the extrapolated 12,5 to 20 kHz",
+)
+def _chk_iso5136_table_2() -> Outcome:
+    """Every band of the two tables, the ranges of Table 2 unrolled."""
+    expected: dict[int, float] = {}
+    for low, high, sigma in ref.ISO5136_TABLE_2_SIGMA_R:
+        expected.update(
+            (band, sigma) for band in ref.ISO5136_BANDS if low <= band <= high
+        )
+    expected.update(dict(ref.ISO5136_TABLE_3_SIGMA_R))
+    bands = [float(band) for band in ref.ISO5136_BANDS]
+    computed = ph.emission.in_duct_reproducibility(bands)
+    worst = max(
+        abs(float(value) - expected[band])
+        for band, value in zip(ref.ISO5136_BANDS, computed, strict=True)
+    )
+    return numeric(
+        0.0,
+        worst,
+        0.0,
+        unit="dB",
+        places=3,
+        expected_label=f"{len(expected)} tabulated values of sigma_R reproduced",
+        computed_label=f"max absolute deviation {worst:.3f} dB",
+    )
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 5136:2003 Annex C Table C.1",
+    "A-weighting C_j of the 27 bands, read back as LWA - LW of one band at a time",
+)
+def _chk_iso5136_table_c1() -> Outcome:
+    """Eq. (C.1) on a single band is LW + C_j, so the difference is the table."""
+    worst = 0.0
+    for band, cj in zip(ref.ISO5136_BANDS, ref.ISO5136_TABLE_C1, strict=True):
+        res = ph.emission.sound_power_in_duct(
+            [80.0], [float(band)], ref.ISO5136_ANNEX_D_DIAMETER, 0.0
+        )
+        worst = max(
+            worst, abs(res.sound_power_level_a - float(res.sound_power_level[0]) - cj)
+        )
+    return numeric(
+        0.0,
+        worst,
+        1e-9,
+        unit="dB",
+        places=9,
+        expected_label=f"{len(ref.ISO5136_TABLE_C1)} tabulated values of C_j reproduced",
+        computed_label=f"max absolute deviation {worst:.1e} dB",
+    )
