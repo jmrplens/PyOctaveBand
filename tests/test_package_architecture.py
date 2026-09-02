@@ -441,7 +441,8 @@ def test_no_error_message_carries_a_comma_decimal() -> None:
     """
     offenders: list[str] = []
     for path in sorted(Path("src/phonometry").rglob("*.py")):
-        for number, line in enumerate(path.read_text().splitlines(), 1):
+        text = path.read_text(encoding="utf-8")
+        for number, line in enumerate(text.splitlines(), 1):
             stripped = line.strip()
             if not stripped.startswith("msg = "):
                 continue
