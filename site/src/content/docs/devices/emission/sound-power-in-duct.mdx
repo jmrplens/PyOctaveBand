@@ -205,8 +205,9 @@ duct.plot()   # in-duct LW spectrum, LWA in the title (needs matplotlib)
 
 *The bars are $L_W$ per band, the dashed line the level the sampling tube
 read before any correction. At the low end the two differ by 4.93 dB: the
-area term $10 \lg S = -5.06$ dB for the 0.312 m² duct, plus the 0.14 dB of
-the impedance term, which widens the gap rather than closing it, less the
+area term $10 \lg S = -5.06$ dB for the 0.312 m² duct, and the $-0.14$ dB of
+the impedance term, which widens the gap rather than closing it because
+Eq. (12) subtracts it, less the
 0.27 dB that $C_{3,4}$ already adds at 12 m/s even in the plane-wave bands.
 From 1 kHz up the corrections take over, until at 10 kHz the combined
 correction reaches 18 dB (4.0 dB of tube response, 12.9 dB of $C_{3,4}$ and
