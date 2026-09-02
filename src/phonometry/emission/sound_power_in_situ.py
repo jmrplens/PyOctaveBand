@@ -611,36 +611,134 @@ def _background_advisory(background_levels: ArrayLike | None) -> None:
         )
 
 
+@dataclass(frozen=True)
+class _Comparison:
+    """Everything the reference source and the environment contribute.
+
+    Both entry points forward these ten arguments to :func:`_determine`
+    unchanged: they describe the source being compared against and the
+    conditions of the test, not the quantity under determination. Keeping
+    them together is what lets the two routes share the second half of the
+    procedure verbatim, which is what the standard does as well, since
+    clauses 8.5 and 9 read the same for power and for energy.
+    """
+
+    levels_ref: ArrayLike
+    lw_ref: ArrayLike
+    frequencies: ArrayLike
+    background_levels_ref: ArrayLike | None
+    temperature: float
+    static_pressure: float
+    excess_levels: ArrayLike | None
+    directivity_range: float | None
+    sigma_omc: float | None
+    coverage_factor: float
+
+
+def _event_shape(arr: np.ndarray, events: int | None) -> tuple[bool, int, int, int]:
+    """Read the two forms of clause 8.4 off the array, and refuse the mixture.
+
+    Measured one event at a time the array is ``(positions, N, bands)`` and
+    carries ``N`` itself, so ``events`` would be a second, contradictable
+    source for the same number and is refused. Measured once over ``N``
+    events the array is ``(positions, bands)``, ``N`` is nowhere in it, and
+    Eq. (17) cannot be applied without it.
+
+    :return: ``(one_at_a_time, n_positions, n_events, n_bands)``.
+    """
+    one_at_a_time = arr.ndim == 3  # noqa: PLR2004
+    if one_at_a_time:
+        if events is not None:
+            msg = (
+                "'events' is counted from the second axis of a 3D 'event_levels'; "
+                "pass it only with a 2D (positions, bands) measurement."
+            )
+            raise ValueError(msg)
+        n_positions, n_events, n_bands = arr.shape
+        return True, n_positions, n_events, n_bands
+    if (
+        events is None
+        or isinstance(events, bool)
+        or not isinstance(events, (int, np.integer))
+        or events < 1
+    ):
+        msg = (
+            "'events' must be a positive integer, the number N of events the "
+            "2D 'event_levels' measurement encompasses (ISO 3747:2010, Eq. 17)."
+        )
+        raise ValueError(msg)
+    n_positions, n_bands = arr.shape
+    return False, n_positions, int(events), n_bands
+
+
+def _event_background(
+    arr: np.ndarray,
+    bg: np.ndarray | None,
+    *,
+    integration_time: float | None,
+    one_at_a_time: bool,
+    n_bands: int,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """``K1``, the per-band verdict and the per-position levels of clause 8.4.
+
+    With no background measured there is nothing to correct and nothing that
+    can be declared valid, so ``K1`` is zero and the verdict is ``False``
+    throughout. With one measured, Eq. (14) compares a time-integrated event
+    level against a time-averaged background, which is a ratio of energies
+    only over a one-second window; ``integration_time`` carries the
+    background to the window actually used before the comparison.
+
+    :return: ``(K1 per position and band, verdict per band, per-position
+        levels)``.
+    """
+    n_positions = arr.shape[0]
+    if bg is None:
+        return (
+            np.zeros((n_positions, n_bands), dtype=np.float64),
+            np.zeros(n_bands, dtype=bool),
+            arr if not one_at_a_time else energy_mean(arr, axis=1),
+        )
+    bg_event = bg
+    if integration_time is not None:
+        bg_event = bg + 10.0 * np.log10(integration_time / _T0_S)
+    if one_at_a_time:
+        k1_events, met_grid = _background_correction(arr - bg_event[:, None, :])
+        per_position = energy_mean(arr - k1_events, axis=1)  # Eq. (13), (15)
+        return (
+            energy_mean(arr, axis=1) - per_position,
+            np.all(met_grid, axis=(0, 1)),
+            per_position,
+        )
+    k1, met_grid = _background_correction(arr - bg_event)
+    return k1, np.all(met_grid, axis=0), arr - k1  # Eq. (16)
+
+
 def _determine(
     *,
     quantity: str,
     mean_source: np.ndarray,
     background_correction: np.ndarray,
     met_source: np.ndarray,
-    levels_ref: ArrayLike,
-    lw_ref: ArrayLike,
-    frequencies: ArrayLike,
     background_levels: np.ndarray | None,
-    background_levels_ref: ArrayLike | None,
-    temperature: float,
-    static_pressure: float,
-    excess_levels: ArrayLike | None,
-    directivity_range: float | None,
-    sigma_omc: float | None,
-    coverage_factor: float,
+    comparison: _Comparison,
 ) -> InSituSoundPowerResult:
     """The part of both determinations that runs on the reference source:
     Eq. (9), (10) and the two energy means of Eq. (12) / (20), then Annex C,
     Annex D and clause 9.
     """
     n_positions, n_bands = background_correction.shape
-    freqs = _checked_frequencies(frequencies, n_bands)
-    ref, power = _reference_grids(levels_ref, lw_ref, n_positions, n_bands)
+    freqs = _checked_frequencies(comparison.frequencies, n_bands)
+    ref, power = _reference_grids(
+        comparison.levels_ref, comparison.lw_ref, n_positions, n_bands
+    )
     m = ref.shape[0]
     # One background reading serves both sources (7.5): the reference-source
     # measurement takes the source's background unless it brought its own.
     bg_ref = _background_grid(
-        background_levels_ref, "background_levels_ref", n_positions, n_bands
+        comparison.background_levels_ref,
+        "background_levels_ref",
+        n_positions,
+        n_bands,
     )
     if bg_ref is None:
         bg_ref = background_levels
@@ -653,7 +751,7 @@ def _determine(
         # it comes from is per location: evaluated per (j, i).
         k1_ref, met = _background_correction(ref - bg_ref[None, :, :])
         met_ref = np.all(met, axis=(0, 1))
-    _validate_meteorology(temperature, static_pressure)
+    _validate_meteorology(comparison.temperature, comparison.static_pressure)
     corrected_ref = ref - k1_ref
     per_location = energy_mean(corrected_ref, axis=1)  # Eq. (9) / (10)
     mean_ref = energy_mean(per_location, axis=0)  # second term of Eq. (12)
@@ -661,8 +759,12 @@ def _determine(
     level = np.asarray(ref_power - mean_ref + mean_source, dtype=np.float64)
     nan_band = np.full(n_bands, np.nan, dtype=np.float64)
     total = energy_sum(level + _a_weighting_corrections(freqs))  # Eq. (D.1) / (D.2)
-    grade = _accuracy_grade(excess_levels, directivity_range, n_positions)
-    sigma_r0, omc, sigma_tot, expanded = _uncertainty(grade, sigma_omc, coverage_factor)
+    grade = _accuracy_grade(
+        comparison.excess_levels, comparison.directivity_range, n_positions
+    )
+    sigma_r0, omc, sigma_tot, expanded = _uncertainty(
+        grade, comparison.sigma_omc, comparison.coverage_factor
+    )
     is_power = quantity == "power"
     return InSituSoundPowerResult(
         frequencies=freqs,
@@ -675,13 +777,13 @@ def _determine(
         background_correction=np.asarray(background_correction, dtype=np.float64),
         background_correction_ref=np.asarray(k1_ref, dtype=np.float64),
         background_requirement_met=np.asarray(met_source & met_ref, dtype=bool),
-        c2=_c2_correction(temperature, static_pressure),
+        c2=_c2_correction(comparison.temperature, comparison.static_pressure),
         grade=grade,
         sigma_r0=sigma_r0,
         sigma_omc=omc,
         sigma_tot=sigma_tot,
         expanded_uncertainty=expanded,
-        coverage_factor=coverage_factor,
+        coverage_factor=comparison.coverage_factor,
         sound_power_level_a=total if is_power else float("nan"),
         sound_energy_level_a=float("nan") if is_power else total,
         quantity=quantity,
@@ -783,17 +885,19 @@ def sound_power_in_situ(
         mean_source=mean_source,
         background_correction=k1,
         met_source=met,
-        levels_ref=levels_ref,
-        lw_ref=lw_ref,
-        frequencies=frequencies,
         background_levels=bg,
-        background_levels_ref=background_levels_ref,
-        temperature=temperature,
-        static_pressure=static_pressure,
-        excess_levels=excess_levels,
-        directivity_range=directivity_range,
-        sigma_omc=sigma_omc,
-        coverage_factor=coverage_factor,
+        comparison=_Comparison(
+            levels_ref=levels_ref,
+            lw_ref=lw_ref,
+            frequencies=frequencies,
+            background_levels_ref=background_levels_ref,
+            temperature=temperature,
+            static_pressure=static_pressure,
+            excess_levels=excess_levels,
+            directivity_range=directivity_range,
+            sigma_omc=sigma_omc,
+            coverage_factor=coverage_factor,
+        ),
     )
 
 
@@ -872,29 +976,7 @@ def sound_energy_in_situ(
         any of the refusals of :func:`sound_power_in_situ` applies.
     """
     arr = _finite_grid(event_levels, "event_levels", (2, 3))
-    one_at_a_time = arr.ndim == 3  # noqa: PLR2004
-    if one_at_a_time:
-        if events is not None:
-            msg = (
-                "'events' is counted from the second axis of a 3D 'event_levels'; "
-                "pass it only with a 2D (positions, bands) measurement."
-            )
-            raise ValueError(msg)
-        n_positions, n_events, n_bands = arr.shape
-    else:
-        if (
-            events is None
-            or isinstance(events, bool)
-            or not isinstance(events, (int, np.integer))
-            or events < 1
-        ):
-            msg = (
-                "'events' must be a positive integer, the number N of events the "
-                "2D 'event_levels' measurement encompasses (ISO 3747:2010, Eq. 17)."
-            )
-            raise ValueError(msg)
-        n_positions, n_bands = arr.shape
-        n_events = events
+    one_at_a_time, n_positions, n_events, n_bands = _event_shape(arr, events)
     _position_advisory(n_positions)
     if n_events < _MIN_EVENTS:
         warnings.warn(
@@ -907,23 +989,13 @@ def sound_energy_in_situ(
     bg = _background_grid(background_levels, "background_levels", n_positions, n_bands)
     if integration_time is not None:
         require_positive(integration_time, "integration_time")
-    if bg is None:
-        k1 = np.zeros((n_positions, n_bands), dtype=np.float64)
-        met = np.zeros(n_bands, dtype=bool)
-        per_position = arr if not one_at_a_time else energy_mean(arr, axis=1)
-    else:
-        bg_event = bg
-        if integration_time is not None:
-            bg_event = bg + 10.0 * np.log10(integration_time / _T0_S)
-        if one_at_a_time:
-            k1_events, met_grid = _background_correction(arr - bg_event[:, None, :])
-            per_position = energy_mean(arr - k1_events, axis=1)  # Eq. (13), (15)
-            k1 = energy_mean(arr, axis=1) - per_position
-            met = np.all(met_grid, axis=(0, 1))
-        else:
-            k1, met_grid = _background_correction(arr - bg_event)
-            per_position = arr - k1  # Eq. (16)
-            met = np.all(met_grid, axis=0)
+    k1, met, per_position = _event_background(
+        arr,
+        bg,
+        integration_time=integration_time,
+        one_at_a_time=one_at_a_time,
+        n_bands=n_bands,
+    )
     if not one_at_a_time:
         per_position = per_position - 10.0 * np.log10(n_events)  # Eq. (17)
     mean_source = energy_mean(per_position, axis=0)  # Eq. (18)
@@ -932,15 +1004,17 @@ def sound_energy_in_situ(
         mean_source=mean_source,
         background_correction=np.asarray(k1, dtype=np.float64),
         met_source=met,
-        levels_ref=levels_ref,
-        lw_ref=lw_ref,
-        frequencies=frequencies,
         background_levels=bg,
-        background_levels_ref=background_levels_ref,
-        temperature=temperature,
-        static_pressure=static_pressure,
-        excess_levels=excess_levels,
-        directivity_range=directivity_range,
-        sigma_omc=sigma_omc,
-        coverage_factor=coverage_factor,
+        comparison=_Comparison(
+            levels_ref=levels_ref,
+            lw_ref=lw_ref,
+            frequencies=frequencies,
+            background_levels_ref=background_levels_ref,
+            temperature=temperature,
+            static_pressure=static_pressure,
+            excess_levels=excess_levels,
+            directivity_range=directivity_range,
+            sigma_omc=sigma_omc,
+            coverage_factor=coverage_factor,
+        ),
     )

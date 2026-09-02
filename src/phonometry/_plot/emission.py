@@ -56,6 +56,13 @@ _LABEL_RESIDUAL_INDEX = r"$\delta_{pI0}$ [dB]"
 #: ``plot()`` rejects as carrying no per-band data.
 _MIN_BANDS = 2
 
+#: Axis labels drawn by more than one renderer here. They are named rather
+#: than repeated because the English text is also the key into ``_STRINGS``,
+#: so a typo in one copy would silently fall back to English for that plot
+#: alone, which is the kind of defect a reader sees and a test does not.
+_YLABEL_LW = "Sound power level $L_W$ [dB]"
+_YLABEL_LW_ABSOLUTE = r"Sound power level $L_W$ [dB re 1 pW]"
+
 #: Spanish translations of the fixed labels/titles/legends rendered by the
 #: emission-domain ``.plot()`` renderers, keyed by their verbatim English
 #: text. ``_t`` returns the English key unchanged for any language other
@@ -63,7 +70,7 @@ _MIN_BANDS = 2
 #: pre-i18n renderers.
 _STRINGS: dict[str, str] = {
     "Band": "Banda",
-    "Sound power level $L_W$ [dB]": "Nivel de potencia acústica $L_W$ [dB]",
+    _YLABEL_LW: "Nivel de potencia acústica $L_W$ [dB]",
     "Sound energy level $L_J$ [dB]": "Nivel de energía acústica $L_J$ [dB]",
     "sound power spectrum": "espectro de potencia acústica",
     "In situ sound power spectrum (ISO 3747)": "Espectro de potencia acústica in situ (ISO 3747)",
@@ -74,7 +81,7 @@ _STRINGS: dict[str, str] = {
     "Intensity level $L_I$": "Nivel de intensidad $L_I$",
     "Level [dB]": "Nivel [dB]",
     r"Pressure-intensity index $\delta_{pI}$ [dB]": r"Índice presión-intensidad $\delta_{pI}$ [dB]",
-    "Sound power level $L_W$ [dB re 1 pW]": "Nivel de potencia acústica $L_W$ [dB re 1 pW]",
+    _YLABEL_LW_ABSOLUTE: "Nivel de potencia acústica $L_W$ [dB re 1 pW]",
     "ISO/TS 7849 sound power from surface vibration": "Potencia acústica por vibración superficial ISO/TS 7849",
     "$F_2$ (surface pressure-intensity)": "$F_2$ (presión-intensidad superficial)",
     "$F_3$ (negative partial power)": "$F_3$ (potencia parcial negativa)",
@@ -173,7 +180,7 @@ def plot_sound_power(
     bars = ax.bar(positions, np.nan_to_num(lw), **kwargs)
     _hatch_invalid(bars, neg)
 
-    ax.set_ylabel(_t("Sound power level $L_W$ [dB]", language))
+    ax.set_ylabel(_t(_YLABEL_LW, language))
     designation = _sound_power_designation(result)
     lwa = float(result.sound_power_level_a)
     if np.isfinite(lwa):
@@ -244,7 +251,7 @@ def plot_in_situ_sound_power(
         title = _t("In situ sound energy spectrum (ISO 3747)", language)
         symbol = "$L_{J\\mathrm{A}}$"
     else:
-        ax.set_ylabel(_t("Sound power level $L_W$ [dB]", language))
+        ax.set_ylabel(_t(_YLABEL_LW, language))
         title = _t("In situ sound power spectrum (ISO 3747)", language)
         symbol = "$L_{W\\mathrm{A}}$"
     if np.isfinite(total):
@@ -469,7 +476,7 @@ def plot_vibration_sound_power(
         result.sound_power_level,
         result.frequencies,
         result.total_level,
-        ylabel=_t(r"Sound power level $L_W$ [dB re 1 pW]", language),
+        ylabel=_t(_YLABEL_LW_ABSOLUTE, language),
         title=_t("ISO/TS 7849 sound power from surface vibration", language),
         language=language,
         **kwargs,
