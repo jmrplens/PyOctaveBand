@@ -421,6 +421,31 @@ def test_no_public_name_is_published_by_two_domains() -> None:
     assert not shared, f"names published by more than one domain: {shared}"
 
 
+def _message_text(node: ast.Assign) -> str | None:
+    """The literal text of a ``msg = ...`` assignment, or ``None``.
+
+    Refusals are written as one assignment and raised on the next line, and
+    most of them are parenthesised over several lines, which the parser has
+    already folded into a single constant. An f-string keeps only its literal
+    runs: what an interpolation puts there is not visible statically.
+    """
+    if len(node.targets) != 1:
+        return None
+    target = node.targets[0]
+    if not isinstance(target, ast.Name) or target.id != "msg":
+        return None
+    value = node.value
+    if isinstance(value, ast.Constant):
+        return value.value if isinstance(value.value, str) else None
+    if isinstance(value, ast.JoinedStr):
+        return "".join(
+            part.value
+            for part in value.values
+            if isinstance(part, ast.Constant) and isinstance(part.value, str)
+        )
+    return None
+
+
 def test_no_error_message_carries_a_comma_decimal() -> None:
     """Error messages are English prose, and English prose takes a point.
 
@@ -435,19 +460,28 @@ def test_no_error_message_carries_a_comma_decimal() -> None:
     edition of a figure and a comma inside ``$...$`` sets with the wrong
     spacing. An error message is neither drawn nor translated.
 
-    Prose that quotes a standard's own notation is a different matter and
-    keeps the separator of the source it cites, which is why this reads the
-    ``msg`` assignments the tree raises from rather than every string in it.
+    This reads the ``msg`` assignments a module raises from, and reads them
+    through the parser rather than line by line: nearly every refusal here is
+    a parenthesised string spanning several lines, and a scan that saw only
+    the ``msg = (`` line saw none of the text.
+
+    A comma between digits is a decimal only when a letter does not precede
+    it. Subscript pairs are written the same way and are notation rather than
+    numbers, so ``k2,1`` and ``F2,b`` stay as they are while ``31,5 Hz``
+    does not.
     """
     offenders: list[str] = []
     for path in sorted(Path("src/phonometry").rglob("*.py")):
-        text = path.read_text(encoding="utf-8")
-        for number, line in enumerate(text.splitlines(), 1):
-            stripped = line.strip()
-            if not stripped.startswith("msg = "):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Assign):
                 continue
-            if re.search(r"\d,\d", stripped):
-                offenders.append(f"{path}:{number}  {stripped}")
+            text = _message_text(node)
+            if text is None:
+                continue
+            found = re.search(r"(?<![A-Za-z])\d,\d", text)
+            if found:
+                offenders.append(f"{path}:{node.lineno}  ...{found.group(0)}...")
     assert not offenders, "comma decimal in an English message:\n" + "\n".join(
         offenders
     )

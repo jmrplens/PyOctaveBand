@@ -864,7 +864,7 @@ def _check_informative_bands(frequencies: np.ndarray, flow_velocity: float) -> N
     msg = (
         f"'flow_velocity' must satisfy |U| <= {limit:g} m/s for the "
         "one-third-octave bands above 10 kHz: ISO 5136 Annex A gives the "
-        "12,5 kHz to 20 kHz coefficients for that range only (the band "
+        "12.5 kHz to 20 kHz coefficients for that range only (the band "
         f"header and footnote of Tables A.1 to A.6); got {flow_velocity:g} "
         f"m/s with {above[0]:g} Hz in 'frequencies'."
     )

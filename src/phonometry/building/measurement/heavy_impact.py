@@ -503,7 +503,7 @@ def check_heavy_impact_source(
     if measured.shape != (n,):
         msg = (
             f"'force_exposure_level' must hold {n} octave-band values "
-            f"(31,5 Hz to 500 Hz)."
+            f"(31.5 Hz to 500 Hz)."
         )
         raise ValueError(msg)
     nominal = np.asarray(spec.force_exposure_level, dtype=np.float64)
