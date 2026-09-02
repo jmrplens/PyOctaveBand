@@ -103,6 +103,7 @@ from ._shared import (
     _background_exposure,
     _c2_correction,
     _single_event_mean,
+    _validate_event_count,
     _validate_meteorology,
 )
 
@@ -890,12 +891,7 @@ class ReverberationSoundEnergyResult:
             ``events`` is below one or ``integration_time`` is not positive.
         """
         require_choice(self.method, "method", ("direct", "comparison"))
-        if self.events is not None and self.events < 1:
-            msg = (
-                "ReverberationSoundEnergyResult: 'events' must be at least 1; "
-                f"got {self.events!r}."
-            )
-            raise ValueError(msg)
+        _validate_event_count(self.events, "ReverberationSoundEnergyResult")
         if self.integration_time is not None:
             require_positive(self.integration_time, "integration_time")
         require_ranks(

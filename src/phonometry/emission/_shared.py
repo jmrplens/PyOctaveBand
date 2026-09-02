@@ -80,6 +80,28 @@ _T0 = 1.0
 #: them all (ISO 3744:2010 8.3.1, ISO 3746:2010 8.4.1, ISO 3741:2010 8.5.1).
 _MIN_EVENTS = 5
 
+
+def _validate_event_count(events: object, owner: str) -> None:
+    """Refuse a count of events that is not a whole number of them.
+
+    The entry points already refuse it, but a result can also be built
+    directly or rebuilt with :func:`dataclasses.replace`, and a count of 2,5
+    events describes no measurement the standard defines. ``bool`` is refused
+    on its own because it is an ``int`` in Python and ``True`` would otherwise
+    pass as one event. Rejecting a wrong type here rather than letting the
+    comparison below raise keeps the promise the docstring makes, which is a
+    ``ValueError`` and not a ``TypeError``.
+    """
+    if events is None:
+        return
+    if isinstance(events, bool) or not isinstance(events, (int, np.integer)):
+        msg = f"{owner}: 'events' must be a whole number of events; got {events!r}."
+        raise ValueError(msg)
+    if int(events) < 1:
+        msg = f"{owner}: 'events' must be at least 1; got {events!r}."
+        raise ValueError(msg)
+
+
 Grade = Literal["engineering", "survey"]
 
 

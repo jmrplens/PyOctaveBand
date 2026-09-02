@@ -100,6 +100,7 @@ from ._shared import (
     _background_exposure,
     _check_grade,
     _single_event_mean,
+    _validate_event_count,
 )
 
 if TYPE_CHECKING:
@@ -1164,11 +1165,7 @@ class SoundEnergyResult:
                 f"got {self.surface_area!r}."
             )
             raise ValueError(msg)
-        if self.events is not None and self.events < 1:
-            msg = (
-                f"SoundEnergyResult: 'events' must be at least 1; got {self.events!r}."
-            )
-            raise ValueError(msg)
+        _validate_event_count(self.events, "SoundEnergyResult")
         if self.integration_time is not None:
             require_positive(self.integration_time, "integration_time")
         require_ranks(

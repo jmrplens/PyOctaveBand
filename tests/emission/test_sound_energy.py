@@ -347,6 +347,12 @@ def test_result_rejects_inconsistent_fields() -> None:
         dataclasses.replace(base, grade="precision")
     with pytest.raises(ValueError, match="'events' must be at least 1"):
         dataclasses.replace(base, events=0)
+    with pytest.raises(ValueError, match="'events' must be a whole number"):
+        dataclasses.replace(base, events=2.5)
+    with pytest.raises(ValueError, match="'events' must be a whole number"):
+        dataclasses.replace(base, events=True)
+    with pytest.raises(ValueError, match="'events' must be a whole number"):
+        dataclasses.replace(base, events="5")
     with pytest.raises(ValueError, match="'integration_time' must be positive"):
         dataclasses.replace(base, integration_time=0.0)
     with pytest.raises(ValueError, match="'sound_energy_level' must be finite"):
@@ -653,6 +659,10 @@ def test_room_result_rejects_inconsistent_fields() -> None:
         dataclasses.replace(base, method="survey")
     with pytest.raises(ValueError, match="'events' must be at least 1"):
         dataclasses.replace(base, events=0)
+    with pytest.raises(ValueError, match="'events' must be a whole number"):
+        dataclasses.replace(base, events=2.5)
+    with pytest.raises(ValueError, match="'events' must be a whole number"):
+        dataclasses.replace(base, events=True)
     with pytest.raises(ValueError, match="'integration_time' must be positive"):
         dataclasses.replace(base, integration_time=-1.0)
     with pytest.raises(ValueError, match="one value per band"):
