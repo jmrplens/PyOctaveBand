@@ -49,9 +49,14 @@ The total acoustic emission of a source, and the power flux it is built on.
   ISO 3745.
 - [Sound Power in the Reverberation Room](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/):
   the direct and comparison methods of ISO 3741.
+<<<<<<< HEAD
 - [Sound Power in Situ by Comparison](https://jmrplens.github.io/phonometry/devices/emission/sound-power-in-situ/):
   the ISO 3747 comparison against a reference sound source where the machine
   works.
+=======
+- [Sound Power in a Duct](https://jmrplens.github.io/phonometry/devices/emission/sound-power-in-duct/):
+  the ISO 5136 in-duct method for fans.
+>>>>>>> c39554cb2 (Explain the in-duct method, and file what its print gets wrong)
 - [Sound Power by Intensity Scanning](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/):
   the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
 - [Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/):

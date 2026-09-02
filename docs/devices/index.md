@@ -45,6 +45,8 @@ The total acoustic emission of a source, and the power flux it is built on.
 - [Sound Power in Situ by Comparison](emission/sound-power-in-situ.md):
   the ISO 3747 comparison against a reference sound source where the machine
   works.
+- [Sound Power in a Duct](emission/sound-power-in-duct.md):
+  the ISO 5136 in-duct method for fans.
 - [Sound Power by Intensity Scanning](emission/sound-power-intensity.md):
   the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
 - [Sound power from surface vibration (ISO/TS 7849)](emission/vibration-sound-power.md):

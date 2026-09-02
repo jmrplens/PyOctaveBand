@@ -401,6 +401,7 @@ export const topics = [
           'devices/emission/sound-power-pressure',
           'devices/emission/sound-power-reverberation',
           'devices/emission/sound-power-in-situ',
+          'devices/emission/sound-power-in-duct',
           'devices/emission/vibration-sound-power',
           'devices/emission/sound-power-intensity',
         ],

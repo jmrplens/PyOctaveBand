@@ -69,6 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+<<<<<<< HEAD
 - The sound power of a machine where it works, by comparison with a reference
   sound source: `emission.sound_power_in_situ` implements ISO 3747:2010 in
   octave bands, correcting the background at every microphone position with
@@ -155,6 +156,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   here, by at most 1,4e-14 dB. One committed conformance residual, the known
   $L_W$ of ISO 3741 Eq. 20, goes from 1,42e-14 to zero for the same reason. No
   figure in the corpus moves.
+=======
+- `emission.sound_power_in_duct()` determines the sound power a fan radiates
+  into its duct by the in-duct method of ISO 5136:2003, the route for a fan
+  that cannot be run unducted. It takes the one-third-octave level a shielded
+  microphone read at three circumferential positions of an anechoically
+  terminated test duct (or the multiplexed or traversed level), adds the
+  combined correction C = C1 + C2 + C3,4 of clause 8 and turns the result into
+  sound power through the plane-wave relation of Eq. 12, with the duct air's
+  rho c against the 400 N s/m3 reference. C1 and C2 are the microphone's and
+  the shield's own responses, supplied per band; C3,4, the combined mean flow
+  velocity and modal correction, is computed: the Annex A polynomial in the
+  signed mean flow velocity for the sampling tube, from the Tables A.1 to A.6
+  that cover 0,15 m to 2 m ducts, and the convective term of Eq. 8 for the
+  nose cone and the foam ball. `flow_modal_correction()` gives that correction
+  on its own, the A-weighted total follows Annex C over the 27 bands of
+  Table C.1, and the result carries the reproducibility of Table 2 doubled
+  into the 95 % statement of clause 9.2 (`in_duct_reproducibility()`), with
+  every band the standard gives for information only, above 10 kHz or beyond
+  40 m/s, flagged as such.
+
+  The oracle is Table D.1: all 162 printed values of C3,4 for d = 0,5 m at
+  +/-5, +/-15 and +/-30 m/s reproduce from the Table A.4 coefficients to the
+  printed 0,1 dB, in the suite and in the conformance report, beside the
+  worked example of Eqs (D.2) and (D.3), Eq. 8 at the nose cone's limit, the
+  two terms of Eq. 12 and Tables 2 and C.1. Eight defects of the printed
+  standard join the errata registry, among them a coefficient of Table A.5
+  printed with its leading digit missing, which the library reads from the
+  neighbouring tables and says so, and the prose of 5.3.4.3 calling negative
+  a correction whose equation is positive on the outlet side.
+>>>>>>> c39554cb2 (Explain the in-duct method, and file what its print gets wrong)
 
 - The ISO 16283 low-frequency procedure, which the standard makes **mandatory**
   and not optional when the receiving room is under 25 m3, taking the volume
