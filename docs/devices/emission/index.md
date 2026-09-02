@@ -62,9 +62,10 @@ judged against.
   method and declaring the noise emission per ISO 4871.
 - [Sound Power by Pressure Methods](sound-power-pressure.md):
   the enveloping surface of ISO 3744/3746 and the precision anechoic grade of
-  ISO 3745.
+  ISO 3745, and the sound energy level of a burst over the same surface.
 - [Sound Power in the Reverberation Room](sound-power-reverberation.md):
-  the direct and comparison methods of ISO 3741.
+  the direct and comparison methods of ISO 3741, for sound power and for the
+  sound energy of a single event.
 - [Sound Power in Situ by Comparison](sound-power-in-situ.md):
   the ISO 3747 engineering and survey comparison against a reference sound
   source in a reverberant environment, for the machine that cannot leave its

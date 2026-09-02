@@ -1919,6 +1919,89 @@ dos ediciones con las mismas entradas y en el mismo orden.
 - **Estado:** sin notificar (traducción nacional, no el texto del organismo
   emisor).
 
+## ISO 3744:2010, 8.3.4, Ecuación (21) (un nivel integrado en el tiempo comparado con uno promediado en el tiempo)
+
+- **Ubicación:** apartado 8.3.4, Ecuación (21) y la lista de símbolos que la
+  sigue (página 31 del PDF, p. 25 impresa) de ISO 3744:2010, leída contra las
+  definiciones de los apartados 3.3 y 3.4 (página 9 del PDF, p. 3 impresa). La
+  misma construcción se imprime como Ecuación (25) de ISO 3741:2010 (página 33
+  del PDF, p. 24 impresa, con su lista de símbolos en la página 34 del PDF,
+  p. 25 impresa) y como Ecuación (14) de ISO 3747:2010 (páginas 22 y 23 del
+  PDF, pp. 13 y 14 impresas).
+- **El impreso:** $K_1 = -10 \lg\left(1 - 10^{-0{,}1\,\Delta L_E}\right)$ dB
+  con $\Delta L_E = \overline{L'_{E(\mathrm{ST})}} - \overline{L_{p(\mathrm{B})}}$,
+  donde $\overline{L'_{E(\mathrm{ST})}}$ «is the mean frequency-band or
+  A-weighted single event time-integrated sound pressure level» y
+  $\overline{L_{p(\mathrm{B})}}$ «is the mean frequency-band or A-weighted
+  time-averaged sound pressure level of the background noise», seguido de
+  «The integration time $T = t_2 - t_1$ and other measurement parameters shall
+  be the same for the measurement of the single event time-integrated sound
+  pressure level $L'_{Ei(\mathrm{ST})}$ and of the background noise level
+  $L_{pi(\mathrm{B})}$.»
+- **El problema:** los dos niveles no comparten magnitud de referencia, y la
+  corrección resta una energía de otra. Por el apartado 3.4, $L_E$ es
+  $\int_{t_1}^{t_2} p^2\,\mathrm{d}t$ re $E_0 = (20\ \mu\text{Pa})^2\,\text{s}$;
+  por el apartado 3.3, $L_{p,T}$ es $\frac{1}{T}\int_{t_1}^{t_2} p^2\,\mathrm{d}t$
+  re $p_0^2$. Su diferencia es un cociente de energías solo cuando $T = 1$ s.
+  Sobre el intervalo común $T$ el fondo aporta la energía
+  $L_{p(\mathrm{B})} + 10 \lg(T/T_0)$ (la identidad de la NOTA 1 del apartado
+  3.4), así que el $\Delta L_E$ impreso supera al cociente de energías
+  señal-fondo en $10 \lg(T/T_0)$ y $K_1$ se subestima para todo $T > 1$ s: una
+  ráfaga cuya energía está 6 dB por encima de la del fondo en un intervalo de
+  10 s se lee 16 dB por encima y no recibe corrección, donde el criterio de
+  8.2.3 sitúa $K_1$ en su mayor valor admisible, 1,3 dB. La cadena gemela de
+  8.2, donde ambos niveles están promediados en el tiempo, no tiene ese
+  término, y 8.3.3 exige promediar los niveles de suceso aislado «in the same
+  way as for the time-averaged sound pressure levels described in 8.2.2», así
+  que la lectura pretendida es aquella bajo la cual las dos cadenas coinciden
+  para una fuente estacionaria durante $T$, $L_J = L_W + 10 \lg(T/T_0)$, y es
+  la lectura bajo la cual la insistencia en un único tiempo de integración
+  para ambas mediciones sirve de algo.
+- **Evidencia:** Verificado en la página 31 del PDF (p. 25 impresa) de
+  ISO 3744:2010 para la ecuación y su lista de símbolos, y en la página 9 del
+  PDF (p. 3 impresa) para las definiciones de los apartados 3.3 y 3.4 con la
+  NOTA 1; la misma construcción leída en las páginas 33 y 34 del PDF (pp. 24 y
+  25 impresas) de BS EN ISO 3741:2010 y en las páginas 22 y 23 del PDF (pp. 13
+  y 14 impresas) de BS EN ISO 3747:2010.
+- **Comportamiento de la biblioteca:** `sound_energy_pressure`,
+  `sound_energy_reverberation` y `sound_energy_comparison` comparan el fondo
+  como su exposición sobre el mismo intervalo,
+  $L_{p(\mathrm{B})} + 10 \lg(T/T_0)$, y exigen `integration_time` siempre que
+  se da un fondo; los criterios y el tope de 8.2.3 (y de 9.1.2 en ISO 3741) se
+  aplican entonces a ese margen. `tests/emission/test_sound_energy.py` fija
+  $K_1 = 1{,}2563$ dB para una ráfaga de 78 dB sobre un fondo de 62 dB en una
+  ventana de 10 s, y $L_J = L_W + 10 \lg(T/T_0)$ campo a campo en ambas
+  familias; el informe de conformidad lleva la identidad como «ISO 3744:2010
+  Eq. 23 / clause 3.4 NOTE 1».
+- **Estado:** sin notificar.
+
+## ISO 3744:2010, 8.3.4 (la corrección llamada K_1i en el texto y K_1 en la Ecuación (21))
+
+- **Ubicación:** apartado 8.3.4, primera frase y Ecuación (21) (página 31 del
+  PDF, p. 25 impresa).
+- **El impreso:** «The background noise correction, $K_{1i}$, shall be
+  calculated using Equation (21):» seguido de
+  $K_1 = -10 \lg\left(1 - 10^{-0{,}1\,\Delta L_E}\right)$ dB con $\Delta L_E$
+  formado a partir de las dos medias sobre la superficie de medición,
+  $\overline{L'_{E(\mathrm{ST})}}$ y $\overline{L_{p(\mathrm{B})}}$.
+- **El problema:** la frase nombra una corrección por posición y la ecuación
+  define una sola a partir de medias superficiales. El apartado gemelo 8.2.3
+  nombra $K_1$ en ambos sitios y lo forma a partir de las mismas medias
+  superficiales (Ecuación (16)), y 8.3.5 resta el $K_1$ sin subíndice en la
+  Ecuación (22). El subíndice es la convención por micrófono de los apartados
+  9.1.2 y 9.2.2 de ISO 3741:2010 ($K_{1i}$, Ecuaciones (14) y (25)), donde
+  cada posición se corrige antes del promedio, y no pertenece a este
+  apartado.
+- **Evidencia:** Verificado en la página 31 del PDF (p. 25 impresa) de
+  ISO 3744:2010, contra el apartado 8.2.3 en la página 29 del PDF (p. 23
+  impresa).
+- **Comportamiento de la biblioteca:** `sound_energy_pressure` forma un $K_1$
+  por banda a partir de las medias superficiales, tal como lo imprime la
+  Ecuación (21) y como hace `sound_power_pressure` con la Ecuación (16); no se
+  aplica ninguna corrección por posición en la cadena de ISO 3744. No hizo
+  falta ningún cambio.
+- **Estado:** sin notificar.
+
 ## ISO/PAS 1996-3:2022, apartado 5 (referencias cruzadas de r y d)
 
 - **Ubicación:** apartado 5, Fórmula (2), las definiciones de los símbolos de

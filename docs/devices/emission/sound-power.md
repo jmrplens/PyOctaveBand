@@ -335,9 +335,14 @@ ISO 3741, ISO 3745, ISO 3747, ISO 9614-1/-2/-3, ISO/TS 7849-1/-2) are covered
 in their method guides.
 
 **Not covered.** Two members of the ISO 3740 family are not implemented at
-all — ISO 3743-1 and ISO 3743-2 — and the sound *energy* level $L_J$ of a
-single event is determined only by the in situ comparison of ISO 3747, in
-[Sound Power in Situ by Comparison](sound-power-in-situ.md). The emission sound pressure level $L_{p\mathrm{A}}$
+all, ISO 3743-1 and ISO 3743-2. The sound *energy* level $L_J$ of a single
+event is covered for the rest, each on its own page: for ISO 3744 and ISO 3746
+on the [pressure-methods](sound-power-pressure.md#4-sound-energy-level-of-a-burst-clause-83)
+page, for ISO 3741 on the
+[reverberation-room](sound-power-reverberation.md#3-sound-energy-level-of-a-single-event-clause-92)
+page, and for ISO 3747 in
+[Sound Power in Situ by Comparison](sound-power-in-situ.md). ISO 3745 defines
+none. The emission sound pressure level $L_{p\mathrm{A}}$
 that stands beside $L_{W\mathrm{A}}$ in a declaration is consumed here, never
 determined: ISO 11201, ISO 11202 and ISO 11204 are outside the library. Of
 ISO 4871, only the clause 6.2 single-machine verification is evaluated; the

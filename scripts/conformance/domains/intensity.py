@@ -259,6 +259,111 @@ def _chk_reverberation_lw() -> Outcome:
     return numeric(0.0, worst, 1e-9, unit="dB", places=9, expected_label="0 dB error")
 
 
+@register(
+    "Intensity & sound power",
+    "ISO 3744:2010 Eq. 23 / clause 3.4 NOTE 1",
+    "Sound energy level of a source steady over T = 10 s is LW + 10 lg(T/T0)",
+)
+def _chk_sound_energy_identity_iso3744() -> Outcome:
+    """The 8.3 chain is the 8.2 chain with L_E for L_p, field by field.
+
+    For p^2 constant over T the integral of clause 3.4 is T p^2, so every
+    position level is L_p + 10 lg(T/T0) (NOTE 1), and with the background
+    compared as its own exposure over the same T the corrections K1 and K2
+    coincide and L_J = L_W + 10 lg(T/T0) exactly. No worked example with L_J
+    is printed in the standard; this identity is the closed-form anchor.
+    """
+    rng = np.random.default_rng(3744)
+    freqs = np.array([250.0, 500.0, 1000.0, 2000.0])
+    lp = np.array([70.0, 74.0, 78.0, 75.0]) + rng.normal(0.0, 0.5, (10, 4))
+    bg = np.array([58.0, 60.0, 62.0, 61.0])
+    room = ph.emission.RoomEnvironment(absorption_area=150.0)
+    lw = ph.emission.sound_power_pressure(
+        lp, "hemisphere", radius=2.0, background_levels=bg, frequencies=freqs, room=room
+    )
+    lj = ph.emission.sound_energy_pressure(
+        lp + 10.0,
+        "hemisphere",
+        radius=2.0,
+        background_levels=bg,
+        integration_time=10.0,
+        frequencies=freqs,
+        room=room,
+    )
+    worst = float(
+        np.max(np.abs(np.asarray(lj.sound_energy_level) - lw.sound_power_level - 10.0))
+    )
+    return numeric(
+        0.0,
+        worst,
+        1e-9,
+        unit="dB",
+        places=9,
+        expected_label="LJ - LW = 10 dB, 0 dB error",
+    )
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 3744:2010 Eq. 20",
+    "One measurement encompassing Ne = 5 events is 10 lg 5 above one event",
+)
+def _chk_sound_energy_events_eq20() -> Outcome:
+    level = ph.emission.mean_single_event_level(np.array([90.0]), events=5)
+    return numeric(
+        10.0 * math.log10(5.0), 90.0 - float(level[0]), 1e-12, unit="dB", places=6
+    )
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 3741:2010 Eq. 30",
+    "Reverberation-room sound energy level inverts to a known LJ",
+)
+def _chk_reverberation_lj() -> Outcome:
+    volume, surface = 200.0, 210.0
+    freqs = np.array([100.0, 500.0, 1000.0, 5000.0, 10000.0])
+    t60 = np.array([2.0, 1.8, 1.5, 1.0, 0.6])
+    theta, ps = 23.0, 101.325
+    lj_target = np.array([90.0, 95.0, 100.0, 92.0, 85.0])
+    le = lj_target - _reverb_bracket(t60, volume, surface, freqs, theta, ps)
+    res = ph.emission.sound_energy_reverberation(
+        le, t60, volume, surface, freqs, temperature=theta, static_pressure=ps
+    )
+    worst = float(np.max(np.abs(np.asarray(res.sound_energy_level) - lj_target)))
+    return numeric(0.0, worst, 1e-9, unit="dB", places=9, expected_label="0 dB error")
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 3741:2010 Eq. F.4",
+    "Three equal one-third-octave bands sum to an octave level 10 lg 3 higher",
+)
+def _chk_octave_band_levels_annex_f() -> Outcome:
+    _, octave = ph.emission.octave_band_levels(
+        np.full(3, 90.0), np.array([800.0, 1000.0, 1250.0])
+    )
+    return numeric(
+        10.0 * math.log10(3.0), float(octave[0]) - 90.0, 1e-12, unit="dB", places=6
+    )
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 3744:2010 Annex G / H.4.2.7",
+    "C1 + C2 of Eq. (G.1)/(G.3) vanish at 120 m altitude and 23 C",
+)
+def _chk_annex_g_zero_at_120m() -> Outcome:
+    """H.4.2.7: 'At 120 m altitude and 23 C the correction is zero.'
+
+    Eq. (G.2) gives p_s(120 m) = 99,89 kPa, -10 lg(p_s/p_s0) = 0,062 dB in
+    each term, and the temperature terms 5 lg(296,15/314) + 15 lg(296,15/296)
+    = -0,124 dB cancel the pair to under 1e-4 dB.
+    """
+    corr = ph.emission.reference_atmosphere_correction(23.0, altitude=120.0)
+    return numeric(0.0, float(corr.total), 1e-3, unit="dB", places=5)
+
+
 def _iso9614_1_band_cells(
     table: list[tuple[float | None, float | None, float | None]],
 ) -> list[tuple[BandType, DeterminationGrade, float, float]]:

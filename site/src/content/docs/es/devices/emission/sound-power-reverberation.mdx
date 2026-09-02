@@ -1,6 +1,6 @@
 ---
 title: "Potencia acústica en cámara reverberante"
-description: "La determinación de precisión del nivel de potencia acústica en una cámara reverberante cualificada según ISO 3741: el método directo mediante el área de absorción de Sabine con las correcciones de Waterhouse y meteorológicas C1/C2, el método de comparación con una fuente sonora de referencia, los avisos de cualificación y la ficha de ensayo de estilo acreditado."
+description: "La determinación de precisión del nivel de potencia acústica en una cámara reverberante cualificada según ISO 3741: el método directo mediante el área de absorción de Sabine con las correcciones de Waterhouse y meteorológicas C1/C2, el método de comparación con una fuente sonora de referencia, los avisos de cualificación, la ficha de ensayo de estilo acreditado, y el nivel de energía acústica LJ de una ráfaga por los mismos dos métodos."
 references:
   - type: book
     authors: ["Beranek, L. L.", "Mellow, T. J."]
@@ -35,7 +35,9 @@ estacionarias y de banda ancha lo bastante pequeñas para viajar a una cámara
 cualificada. Esta guía cubre el método directo mediante el área de
 absorción de Sabine, las correcciones de Waterhouse y meteorológicas, el
 método de comparación con una fuente sonora de referencia, los avisos de
-cualificación y la ficha de ensayo de estilo acreditado. Qué vía encaja con
+cualificación, la ficha de ensayo de estilo acreditado y, en la sección 4, el
+nivel de energía acústica $L_J$ que los mismos dos métodos dan a un suceso
+aislado. Qué vía encaja con
 qué trabajo, y las alternativas de presión e intensidad, se sopesan en
 [Potencia acústica](/phonometry/es/devices/emission/sound-power/).
 
@@ -54,9 +56,9 @@ hasta el 5 % solo cuando un código de ensayo de ruido dice lo que eso cuesta en
 incertidumbre), para que no cargue el campo en el que se la está midiendo, y
 debe ser estacionaria durante el intervalo de medida: la Ec. 20 promedia en
 energía y da un ritmo de flujo de energía, así que caracteriza a la máquina solo
-si la máquina es invariante en el tiempo mientras funciona. Un suceso aislado
-— una carrera de prensa, un portazo — se describe en cambio con el nivel de
-energía acústica $L_J$ del apartado 9.2, que aquí no está implementado.
+si la máquina es invariante en el tiempo mientras funciona. Un suceso aislado,
+una carrera de prensa o un portazo, se describe en cambio con el nivel de
+energía acústica $L_J$ del apartado 9.2, que cubre la sección 4.
 
 El fondo debe quedar al menos **6 dB** por debajo del nivel de fuente en las
 bandas de tercio de octava de 200 Hz y por debajo y de 6,3 kHz y por encima, y al
@@ -473,6 +475,129 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 />
 
 
+## 4. Nivel de energía acústica de un suceso aislado (apartado 9.2)
+
+Los dos métodos anteriores promedian en energía el nivel de la cámara y dan un
+ritmo de flujo de energía, así que una máquina que dispara una vez y calla no
+tiene $L_W$ que determinar. El apartado 9.2 le da el **nivel de energía
+acústica** $L_J = 10\log_{10}(J/J_0)$, $J_0 = 1$ pJ (apartado 3.18), y lo
+determina por las mismas dos vías con el nivel de presión acústica de suceso
+aislado integrado en el tiempo $L_E$ (apartado 3.4) en lugar del $L_p$
+promediado en el tiempo: la Ec. 30 es la Ec. 20 con $\overline{L_E(\text{ST})}$
+donde estaba $\overline{L_p(\text{ST})}$, y la Ec. 31 es la Ec. 21 de igual
+modo,
+
+$$
+L_J = \overline{L_E(\text{ST})} + \left[10\log_{10}\frac{A}{A_0} + 4.34\ \frac{A}{S}
++ 10\log_{10}\left(1 + \frac{S c}{8 V f}\right) + C_1 + C_2 - 6\right], \qquad
+L_J = L_W(\text{RSS}) + \left(\overline{L_E(\text{ST})} - \overline{L_p(\text{RSS})}\right) + C_2 .
+$$
+
+La medición es el apartado 8.5: al menos **cinco** sucesos en cada una de las
+seis posiciones, uno a uno o como una sola lectura que los abarque todos, a
+través de un intervalo que contenga toda parte significativa del suceso
+*incluida su caída*, y sin micrófono móvil para un impulso no repetitivo. El
+apartado 9.2.1 reduce ambas lecturas al nivel de un suceso en cada posición
+(Ec. 22, la media energética de $N_\mathrm{e}$ lecturas individuales, o Ec. 23,
+una lectura menos $10\log_{10} N_\mathrm{e}$; `mean_single_event_level` en la
+[página de métodos de presión](/phonometry/es/devices/emission/sound-power-pressure/#cinco-sucesos-uno-a-uno-o-todos-a-la-vez)
+es el mismo par). El apartado 9.2.2 corrige cada posición por su propio fondo
+con el criterio dependiente de la frecuencia de 9.1.2 (Ec. 25/26), y el
+apartado 9.2.3 promedia en energía las posiciones corregidas (Ec. 27). El fondo
+es el nivel promediado en el tiempo medido sobre el mismo tiempo de integración
+$T$ que los sucesos, y se compara como su exposición sobre esa ventana,
+$L_{pi(\mathrm{B})} + 10\log_{10}(T/T_0)$, para que las energías que resta la
+Ec. 25 compartan una referencia; `integration_time` es por tanto obligatorio
+con `background_levels`. Las razones se detallan en la página de métodos de
+presión y en el [registro de
+erratas](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.es.md).
+
+`sound_energy_reverberation` y `sound_energy_comparison` admiten `levels` en
+las formas que admiten las funciones de potencia acústica, más una: un array
+3D `(Ne, NM, NB)` de los sucesos medidos uno a uno, o una lectura 1D/2D con
+`events=Ne` para una sola medición de varios. La cámara de la sección 1 y la
+fuente de referencia de la sección 2 sirven para ambas:
+
+```python
+import numpy as np
+from phonometry import emission
+
+# Cinco portazos registrados en las seis posiciones de la cámara de la sección 1,
+# uno a uno: (sucesos, posiciones, bandas), tercios de octava de 100 Hz a 10 kHz.
+slam = np.linspace(88.0, 76.0, freqs.size)      # nivel de suceso aislado, dB re E0
+rng = np.random.default_rng(3741)
+slams = slam + rng.normal(0.0, 0.6, size=(5, 6, freqs.size))
+
+slam_lj = emission.sound_energy_reverberation(
+    slams, t60, volume=200.0, surface_area=220.0, frequencies=freqs,
+    background_levels=np.full(freqs.size, 45.0),   # promediado en los mismos 4 s
+    integration_time=4.0, temperature=20.0, static_pressure=101.0,
+)
+print(slam_lj.events, slam_lj.method)                    # 5 direct
+print(np.round(slam_lj.sound_energy_level[:3], 1))       # [96.  94.9 94.2] dB re 1 pJ
+print(round(slam_lj.sound_energy_level_a, 1))            # LJA = 99.0 dB(A)
+
+# Método de comparación: la fuente de referencia de la sección 2, en régimen estacionario.
+slam_cmp = emission.sound_energy_comparison(
+    slams, lp_rss, lw_rss, frequencies=freqs, temperature=20.0,
+)
+print(round(float(slam_cmp.sound_energy_level[0]), 1), slam_cmp.method)   # 95.0 comparison
+
+slam_lj.plot()   # LJ por tercio de octava, LJA en el título (requiere matplotlib)
+```
+
+La identidad con la cadena estacionaria es exacta también aquí: el nivel medio
+de cámara de la sección 1 leído como ventana de 10 s,
+$L_E = L_p + 10\log_{10}(T/T_0)$ en cada posición, da $L_J = L_W + 10$ dB en
+todas las bandas a través de la misma área de absorción, el mismo término de
+Waterhouse y los mismos $C_1$/$C_2$, que es la razón de que la Ec. 30 exprese
+$L_J$ en las condiciones meteorológicas de referencia exactamente como la
+Ec. 20 expresa $L_W$:
+
+```python
+ten_seconds = emission.sound_energy_reverberation(
+    lp + 10.0, t60, volume=200.0, surface_area=220.0, frequencies=freqs,
+    temperature=20.0, static_pressure=101.0,
+)
+print(np.round(ten_seconds.sound_energy_level - rev.sound_power_level, 6)[:3])   # 10.0
+```
+
+### Bandas de octava y total ponderado A (Anexo F)
+
+Ambos métodos se definen sobre bandas de tercio de octava, y el Anexo F forma
+después los niveles por bandas de octava y ponderados A, para la potencia
+acústica (Ec. F.1, F.2) y para la energía acústica (Ec. F.4, F.5) por igual. El
+total ponderado A es el `sound_energy_level_a` de todos los resultados
+anteriores; las bandas de octava son la suma energética de los tres tercios
+$k = 3i - 2$ a $3i$ que la Tabla F.1 asigna a la octava $i$, numerados desde
+$k = 1$ en 50 Hz, que `octave_band_levels` aplica a cualquier espectro por
+bandas cuyos tercios lleguen en tripletes completos:
+
+```python
+octaves, lj_octave = emission.octave_band_levels(slam_lj.sound_energy_level, freqs)
+print(octaves)                        # [ 125.  250.  500. 1000. 2000. 4000. 8000.]
+print(np.round(lj_octave, 1))         # 99.8 ... 87.7 dB, tres tercios sumados por octava
+```
+
+### Parámetros de `sound_energy_reverberation()` y `sound_energy_comparison()`
+
+| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `levels` | array 1D, 2D o 3D | dB | por banda, `(NM, NB)` o `(Ne, NM, NB)` | Niveles de suceso aislado: por suceso en el primer eje (Ec. 22), una lectura de `events` sucesos (Ec. 23), o la media de un suceso |
+| `t60`, `volume`, `surface_area`, `frequencies` | como en la sección 1 | | | Solo método directo; `frequencies` lo exigen ambos |
+| `levels_ref`, `lw_ref`, `background_levels_ref` | como en la sección 2 | | | Solo método de comparación; la fuente de referencia es estacionaria y conserva la corrección de 9.1.2 |
+| `events` | int o None | | `>= 1`, por defecto `None` | $N_\mathrm{e}$ abarcados por una lectura (Ec. 23); al menos 5 sin aviso |
+| `background_levels` | array 1D o 2D | dB | coincide con `levels` | Fondo promediado en el tiempo sobre la misma ventana; $K_{1i}$ por posición (Ec. 25/26) |
+| `integration_time` | float | s | > 0, obligatorio con `background_levels` | La ventana $T$; el fondo se compara como $L_{pi(\mathrm{B})} + 10\log_{10}(T/T_0)$ |
+| `temperature`, `static_pressure` | float | °C, kPa | por defecto `23.0`, `101.325` | Fijan $c$, $C_1$, $C_2$ como en la sección 1 |
+
+Ambas devuelven un `ReverberationSoundEnergyResult` (`sound_energy_level`,
+`mean_event_level`, `absorption_area`, `waterhouse_correction`,
+`background_correction`, `c1`, `c2`, `speed_of_sound`, `sound_energy_level_a`,
+`method`, `events`, `integration_time`), con los mismos campos `NaN` para el
+método de comparación que su gemelo de potencia acústica, y los mismos avisos
+de cualificación.
+
 ## Qué cubre esta guía
 
 <Scope>
@@ -483,16 +608,20 @@ absorción de Sabine, la corrección de contorno de Waterhouse y las
 correcciones meteorológicas $C_1$/$C_2$, y el método de comparación con una
 fuente sonora de referencia (`sound_power_comparison`, Ec. 21), ambos con
 corrección de fondo por banda y el total ponderado A del Anexo F, presentados
-como ficha de potencia acústica de estilo acreditado mediante `.report()`.
+como ficha de potencia acústica de estilo acreditado mediante `.report()`. El
+nivel de energía acústica $L_J$ de un suceso aislado por los mismos dos
+métodos (`sound_energy_reverberation`, Ec. 30; `sound_energy_comparison`,
+Ec. 31): los $N_\mathrm{e}$ sucesos reducidos a uno (Ec. 22/23), el $K_{1i}$
+por posición de la Ec. 25 con el fondo comparado sobre la misma ventana, la
+media de la Ec. 27, y los niveles por bandas de octava
+(`octave_band_levels`, Ec. F.1/F.4) y ponderados A (Ec. F.2/F.5) del Anexo F.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="No cubierto">
-El nivel de energía acústica $L_J$ del apartado 9.2, la contrapartida para
-sucesos aislados de $L_W$ definida en los mismos apartados, no está
-implementado, así que una fuente impulsiva o de suceso aislado cae fuera de
-esta guía. Tampoco lo está la suma en bandas de octava del Anexo F, de modo
-que los resultados por octava hay que sumarlos a mano a partir de las
-potencias de banda de tercio de octava. La propia cualificación de la cámara
+Los resultados de suceso aislado no llevan ficha `.report()`, y el promedio
+sobre varias posiciones de fuente de la Ec. 24 (y de la Ec. 13 para $L_W$) se
+deja a quien llama, que aporta niveles ya promediados sobre las posiciones del
+apartado 8.4.2.4. La propia cualificación de la cámara
 reverberante (Anexo C/D, recuento de frecuencias propias o comparación con una
 fuente de referencia) se da por supuesta, no se ejecuta; la biblioteca solo
 avisa de los criterios orientativos que ISO 3741 declara explícitamente (el

@@ -98,6 +98,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   coefficient of that same table, which E.4.2.6.3 and the budget of E.4.2.12
   both put at 1 where the table prints 0,5, and the equation E.4.2.3 sends
   the reader to for a derivative that is taken of another.
+- The sound energy level $L_J$ of a noise burst or transient emission, the
+  quantity ISO 3744 and ISO 3741 name in their titles beside the sound power
+  level and determine in the clauses the library had left out. A press stroke
+  or a door slam has no steady power to report, so clause 3.23 gives it the
+  energy it radiates, $L_J = 10 \lg(J/J_0)$ re 1 pJ, and clause 8.3 of ISO 3744
+  (clause 8.4 of ISO 3746 for the survey grade) determines it by the
+  enveloping-surface chain with the single event time-integrated level $L_E$
+  in place of the time-averaged $L_p$: `sound_energy_pressure` takes the
+  events measured one at a time (Eq. 19) or one reading encompassing them
+  (Eq. 20), the $K_1$ of Eq. 21, the $K_2$ of Annex A and the surface term of
+  Eq. 23, and returns a `SoundEnergyResult` with the Annex E $L_{J\mathrm{A}}$
+  and `.plot()`. In the reverberation room, `sound_energy_reverberation`
+  (Eq. 30) and `sound_energy_comparison` (Eq. 31) are clause 9.2 of ISO 3741,
+  with the per-position $K_{1i}$ of Eq. 25, and `octave_band_levels` is the
+  Annex F sum of thirds into octaves (Eq. F.1/F.4). `mean_single_event_level`
+  is the Eq. 19/20 reduction on its own, and `reference_atmosphere_correction`
+  the Annex G correction of either level to 101,325 kPa and 23,0 °C, from a
+  measured static pressure or from the altitude through Eq. G.2.
+
+  Neither standard prints a worked example with $L_J$, so the oracle is the
+  definitions of clause 3: for a source steady over $T$ the integral of $p^2$
+  is $T p^2$, $L_E = L_p + 10 \lg(T/T_0)$ (clause 3.4 NOTE 1), and every
+  equation of the energy chain being its power twin gives
+  $L_J = L_W + 10 \lg(T/T_0)$ with the same $K_1$, $K_2$, A-weighting and
+  uncertainty. The suite and the conformance report pin that identity on
+  both families with background and room in play, Eq. 20's $10 \lg N_\mathrm{e}$,
+  Annex F's $10 \lg 3$, and the H.4.2.7 statement that the Annex G
+  correction vanishes at 120 m and 23 °C.
+
+  One reading had to be decided. Eq. 21 subtracts a time-averaged background
+  level (re $p_0^2$) from a time-integrated event level (re $E_0 = p_0^2
+  \cdot 1$ s), which is a ratio of energies only when $T = 1$ s. The library
+  compares the background as its exposure over the same window,
+  $L_{p(\mathrm{B})} + 10 \lg(T/T_0)$, so that the identity above holds for
+  every $T$, and asks for `integration_time` whenever a background is given;
+  the errata registry records the reading, for ISO 3744 Eq. 21 and the same
+  construction in ISO 3741 Eq. 25.
 
 - The ISO 16283 low-frequency procedure, which the standard makes **mandatory**
   and not optional when the receiving room is under 25 m3, taking the volume
