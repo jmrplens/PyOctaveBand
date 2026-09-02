@@ -622,7 +622,7 @@ source level in every band and at least **10 dB** below from 250 Hz to 5 kHz
 (clause 5.2.1.1) — a band that cannot reach it may instead be excluded from the
 range of interest if its corrected A-weighted band power is at least 15 dB below
 the highest (clause 5.2.1.2). Where the margin falls short anyway, clause 9.4.2
-freezes $K_{1i}$ at the value the criterion produces — 1,26 dB for the bands at
+freezes $K_{1i}$ at the value the criterion produces, 1.26 dB for the bands at
 and below 200 Hz and at and above 6,3 kHz, 0,46 dB from 250 Hz to 5 kHz — and
 then *requires* the test report, and the tables and graphs in it, to state that
 those bands are upper bounds. `precision_background_correction` applies exactly
@@ -980,7 +980,7 @@ the event level with, and why `integration_time` is required whenever
 `background_levels` is given. Read literally, a 62 dB background under a 78 dB
 burst in a 10 s window would look 16 dB down and earn no correction; as an
 energy it is 72 dB, the margin is the 6 dB engineering criterion, and $K_1$ is
-its full 1,26 dB. The [errata registry](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md)
+its full 1.26 dB. The [errata registry](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md)
 records the reading. With the background in place, the criteria and the clamp
 are section 1's: 6 dB to 15 dB for the engineering grade, 3 dB to 10 dB for the
 survey grade of ISO 3746, and a `SoundPowerWarning` when a band falls below
