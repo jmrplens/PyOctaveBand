@@ -7,14 +7,14 @@ references:
     year: 2018
     title: "Acoustics — Hearing protectors — Part 2: Estimation of effective A-weighted sound pressure levels when hearing protectors are worn"
     designation: "ISO 4869-2:2018"
-    url: "https://www.iso.org/standard/70090.html"
+    url: "https://www.iso.org/standard/65582.html"
     note: "The implemented standard: the assumed protection value of Clause 5, the octave-band method of Clause 6, the HML method of Clause 7 and the SNR method of Clause 8, validated against the worked examples of Annexes A to D."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2018
     title: "Acoustics — Hearing protectors — Part 1: Subjective method for the measurement of sound attenuation"
     designation: "ISO 4869-1:2018"
-    url: "https://www.iso.org/standard/69233.html"
+    url: "https://www.iso.org/standard/65581.html"
     note: "Where the per-subject attenuation values come from: the real-ear attenuation at threshold measured on at least 16 subjects, which is the input every method here starts from."
 ---
 
@@ -50,8 +50,8 @@ import numpy as np
 from phonometry import hearing
 
 # ISO 4869-1 attenuation of one protector: 16 subjects, eight octave bands
-# from 63 Hz to 8 kHz. This is the example Annexes A to D of ISO 4869-2 are
-# worked on end to end.
+# from 63 Hz to 8 kHz. Annexes A to D of ISO 4869-2 work this same example
+# through all three methods.
 attenuation = np.array([
     [4, 8, 13, 18, 20, 30, 35, 30],   [6, 12, 16, 21, 29, 35, 47, 35],
     [10, 16, 17, 23, 25, 32, 48, 37], [3, 7, 12, 18, 20, 25, 33, 30],
@@ -200,10 +200,11 @@ not a ranking: the octave-band method uses more information and is the one to
 prefer when the spectrum is available, while HML and SNR exist precisely for
 when it is not.
 
-All three computations begin at 125 Hz. Formula (2) may start at 63 Hz when
-both the noise and the protector have data there, but the HML and SNR
-computations always start at 125 Hz regardless, which is why the reference
-spectra of Tables 2 and 3 begin there.
+The octave-band method starts at 63 Hz when both the noise and the protector
+have data there and at 125 Hz when either does not (Clause 6). The HML and SNR
+computations start at 125 Hz always, whatever is available at 63 Hz, which is
+why the reference spectra of Table 2 (Clause 7) and Table 3 (Clause 8) begin
+there.
 
 One caution about the reference spectra: Annex C reprints Table 2 as its
 Table C.1 and the reprint disagrees with the original in two cells. Table 2 is

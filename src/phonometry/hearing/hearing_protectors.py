@@ -39,10 +39,11 @@ example of Annexes B, C and D the same protector in the same noise gives 81 dB,
 82 dB and 82 dB. Clause 1's own NOTE puts differences of 3 dB or less between
 comparable protectors below the resolution of the exercise.
 
-All three computations begin at 125 Hz. Formula (2) may start at 63 Hz when
-both the noise and the protector have data there, but the ``HML`` and ``SNR``
-computations always start at 125 Hz regardless (Clause 6), which is why the
-reference spectra of Tables 2 and 3 begin there.
+The octave-band method starts at 63 Hz when both the noise and the protector
+have data there and at 125 Hz when either does not (Clause 6). The ``HML``
+(Clause 7) and ``SNR`` (Clause 8) computations start at 125 Hz always,
+whatever is available at 63 Hz, which is why the reference spectra of Tables 2
+and 3 begin there.
 
 Clause, formula and table numbers refer to ISO 4869-2:2018(E).
 """
@@ -387,7 +388,11 @@ class ProtectedLevelResult:
     :ivar effective_level: :math:`L'_{p,Ax}`, in dB, unrounded. Clauses 6, 7.3
         and 8.3 all report it to the nearest integer, which
         :attr:`reported_level` does.
-    :ivar noise_reduction: :math:`PNR_x = L_{p,A} - L'_{p,Ax}`, in dB.
+    :ivar noise_reduction: :math:`PNR_x = L_{p,A} - L'_{p,Ax}`, in dB, or
+        ``None`` where it cannot be formed. The ``SNR`` method given only a
+        C-weighted level never learns :math:`L_{p,A}`, and the difference
+        between the C-weighted level and the answer is the rating itself
+        rather than a noise reduction.
     :ivar performance: The protection performance ``x``, in per cent, or
         ``None`` when the rating that produced it did not carry one.
     :ivar method: ``"octave-band"``, ``"HML"`` or ``"SNR"``.
@@ -398,7 +403,7 @@ class ProtectedLevelResult:
     """
 
     effective_level: float
-    noise_reduction: float
+    noise_reduction: float | None
     performance: int | None
     method: str
     band_levels: np.ndarray | None = None
@@ -481,7 +486,17 @@ def octave_band_protected_level(
         )
         raise ValueError(msg)
     freqs = _octave_axis(frequencies, levels.size, "octave_band_protected_level")
-    weighting = _a_weighting_axis(a_weighting, levels.size)
+    if isinstance(apv, AssumedProtectionResult):
+        carried = np.asarray(apv.frequencies, dtype=np.float64)
+        if carried.size != freqs.size or not np.allclose(carried, freqs):
+            msg = (
+                "'apv' was computed over a different band axis than this call: "
+                f"{carried.tolist()} against {freqs.tolist()}. Formula (2) "
+                "subtracts band by band, so the two have to be the same bands "
+                "in the same order."
+            )
+            raise ValueError(msg)
+    weighting = _a_weighting_axis(a_weighting, freqs)
     band = levels + weighting - protection
     effective = float(10.0 * np.log10(np.sum(10.0 ** (0.1 * band))))
     l_p_a = float(10.0 * np.log10(np.sum(10.0 ** (0.1 * (levels + weighting)))))
@@ -496,31 +511,42 @@ def octave_band_protected_level(
 
 
 def _a_weighting_axis(
-    a_weighting: Sequence[float] | np.ndarray | None, count: int
+    a_weighting: Sequence[float] | np.ndarray | None, freqs: np.ndarray
 ) -> np.ndarray:
-    """Frequency weighting A over the bands in play, defaulted to Table 3.
+    """Frequency weighting A over the bands in play, defaulted from the table.
+
+    The default is keyed to the *frequencies* and not to how many there are: a
+    band set that is not the standard octaves has no tabulated weighting, and
+    picking one by count alone would silently apply the 63 Hz to 8 kHz values
+    to a different axis.
 
     :param a_weighting: The caller's weighting, or ``None``.
-    :param count: How many bands the data carries.
+    :param freqs: The band axis the levels sit on, in hertz.
     :return: The weighting as a float array.
-    :raises ValueError: if the count does not match, or if no default fits.
+    :raises ValueError: if the count does not match, if any value is not
+        finite, or if no tabulated default covers the given bands.
     """
+    standard = np.asarray(PROTECTOR_OCTAVE_BANDS, dtype=np.float64)
     if a_weighting is None:
-        if count == len(PROTECTOR_A_WEIGHTING):
-            return np.asarray(PROTECTOR_A_WEIGHTING, dtype=np.float64)
-        if count == len(PROTECTOR_A_WEIGHTING) - 1:
-            return np.asarray(PROTECTOR_A_WEIGHTING[1:], dtype=np.float64)
+        for offset in (0, 1):
+            bands = standard[offset:]
+            if freqs.size == bands.size and np.allclose(freqs, bands):
+                return np.asarray(PROTECTOR_A_WEIGHTING[offset:], dtype=np.float64)
         msg = (
-            "pass 'a_weighting' explicitly for this band set; only the eight "
-            "octaves of Formula (2), or those seven without 63 Hz, are assumed."
+            "pass 'a_weighting' explicitly for these bands: only the eight "
+            "octaves of Formula (2), or those seven without 63 Hz, have a "
+            f"tabulated weighting; got {freqs.tolist()}."
         )
         raise ValueError(msg)
     weighting = np.asarray(a_weighting, dtype=np.float64)
-    if weighting.ndim != 1 or weighting.size != count:
+    if weighting.ndim != 1 or weighting.size != freqs.size:
         msg = (
             "'a_weighting' must be one value per band; got "
-            f"{weighting.size} for {count} bands."
+            f"{weighting.size} for {freqs.size} bands."
         )
+        raise ValueError(msg)
+    if not np.all(np.isfinite(weighting)):
+        msg = "'a_weighting' must contain only finite values, in dB."
         raise ValueError(msg)
     return weighting
 
@@ -871,7 +897,10 @@ def snr_protected_level(
         raise ValueError(msg)
     reported = rating.reported
     effective = c_level - reported
-    reduction = (a_level - effective) if a_level is not None else (c_level - effective)
+    # Formula (23) is handed the C-weighted level alone, so LpA is unknown and
+    # there is no predicted noise level reduction to report: c_level - effective
+    # is the rating back again, which is not what this field means.
+    reduction = None if a_level is None else a_level - effective
     return ProtectedLevelResult(
         effective_level=effective,
         noise_reduction=reduction,

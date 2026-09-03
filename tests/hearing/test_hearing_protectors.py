@@ -387,3 +387,68 @@ def test_the_reported_levels_round_halves_away_from_zero() -> None:
     assert half.effective_level == pytest.approx(82.5)
     assert half.reported_level == 83
     assert round(82.5) == 82
+
+
+def test_the_octave_band_method_refuses_a_mismatched_band_axis() -> None:
+    """Formula (2) subtracts band by band, so both sides index the same bands.
+
+    A result carries the axis it was computed over, and matching only the
+    count would let a protector measured over one band set be applied to a
+    noise measured over another.
+    """
+    apv = hearing.assumed_protection_value(
+        ref.ISO4869_2_ATTENUATION,
+        frequencies=[50.0, 100.0, 200.0, 400.0, 800.0, 1600.0, 3150.0, 6300.0],
+    )
+    with pytest.raises(ValueError, match="different band axis"):
+        hearing.octave_band_protected_level(ref.ISO4869_2_ANNEX_B_NOISE, apv)
+    # The same numbers as a bare array carry no axis and are taken at face value.
+    bare = hearing.octave_band_protected_level(ref.ISO4869_2_ANNEX_B_NOISE, apv.apv)
+    assert bare.reported_level == ref.ISO4869_2_ANNEX_B_REPORTED
+
+
+def test_a_band_set_with_no_tabulated_weighting_needs_an_explicit_one() -> None:
+    """The default weighting follows the frequencies, not their number."""
+    third_octaves = [50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0]
+    with pytest.raises(ValueError, match="tabulated weighting"):
+        hearing.octave_band_protected_level(
+            [80.0] * 8, [10.0] * 8, frequencies=third_octaves
+        )
+    supplied = hearing.octave_band_protected_level(
+        [80.0] * 8, [10.0] * 8, frequencies=third_octaves, a_weighting=[-30.0] * 8
+    )
+    assert supplied.frequencies is not None
+    assert supplied.frequencies.tolist() == third_octaves
+
+
+@pytest.mark.parametrize("bad", [np.nan, np.inf, -np.inf])
+def test_a_non_finite_weighting_is_refused(bad: float) -> None:
+    """A weighting that is not finite gives a level that is not a level."""
+    weighting = [*list(hearing.PROTECTOR_A_WEIGHTING[:-1]), bad]
+    with pytest.raises(ValueError, match="'a_weighting' must contain only finite"):
+        hearing.octave_band_protected_level(
+            ref.ISO4869_2_ANNEX_B_NOISE,
+            ref.ISO4869_2_APV84_PRINTED,
+            a_weighting=weighting,
+        )
+
+
+def test_the_snr_method_reports_no_reduction_without_the_a_weighted_level() -> None:
+    """PNR is LpA minus the answer, and Formula (23) never learns LpA.
+
+    Reporting the difference between the C-weighted level and the answer would
+    report the rating back again, which is not a noise level reduction: on the
+    worked example it is 21 dB where the reduction is 22 dB.
+    """
+    rating = hearing.snr_rating(ref.ISO4869_2_ATTENUATION)
+    by_c = hearing.snr_protected_level(rating, l_p_c=ref.ISO4869_2_ANNEX_B_LPC)
+    assert by_c.noise_reduction is None
+    by_a = hearing.snr_protected_level(
+        rating,
+        l_p_a=ref.ISO4869_2_ANNEX_B_LPA,
+        c_minus_a=ref.ISO4869_2_ANNEX_B_LPC - ref.ISO4869_2_ANNEX_B_LPA,
+    )
+    assert by_a.noise_reduction == pytest.approx(
+        ref.ISO4869_2_ANNEX_B_LPA - by_a.effective_level
+    )
+    assert by_a.noise_reduction != pytest.approx(float(rating.reported))

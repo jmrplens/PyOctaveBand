@@ -87,8 +87,9 @@ and SNR exist precisely for when it is not.
 
 The values that enter the HML and SNR applications are the **rounded** ones:
 Clauses 7.2 and 8.2 round the ratings to the nearest integer, which is what a
-protector is published with. All three computations begin at 125 Hz; Formula
-(2) may start at 63 Hz when both the noise and the protector have data there.
+protector is published with. The octave-band method starts at 63 Hz when both the
+noise and the protector have data there and at 125 Hz when either does not
+(Clause 6); the HML and SNR computations start at 125 Hz always.
 
 One caution about the reference spectra: Annex C reprints Table 2 as its
 Table C.1 and the reprint disagrees with the original in two cells. Table 2 is
@@ -100,13 +101,13 @@ library carries; the discrepancy is registered in [ERRATA](../../ERRATA.md).
 - International Organization for Standardization (2018). *Acoustics — Hearing
   protectors — Part 2: Estimation of effective A-weighted sound pressure levels
   when hearing protectors are worn* (ISO 4869-2:2018).
-  [iso.org catalogue](https://www.iso.org/standard/70090.html).
+  [iso.org catalogue](https://www.iso.org/standard/65582.html).
   The implemented standard: Clauses 5 to 8 and the worked examples of
   Annexes A to D.
 - International Organization for Standardization (2018). *Acoustics — Hearing
   protectors — Part 1: Subjective method for the measurement of sound
   attenuation* (ISO 4869-1:2018).
-  [iso.org catalogue](https://www.iso.org/standard/69233.html).
+  [iso.org catalogue](https://www.iso.org/standard/65581.html).
   Where the per-subject attenuation values come from.
 
 ## Standards

@@ -45,10 +45,11 @@ example of Annexes B, C and D the same protector in the same noise gives 81 dB,
 82 dB and 82 dB. Clause 1's own NOTE puts differences of 3 dB or less between
 comparable protectors below the resolution of the exercise.
 
-All three computations begin at 125 Hz. Formula (2) may start at 63 Hz when
-both the noise and the protector have data there, but the `HML` and `SNR`
-computations always start at 125 Hz regardless (Clause 6), which is why the
-reference spectra of Tables 2 and 3 begin there.
+The octave-band method starts at 63 Hz when both the noise and the protector
+have data there and at 125 Hz when either does not (Clause 6). The `HML`
+(Clause 7) and `SNR` (Clause 8) computations start at 125 Hz always,
+whatever is available at 63 Hz, which is why the reference spectra of Tables 2
+and 3 begin there.
 
 Clause, formula and table numbers refer to ISO 4869-2:2018(E).
 
@@ -401,7 +402,7 @@ PINK_NOISE_A_WEIGHTED = (75.9, 83.4, 88.8, 92.0, 93.2, 93.0, 90.9)
 ```python
 ProtectedLevelResult(
     effective_level: float,
-    noise_reduction: float,
+    noise_reduction: float | None,
     performance: int | None,
     method: str,
     band_levels: np.ndarray | None = None,
@@ -416,7 +417,7 @@ The A-weighted level left at the ear behind a protector.
 | Name | Description |
 | :--- | :--- |
 | `effective_level` | $L'_{p,Ax}$, in dB, unrounded. Clauses 6, 7.3 and 8.3 all report it to the nearest integer, which `reported_level` does. |
-| `noise_reduction` | $PNR_x = L_{p,A} - L'_{p,Ax}$, in dB. |
+| `noise_reduction` | $PNR_x = L_{p,A} - L'_{p,Ax}$, in dB, or `None` where it cannot be formed. The `SNR` method given only a C-weighted level never learns $L_{p,A}$, and the difference between the C-weighted level and the answer is the rating itself rather than a noise reduction. |
 | `performance` | The protection performance `x`, in per cent, or `None` when the rating that produced it did not carry one. |
 | `method` | `"octave-band"`, `"HML"` or `"SNR"`. |
 | `band_levels` | The A-weighted band levels behind the protector, in dB, for the octave-band method, and `None` for the other two, which never see a spectrum. |
