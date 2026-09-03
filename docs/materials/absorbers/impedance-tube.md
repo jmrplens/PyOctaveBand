@@ -349,11 +349,11 @@ $r = 0$; 0.80 at 500 Hz, where $k_0 L = \pi/4$ and $z = 1 - \mathrm{j}$.
 
 ```python
 import numpy as np
-from phonometry import materials, ReportMetadata
+from phonometry import ReportMetadata, fluids, materials
 
 # 100 mm tube, s = 50 mm, far microphone at x1 = 100 mm, 20 degC / 101 kPa.
 c0 = float(materials.speed_of_sound_iso10534(temperature_c=20.0))   # 343.29 m/s
-rho_c = materials.characteristic_impedance(
+rho_c = fluids.characteristic_impedance(
     float(materials.air_density_iso10534(
         temperature_c=20.0, atmospheric_pressure_kpa=101.0)), c0)   # 405.6 Pa.s/m
 diameter, spacing, x1 = 0.100, 0.050, 0.100

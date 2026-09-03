@@ -23,6 +23,7 @@ from ._state import (
     FluidAssumptionWarning,
     FluidPropertyUnavailable,
     FluidWarning,
+    characteristic_impedance,
 )
 from .air import (
     DEFAULT_CO2_MOLE_FRACTION,
@@ -40,4 +41,5 @@ __all__ = [
     "FluidPropertyUnavailable",
     "FluidWarning",
     "air",
+    "characteristic_impedance",
 ]

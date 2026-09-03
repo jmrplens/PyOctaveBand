@@ -100,7 +100,6 @@ __all__ = [
     "absorption_from_reflection",
     "air_density_iso10534",
     "apply_mic_calibration",
-    "characteristic_impedance",
     "hydraulic_diameter",
     "mic_calibration_factor",
     "normalized_surface_admittance",
@@ -756,18 +755,3 @@ def two_microphone_impedance(
         shape=canonical if diameter is not None else None,
     )
 
-
-def characteristic_impedance(density: float, speed_of_sound: float) -> float:
-    """Characteristic impedance of air ``rho c`` (rayls).
-
-    A convenience for both standards (ISO 10534-2 Clause 7.2; ASTM E2611-19
-    Clause 8.2/8.3): the real product of air density and speed of sound.
-
-    :param density: Air density ``rho``, in kg/m3.
-    :param speed_of_sound: Speed of sound ``c``, in m/s.
-    :return: Characteristic impedance ``rho c``, in rayls.
-    """
-    if density <= 0.0 or speed_of_sound <= 0.0:
-        msg = "'density' and 'speed_of_sound' must be positive."
-        raise ValueError(msg)
-    return float(density * speed_of_sound)

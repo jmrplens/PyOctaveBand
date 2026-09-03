@@ -744,6 +744,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `characteristic_impedance` is published by `phonometry.fluids` rather than by
+  `phonometry.materials`. `rho c` is a property of the medium, not of the
+  impedance-tube procedure that happened to publish it: `room.steady_field`,
+  `emission.sound_power_in_duct`, the layered and porous models and the tube
+  itself all reached into `materials` for it, four domains for one product.
+
+  The arguments keep the names `density` and `speed_of_sound`. The unit belongs
+  in a parameter name where two units are in play and a caller can supply the
+  wrong one, which is why the temperatures say `_c` and the pressures say `_pa`;
+  a density in this tree is kilograms per cubic metre everywhere and a speed of
+  sound is metres per second everywhere, so a suffix here would only make this
+  function differ from the two hundred other parameters that already carry
+  those names.
+
+  `Fluid` exposes the same quantity as a property, closed from the two it was
+  built with. The function is for a caller holding a density and a speed of
+  sound with no fluid to go with them.
+
 - ISO 3747's Annex C prints its static pressure in pascals, and the library
   says so. It is alone in the ISO 3740 family in doing so: ISO 3741:2010,
   ISO 3744:2010 and ISO 3745:2012 all print kilopascals, and

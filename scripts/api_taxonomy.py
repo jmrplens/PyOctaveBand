@@ -407,6 +407,7 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     "FluidAssumptionWarning": "phonometry.fluids",
     "FluidPropertyUnavailable": "phonometry.fluids",
     "FluidWarning": "phonometry.fluids",
+    "characteristic_impedance": "phonometry.fluids",
     # The three assumed conditions are owned by the air model and re-exported
     # by the package, so a plain scan sees them in both.
     "DEFAULT_CO2_MOLE_FRACTION": "phonometry.fluids.air",

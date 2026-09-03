@@ -24,6 +24,7 @@ import dataclasses
 import numpy as np
 import pytest
 
+from phonometry.fluids import characteristic_impedance
 from phonometry.materials.absorbers.four_microphone import (
     TransferMatrix,
     air_density_astm,
@@ -41,7 +42,6 @@ from phonometry.materials.absorbers.impedance_tube import (
     absorption_from_reflection,
     air_density_iso10534,
     apply_mic_calibration,
-    characteristic_impedance,
     hydraulic_diameter,
     mic_calibration_factor,
     normalized_surface_admittance,
@@ -998,7 +998,6 @@ def test_public_exports() -> None:
         "absorption_from_reflection",
         "normalized_surface_impedance",
         "normalized_surface_admittance",
-        "characteristic_impedance",
         "speed_of_sound_iso10534",
         "speed_of_sound_astm",
         "air_density_iso10534",

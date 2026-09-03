@@ -23,6 +23,45 @@ ceasing to reproduce the standard it claims.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
+## characteristic_impedance
+
+```python
+characteristic_impedance(density: float, speed_of_sound: float) -> float
+```
+
+Characteristic impedance `rho c`, in pascal seconds per metre.
+
+The product of a medium's density and its speed of sound. It belongs to the
+medium rather than to any procedure, which is why it lives here and not with
+the impedance tube that used to publish it; ISO 10534-2 Clause 7.2 and
+ASTM E2611-19 Clauses 8.2/8.3 both reach for the same product, and so does
+every reflection coefficient in the library.
+
+[`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) exposes the same quantity as a property, closed from the two
+it was built with. This function is for a caller who has a density and a
+speed of sound and no fluid to go with them.
+
+The arguments carry no unit in their names, unlike the temperatures and
+pressures elsewhere in the library: those name a unit because two are in
+play and a caller can supply the wrong one. A density in this tree is
+kilograms per cubic metre everywhere, and a speed of sound is metres per
+second everywhere, so there is no second unit to be confused with.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `density` | Density `rho`, in kg/m3. |
+| `speed_of_sound` | Speed of sound `c`, in m/s. |
+
+**Returns:** Characteristic impedance `rho c`, in Pa\*s/m (rayl).
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | if either argument is not positive. |
+
 ## Fluid
 
 ```python

@@ -41,6 +41,36 @@ class FluidPropertyUnavailable(AttributeError):
     """A quantity the model that built this fluid does not determine."""
 
 
+def characteristic_impedance(density: float, speed_of_sound: float) -> float:
+    """Characteristic impedance ``rho c``, in pascal seconds per metre.
+
+    The product of a medium's density and its speed of sound. It belongs to the
+    medium rather than to any procedure, which is why it lives here and not with
+    the impedance tube that used to publish it; ISO 10534-2 Clause 7.2 and
+    ASTM E2611-19 Clauses 8.2/8.3 both reach for the same product, and so does
+    every reflection coefficient in the library.
+
+    :class:`Fluid` exposes the same quantity as a property, closed from the two
+    it was built with. This function is for a caller who has a density and a
+    speed of sound and no fluid to go with them.
+
+    The arguments carry no unit in their names, unlike the temperatures and
+    pressures elsewhere in the library: those name a unit because two are in
+    play and a caller can supply the wrong one. A density in this tree is
+    kilograms per cubic metre everywhere, and a speed of sound is metres per
+    second everywhere, so there is no second unit to be confused with.
+
+    :param density: Density ``rho``, in kg/m3.
+    :param speed_of_sound: Speed of sound ``c``, in m/s.
+    :return: Characteristic impedance ``rho c``, in Pa*s/m (rayl).
+    :raises ValueError: if either argument is not positive.
+    """
+    if density <= 0.0 or speed_of_sound <= 0.0:
+        msg = "'density' and 'speed_of_sound' must be positive."
+        raise ValueError(msg)
+    return float(density * speed_of_sound)
+
+
 @dataclasses.dataclass(frozen=True)
 class Fluid:
     """One fluid at one state, and the properties its model fixed there.
