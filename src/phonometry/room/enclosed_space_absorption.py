@@ -83,7 +83,7 @@ AIR_ATTENUATION: dict[str, np.ndarray] = {
 }
 
 #: The recommended default air condition (clause 4.3): 20 C, 50 %-70 % humidity.
-DEFAULT_AIR_CONDITION = "20C_50-70"
+PUBLISHED_AIR_CONDITION = "20C_50-70"
 
 
 # ---------------------------------------------------------------------------

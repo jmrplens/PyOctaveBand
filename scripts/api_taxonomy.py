@@ -409,6 +409,10 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     "FluidPropertyUnavailable": "phonometry.fluids",
     "FluidWarning": "phonometry.fluids",
     "characteristic_impedance": "phonometry.fluids",
+    # A Fluid instance reports its class's module, so the published air of
+    # the Johnson-Champoux-Allard model is credited to fluids unless said
+    # otherwise. It belongs to the model that publishes those constants.
+    "PUBLISHED_AIR": "phonometry.materials.absorbers.porous",
     # The three assumed conditions are owned by the air model and re-exported
     # by the package, so a plain scan sees them in both.
     "DEFAULT_CO2_MOLE_FRACTION": "phonometry.fluids.air",

@@ -32,7 +32,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ..._internal.validation import require_positive, require_positive_array
-from ..absorbers.porous import DEFAULT_AIR, AirProperties, Complex
+from ..absorbers.porous import PUBLISHED_AIR, Complex
 from ..absorbers.slow_sound import HelmholtzResonator, slit_helmholtz_absorber
 from .design import (
     DEFAULT_POLAR_ANGLES,
@@ -52,6 +52,7 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ..._internal.types import Real
+    from ...fluids import Fluid
 
 __all__ = [
     "MetadiffuserResult",
@@ -177,7 +178,7 @@ def metadiffuser_reflection(
     period: float,
     angle: float = 0.0,
     resonator_geometry: str = "slit",
-    air: AirProperties = DEFAULT_AIR,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> MetadiffuserResult:
     r"""Per-well reflection spectra of a metadiffuser panel (Sci. Rep. Eq. (6)).
 
@@ -200,9 +201,9 @@ def metadiffuser_reflection(
     :param resonator_geometry: ``"slit"`` (default) for the paper's
         two-dimensional resonators, ``"square"`` for square-duct necks
         and cavities.
-    :param air: State of the air the panel radiates into and the slits and
+    :param fluid: State of the air the panel radiates into and the slits and
         resonators are filled with
-        (:class:`~phonometry.materials.absorbers.porous.AirProperties`): its
+        (:class:`~phonometry.fluids.Fluid`): its
         speed of sound ``c0``, density ``rho0``, viscosity ``eta``, Prandtl
         number ``Pr``, ratio of specific heats ``gamma`` and static pressure
         ``P0``.
@@ -223,7 +224,7 @@ def metadiffuser_reflection(
             period=period,
             angle=angle,
             resonator_geometry=resonator_geometry,
-            air=air,
+            fluid=fluid,
         )
         rows[i] = prediction.reflection
     well_alpha = 1.0 - np.abs(rows) ** 2
@@ -248,7 +249,7 @@ def metadiffuser_polar_response(
     source_angle: float = 0.0,
     periods: int = 1,
     resonator_geometry: str = "slit",
-    air: AirProperties = DEFAULT_AIR,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> DiffuserPolarResponse:
     """Far-field polar response of a metadiffuser at one frequency.
 
@@ -273,9 +274,9 @@ def metadiffuser_polar_response(
     :param resonator_geometry: ``"slit"`` (default) for the paper's
         two-dimensional resonators, ``"square"`` for square-duct necks
         and cavities.
-    :param air: State of the air the panel radiates into and the slits and
+    :param fluid: State of the air the panel radiates into and the slits and
         resonators are filled with
-        (:class:`~phonometry.materials.absorbers.porous.AirProperties`); its
+        (:class:`~phonometry.fluids.Fluid`); its
         speed of sound ``c0`` also carries the far field.
     :return: A
         :class:`~phonometry.materials.diffusers.design.DiffuserPolarResponse`.
@@ -288,7 +289,7 @@ def metadiffuser_polar_response(
         period=period,
         angle=float(np.radians(source_angle)),
         resonator_geometry=resonator_geometry,
-        air=air,
+        fluid=fluid,
     )
     # Sci. Rep. Eq. (1) is the bare Fraunhofer integral of R(x): the
     # piecewise-constant wells carry the aperture factor, but there is no
@@ -300,7 +301,7 @@ def metadiffuser_polar_response(
         angles=angles,
         source_angle=source_angle,
         periods=periods,
-        speed_of_sound=air.speed_of_sound,
+        speed_of_sound=fluid.speed_of_sound,
         include_obliquity=False,
     )
 
@@ -315,7 +316,7 @@ def metadiffuser_diffusion_spectrum(
     source_angle: float = 0.0,
     periods: int = 1,
     resonator_geometry: str = "slit",
-    air: AirProperties = DEFAULT_AIR,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> DiffusionSpectrum:
     r"""Normalized diffusion-coefficient spectrum ``d_n(f)`` of a metadiffuser.
 
@@ -337,9 +338,9 @@ def metadiffuser_diffusion_spectrum(
     :param resonator_geometry: ``"slit"`` (default) for the paper's
         two-dimensional resonators, ``"square"`` for square-duct necks
         and cavities.
-    :param air: State of the air the panel radiates into and the slits and
+    :param fluid: State of the air the panel radiates into and the slits and
         resonators are filled with
-        (:class:`~phonometry.materials.absorbers.porous.AirProperties`); its
+        (:class:`~phonometry.fluids.Fluid`); its
         speed of sound ``c0`` also carries the far field.
     :return: A
         :class:`~phonometry.materials.diffusers.scattering_diffusion.DiffusionSpectrum`
@@ -358,7 +359,7 @@ def metadiffuser_diffusion_spectrum(
         period=period,
         angle=float(np.radians(source_angle)),
         resonator_geometry=resonator_geometry,
-        air=air,
+        fluid=fluid,
     )
     raw = np.empty(freqs.size, dtype=np.float64)
     norm = np.empty(freqs.size, dtype=np.float64)
@@ -370,7 +371,7 @@ def metadiffuser_diffusion_spectrum(
             angles=angles,
             source_angle=source_angle,
             periods=periods,
-            speed_of_sound=air.speed_of_sound,
+            speed_of_sound=fluid.speed_of_sound,
             include_obliquity=False,
         )
         reference = predict_diffuser_polar_response(
@@ -380,7 +381,7 @@ def metadiffuser_diffusion_spectrum(
             angles=angles,
             source_angle=source_angle,
             periods=periods,
-            speed_of_sound=air.speed_of_sound,
+            speed_of_sound=fluid.speed_of_sound,
             include_obliquity=False,
         )
         raw[i] = surface.coefficient
