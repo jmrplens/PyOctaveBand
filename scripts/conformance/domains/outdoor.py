@@ -297,10 +297,25 @@ def _chk_iso11654_a2() -> Outcome:
     )
 
 
+# Annex A.3 computes its example from the five air properties it prints, so both
+# rows pass them rather than taking the library defaults, which are that same air
+# state computed from IEC 61094-2:2009 Annex F. The two differ in the thermal
+# conductivity and the specific heat capacity, which Annex A.3 credits to
+# IEC 61094-2:2009 and which are not found there (see docs/ERRATA.md). Both give
+# b = 1,83e-3 m and kappa' = 1,370, because the printed pair preserves the
+# tabulated diffusivity; passing the printed pair is what makes these rows
+# reproduce the standard rather than merely agree with it.
+_AIR = ref.ISO9053_2_ANNEX_A_PRINTED_AIR
+
+
 @register(_MATERIALS, "ISO 9053-2:2020 Annex A.3", "Thermal boundary-layer thickness b")
 def _chk_iso9053_2_boundary() -> Outcome:
     b = ph.materials.thermal_boundary_layer_thickness(
-        frequency=ref.ISO9053_2_ANNEX_A_FREQUENCY
+        frequency=ref.ISO9053_2_ANNEX_A_FREQUENCY,
+        speed_of_sound=_AIR["speed_of_sound"],
+        air_density=_AIR["air_density"],
+        specific_heat_cp=_AIR["specific_heat_cp"],
+        thermal_conductivity=_AIR["thermal_conductivity"],
     )
     return numeric(
         ref.ISO9053_2_ANNEX_A_BOUNDARY_LAYER,
@@ -319,6 +334,7 @@ def _chk_iso9053_2_kappa() -> Outcome:
         cavity_surface=ref.ISO9053_2_ANNEX_A_SURFACE,
         cavity_volume=ref.ISO9053_2_ANNEX_A_VOLUME,
         frequency=ref.ISO9053_2_ANNEX_A_FREQUENCY,
+        **_AIR,
     )
     return numeric(ref.ISO9053_2_ANNEX_A_KAPPA_PRIME, kp, 5e-4, places=3)
 

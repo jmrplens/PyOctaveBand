@@ -151,11 +151,11 @@ effective_kappa(
     cavity_volume: float,
     frequency: float,
     *,
-    speed_of_sound: float = 345.9,
-    air_density: float = 1.186,
-    specific_heat_ratio: float = 1.4008,
-    specific_heat_cp: float = 938.7,
-    thermal_conductivity: float = 0.02355,
+    speed_of_sound: float = 345.86652,
+    air_density: float = 1.1860848,
+    specific_heat_ratio: float = 1.4007573,
+    specific_heat_cp: float = 1013.738121253794,
+    thermal_conductivity: float = 0.0254341377186358,
 ) -> float
 ```
 
@@ -174,8 +174,10 @@ of the air cavity (m2) and `V` its volume (m3).
 
 `cavity_surface` is `S` (m2), `cavity_volume` `V` (m3) and `frequency`
 the piston frequency `f` (Hz); `specific_heat_ratio` `kappa` (adiabatic) and
-the remaining air properties default to the ISO 9053-2:2020 Annex A.3 values.
-Returns the dimensionless `kappa'` for use in
+the remaining air properties default to air at the Annex A.3 reference state,
+computed from IEC 61094-2:2009 Annex F (see
+[`thermal_boundary_layer_thickness`](/phonometry/reference/api/materials/airflow-resistance/#thermal_boundary_layer_thickness) on why those differ from the pair
+Annex A.3 prints). Returns the dimensionless `kappa'` for use in
 [`alternating_airflow_resistance`](/phonometry/reference/api/materials/airflow-resistance/#alternating_airflow_resistance); the Annex A.3 worked example
 ($S = 0.0471$ m2, $V = 7.854\times 10^{-4}$ m3,
 $f = 2$ Hz) yields $\kappa' = 1.370$.
@@ -365,10 +367,10 @@ place (mm/s).
 thermal_boundary_layer_thickness(
     frequency: float,
     *,
-    speed_of_sound: float = 345.9,
-    air_density: float = 1.186,
-    specific_heat_cp: float = 938.7,
-    thermal_conductivity: float = 0.02355,
+    speed_of_sound: float = 345.86652,
+    air_density: float = 1.1860848,
+    specific_heat_cp: float = 1013.738121253794,
+    thermal_conductivity: float = 0.0254341377186358,
 ) -> float
 ```
 
@@ -384,6 +386,14 @@ $$
 
 `frequency` is the piston frequency `f` (Hz); `speed_of_sound` `c0` (m/s),
 `air_density` `rho0` (kg/m3), `specific_heat_cp` `C_P` (J/(kg\*K)) and
-`thermal_conductivity` `k_a` (J/(s\*m\*K)) are air properties, defaulting to the
-IEC 61094-2:2009 values used in ISO 9053-2:2020 Annex A.3. Returns `b` in metres;
-with the Annex A.3 example ($f = 2$ Hz) this is `1.83e-3 m`.
+`thermal_conductivity` `k_a` (J/(s\*m\*K)) are air properties, defaulting to air
+at 23 degC, 101,325 kPa and 50 % relative humidity computed from IEC 61094-2:2009
+Annex F. Note that `c0` cancels: `b` is
+$\sqrt{2 k_\mathrm{a} / (\rho_0 C_\mathrm{P} \omega)}$, so only the pair
+`k_a`/`C_P` and the density move it.
+
+ISO 9053-2:2020 Annex A.3 prints a `k_a`/`C_P` pair 1,0800 times smaller than
+Annex F gives at that state, which it credits to IEC 61094-2:2009 but which cannot
+be found there (see `docs/ERRATA.md`). The defaults here are the Annex F values;
+with the Annex A.3 example ($f = 2$ Hz) both pairs give `1.83e-3 m`, because
+the printed pair preserves the tabulated diffusivity.

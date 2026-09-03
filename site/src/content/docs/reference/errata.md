@@ -187,6 +187,66 @@ in the same order.
   the printed 0,97 with a tolerance that documents the recomputed 0,9621.
 - **Status:** unreported.
 
+## ISO 9053-2:2020, Annex A.3 (two air properties credited to a document that does not print them)
+
+- **Location:** Annex A.3, printed folio 13 (PDF page 17) for the first four
+  values and printed folio 14 (PDF page 18) for the fifth.
+- **The print:** "The following physical properties for air, valid at 23 °C,
+  101,325 kPa and 50 % RH, are used for the calculation (values from
+  IEC 61094-2:2009):", followed by $c_0 = 345{,}9$ m/s, $\rho_0 = 1{,}186$
+  kg/m³, $\kappa = 1{,}400\,8$, $k_\mathrm{a} = 0{,}023\,55$ J/(s·m·K) and,
+  overleaf, $C_\mathrm{P} = 938{,}7$ J/(kg·K).
+- **The problem:** two of the five are not IEC 61094-2:2009 values. Table F.1 of
+  that standard (printed folio 40) tabulates exactly five quantities at this
+  state: $\rho$, $c_0$, $\kappa$, $\eta$ and the thermal **diffusivity**
+  $\alpha_t = 2{,}115\,317 \times 10^{-5}$ m²/s. It does not tabulate the
+  thermal conductivity or the specific heat capacity; those appear in Annex F
+  only as the two expressions under Clause F.6, which print no values. The three
+  Annex A.3 values that do match are precisely the three Table F.1 cells rounded
+  to four figures ($345{,}866\,52 \to 345{,}9$; $1{,}186\,084\,8 \to
+  1{,}186$; $1{,}400\,757\,3 \to 1{,}400\,8$). The two that do not match are
+  precisely the two quantities Table F.1 does not print: evaluated at the same
+  state, Clause F.6 gives $k_\mathrm{a} = 0{,}025\,434\,1$ J/(s·m·K) and
+  $C_\mathrm{P} = 1013{,}74$ J/(kg·K), each larger than the printed pair by the
+  same factor 1,0800.
+
+  The common factor is not a coincidence and not a unit difference. The pair is
+  locked to the tabulated diffusivity: $0{,}023\,55 / (1{,}186 \times
+  2{,}115\,317 \times 10^{-5}) = 938{,}708\,5$, which prints as 938,7. So one
+  of the two came from elsewhere and the other was computed back through
+  Formula (F.5) to keep $\alpha_t$ right. Which one is foreign is settled by
+  thermodynamics rather than by preference: $C_\mathrm{P} = 938{,}7$ J/(kg·K) is
+  27,19 J/(mol·K), below the rigid-rotor diatomic floor $(7/2)R = 29{,}10$
+  J/(mol·K), so it is not air at any temperature, in any unit, per mass or per
+  mole, and the Annex F expression for $C_\mathrm{P}$ never falls below about
+  1013 J/(kg·K) anywhere from 200 K to 400 K. The conductivity 0,023 55
+  J/(s·m·K), by contrast, is a real conductivity of air: it is what the Annex F
+  expression gives near −1,4 °C, outside the 15 °C to 27 °C domain Annex F
+  prints for itself.
+- **Consequence for the annex's own example:** none. Formula (A.5) uses
+  $k_\mathrm{a}$ and $C_\mathrm{P}$ only through the combination
+  $k_\mathrm{a}/(\rho_0 c_0 C_\mathrm{P})$, and the common factor cancels
+  there, so both pairs give the printed $b = 1{,}83 \times 10^{-3}$ m and
+  $\kappa' = 1{,}370$. The defect is invisible inside Annex A.3 and appears only
+  when either constant is read out on its own, as a document credited with
+  publishing it.
+- **Evidence:** the two printed pages against IEC 61094-2:2009 Table F.1
+  (printed folio 40) and Clause F.6 (printed folio 39); the Clause F.6
+  expressions evaluated at 23 °C, 101 325 Pa and 50 % RH, which reproduce the
+  printed $\alpha_t$ to $1{,}0 \times 10^{-7}$ relative; the molar heat
+  capacity implied by 938,7 J/(kg·K) against the diatomic floor. IEC 61094-2:2009
+  is not a normative reference of ISO 9053-2:2020; it appears only as
+  Bibliography item [4]. Verified on PDF page 17 (printed p. 13) and PDF page 18
+  (printed p. 14) of ISO 9053-2:2020, and on PDF page 42 (printed p. 40) and PDF
+  page 41 (printed p. 39) of BS EN 61094-2:2009.
+- **Library behaviour:** the conformance rows that reproduce Annex A.3 pass the
+  five values the annex prints, so they reproduce the standard rather than merely
+  agree with it. The defaults a caller receives are the same air state computed
+  from IEC 61094-2:2009 Annex F, which is what the annex says it is using; both
+  land on the printed $b$ and $\kappa'$ ([`tests/reference_data/`](https://github.com/jmrplens/phonometry/blob/main/tests/reference_data),
+  conformance checks "ISO 9053-2:2020 Annex A.3").
+- **Status:** unreported.
+
 ## EN 12354-1:2000 Formula (E.5) / ISO 12354-1:2017 E.3.4 (K24 clamp misprint)
 
 - **Location:** EN 12354-1:2000, Annex E, the wall-junction-with-flexible-
