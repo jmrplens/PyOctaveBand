@@ -415,7 +415,7 @@ the housing.
 ## fan_efficiency_correction
 
 ```python
-fan_efficiency_correction(relative_efficiency: float) -> float
+fan_efficiency_correction(*, relative_efficiency_percent: float) -> float
 ```
 
 Off-peak efficiency correction `C_EFF` (Long Table 13.6).
@@ -431,7 +431,7 @@ the 6 dB step.
 
 | Name | Description |
 | :--- | :--- |
-| `relative_efficiency` | Static efficiency as a percentage of the peak, in `(0, 100]`. |
+| `relative_efficiency_percent` | Static efficiency as a **percentage** of the peak, in `(0, 100]`. A fraction is not accepted in disguise: the table is tabulated from 50 % up, so 0,8 would fall to its bottom row and return 16 dB where 80 % returns 6, ten decibels with nothing to say it happened. Below 50 % the caller is warned that the value is outside the span Table 13.6 tabulates. |
 
 **Returns:** The correction `C_EFF`, dB.
 
@@ -446,10 +446,10 @@ the 6 dB step.
 ```python
 fan_sound_power(
     volume_flow: float,
-    static_pressure: float,
     *,
+    fan_static_pressure_pa: float,
     fan_type: str = 'forward_curved',
-    relative_efficiency: float = 80.0,
+    relative_efficiency_percent: float = 80.0,
     blade_frequency: float | None = None,
     frequencies: ArrayLike | None = None,
 ) -> HvacSpectrumResult
@@ -488,9 +488,9 @@ module warning.
 | Name | Description |
 | :--- | :--- |
 | `volume_flow` | Volume flow through the fan `Q_\mathrm{F}`, m3/s. |
-| `static_pressure` | Fan static pressure `P_\mathrm{F}`, Pa (gauge). |
+| `fan_static_pressure_pa` | Fan static pressure `P_\mathrm{F}`, in **pascals gauge**. This is the pressure rise the fan produces across itself, not an ambient pressure, and it shares neither the unit nor the datum of the `static_pressure` the ISO 3740 family takes in kilopascals absolute. No plausibility guard can separate the two: 101,325 Pa is a legitimate duty for a panel or propeller fan, so the name is what keeps them apart. |
 | `fan_type` | One of `"airfoil_large"` / `"airfoil_small"` (backward-curved or backward-inclined centrifugal wheels above and below 36 in diameter), `"forward_curved"`, `"radial_low"` / `"radial_medium"` / `"radial_high"` (radial blades by total pressure), `"vaneaxial_hub_low"` / `"vaneaxial_hub_medium"` / `"vaneaxial_hub_high"` (hub ratios 0.3-0.4, 0.4-0.6 and 0.6-0.8), `"tubeaxial_large"` / `"tubeaxial_small"` (above and below 40 in wheel diameter) or `"propeller"`. |
-| `relative_efficiency` | Static efficiency as a percentage of the peak (default 80, Long's recommendation when the peak is unknown). |
+| `relative_efficiency_percent` | Static efficiency as a **percentage** of the peak (default 80, Long's recommendation when the peak is unknown). Table 13.6 is tabulated from 50 % up, so a fraction such as 0,8 falls through to the table's bottom row and silently returns its worst-case 16 dB correction instead of the 6 dB that 80 % earns. |
 | `blade_frequency` | Blade passing frequency `f_bp`, Hz (from [`blade_passing_frequency`](/phonometry/reference/api/noise_control/hvac/#blade_passing_frequency)). `None` (default) places the increment in the octave band Table 13.7 tabulates for the fan type. |
 | `frequencies` | Octave-band centres, Hz; `None` (default) uses the 63 Hz to 8 kHz bands of [`OCTAVE_BANDS`](/phonometry/reference/api/materials/rating/#octave_bands). |
 

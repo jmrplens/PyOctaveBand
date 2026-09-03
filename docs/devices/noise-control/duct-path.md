@@ -103,12 +103,12 @@ from phonometry import noise_control
 
 CFM, IN_WG = 0.0004719474432, 249.0
 
-fan = noise_control.fan_sound_power(volume_flow=5000 * CFM, static_pressure=2 * IN_WG,
-                                    fan_type="forward_curved", relative_efficiency=80.0)
+fan = noise_control.fan_sound_power(volume_flow=5000 * CFM, fan_static_pressure_pa=2 * IN_WG,
+                                    fan_type="forward_curved", relative_efficiency_percent=80.0)
 print([round(float(v)) for v in fan.values])
 # [99, 99, 89, 84, 82, 77, 72, 67]
 
-print(noise_control.fan_efficiency_correction(80.0))          # 6.0 dB off the peak
+print(noise_control.fan_efficiency_correction(relative_efficiency_percent=80.0))          # 6.0 dB off the peak
 print(noise_control.blade_passing_frequency(1200.0, 24))      # 480.0 Hz, in the 500 Hz band
 print(noise_control.fan_casing_attenuation().values)          # what the housing holds back
 # [ 0.  0.  5. 10. 15. 20. 22. 25.]

@@ -145,7 +145,10 @@ def _chk_end_reflection_table() -> Outcome:
 )
 def _chk_fan_sound_power_reference_point() -> Outcome:
     res = ph.noise_control.fan_sound_power(
-        0.472e-3, 249.0, fan_type="forward_curved", relative_efficiency=100.0
+        0.472e-3,
+        fan_static_pressure_pa=249.0,
+        fan_type="forward_curved",
+        relative_efficiency_percent=100.0,
     )
     # Table 13.5 forward-curved 500 Hz entry (36 dB) plus the Table 13.7
     # blade frequency increment of the 500 Hz octave (2 dB).

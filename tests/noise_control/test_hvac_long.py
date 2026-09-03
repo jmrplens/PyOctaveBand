@@ -25,6 +25,7 @@ evaluated here with plain arithmetic, never a value read back from the module.
 from __future__ import annotations
 
 import math
+import warnings
 
 import numpy as np
 import pytest
@@ -48,7 +49,10 @@ def test_fan_sound_power_at_the_reference_operating_point() -> None:
     500 Hz octave, and no efficiency correction at peak efficiency.
     """
     res = hvac.fan_sound_power(
-        0.472e-3, _IN_WG, fan_type="forward_curved", relative_efficiency=100.0
+        0.472e-3,
+        fan_static_pressure_pa=_IN_WG,
+        fan_type="forward_curved",
+        relative_efficiency_percent=100.0,
     )
     assert np.allclose(res.values, [53, 53, 43, 38, 36, 31, 26, 21], atol=1e-9)
     assert res.quantity == "sound_power_level"
@@ -66,13 +70,16 @@ def test_fan_sound_power_duty_terms() -> None:
     :mod:`phonometry.noise_control.hvac`), and this test pins what the printed
     equation actually gives.
     """
-    res = hvac.fan_sound_power(5000.0 * _CFM, 2.0 * _IN_WG)
+    res = hvac.fan_sound_power(5000.0 * _CFM, fan_static_pressure_pa=2.0 * _IN_WG)
     assert np.allclose(res.values, [99, 99, 89, 84, 82, 77, 72, 67], atol=1e-9)
 
 
 def test_fan_sound_power_places_the_blade_increment_by_frequency() -> None:
     res = hvac.fan_sound_power(
-        0.472e-3, _IN_WG, relative_efficiency=100.0, blade_frequency=1000.0
+        0.472e-3,
+        fan_static_pressure_pa=_IN_WG,
+        relative_efficiency_percent=100.0,
+        blade_frequency=1000.0,
     )
     # The 2 dB increment moves from the 500 Hz to the 1 kHz octave.
     assert np.allclose(res.values, [53, 53, 43, 36, 38, 31, 26, 21], atol=1e-9)
@@ -91,7 +98,10 @@ def test_fan_sound_power_places_the_blade_increment_by_frequency() -> None:
     ],
 )
 def test_efficiency_correction_table_13_6(efficiency: float, correction: float) -> None:
-    assert hvac.fan_efficiency_correction(efficiency) == correction
+    assert (
+        hvac.fan_efficiency_correction(relative_efficiency_percent=efficiency)
+        == correction
+    )
 
 
 def test_blade_passing_frequency_eq_13_4() -> None:
@@ -107,13 +117,19 @@ def test_fan_casing_attenuation_table_13_8() -> None:
     ("kwargs", "match"),
     [
         ({"fan_type": "turbine"}, r"'fan_type' must be one of"),
-        ({"relative_efficiency": 0.0}, r"'relative_efficiency' must be positive"),
-        ({"relative_efficiency": 101.0}, r"'relative_efficiency' must not exceed"),
+        (
+            {"relative_efficiency_percent": 0.0},
+            r"'relative_efficiency_percent' must be positive",
+        ),
+        (
+            {"relative_efficiency_percent": 101.0},
+            r"'relative_efficiency_percent' must not exceed",
+        ),
     ],
 )
 def test_fan_sound_power_validation(kwargs: dict[str, object], match: str) -> None:
     with pytest.raises(ValueError, match=match):
-        hvac.fan_sound_power(1.0, 500.0, **kwargs)  # type: ignore[arg-type]
+        hvac.fan_sound_power(1.0, fan_static_pressure_pa=500.0, **kwargs)  # type: ignore[arg-type]
 
 
 def test_blade_passing_frequency_validation() -> None:
@@ -682,3 +698,43 @@ def test_room_effect_empty_room_constant_raises() -> None:
 def test_room_effect_two_dimensional_room_constant_raises() -> None:
     with pytest.raises(ValueError, match="'room_constant' must be a scalar"):
         hvac.room_effect(2.0, np.full((2, 3), 50.0))
+
+
+# --- what the two renamed arguments protect ---------------------------------
+
+
+def test_fan_pressure_cannot_be_given_positionally() -> None:
+    """The fan's pressure rise is not an ambient pressure, and the name says so.
+
+    ``static_pressure`` in the ISO 3740 family is an absolute ambient pressure
+    in kilopascals; this one is a gauge pressure rise in pascals. No guard can
+    separate them, because 101 325 Pa is a legitimate duty for a panel or
+    propeller fan, so only the name keeps them apart. Keyword-only is what
+    makes the name unavoidable.
+    """
+    with pytest.raises(TypeError, match="positional"):
+        hvac.fan_sound_power(2.0, 500.0)  # type: ignore[misc]
+
+
+def test_a_fraction_where_a_percentage_belongs_is_ten_decibels() -> None:
+    """0,8 for 80 % falls to Table 13.6's bottom row and used to say nothing.
+
+    The table is tabulated from 50 % up, so any fraction lands in the
+    catch-all row and returns its worst-case 16 dB correction where 80 %
+    earns 6. The value is unchanged, because the table is what it is; what
+    changed is that the caller is told.
+    """
+    quiet = hvac.fan_sound_power(2.0, fan_static_pressure_pa=500.0)
+    with pytest.warns(hvac.HvacWarning, match="percentage"):
+        loud = hvac.fan_sound_power(
+            2.0, fan_static_pressure_pa=500.0, relative_efficiency_percent=0.8
+        )
+    assert float(loud.values[0] - quiet.values[0]) == pytest.approx(10.0, abs=1e-9)
+
+
+def test_a_percentage_inside_the_table_is_silent() -> None:
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        hvac.fan_sound_power(
+            2.0, fan_static_pressure_pa=500.0, relative_efficiency_percent=80.0
+        )

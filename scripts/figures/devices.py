@@ -3750,9 +3750,9 @@ def generate_duct_sheet_verification(output_dir: str) -> None:
 
     fan = noise_control.fan_sound_power(
         volume_flow=5000 * cfm,
-        static_pressure=2 * in_wg,
+        fan_static_pressure_pa=2 * in_wg,
         fan_type="forward_curved",
-        relative_efficiency=80.0,
+        relative_efficiency_percent=80.0,
     )
     flex = hvac.flexible_duct_insertion_loss(
         bands[:7], diameter=12 * inch, length=6 * foot
@@ -3948,9 +3948,9 @@ def generate_fan_sound_power(output_dir: str) -> None:
     ):
         fan = noise_control.fan_sound_power(
             volume_flow,
-            static_pressure,
+            fan_static_pressure_pa=static_pressure,
             fan_type=fan_type,
-            relative_efficiency=efficiency,
+            relative_efficiency_percent=efficiency,
         )
         ax.semilogx(
             np.asarray(fan.frequencies),
@@ -3961,13 +3961,13 @@ def generate_fan_sound_power(output_dir: str) -> None:
             marker="o",
             ms=4,
             label=f"{efficiency:.0f} % of peak static efficiency "
-            f"(+{noise_control.fan_efficiency_correction(efficiency):.0f} dB)",
+            f"(+{noise_control.fan_efficiency_correction(relative_efficiency_percent=efficiency):.0f} dB)",
         )
     tone = noise_control.fan_sound_power(
         volume_flow,
-        static_pressure,
+        fan_static_pressure_pa=static_pressure,
         fan_type=fan_type,
-        relative_efficiency=80.0,
+        relative_efficiency_percent=80.0,
         blade_frequency=2000.0,
     )
     # The same fan again, so the same colour: what changed is the blade tone,
@@ -4022,7 +4022,10 @@ def generate_fan_sound_power(output_dir: str) -> None:
     grid = np.linspace(40.0, 100.0, 400)
     inset.plot(
         grid,
-        [noise_control.fan_efficiency_correction(v) for v in grid],
+        [
+            noise_control.fan_efficiency_correction(relative_efficiency_percent=v)
+            for v in grid
+        ],
         color=COLOR_PRIMARY,
         lw=1.8,
     )
