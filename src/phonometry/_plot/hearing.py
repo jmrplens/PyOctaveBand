@@ -394,7 +394,7 @@ def plot_assumed_protection(
         _t("assumed protection $APV_{{f{x}}}$", language).format(x=result.performance),
     )
     apv_kwargs.setdefault("color", _C_SECONDARY)
-    apv_kwargs.setdefault("lw", 2.4)
+    apv_kwargs.setdefault("linewidth", 2.4)
     ax.plot(
         freqs,
         np.asarray(result.apv, dtype=np.float64),
@@ -445,7 +445,7 @@ def plot_hml_rating(
     right = np.linspace(2.0, 12.0, 2)
     curve_kwargs = dict(kwargs)
     curve_kwargs.setdefault("color", _C_PRIMARY)
-    curve_kwargs.setdefault("lw", 2.4)
+    curve_kwargs.setdefault("linewidth", 2.4)
     curve_kwargs.setdefault(
         "label",
         _t("ISO 4869-2 HML method — $H$ = {h}, $M$ = {m}, $L$ = {l} dB", language)
@@ -458,7 +458,7 @@ def plot_hml_rating(
         right,
         medium - (medium - low) / 8.0 * (right - 2.0),
         color=curve_kwargs["color"],
-        lw=curve_kwargs["lw"],
+        linewidth=curve_kwargs["linewidth"],
     )
     ax.plot(
         [-2.0, 2.0, 10.0],
