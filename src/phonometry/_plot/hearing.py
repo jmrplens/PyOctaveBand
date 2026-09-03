@@ -50,6 +50,12 @@ _BAND_LEVEL_LABEL = "A-weighted band level [dB]"
 _REDUCTION_LABEL = "Predicted noise level reduction [dB]"
 _C_MINUS_A_LABEL = "$L_{p,C} - L_{p,A}$ [dB]"
 _SUBJECT_LABEL = "Test subject"
+_SPREAD_LABEL = r"$\pm s_f$"
+_HML_TITLE = "ISO 4869-2 HML method — $H$ = {h}, $M$ = {m}, $L$ = {l} dB"
+#: The curve of Formulae (16) and (17) carries its own label rather than a
+#: slice of the title: deriving one from the other by splitting on the dash
+#: breaks the moment a translation punctuates differently.
+_HML_CURVE_LABEL = "$PNR$ from $H$ = {h}, $M$ = {m}, $L$ = {l} dB"
 _NIPTS_LABEL = "NIPTS [dB]"
 _FRACTILE_LABEL = "Fractile {v}"
 
@@ -61,10 +67,11 @@ _STRINGS: dict[str, str] = {
     _C_MINUS_A_LABEL: _C_MINUS_A_LABEL,
     _SUBJECT_LABEL: "Sujeto de ensayo",
     "mean attenuation $m_f$": r"atenuación media $m_f$",
-    r"$\pm s_f$": r"$\pm s_f$",
+    _SPREAD_LABEL: _SPREAD_LABEL,
     "assumed protection $APV_{{f{x}}}$": "protección supuesta $APV_{{f{x}}}$",
     "ISO 4869-2 assumed protection values — {x} % performance": "ISO 4869-2 valores de protección supuesta — rendimiento del {x} %",
-    "ISO 4869-2 HML method — $H$ = {h}, $M$ = {m}, $L$ = {l} dB": "ISO 4869-2 método HML — $H$ = {h}, $M$ = {m}, $L$ = {l} dB",
+    _HML_TITLE: "ISO 4869-2 método HML — $H$ = {h}, $M$ = {m}, $L$ = {l} dB",
+    _HML_CURVE_LABEL: "$PNR$ a partir de $H$ = {h}, $M$ = {m}, $L$ = {l} dB",
     "ISO 4869-2 single number rating — $SNR$ = {snr} dB": "ISO 4869-2 índice de número único — $SNR$ = {snr} dB",
     "ISO 4869-2 octave-band method — $L'_{{p,A{x}}}$ = {level} dB": "ISO 4869-2 método por bandas de octava — $L'_{{p,A{x}}}$ = {level} dB",
     "per subject": "por sujeto",
@@ -376,7 +383,7 @@ def plot_assumed_protection(
         mean + spread,
         color=theme_fill(_C_PRIMARY, ax),
         zorder=0,
-        label=_t(r"$\pm s_f$", language),
+        label=_t(_SPREAD_LABEL, language),
     )
     ax.plot(
         freqs,
@@ -447,11 +454,7 @@ def plot_hml_rating(
     curve_kwargs.setdefault("color", _C_PRIMARY)
     curve_kwargs.setdefault("linewidth", 2.4)
     curve_kwargs.setdefault(
-        "label",
-        _t("ISO 4869-2 HML method — $H$ = {h}, $M$ = {m}, $L$ = {l} dB", language)
-        .format(h=high, m=medium, l=low)
-        .split("—")[-1]
-        .strip(),
+        "label", _t(_HML_CURVE_LABEL, language).format(h=high, m=medium, l=low)
     )
     ax.plot(left, medium - (high - medium) / 4.0 * (left - 2.0), **curve_kwargs)
     ax.plot(
@@ -482,11 +485,7 @@ def plot_hml_rating(
     )
     ax.set_xlabel(_t(_C_MINUS_A_LABEL, language))
     ax.set_ylabel(_t(_REDUCTION_LABEL, language))
-    ax.set_title(
-        _t(
-            "ISO 4869-2 HML method — $H$ = {h}, $M$ = {m}, $L$ = {l} dB", language
-        ).format(h=high, m=medium, l=low)
-    )
+    ax.set_title(_t(_HML_TITLE, language).format(h=high, m=medium, l=low))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, alpha=0.3)
     localize_axes(ax, language)
