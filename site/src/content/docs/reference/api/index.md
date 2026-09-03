@@ -66,6 +66,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | :--- | :--- |
 | [`fluids`](/phonometry/reference/api/fluids/fluids/) | fluids domain of phonometry (see module docstrings). |
 | [`fluids.air`](/phonometry/reference/api/fluids/air/) | Humid air (IEC 61094-2:2009, Annex F). |
+| [`fluids.water`](/phonometry/reference/api/fluids/water/) | Sea water: its speed of sound, and its density. |
 
 ## Audio files
 
@@ -223,7 +224,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`underwater.acoustics`](/phonometry/reference/api/underwater/acoustics/) | Underwater-acoustics reference levels (ISO 18405:2017). |
 | [`underwater.propagation.closed_form`](/phonometry/reference/api/underwater/closed-form/) | Underwater sound propagation: propagation loss (closed-form). |
 | [`underwater.propagation.weston_regimes`](/phonometry/reference/api/underwater/weston-regimes/) | Weston's shallow-water propagation regimes (flux theory). |
-| [`underwater.propagation.sound_speed`](/phonometry/reference/api/underwater/sound-speed/) | Speed of sound in sea water (empirical equations). |
+| [`underwater.propagation.sound_speed`](/phonometry/reference/api/underwater/sound-speed/) | Sound-speed profiles over a column of water. |
 | [`underwater.sonar_equation`](/phonometry/reference/api/underwater/sonar-equation/) | The sonar equation (passive and active), in decibels. |
 | [`underwater.sources.ambient_noise`](/phonometry/reference/api/underwater/ambient-noise/) | Ocean ambient-noise spectrum levels (Wenz framework). |
 | [`underwater.propagation.seabed_reflection`](/phonometry/reference/api/underwater/seabed-reflection/) | Plane-wave reflection at the seabed (fluid-fluid Rayleigh model). |

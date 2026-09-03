@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 616 numerical conformance checks against 379 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 619 numerical conformance checks against 382 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 616 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 61 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 619 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 62 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -458,6 +458,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [filters/weighting-compliance](https://jmrplens.github.io/phonometry/reference/api/filters/weighting-compliance/)
 - [fluids/air](https://jmrplens.github.io/phonometry/reference/api/fluids/air/)
 - [fluids/fluids](https://jmrplens.github.io/phonometry/reference/api/fluids/fluids/)
+- [fluids/water](https://jmrplens.github.io/phonometry/reference/api/fluids/water/)
 - [hearing/hearing-protectors](https://jmrplens.github.io/phonometry/reference/api/hearing/hearing-protectors/)
 - [hearing/noise-induced-hearing-loss](https://jmrplens.github.io/phonometry/reference/api/hearing/noise-induced-hearing-loss/)
 - [hearing/occupational-exposure](https://jmrplens.github.io/phonometry/reference/api/hearing/occupational-exposure/)
@@ -37305,6 +37306,10 @@ documents, one page per module.
 | `air` | `function` | **Humid air (IEC 61094-2:2009 Annex F, CIPM-2007).**<br>• `temperature_c` t [°C], required<br>• `static_pressure_pa` p_s [Pa] (Default: None → 101 325, warns)<br>• `relative_humidity_percent` H [%] (Default: None → 50, warns)<br>• `co2_mole_fraction` x_c (Default: None → 0,000 4, silent) | `f = fluids.air(temperature_c=23.0, static_pressure_pa=101325.0, relative_humidity_percent=50.0)`<br><br>• `Fluid`; rho = 1.1860848 kg/m³, c0 = 345.86652 m/s |
 | `Fluid` | `dataclass` | **One fluid at one state, and what its model fixed there.**<br>• `temperature_c`, `static_pressure_pa`, `composition`, `model`, `validity`, `properties`<br>• accessors `density`, `speed_of_sound`, `heat_capacity_ratio`, `viscosity`, `thermal_diffusivity`, `thermal_conductivity`, `specific_heat_capacity`<br>• closed by identity: `characteristic_impedance`, `kinematic_viscosity`, and `prandtl_number` unless the model printed one of its own, which wins | `f.characteristic_impedance  # rho c` |
 | `characteristic_impedance` | `function` | **Characteristic impedance rho c [Pa·s/m].**<br>• `density` ρ [kg/m³]<br>• `speed_of_sound` c [m/s]<br>The medium's own quantity, so it moved here from the impedance tube that used to publish it; `Fluid` exposes the same thing as a property | `fluids.characteristic_impedance(1.186, 343.2)  # 407.04` |
+| `sea_water` | `function` | **Sea water at one point of the ocean.**<br>• `temperature_c` T [°C], required<br>• `salinity_psu` S (Default: 35)<br>• `depth_m` (Default: 0)<br>• `latitude_deg` (Default: 45)<br>• `sound_speed_model`: `unesco` (default), `del_grosso`, `mackenzie`, `medwin` | `fluids.sea_water(temperature_c=10.0)`<br><br>• `Fluid`; rho = 1027.04 kg/m³, c = 1489.83 m/s. No heat-capacity ratio: no source here prints one |
+| `sea_water_density` | `function` | **Density of sea water (Ainslie 2010 Eq. 4.6, after Pierce 1989).**<br>• `temperature_c` T [°C]<br>• `salinity_psu` S<br>• `absolute_pressure_pa` P_w [Pa], **absolute** | `fluids.sea_water_density(temperature_c=10.0, salinity_psu=35.0, absolute_pressure_pa=101989.16)  # 1027.04`<br><br>• ρ [kg/m³] |
+| `depth_to_absolute_pressure_pa` | `function` | **Absolute static pressure at a depth (Ainslie 2010 Eq. 4.11).**<br>• `depth_m` z [m]<br>• `latitude_deg` (Default: 45)<br>One atmosphere at the surface, not zero | `fluids.depth_to_absolute_pressure_pa(depth_m=0.0)  # 101989.16` |
+| `depth_to_gauge_pressure_mpa` | `function` | **Gauge pressure at a depth (Leroy & Parthiot 1998).**<br>• `depth_m` Z [m]<br>• `latitude_deg` (Default: 45)<br>Zero at the surface; what the UNESCO and Del Grosso sound speeds want | `fluids.depth_to_gauge_pressure_mpa(depth_m=1000.0)  # 10.106` |
 | `FluidWarning` | `warning class` | **State outside the domain its model states for itself.**<br>Annex F states 15 °C to 27 °C, 60 kPa to 110 kPa, 10 % to 90 % RH; outside it the result is an extrapolation, not a refusal | `warnings.simplefilter("error", fluids.FluidWarning)` |
 | `FluidAssumptionWarning` | `warning class` | **A condition the caller did not supply was assumed.**<br>Names the assumed values and what they are worth; passing every condition silences it | `warnings.simplefilter("error", fluids.FluidAssumptionWarning)` |
 | `FluidPropertyUnavailable` | `exception` | **A quantity the model does not determine.**<br>Raised instead of returning a number no source printed; names the model and what it does fix | `f.density  # on a model that fixes only a speed of sound` |
@@ -51920,7 +51925,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 616 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 619 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -52287,7 +52292,7 @@ sample from the metrology core:
 | IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()`; IEC 61252:2025 has since superseded this print, and the transcription still targets the 1993+A2 text | `tests/signals/test_levels.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-616 numerical conformance checks across 61 domains and 379 standards, covering
+619 numerical conformance checks across 62 domains and 382 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise

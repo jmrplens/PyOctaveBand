@@ -31,6 +31,13 @@ from .air import (
     DEFAULT_STATIC_PRESSURE_PA,
     air,
 )
+from .water import (
+    depth_to_absolute_pressure_pa,
+    depth_to_gauge_pressure_mpa,
+    sea_water,
+    sea_water_density,
+    sea_water_sound_speed,
+)
 
 __all__ = [
     "DEFAULT_CO2_MOLE_FRACTION",
@@ -42,4 +49,9 @@ __all__ = [
     "FluidWarning",
     "air",
     "characteristic_impedance",
+    "depth_to_absolute_pressure_pa",
+    "depth_to_gauge_pressure_mpa",
+    "sea_water",
+    "sea_water_density",
+    "sea_water_sound_speed",
 ]

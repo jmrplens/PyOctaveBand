@@ -878,7 +878,7 @@ def generate_seawater_absorption(output_dir: str) -> None:
 def generate_sound_speed_models(output_dir: str) -> None:
     """The four sound-speed equations on one profile, and their spread."""
     print("Generating sound_speed_models...")
-    from phonometry import underwater
+    from phonometry import fluids, underwater
 
     depths = np.linspace(0.0, 5000.0, 251)
     temps = 4.0 + 14.0 / (1.0 + (np.maximum(depths - 80.0, 0.0) / 250.0) ** 2)
@@ -924,9 +924,7 @@ def generate_sound_speed_models(output_dir: str) -> None:
     ax_d.set_axisbelow(True)
     ax_d.legend(loc="lower left", fontsize=9)
 
-    check = float(
-        underwater.sea_water_sound_speed(25.0, 35.0, 1000.0, model="mackenzie")
-    )
+    check = float(fluids.sea_water_sound_speed(25.0, 35.0, 1000.0, model="mackenzie"))
     ax_c.text(
         0.03,
         0.05,

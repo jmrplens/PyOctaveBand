@@ -496,9 +496,7 @@ def test_speed_of_sound_rejects_temperature_below_absolute_zero() -> None:
     hands back a NaN, which would then travel silently into the Sabine
     Eqs. (1)/(4) that consume c. The temperature is refused first.
     """
-    with pytest.raises(
-        ValueError, match="'temperature_c' must be finite temperatures above"
-    ):
+    with pytest.raises(ValueError, match="'temperature_c' must be finite and above"):
         speed_of_sound_iso17497(temperature_c=-300.0)
 
 

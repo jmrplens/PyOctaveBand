@@ -3,12 +3,12 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 616,
-    "passing": 616,
+    "checks": 619,
+    "passing": 619,
     "failing": 0,
-    "domains": 61,
-    "standards": 379,
-    "citations": 551,
+    "domains": 62,
+    "standards": 382,
+    "citations": 554,
     "designations": 120,
     "sources": 84
   },
@@ -27,6 +27,7 @@
     "N/m",
     "Np/rad",
     "N·s/m",
+    "Pa",
     "Pa·s/m²",
     "W/m²",
     "acum",
@@ -80,6 +81,12 @@
     {
       "id": "humid-air-iec-61094-2-2009-annex-f",
       "title": "Humid air (IEC 61094-2:2009 Annex F)",
+      "checks": 3,
+      "passing": 3
+    },
+    {
+      "id": "sea-water-ainslie-2010",
+      "title": "Sea water (Ainslie 2010)",
       "checks": 3,
       "passing": 3
     },
@@ -970,6 +977,93 @@
         "value": 0.0
       },
       "precision": 9,
+      "verdict": "pass"
+    },
+    {
+      "id": "sea-water-ainslie-2010/ainslie-2010-eq-4-6-printed-folio-127/density-of-the-standard-ocean-10-c-salinity-35-at-the-surface",
+      "domain": "sea-water-ainslie-2010",
+      "reference": {
+        "kind": "article",
+        "designation": "Ainslie",
+        "edition": "(2010)",
+        "clause": "Eq. (4.6), printed folio 127",
+        "cite": "Ainslie (2010) Eq. (4.6), printed folio 127"
+      },
+      "quantity": "Density of the standard ocean: 10 C, salinity 35, at the surface",
+      "kind": "scalar",
+      "expected": {
+        "value": 1027.0
+      },
+      "computed": {
+        "value": 1027.0439
+      },
+      "unit": "kg/m³",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.5
+      },
+      "deviation": {
+        "value": 0.0439
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "sea-water-ainslie-2010/ainslie-2010-eq-4-11-printed-folio-128/absolute-static-pressure-at-the-surface-is-one-atmosphere-not-zero",
+      "domain": "sea-water-ainslie-2010",
+      "reference": {
+        "kind": "article",
+        "designation": "Ainslie",
+        "edition": "(2010)",
+        "clause": "Eq. (4.11), printed folio 128",
+        "cite": "Ainslie (2010) Eq. (4.11), printed folio 128"
+      },
+      "quantity": "Absolute static pressure at the surface is one atmosphere, not zero",
+      "kind": "scalar",
+      "expected": {
+        "value": 101989.16
+      },
+      "computed": {
+        "value": 101989.16
+      },
+      "unit": "Pa",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-06
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "sea-water-ainslie-2010/ainslie-2010-eq-4-6-vs-printed-folio-177/the-pressure-term-the-book-s-own-folio-177-drops-4-3e-7-per-pascal-times-one-atmosphere",
+      "domain": "sea-water-ainslie-2010",
+      "reference": {
+        "kind": "article",
+        "designation": "Ainslie",
+        "edition": "(2010)",
+        "clause": "Eq. (4.6) vs printed folio 177",
+        "cite": "Ainslie (2010) Eq. (4.6) vs printed folio 177"
+      },
+      "quantity": "The pressure term the book's own folio 177 drops: 4,3e-7 per pascal times one atmosphere",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0438549088
+      },
+      "computed": {
+        "value": 0.0438549
+      },
+      "unit": "kg/m³",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": 8.55e-14
+      },
+      "precision": 7,
       "verdict": "pass"
     },
     {

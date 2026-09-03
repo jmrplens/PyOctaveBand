@@ -52,6 +52,7 @@ export const apiSections = {
     items: [
       'reference/api/fluids/fluids',
       'reference/api/fluids/air',
+      'reference/api/fluids/water',
     ],
   },
   'io': {

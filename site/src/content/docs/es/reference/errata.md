@@ -210,6 +210,53 @@ dos ediciones con las mismas entradas y en el mismo orden.
   el 0,9621 recalculado.
 - **Estado:** sin notificar.
 
+## Ainslie (2010), la Ec. (4.6) frente a su propio folio 177, y el exponente de la Ec. (4.13)
+
+- **Ubicación:** *Principles of Sonar Performance Modelling* (Springer 2010),
+  Ec. (4.6) en el folio impreso 127; la densidad del agua de mar citada en el
+  apartado 4.4 del folio impreso 177; Ec. (4.13) del folio impreso 135.
+- **Lo impreso:** la Ec. (4.6) da la densidad del agua de mar como
+  $\hat\rho = 1027 + 4{,}3\times10^{-7}\hat P_\mathrm{w} + 0{,}75[S-35]
+  - 0{,}16[\hat T-10] - 0{,}004[\hat T-10]^2$, atribuida a Pierce (1989,
+  p. 34), con las unidades fijadas por las Ecs. (4.7) a (4.10) del folio 128:
+  presión en pascales, temperatura en grados Celsius, densidad en kg/m³. La
+  Ec. (4.4) del folio 127 define esa presión como
+  $P_\mathrm{w}(z) = P_\mathrm{atm} + \int_0^z \rho g\,\mathrm{d}\zeta$,
+  y la Ec. (4.11) del folio 128 la evalúa en $98\,066{,}5 \times 1{,}04 =
+  101\,989{,}16$ Pa en superficie. El folio 177 enuncia después, para los
+  cocientes que escalan las correlaciones de sedimento de Bachman, «*standard
+  conditions involving atmospheric pressure, a temperature of 23 °C, and
+  salinity 35*» con $\rho_\mathrm{w} = 1024{,}2$ kg/m³.
+- **El problema:** dos defectos de distinta naturaleza.
+
+  (a) El 1024,2 del folio 177 no se sigue de la Ec. (4.6) leída con la
+  Ec. (4.4). A 23 °C, salinidad 35 y una atmósfera, la ecuación da 1024,287 9,
+  que imprime 1024,3. El 1024,2 impreso es lo que da la ecuación con su término
+  de presión a cero, es decir, leyendo $P_\mathrm{w}$ como presión manométrica
+  contra la definición que enuncia el mismo capítulo. La diferencia son
+  0,043 9 kg/m³, o 4,3 partes por cien mil.
+
+  (b) La Ec. (4.13), que despeja la (4.6) para estimar la salinidad a partir de
+  una densidad medida, imprime el coeficiente de presión como
+  $4{,}3\times10^{-5}$ donde la (4.6) tiene $4{,}3\times10^{-7}$. Dos órdenes
+  de magnitud, y no es otra magnitud reformulada: es el mismo coeficiente en el
+  mismo papel. Arrastrado a 23 °C da 1028,63 kg/m³ frente a 1024,29, un error
+  del 0,42 %.
+- **Evidencia:** la Ec. (4.6) evaluada en las condiciones enunciadas con la
+  presión de la Ec. (4.11), contra el valor que imprime el folio 177; y los dos
+  exponentes impresos comparados directamente. Verificado en las páginas 157,
+  158, 165 y 207 (pp. 127, 128, 135 y 177 impresas) del PDF de la edición
+  Springer de 2010.
+- **Comportamiento de la biblioteca:** implementa la Ec. (4.6) con la presión
+  absoluta que define su propia Ec. (4.4), porque una definición impresa manda
+  sobre la cita redondeada de un valor derivado tres capítulos más allá. La
+  discrepancia queda por debajo de toda tolerancia de esta biblioteca, así que
+  nada depende de la elección; lo que sí dependía era de elegir bando en
+  silencio. La Ec. (4.13) no se implementa
+  ([`tests/fluids/test_water.py`](https://github.com/jmrplens/phonometry/blob/main/tests/fluids/test_water.py),
+  comprobaciones de conformidad «Sea water (Ainslie 2010)»).
+- **Estado:** sin comunicar.
+
 ## ISO 9053-2:2020, Anexo A.3 (dos propiedades del aire atribuidas a un documento que no las imprime)
 
 - **Ubicación:** Anexo A.3, folio impreso 13 (página 17 del PDF) para los cuatro

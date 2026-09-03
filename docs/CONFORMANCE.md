@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**616/616 conformance checks pass** across 61 domains and 379 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**619/619 conformance checks pass** across 62 domains and 382 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -98,6 +98,17 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | IEC 61094-2:2009 Table F.1 | Set A (23 C, 101 325 Pa, 50 % RH): rho, c0, kappa, eta and alpha_t, as a fraction of the rounding of the last printed figure | 0 (+/-1) | 0.549 | 0.549 | 55 % | ![Pass][cv-pass] Pass |
 | IEC 61094-2:2009 Table F.1 | Set B (20 C, 80 000 Pa, 65 % RH): rho, c0, kappa, eta and alpha_t, as a fraction of the rounding of the last printed figure | 0 (+/-1) | 0.96 | 0.96 | 96 % | ![Pass][cv-pass] Pass |
 | IEC 61094-2:2009 Formula (F.5) | Thermal conductivity and specific heat capacity close the printed thermal diffusivity, alpha_t = k_a / (rho C_P) | 0.000021153 m²/s (+/-1e-10%) | 0.000021153 m²/s | 0 m²/s | 0 % | ![Pass][cv-pass] Pass |
+
+</details>
+
+<details>
+<summary><b>Sea water (Ainslie 2010)</b>: 100% (3/3)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
+|:---|:---|:---|:---|:---|:---:|:---:|
+| Ainslie (2010) Eq. (4.6), printed folio 127 | Density of the standard ocean: 10 C, salinity 35, at the surface | 1027 kg/m³ (+/-0.5 kg/m³) | 1027.0439 kg/m³ | 0.0439 kg/m³ | 9 % | ![Pass][cv-pass] Pass |
+| Ainslie (2010) Eq. (4.11), printed folio 128 | Absolute static pressure at the surface is one atmosphere, not zero | 101989.16 Pa (+/-0 Pa) | 101989.16 Pa | 0 Pa | 0 % | ![Pass][cv-pass] Pass |
+| Ainslie (2010) Eq. (4.6) vs printed folio 177 | The pressure term the book's own folio 177 drops: 4,3e-7 per pascal times one atmosphere | 0.0438549 kg/m³ (+/-0 kg/m³) | 0.0438549 kg/m³ | 0 kg/m³ | 9 % | ![Pass][cv-pass] Pass |
 
 </details>
 

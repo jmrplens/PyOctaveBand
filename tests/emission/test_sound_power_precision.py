@@ -535,9 +535,7 @@ def test_intensity_temperature_below_absolute_zero_raises() -> None:
     """
     intensity = np.full((2,), 1e-5)
     areas = np.array([1.0, 1.0])
-    with pytest.raises(
-        ValueError, match="'temperature' must be a finite temperature above"
-    ):
+    with pytest.raises(ValueError, match="'temperature' must be finite and above"):
         sound_power_intensity_precision(intensity, areas, temperature=-300.0)
 
 

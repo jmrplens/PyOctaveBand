@@ -101,6 +101,7 @@ _SECTION_LIST: tuple[Section, ...] = (
         modules=(
             "phonometry.fluids",
             "phonometry.fluids.air",
+            "phonometry.fluids.water",
         ),
     ),
     Section(

@@ -40,8 +40,6 @@ from .seabed_reflection import (
 )
 from .sound_speed import (
     SoundSpeedProfile,
-    depth_to_pressure,
-    sea_water_sound_speed,
     sound_speed_profile,
 )
 from .weston_regimes import (
@@ -80,7 +78,6 @@ __all__ = [
     "bottom_reflection_loss",
     "critical_angle",
     "critical_grazing_angle",
-    "depth_to_pressure",
     "effective_depth",
     "eigenrays",
     "gaussian_beams",
@@ -91,7 +88,6 @@ __all__ = [
     "ray_trace",
     "reflection_coefficient",
     "reflection_loss_gradient",
-    "sea_water_sound_speed",
     "seabed_reflection",
     "seawater_absorption",
     "sound_speed_profile",
