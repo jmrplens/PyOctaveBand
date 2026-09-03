@@ -34,16 +34,32 @@ ISO11654_ANNEX_A2_INDICATOR = "M"
 # ---------------------------------------------------------------------------
 # ISO 9053-2:2020 alternating-method airflow resistance — the Annex A.3 worked
 # example of the effective ratio of specific heats. A closed cylinder 100 mm x
-# 100 mm gives V = 7,854e-4 m3 and S = 0,0471 m2; with the IEC 61094-2:2009 air
-# properties at 23 C and f = 2 Hz the standard prints b = 1,83e-3 m and the
-# heat-conduction-corrected kappa' = kappa*0,978 = 1,370. Mirrors
+# 100 mm gives V = 7,854e-4 m3 and S = 0,0471 m2; at f = 2 Hz the standard
+# prints the wavelength 172,9 m, the thermal boundary layer b = 1,83e-3 m and
+# the heat-conduction-corrected kappa' = kappa*0,978 = 1,370. Mirrors
 # tests/materials/absorbers/test_airflow_resistance.py.
+#
+# The five air properties below are the ones Annex A.3 PRINTS, on printed folios
+# 13 and 14. The worked example is computed from them, so they are the inputs
+# the conformance rows pass. They are not the library defaults: Annex A.3
+# credits all five to IEC 61094-2:2009, and two of them cannot be found there.
+# See docs/ERRATA.md.
 # ---------------------------------------------------------------------------
 ISO9053_2_ANNEX_A_SURFACE = 0.0471  # S (m2)
 ISO9053_2_ANNEX_A_VOLUME = 7.854e-4  # V (m3)
 ISO9053_2_ANNEX_A_FREQUENCY = 2.0  # f (Hz)
+ISO9053_2_ANNEX_A_WAVELENGTH = 172.9  # lambda = c0/f (m)
 ISO9053_2_ANNEX_A_BOUNDARY_LAYER = 1.83e-3  # b (m)
 ISO9053_2_ANNEX_A_KAPPA_PRIME = 1.370  # kappa' = kappa*0,978
+
+#: The air properties as printed in Annex A.3, folios 13 and 14.
+ISO9053_2_ANNEX_A_PRINTED_AIR: dict[str, float] = {
+    "speed_of_sound": 345.9,  # c0 (m/s)
+    "air_density": 1.186,  # rho0 (kg/m3)
+    "specific_heat_ratio": 1.4008,  # kappa, adiabatic
+    "specific_heat_cp": 938.7,  # C_P (J/(kg*K))
+    "thermal_conductivity": 0.02355,  # k_a (J/(s*m*K))
+}
 
 # ---------------------------------------------------------------------------
 # ISO 10534-1:1996 standing-wave-ratio method — closed-form physics oracle from

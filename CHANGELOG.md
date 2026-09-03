@@ -633,6 +633,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The air behind ISO 9053-2's thermal correction is the air IEC 61094-2:2009
+  actually publishes. `thermal_boundary_layer_thickness` and `effective_kappa`
+  defaulted to the five properties ISO 9053-2:2020 Annex A.3 prints, which that
+  annex credits to IEC 61094-2:2009. Three of them are its Table F.1 cells
+  rounded to four figures. The other two are not in that document at all: the
+  table gives the thermal diffusivity, not its two constituents, and the pair
+  Annex A.3 prints for them is 1,0800 times smaller than Annex F gives at the
+  same state. A caller who asked this library for air received a specific heat
+  capacity of 938,7 J/(kg·K), which is 27,19 J/(mol·K), below the rigid-rotor
+  diatomic floor of 29,10, so it is not air at any temperature in any unit.
+
+  The defaults are now the Annex F values at 23 °C, 101,325 kPa and 50 %
+  relative humidity. The two conformance rows that reproduce the Annex A.3
+  worked example pass the five values the annex prints, so they reproduce the
+  standard rather than merely agree with it, and the citation is visible at the
+  call instead of hidden in a default.
+
+  Nothing moves in the printed example either way, because Formula (A.5) uses
+  the two constants only through `k_a/(rho0 c0 C_P)` and the common factor
+  cancels there: both air states give the printed b = 1,83 mm and kappa' =
+  1,370. What changes is the number a caller gets when they do not supply air of
+  their own. Anyone reproducing Annex A.3 exactly should now pass its printed
+  values explicitly. The defect is registered against ISO 9053-2:2020 in
+  `docs/ERRATA.md`.
+
+  Two things are checked that were not. The wavelength the annex prints,
+  172,9 m, guards the transcription of the speed of sound, and it was verified
+  nowhere before. And the boundary-layer assertion says what it means: b is
+  printed to three significant figures, so reproducing it means rounding to it,
+  which is what the test now asserts rather than a tolerance that reads like
+  spare room. There is none: the true 1,834 8 mm sits near the upper edge of
+  that rounding band, and did so before this change too.
+
 - The five air-property helpers of `materials` take degrees Celsius, spell the
   unit in the argument name and refuse a positional call. Two of them took
   kelvin under the same `temperature` name their three siblings read as degrees

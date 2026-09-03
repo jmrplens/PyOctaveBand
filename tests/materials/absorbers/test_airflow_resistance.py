@@ -29,8 +29,10 @@ from reference_data import (
     ISO9053_2_ANNEX_A_BOUNDARY_LAYER,
     ISO9053_2_ANNEX_A_FREQUENCY,
     ISO9053_2_ANNEX_A_KAPPA_PRIME,
+    ISO9053_2_ANNEX_A_PRINTED_AIR,
     ISO9053_2_ANNEX_A_SURFACE,
     ISO9053_2_ANNEX_A_VOLUME,
+    ISO9053_2_ANNEX_A_WAVELENGTH,
 )
 
 from phonometry.materials.absorbers.airflow_resistance import (
@@ -383,26 +385,81 @@ def test_alternating_invalid_inputs_raise(
 
 # --- Annex A (normative): effective ratio of specific heats kappa' -----------
 # Worked example, ISO 9053-2:2020 Annex A.3 (page-verified oracle): closed cylinder
-# 100 mm x 100 mm -> V = 7.854e-4 m3, S = 0.0471 m2; IEC 61094-2:2009 air properties
-# at 23 C; f = 2 Hz give b = 1.83e-3 m and kappa' = kappa*0.978 = 1.370. The inputs
-# and expected values are imported from tests/reference_data/ (shared with the
-# CI conformance report).
+# 100 mm x 100 mm -> V = 7.854e-4 m3, S = 0.0471 m2; the five air properties the
+# annex prints; f = 2 Hz give lambda = 172.9 m, b = 1.83e-3 m and kappa' =
+# kappa*0.978 = 1.370. The inputs and expected values are imported from
+# tests/reference_data/ (shared with the CI conformance report).
+#
+# The rows pass the PRINTED air rather than the library defaults, which are the
+# same air state computed from IEC 61094-2:2009 Annex F. See docs/ERRATA.md.
+
+
+def test_annex_a_printed_air_reproduces_the_printed_wavelength() -> None:
+    """lambda = c0/f is the third number Annex A.3 prints, and it pins c0.
+
+    It is arithmetic, not library code, so it guards the transcription of the
+    reference data rather than the implementation: a typo in the printed speed
+    of sound would show up here and nowhere else.
+    """
+    c0 = ISO9053_2_ANNEX_A_PRINTED_AIR["speed_of_sound"]
+    wavelength = c0 / ISO9053_2_ANNEX_A_FREQUENCY
+    assert round(wavelength, 1) == ISO9053_2_ANNEX_A_WAVELENGTH
 
 
 def test_thermal_boundary_layer_thickness_annex_a_example() -> None:
-    b = thermal_boundary_layer_thickness(frequency=ISO9053_2_ANNEX_A_FREQUENCY)
-    assert b == pytest.approx(ISO9053_2_ANNEX_A_BOUNDARY_LAYER, abs=5e-6)
+    """b rounds to the 1,83e-3 m the annex prints, from the air it prints.
+
+    The assertion is that our value carries the printed digits, not that it sits
+    inside some chosen tolerance: 1,83e-3 is printed to three significant figures,
+    so reproducing it means rounding to it. Our value is 1,834 8e-3, which is
+    correct and sits near the upper edge of that band; there is no slack to lose
+    and none to gain.
+    """
+    b = thermal_boundary_layer_thickness(
+        frequency=ISO9053_2_ANNEX_A_FREQUENCY,
+        speed_of_sound=ISO9053_2_ANNEX_A_PRINTED_AIR["speed_of_sound"],
+        air_density=ISO9053_2_ANNEX_A_PRINTED_AIR["air_density"],
+        specific_heat_cp=ISO9053_2_ANNEX_A_PRINTED_AIR["specific_heat_cp"],
+        thermal_conductivity=ISO9053_2_ANNEX_A_PRINTED_AIR["thermal_conductivity"],
+    )
+    assert float(f"{b:.3g}") == ISO9053_2_ANNEX_A_BOUNDARY_LAYER
+
+
+def test_default_air_also_reproduces_the_printed_boundary_layer() -> None:
+    """The Annex F defaults reproduce the printed b as well as the printed pair.
+
+    b is sqrt(2 k_a / (rho0 C_P omega)), so it moves only with k_a/C_P and the
+    density. The pair Annex A.3 prints is 1,0800 times smaller in both, which
+    cancels in the ratio, so both air states land on the same printed digits.
+    """
+    assert float(f"{thermal_boundary_layer_thickness(frequency=2.0):.3g}") == (
+        ISO9053_2_ANNEX_A_BOUNDARY_LAYER
+    )
 
 
 def test_effective_kappa_annex_a_example() -> None:
+    """From the air Annex A.3 prints, kappa' carries the printed 1,370."""
+    kappa_prime = effective_kappa(
+        cavity_surface=ISO9053_2_ANNEX_A_SURFACE,
+        cavity_volume=ISO9053_2_ANNEX_A_VOLUME,
+        frequency=ISO9053_2_ANNEX_A_FREQUENCY,
+        **ISO9053_2_ANNEX_A_PRINTED_AIR,
+    )
+    # Standard prints kappa' = kappa*0.978 = 1.370 (kappa = 1.4008).
+    assert kappa_prime == pytest.approx(ISO9053_2_ANNEX_A_KAPPA_PRIME, abs=5e-4)
+    assert kappa_prime == pytest.approx(1.4008 * 0.978, abs=1e-3)
+
+
+def test_default_air_also_reproduces_the_printed_kappa_prime() -> None:
+    """The Annex F defaults land on the printed 1,370 with more room than the
+    printed pair does: 44 % of the rounding band against 52 %.
+    """
     kappa_prime = effective_kappa(
         cavity_surface=ISO9053_2_ANNEX_A_SURFACE,
         cavity_volume=ISO9053_2_ANNEX_A_VOLUME,
         frequency=ISO9053_2_ANNEX_A_FREQUENCY,
     )
-    # Standard prints kappa' = kappa*0.978 = 1.370 (kappa = 1.4008).
     assert kappa_prime == pytest.approx(ISO9053_2_ANNEX_A_KAPPA_PRIME, abs=5e-4)
-    assert kappa_prime == pytest.approx(1.4008 * 0.978, abs=1e-3)
 
 
 def test_effective_kappa_below_adiabatic() -> None:

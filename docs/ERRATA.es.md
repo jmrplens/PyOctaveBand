@@ -171,6 +171,67 @@ dos ediciones con las mismas entradas y en el mismo orden.
   el 0,9621 recalculado.
 - **Estado:** sin notificar.
 
+## ISO 9053-2:2020, Anexo A.3 (dos propiedades del aire atribuidas a un documento que no las imprime)
+
+- **Ubicación:** Anexo A.3, folio impreso 13 (página 17 del PDF) para los cuatro
+  primeros valores y folio impreso 14 (página 18 del PDF) para el quinto.
+- **Lo impreso:** «The following physical properties for air, valid at 23 °C,
+  101,325 kPa and 50 % RH, are used for the calculation (values from
+  IEC 61094-2:2009):», y a continuación $c_0 = 345{,}9$ m/s, $\rho_0 = 1{,}186$
+  kg/m³, $\kappa = 1{,}400\,8$, $k_\mathrm{a} = 0{,}023\,55$ J/(s·m·K) y, a la
+  vuelta, $C_\mathrm{P} = 938{,}7$ J/(kg·K).
+- **El problema:** dos de los cinco no son valores de IEC 61094-2:2009. La
+  Tabla F.1 de esa norma (folio impreso 40) tabula exactamente cinco magnitudes
+  en ese estado: $\rho$, $c_0$, $\kappa$, $\eta$ y la **difusividad** térmica
+  $\alpha_t = 2{,}115\,317 \times 10^{-5}$ m²/s. No tabula ni la conductividad
+  térmica ni el calor específico; ésos aparecen en el Anexo F sólo como las dos
+  expresiones de la cláusula F.6, que no imprimen valor. Los tres valores del
+  Anexo A.3 que sí cuadran son precisamente las tres celdas de la Tabla F.1
+  redondeadas a cuatro cifras ($345{,}866\,52 \to 345{,}9$;
+  $1{,}186\,084\,8 \to 1{,}186$; $1{,}400\,757\,3 \to 1{,}400\,8$). Los dos
+  que no cuadran son precisamente las dos magnitudes que la Tabla F.1 no imprime:
+  evaluada en ese mismo estado, la cláusula F.6 da
+  $k_\mathrm{a} = 0{,}025\,434\,1$ J/(s·m·K) y $C_\mathrm{P} = 1013{,}74$
+  J/(kg·K), cada uno mayor que el par impreso por el mismo factor 1,0800.
+
+  El factor común no es casualidad ni una diferencia de unidades. El par está
+  anclado a la difusividad tabulada: $0{,}023\,55 / (1{,}186 \times
+  2{,}115\,317 \times 10^{-5}) = 938{,}708\,5$, que imprime 938,7. O sea, uno
+  de los dos vino de otro sitio y el otro se retrocalculó por la Fórmula (F.5)
+  para que $\alpha_t$ siguiera saliendo. Cuál de los dos es el ajeno lo decide la
+  termodinámica y no una preferencia: $C_\mathrm{P} = 938{,}7$ J/(kg·K) son
+  27,19 J/(mol·K), por debajo del suelo del rotor rígido diatómico
+  $(7/2)R = 29{,}10$ J/(mol·K), así que no es aire a ninguna temperatura, en
+  ninguna unidad, ni por masa ni por mol, y la expresión del Anexo F para
+  $C_\mathrm{P}$ no baja de unos 1013 J/(kg·K) en todo el intervalo de 200 K a
+  400 K. La conductividad 0,023 55 J/(s·m·K), en cambio, sí es una conductividad
+  real del aire: es la que da la expresión del Anexo F cerca de −1,4 °C, fuera
+  del dominio de 15 °C a 27 °C que el propio Anexo F imprime.
+- **Consecuencia para el ejemplo del anexo:** ninguna. La Fórmula (A.5) usa
+  $k_\mathrm{a}$ y $C_\mathrm{P}$ sólo a través de la combinación
+  $k_\mathrm{a}/(\rho_0 c_0 C_\mathrm{P})$, donde el factor común se cancela,
+  así que los dos pares dan el $b = 1{,}83 \times 10^{-3}$ m y el
+  $\kappa' = 1{,}370$ impresos. El defecto es invisible dentro del Anexo A.3 y
+  sólo aparece al leer cualquiera de las dos constantes por separado, como
+  documento al que se atribuye haberla publicado.
+- **Evidencia:** las dos páginas impresas contra la Tabla F.1 (folio impreso 40)
+  y la cláusula F.6 (folio impreso 39) de IEC 61094-2:2009; las expresiones de la
+  cláusula F.6 evaluadas a 23 °C, 101 325 Pa y 50 % de humedad relativa, que
+  reproducen el $\alpha_t$ impreso a $1{,}0 \times 10^{-7}$ relativo; el calor
+  molar que implican los 938,7 J/(kg·K) contra el suelo diatómico.
+  IEC 61094-2:2009 no es referencia normativa de ISO 9053-2:2020: aparece sólo
+  como entrada [4] de la bibliografía. Verificado en la página 17 (p. 13 impresa)
+  y la página 18 (p. 14 impresa) del PDF de ISO 9053-2:2020, y en la página 42
+  (p. 40 impresa) y la página 41 (p. 39 impresa) del PDF de BS EN 61094-2:2009.
+- **Comportamiento de la biblioteca:** las filas de conformidad que reproducen el
+  Anexo A.3 pasan los cinco valores que el anexo imprime, así que reproducen la
+  norma en vez de limitarse a coincidir con ella. Los valores por defecto que
+  recibe quien llama son ese mismo estado del aire calculado desde el Anexo F de
+  IEC 61094-2:2009, que es lo que el anexo dice estar usando; los dos caen sobre
+  el $b$ y el $\kappa'$ impresos ([`tests/reference_data/`](../tests/reference_data/),
+  comprobaciones de conformidad «ISO 9053-2:2020 Annex A.3»).
+- **Estado:** sin comunicar.
+
 ## EN 12354-1:2000 Fórmula (E.5) / ISO 12354-1:2017 E.3.4 (errata de la acotación de K24)
 
 - **Ubicación:** EN 12354-1:2000, Anexo E, el bloque de uniones de pared con

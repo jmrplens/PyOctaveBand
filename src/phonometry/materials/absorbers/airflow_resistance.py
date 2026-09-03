@@ -103,13 +103,34 @@ _STANDARD_STATIC_PRESSURE = 101325.0
 #: ``kappa'`` when no cavity/air data are supplied. NOT the Annex A output: Annex A
 #: applies a heat-conduction correction that lowers it (worked example ``kappa' = 1.370``).
 _ADIABATIC_KAPPA = 1.4
-#: Reference air properties from IEC 61094-2:2009 (23 C, 101.325 kPa, 50 % RH) as used
-#: in the ISO 9053-2:2020 Annex A.3 worked example; defaults of :func:`effective_kappa`.
-_ANNEX_A_SPEED_OF_SOUND = 345.9  # c0 (m/s)
-_ANNEX_A_AIR_DENSITY = 1.186  # rho0 (kg/m3)
-_ANNEX_A_HEAT_RATIO = 1.4008  # kappa, adiabatic (ISO 9053-2:2020 Annex A.3)
-_ANNEX_A_THERMAL_CONDUCTIVITY = 0.02355  # k_a (J/(s*m*K))
-_ANNEX_A_SPECIFIC_HEAT_CP = 938.7  # C_P (J/(kg*K))
+#: Air at the reference state of the Annex A.3 example (23 C, 101,325 kPa, 50 % RH),
+#: computed from IEC 61094-2:2009 Annex F. Defaults of
+#: :func:`thermal_boundary_layer_thickness` and :func:`effective_kappa`.
+#:
+#: ISO 9053-2:2020 Annex A.3 prints five air properties and credits them to
+#: IEC 61094-2:2009. Three of them are Table F.1 cells rounded to four figures and are
+#: reproduced below. The other two are not: Table F.1 tabulates the thermal
+#: *diffusivity*, not its two constituents, and the pair Annex A.3 prints for them is
+#: 1,0800 times smaller than Annex F gives at that state. That pair is kept separately
+#: as ``_ANNEX_A_PRINTED_*`` because the standard's own worked example is computed from
+#: it, but it is not what a caller who asks for air should be handed: its
+#: ``C_P = 938,7 J/(kg K)`` is 27,19 J/(mol K), below the rigid-rotor diatomic floor of
+#: ``(7/2)R = 29,10``, so it is not air at any temperature, in any unit. See
+#: ``docs/ERRATA.md``.
+_ANNEX_A_SPEED_OF_SOUND = 345.86652  # c0 (m/s), Table F.1
+_ANNEX_A_AIR_DENSITY = 1.1860848  # rho0 (kg/m3), Table F.1
+_ANNEX_A_HEAT_RATIO = 1.4007573  # kappa, adiabatic, Table F.1
+_ANNEX_A_THERMAL_CONDUCTIVITY = 0.0254341377186358  # k_a (J/(s*m*K)), Clause F.6
+_ANNEX_A_SPECIFIC_HEAT_CP = 1013.738121253794  # C_P (J/(kg*K)), Clause F.6
+
+#: The five values ISO 9053-2:2020 Annex A.3 actually prints, on printed folios 13 and
+#: 14. The worked example of that annex is computed from these, so the conformance rows
+#: that reproduce it pass them explicitly rather than relying on the defaults above.
+_ANNEX_A_PRINTED_SPEED_OF_SOUND = 345.9  # c0 (m/s)
+_ANNEX_A_PRINTED_AIR_DENSITY = 1.186  # rho0 (kg/m3)
+_ANNEX_A_PRINTED_HEAT_RATIO = 1.4008  # kappa, adiabatic
+_ANNEX_A_PRINTED_THERMAL_CONDUCTIVITY = 0.02355  # k_a (J/(s*m*K))
+_ANNEX_A_PRINTED_SPECIFIC_HEAT_CP = 938.7  # C_P (J/(kg*K))
 #: Reference linear airflow velocity, ISO 9053-1:2018 clause 7.5 (m/s).
 _STATIC_REFERENCE_VELOCITY = 0.5e-3
 #: Upper linear-velocity limit of the static method, ISO 9053-1:2018 clause 7.5 (m/s).
@@ -521,9 +542,17 @@ def thermal_boundary_layer_thickness(
 
     ``frequency`` is the piston frequency ``f`` (Hz); ``speed_of_sound`` ``c0`` (m/s),
     ``air_density`` ``rho0`` (kg/m3), ``specific_heat_cp`` ``C_P`` (J/(kg*K)) and
-    ``thermal_conductivity`` ``k_a`` (J/(s*m*K)) are air properties, defaulting to the
-    IEC 61094-2:2009 values used in ISO 9053-2:2020 Annex A.3. Returns ``b`` in metres;
-    with the Annex A.3 example (:math:`f = 2` Hz) this is ``1.83e-3 m``.
+    ``thermal_conductivity`` ``k_a`` (J/(s*m*K)) are air properties, defaulting to air
+    at 23 degC, 101,325 kPa and 50 % relative humidity computed from IEC 61094-2:2009
+    Annex F. Note that ``c0`` cancels: ``b`` is
+    :math:`\sqrt{2 k_\mathrm{a} / (\rho_0 C_\mathrm{P} \omega)}`, so only the pair
+    ``k_a``/``C_P`` and the density move it.
+
+    ISO 9053-2:2020 Annex A.3 prints a ``k_a``/``C_P`` pair 1,0800 times smaller than
+    Annex F gives at that state, which it credits to IEC 61094-2:2009 but which cannot
+    be found there (see ``docs/ERRATA.md``). The defaults here are the Annex F values;
+    with the Annex A.3 example (:math:`f = 2` Hz) both pairs give ``1.83e-3 m``, because
+    the printed pair preserves the tabulated diffusivity.
     """
     if frequency <= 0.0:
         raise ValueError(_FREQUENCY_POSITIVE_MSG)
@@ -573,8 +602,10 @@ def effective_kappa(
 
     ``cavity_surface`` is ``S`` (m2), ``cavity_volume`` ``V`` (m3) and ``frequency``
     the piston frequency ``f`` (Hz); ``specific_heat_ratio`` ``kappa`` (adiabatic) and
-    the remaining air properties default to the ISO 9053-2:2020 Annex A.3 values.
-    Returns the dimensionless ``kappa'`` for use in
+    the remaining air properties default to air at the Annex A.3 reference state,
+    computed from IEC 61094-2:2009 Annex F (see
+    :func:`thermal_boundary_layer_thickness` on why those differ from the pair
+    Annex A.3 prints). Returns the dimensionless ``kappa'`` for use in
     :func:`alternating_airflow_resistance`; the Annex A.3 worked example
     (:math:`S = 0.0471` m2, :math:`V = 7.854\times 10^{-4}` m3,
     :math:`f = 2` Hz) yields :math:`\kappa' = 1.370`.
