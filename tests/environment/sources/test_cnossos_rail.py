@@ -47,6 +47,7 @@ from phonometry.environment.sources.cnossos_rail import (
     BridgeType,
     ContactFilter,
     DirectivityEdition,
+    RailJoints,
     RailPad,
     RailRoughnessClass,
     RailwayEmissionResult,
@@ -58,6 +59,7 @@ from phonometry.environment.sources.cnossos_rail import (
     TrackBase,
     TrackCurvature,
     TrackDescriptor,
+    TrackMeasure,
     TrackTransferClass,
     TractionVehicle,
     VehicleDescriptor,
@@ -616,8 +618,17 @@ def test_vehicle_and_track_descriptors_round_trip() -> None:
     assert track.base is TrackBase.BALLAST
     assert track.roughness is RailRoughnessClass.NORMAL
     assert track.pad is RailPad.SOFT
+    assert track.measure is TrackMeasure.NONE
+    assert track.joints is RailJoints.NONE
     assert track.curvature is TrackCurvature.HIGH
     assert track.code == "BMSNNH"
+
+    # Digits 4 and 5 carrying something other than their default, which is what
+    # a reader has to be able to name to describe a damped, jointed track.
+    damped = TrackDescriptor.from_code("BMSDSH")
+    assert damped.measure is TrackMeasure.RAIL_DAMPER
+    assert damped.joints is RailJoints.SINGLE
+    assert damped.code == "BMSDSH"
 
 
 def test_descriptor_rejects_bad_codes() -> None:

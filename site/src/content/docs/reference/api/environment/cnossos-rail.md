@@ -379,6 +379,14 @@ to be supplied by the Member State.
 | :--- | :--- |
 | ValueError | If the class carries no spectrum in Table G-1b. |
 
+## RailJoints
+
+```python
+RailJoints(*values)
+```
+
+Digit 5 of the track descriptor, Table [2.3.b].
+
 ## RailPad
 
 ```python
@@ -825,8 +833,8 @@ The six-digit track descriptor of Table [2.3.b].
 | `base` | Digit 1, the [`TrackBase`](/phonometry/reference/api/environment/cnossos-rail/#trackbase). |
 | `roughness` | Digit 2, the [`RailRoughnessClass`](/phonometry/reference/api/environment/cnossos-rail/#railroughnessclass). |
 | `pad` | Digit 3, the [`RailPad`](/phonometry/reference/api/environment/cnossos-rail/#railpad) dynamic stiffness. |
-| `measure` | Digit 4, the `TrackMeasure`. |
-| `joints` | Digit 5, the `RailJoints`. |
+| `measure` | Digit 4, the [`TrackMeasure`](/phonometry/reference/api/environment/cnossos-rail/#trackmeasure). |
+| `joints` | Digit 5, the [`RailJoints`](/phonometry/reference/api/environment/cnossos-rail/#railjoints). |
 | `curvature` | Digit 6, the [`TrackCurvature`](/phonometry/reference/api/environment/cnossos-rail/#trackcurvature). |
 
 ### TrackDescriptor.code
@@ -858,6 +866,14 @@ Parse a descriptor such as `"BMSNNN"`.
 | Exception | When |
 | :--- | :--- |
 | ValueError | If the code is not a valid six-digit descriptor. |
+
+## TrackMeasure
+
+```python
+TrackMeasure(*values)
+```
+
+Digit 4 of the track descriptor, Table [2.3.b].
 
 ## TrackTransferClass
 

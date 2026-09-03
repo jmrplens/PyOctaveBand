@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- `phonometry.environment` publishes all six digits of the CNOSSOS-EU track
+  descriptor. `TrackMeasure` (digit 4, the additional measure: rail damper, low
+  barrier, absorber plate, embedded rail) and `RailJoints` (digit 5) were
+  defined beside the other four and left out of every `__all__` on the way up,
+  so `TrackDescriptor.from_code("BMSDSH")` handed back a `TrackMeasure` that the
+  caller who received it had no supported way to import.
+
+  The round-trip test had the same hole, asserting digits 1, 2, 3 and 6 and
+  skipping the two it could not name either, which is how the gap survived: the
+  reference table documented both enums, and the gate behind it asks only that
+  every published name have a row, never that every documented row name
+  something a reader can reach.
+
+  A new architecture test closes the class rather than the case. It walks the
+  fields of every published dataclass and fails on any field whose type is
+  defined in the tree and published by no package, so the next type that can be
+  received but not named fails the build instead of the reader.
+
 ### Removed
 
 - The top-level `phonometry` package publishes twenty-three names: the

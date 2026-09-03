@@ -396,6 +396,65 @@ def test_every_public_name_is_reachable_from_its_domain() -> None:
     )
 
 
+def test_a_published_field_type_is_published_too() -> None:
+    """A type you can receive but cannot name is a type you cannot use.
+
+    ``TrackMeasure`` and ``RailJoints`` were two of the six digits of the
+    CNOSSOS-EU track descriptor. ``TrackDescriptor`` declared both as fields and
+    ``from_code`` handed them back, so a caller held a ``TrackMeasure`` it had
+    no supported way to import: the other four digits were published and these
+    two were not. The round-trip test had the same gap, asserting digits 1, 2, 3
+    and 6 and skipping the two it could not name either.
+    """
+    import dataclasses
+    import inspect
+    import typing
+
+    import phonometry
+
+    domains = {
+        name
+        for name in dir(phonometry)
+        if not name.startswith("_") and inspect.ismodule(getattr(phonometry, name))
+    }
+    published = {
+        name
+        for domain in domains
+        for name in getattr(getattr(phonometry, domain), "__all__", ())
+    }
+
+    unreachable: list[str] = []
+    for domain in sorted(domains):
+        package = getattr(phonometry, domain)
+        for owner in getattr(package, "__all__", ()):
+            obj = getattr(package, owner, None)
+            if not dataclasses.is_dataclass(obj):
+                continue
+            try:
+                hints = typing.get_type_hints(obj)
+            except Exception:  # noqa: BLE001 - a forward reference we cannot resolve
+                continue
+            for field, annotation in hints.items():
+                for part in getattr(annotation, "__args__", (annotation,)):
+                    if not inspect.isclass(part):
+                        continue
+                    module = getattr(part, "__module__", "")
+                    if not module.startswith("phonometry."):
+                        continue
+                    if part.__name__ in published:
+                        continue
+                    unreachable.append(
+                        f"phonometry.{domain}.{owner}.{field} is a "
+                        f"{part.__name__}, defined in {module}"
+                    )
+
+    assert not unreachable, (
+        "types a published dataclass exposes but no package publishes:\n  "
+        + "\n  ".join(sorted(set(unreachable)))
+        + "\nExport each from the package that owns the dataclass."
+    )
+
+
 def test_no_public_name_is_published_by_two_domains() -> None:
     """One name, one owner: what makes the flat root a shortcut and not a map.
 
