@@ -323,8 +323,9 @@ def static_pressure_from_altitude(altitude: float) -> float:
     Annex C prints :math:`p_{\mathrm{s},0}` = 1,013 25 x 10^5 Pa and states
     the quantity in pascals. The result here is in kilopascals so that it feeds
     ``static_pressure`` of :func:`sound_power_in_situ` directly, matching
-    ISO 3741, ISO 3744 and ISO 3745, which do print kilopascals; the ratio the
-    correction uses is the same either way. A site below sea level is admissible (the base exceeds one);
+    ISO 3741, ISO 3744 and ISO 3745, which do print kilopascals. The pressure
+    reaches ``C2`` only as :math:`p_\mathrm{s}/p_{\mathrm{s},0}`, so the two
+    unit conventions give the same correction. A site below sea level is admissible (the base exceeds one);
     the formula stops meaning anything where the base reaches zero, some
     44 km up, and that is refused.
 
@@ -877,8 +878,10 @@ def sound_power_in_situ(
         Pa, and is alone in its family in doing so: ISO 3741:2010,
         ISO 3744:2010 and ISO 3745:2012 all print kilopascals. This argument
         follows the three, so that one unit serves the whole ISO 3740 family;
-        ``C2`` depends only on the ratio :math:`p_\mathrm{s}/p_{\mathrm{s},0}`,
-        so the choice cannot move a result.
+        ``C2`` carries a pressure term and a temperature term, and the
+        pressure enters only as the ratio
+        :math:`p_\mathrm{s}/p_{\mathrm{s},0}`, so converting both together
+        cannot move a result.
     :param conditions: The :class:`GradeConditions` Table 2 reads to decide
         the accuracy grade: the excess of sound pressure level at each
         microphone position (Annex A) and the range of the directivity survey

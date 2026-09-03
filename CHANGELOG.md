@@ -657,9 +657,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   says so. It is alone in the ISO 3740 family in doing so: ISO 3741:2010,
   ISO 3744:2010 and ISO 3745:2012 all print kilopascals, and
   `sound_power_in_situ` follows those three so that one unit serves the whole
-  family. Nothing moves, because C2 depends only on the ratio ps/ps,0. What
-  changes is that a reader comparing the docstring with the printed page is
-  told which is which instead of finding an unexplained unit.
+  family. Nothing moves: C2 carries a pressure term and a temperature term,
+  and the pressure enters only as the ratio ps/ps,0, so converting both
+  together leaves the correction alone. What changes is that a reader
+  comparing the docstring with the printed page is told which is which
+  instead of finding an unexplained unit.
 
 - The air behind ISO 9053-2's thermal correction is the air IEC 61094-2:2009
   actually publishes. `thermal_boundary_layer_thickness` and `effective_kappa`
