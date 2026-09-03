@@ -35,7 +35,12 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    ABSOLUTE_ZERO_C,
+    require_above_absolute_zero,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -263,7 +268,7 @@ def sea_water_sound_speed(
         Ainslie's words) and drifts by a few m/s against the UNESCO standard
         away from mid-range temperatures and shallow depths.
     """
-    t = _finite(temperature, "temperature")
+    t = require_above_absolute_zero(_finite(temperature, "temperature"), "temperature")
     s = _finite(salinity, "salinity")
     if s < 0.0:
         msg = "'salinity' must be non-negative."
@@ -383,6 +388,9 @@ def sound_speed_profile(
     sal = np.broadcast_to(np.asarray(salinities, dtype=np.float64), z.shape)
     if not (np.all(np.isfinite(temp)) and np.all(np.isfinite(sal))):
         msg = "'temperatures' and 'salinities' must be finite."
+        raise ValueError(msg)
+    if np.any(temp <= ABSOLUTE_ZERO_C):
+        msg = "'temperatures' must be finite temperatures above -273.15 degC."
         raise ValueError(msg)
     if np.any(sal < 0.0):
         msg = "'salinities' must be non-negative."

@@ -33,6 +33,37 @@ def require_positive(value: float, name: str) -> float:
     return float(value)
 
 
+#: Absolute zero, in degrees Celsius. The bound on a temperature that has to be
+#: a temperature. It is not the same number as the ``-273`` that several ISO 3740
+#: clauses print inside their own ``sqrt(273 + theta)``: those guards protect the
+#: pole of the formula the clause states, which sits 0,15 degC higher, and they
+#: stay where they are.
+ABSOLUTE_ZERO_C = -273.15
+
+
+def require_above_absolute_zero(value: float, name: str) -> float:
+    """Require a finite temperature in degrees Celsius above absolute zero.
+
+    The one bound a temperature always has. A model may state a narrower domain
+    for itself, and that is a warning rather than a refusal, because a fit past
+    its validated range is still arithmetic; a temperature below absolute zero
+    is not a state at all, and the arithmetic below one is not wrong so much as
+    meaningless. Left unguarded it does not raise, it returns: a sea-water sound
+    speed comes back at -31 457 m/s, and an absorption at -300 degC comes back
+    at a plausible-looking 0,495 dB/km.
+
+    :param value: The temperature to validate, in degrees Celsius.
+    :param name: Parameter name used in the error message.
+    :return: The validated temperature as a ``float``.
+    :raises ValueError: for a non-finite temperature, or one at or below
+        -273,15 degC.
+    """
+    if not math.isfinite(value) or value <= ABSOLUTE_ZERO_C:
+        msg = f"'{name}' must be a finite temperature above -273.15 degC."
+        raise ValueError(msg)
+    return float(value)
+
+
 def require_non_negative(value: float, name: str) -> float:
     """Require a non-negative finite number (rejects NaN and infinities).
 

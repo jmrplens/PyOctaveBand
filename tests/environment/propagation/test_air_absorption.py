@@ -168,7 +168,7 @@ def test_out_of_range_frequency_warns() -> None:
         (
             (1000.0,),
             {"temperature": -273.15},
-            "'temperature' must be above absolute zero",
+            "'temperature' must be a finite temperature above",
         ),
         # negative RH
         ((1000.0,), {"relative_humidity": -1.0}, "'relative_humidity' must be within"),

@@ -102,6 +102,7 @@ if TYPE_CHECKING:
 from .._internal.levels_math import energy_mean, weighted_energy_mean
 from .._internal.validation import (
     check_engine,
+    require_above_absolute_zero,
     require_equal_shapes,
     require_finite_fields,
     require_per_band,
@@ -1454,9 +1455,7 @@ def sound_power_intensity_precision(
     if np.any(seg <= 0.0):
         msg = "All 'areas' must be positive."
         raise ValueError(msg)
-    if temperature <= _ABS_ZERO_C:
-        msg = "'temperature' must be above -273.15 degrees Celsius."
-        raise ValueError(msg)
+    require_above_absolute_zero(float(temperature), "temperature")
     if barometric_pressure <= 0.0:
         msg = "'barometric_pressure' must be positive (Pa)."
         raise ValueError(msg)

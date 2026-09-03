@@ -38,7 +38,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_ranks, require_same_length
+from ..._internal.validation import (
+    require_above_absolute_zero,
+    require_ranks,
+    require_same_length,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -118,6 +122,12 @@ def _thorp(f_khz: NDArray[np.float64]) -> NDArray[np.float64]:
     return 1.0936 * (
         0.1 * f_khz**2 / (1.0 + f_khz**2) + 40.0 * f_khz**2 / (4100.0 + f_khz**2)
     )
+
+
+#: The Celsius-to-kelvin offset Francois & Garrison print inside their two
+#: relaxation frequencies. It is 273, not 273,15, and it is normative: the pole
+#: of this model therefore sits 0,15 degC above absolute zero.
+_FG_KELVIN_OFFSET = 273.0
 
 
 def _francois_garrison(
@@ -202,10 +212,24 @@ def seawater_absorption(
     if s < 0.0 or z < 0.0:
         msg = "'salinity' and 'depth' must be non-negative."
         raise ValueError(msg)
+    require_above_absolute_zero(t, "temperature")
     key = model.strip().lower()
     if key == "thorp":
         return _thorp(f_khz)
     if key == "francois-garrison":
+        # This model has a pole of its own, 0,15 degC above absolute zero: its
+        # relaxation frequencies are written 1245/(273 + t) and 1990/(273 + t)
+        # with the 273 the paper prints, so the whole band (-273,15, -273,0]
+        # clears the check above and then overflows or divides by zero, neither
+        # of which names the argument that caused it. The printed 273 is
+        # normative and stays; the guard goes in front of it.
+        if _FG_KELVIN_OFFSET + t <= 0.0:
+            msg = (
+                "'temperature' must exceed -273 degC for the francois-garrison "
+                "model, whose relaxation frequencies are printed as "
+                "1245/(273 + t) and 1990/(273 + t)."
+            )
+            raise ValueError(msg)
         return _francois_garrison(f_khz, t, s, z, float(ph))
     if key == "ainslie-mccolm":
         return _ainslie_mccolm(f_khz, t, s, z / _M_PER_KM, float(ph))
