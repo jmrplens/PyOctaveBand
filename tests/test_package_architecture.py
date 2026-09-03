@@ -10,6 +10,7 @@ an edge is an explicit, reviewed decision.
 from __future__ import annotations
 
 import ast
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -418,3 +419,69 @@ def test_no_public_name_is_published_by_two_domains() -> None:
 
     shared = {name: owners for name, owners in published.items() if len(owners) > 1}
     assert not shared, f"names published by more than one domain: {shared}"
+
+
+def _message_text(node: ast.Assign) -> str | None:
+    """The literal text of a ``msg = ...`` assignment, or ``None``.
+
+    Refusals are written as one assignment and raised on the next line, and
+    most of them are parenthesised over several lines, which the parser has
+    already folded into a single constant. An f-string keeps only its literal
+    runs: what an interpolation puts there is not visible statically.
+    """
+    if len(node.targets) != 1:
+        return None
+    target = node.targets[0]
+    if not isinstance(target, ast.Name) or target.id != "msg":
+        return None
+    value = node.value
+    if isinstance(value, ast.Constant):
+        return value.value if isinstance(value.value, str) else None
+    if isinstance(value, ast.JoinedStr):
+        return "".join(
+            part.value
+            for part in value.values
+            if isinstance(part, ast.Constant) and isinstance(part.value, str)
+        )
+    return None
+
+
+def test_no_error_message_carries_a_comma_decimal() -> None:
+    """Error messages are English prose, and English prose takes a point.
+
+    The library writes its own numbers into refusals: a temperature floor at
+    absolute zero, the thermodynamic bound on a Poisson ratio. Seven of them
+    had drifted to a comma, four of them the same -273,15, while eleven
+    comparable messages used a point and one of the two spellings of the same
+    0.5 sat in each camp.
+
+    Nothing could see it. The figure gate that does police decimal commas
+    reads drawn labels, not exceptions, because its subject is the Spanish
+    edition of a figure and a comma inside ``$...$`` sets with the wrong
+    spacing. An error message is neither drawn nor translated.
+
+    This reads the ``msg`` assignments a module raises from, and reads them
+    through the parser rather than line by line: nearly every refusal here is
+    a parenthesised string spanning several lines, and a scan that saw only
+    the ``msg = (`` line saw none of the text.
+
+    A comma between digits is a decimal only when a letter does not precede
+    it. Subscript pairs are written the same way and are notation rather than
+    numbers, so ``k2,1`` and ``F2,b`` stay as they are while ``31,5 Hz``
+    does not.
+    """
+    offenders: list[str] = []
+    for path in sorted(Path("src/phonometry").rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Assign):
+                continue
+            text = _message_text(node)
+            if text is None:
+                continue
+            found = re.search(r"(?<![A-Za-z])\d,\d", text)
+            if found:
+                offenders.append(f"{path}:{node.lineno}  ...{found.group(0)}...")
+    assert not offenders, "comma decimal in an English message:\n" + "\n".join(
+        offenders
+    )

@@ -774,7 +774,7 @@ def sti_from_impulse_response(
     if fs < _MIN_FS:
         msg = (
             f"Sample rate 'fs' must be >= {_MIN_FS} Hz: the 8 kHz octave band "
-            "extends to 11,2 kHz (IEC 61260-1)."
+            "extends to 11.2 kHz (IEC 61260-1)."
         )
         raise ValueError(msg)
     if not np.any(ir_proc):
@@ -975,7 +975,7 @@ def stipa(
     if fs < _MIN_FS:
         msg = (
             f"Sample rate 'fs' must be >= {_MIN_FS} Hz: the 8 kHz octave band "
-            "extends to 11,2 kHz (IEC 61260-1)."
+            "extends to 11.2 kHz (IEC 61260-1)."
         )
         raise ValueError(msg)
 
@@ -1048,7 +1048,7 @@ def stipa_signal(
     if fs < _MIN_FS:
         msg = (
             f"Sample rate 'fs' must be >= {_MIN_FS} Hz: the 8 kHz half-octave "
-            "carrier extends beyond 9,4 kHz."
+            "carrier extends beyond 9.4 kHz."
         )
         raise ValueError(msg)
     if seconds <= 0:
