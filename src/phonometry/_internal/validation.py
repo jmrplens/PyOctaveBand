@@ -64,6 +64,27 @@ def require_above_absolute_zero(value: float, name: str) -> float:
     return float(value)
 
 
+def require_above_absolute_zero_array(x: ArrayLike, name: str) -> np.ndarray:
+    """Require every temperature in ``x`` to be finite and above absolute zero.
+
+    The array companion of :func:`require_above_absolute_zero`. A profile is
+    where this bites hardest: one element below absolute zero among a hundred
+    good ones still poisons the whole returned array, and the caller has no
+    reason to look at any single element of it.
+
+    :param x: Temperatures, in degrees Celsius.
+    :param name: Parameter name used in the error message.
+    :return: The temperatures as a ``float64`` array.
+    :raises ValueError: if any element is non-finite or at or below
+        -273,15 degC.
+    """
+    values = _as_float64(x, name)
+    if not np.all(np.isfinite(values)) or np.any(values <= ABSOLUTE_ZERO_C):
+        msg = f"'{name}' must be finite temperatures above -273.15 degC."
+        raise ValueError(msg)
+    return values
+
+
 def require_non_negative(value: float, name: str) -> float:
     """Require a non-negative finite number (rejects NaN and infinities).
 

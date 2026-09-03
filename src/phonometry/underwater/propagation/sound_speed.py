@@ -36,8 +36,8 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ..._internal.validation import (
-    ABSOLUTE_ZERO_C,
     require_above_absolute_zero,
+    require_above_absolute_zero_array,
     require_ranks,
     require_same_length,
 )
@@ -389,9 +389,7 @@ def sound_speed_profile(
     if not (np.all(np.isfinite(temp)) and np.all(np.isfinite(sal))):
         msg = "'temperatures' and 'salinities' must be finite."
         raise ValueError(msg)
-    if np.any(temp <= ABSOLUTE_ZERO_C):
-        msg = "'temperatures' must be finite temperatures above -273.15 degC."
-        raise ValueError(msg)
+    require_above_absolute_zero_array(temp, "temperatures")
     if np.any(sal < 0.0):
         msg = "'salinities' must be non-negative."
         raise ValueError(msg)

@@ -104,9 +104,9 @@ def test_air_density_reference_values() -> None:
 
 
 def test_air_property_domain_errors() -> None:
-    with pytest.raises(ValueError, match="'temperature_c' must exceed"):
+    with pytest.raises(ValueError, match="'temperature_c' must be finite temperatures above"):
         speed_of_sound_iso10534(temperature_c=-300.0)
-    with pytest.raises(ValueError, match="'temperature_c' must exceed"):
+    with pytest.raises(ValueError, match="'temperature_c' must be finite temperatures above"):
         speed_of_sound_astm(temperature_c=-300.0)
     with pytest.raises(ValueError, match="'atmospheric_pressure_kpa' must be positive"):
         air_density_iso10534(temperature_c=19.85, atmospheric_pressure_kpa=-1.0)
@@ -122,7 +122,7 @@ def test_air_density_astm_rejects_temperature_below_absolute_zero() -> None:
     reduction builds on. The temperature is refused at the door, exactly as
     ``speed_of_sound_astm`` refuses it above.
     """
-    with pytest.raises(ValueError, match="'temperature_c' must exceed"):
+    with pytest.raises(ValueError, match="'temperature_c' must be finite temperatures above"):
         air_density_astm(temperature_c=-300.0, atmospheric_pressure_kpa=101.325)
 
 
@@ -171,7 +171,7 @@ def test_air_helpers_bound_only_absolute_zero(
     """
     for temperature_c in (-272.0, -50.0, 0.0, 100.0, 500.0):
         assert np.isfinite(float(helper(temperature_c=temperature_c, **extra)))  # type: ignore[operator]
-    with pytest.raises(ValueError, match="'temperature_c' must exceed"):
+    with pytest.raises(ValueError, match="'temperature_c' must be finite temperatures above"):
         helper(temperature_c=-273.15, **extra)  # type: ignore[operator]
 
 

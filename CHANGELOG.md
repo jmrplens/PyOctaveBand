@@ -491,9 +491,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   next to the 0,0185 dB/km of real cold water.
 
   `require_above_absolute_zero` in the internal validation now says it once,
-  and the sites that had written it by hand use it: the air absorption of
-  ISO 9613-1, the ASTM C423 absorption, the intensity sound power, the airport
-  impedance adjustment and the ocean ambient noise. One of those was spelling
+  with an array companion for the profiles, and every site that had written it
+  by hand uses one of the two: the air absorption of ISO 9613-1, the ASTM C423
+  absorption, the intensity sound power, the airport impedance adjustment, the
+  ocean ambient noise, the two ocean sound-speed entry points and the five air
+  helpers of `materials`. One of those was spelling
   its message with a Unicode minus and a degree sign where the rest of the tree
   uses ASCII.
 
