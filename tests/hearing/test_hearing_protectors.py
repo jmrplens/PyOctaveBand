@@ -452,3 +452,46 @@ def test_the_snr_method_reports_no_reduction_without_the_a_weighted_level() -> N
         ref.ISO4869_2_ANNEX_B_LPA - by_a.effective_level
     )
     assert by_a.noise_reduction != pytest.approx(float(rating.reported))
+
+
+def test_a_band_count_with_no_default_axis_needs_explicit_frequencies() -> None:
+    """Only the eight octaves, or those seven, are assumed from a count."""
+    with pytest.raises(ValueError, match="pass 'frequencies' explicitly"):
+        hearing.octave_band_protected_level([80.0] * 5, [10.0] * 5)
+
+
+def test_the_frequency_axis_must_have_one_value_per_band() -> None:
+    """A band axis is one mid-band frequency per level, and one dimension."""
+    with pytest.raises(ValueError, match="one mid-band frequency per band"):
+        hearing.octave_band_protected_level(
+            [80.0, 81.0], [10.0, 11.0], frequencies=[125.0, 250.0, 500.0]
+        )
+
+
+def test_the_weighting_must_have_one_value_per_band() -> None:
+    """So must the weighting, when it is supplied."""
+    with pytest.raises(ValueError, match="'a_weighting' must be one value per band"):
+        hearing.octave_band_protected_level(
+            ref.ISO4869_2_ANNEX_B_NOISE,
+            ref.ISO4869_2_APV84_PRINTED,
+            a_weighting=[-16.1, -8.6],
+        )
+
+
+def test_a_seven_band_grid_is_read_as_starting_at_125_hz() -> None:
+    """Formulae (15) and (22) read seven bands, so seven are taken as theirs."""
+    eight = np.asarray(ref.ISO4869_2_ATTENUATION, dtype=float)
+    from_eight = hearing.snr_rating(eight)
+    from_seven = hearing.snr_rating(eight[:, 1:])
+    assert from_seven.snr == pytest.approx(from_eight.snr)
+
+
+@pytest.mark.parametrize("bad", [np.nan, np.inf])
+def test_a_non_finite_level_is_refused_by_the_applications(bad: float) -> None:
+    """A level that is not finite gives an answer that is not a level."""
+    hml = hearing.hml_rating(ref.ISO4869_2_ATTENUATION)
+    with pytest.raises(ValueError, match="finite sound pressure level"):
+        hearing.hml_protected_level(bad, 103.0, hml)
+    snr = hearing.snr_rating(ref.ISO4869_2_ATTENUATION)
+    with pytest.raises(ValueError, match="finite sound pressure level"):
+        hearing.snr_protected_level(snr, l_p_c=bad)
