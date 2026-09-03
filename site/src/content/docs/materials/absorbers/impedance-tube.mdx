@@ -500,10 +500,11 @@ trustworthy are most of ISO 10534-2. In the order they matter:
   the atmospheric pressure to ±0.5 kPa (Clause 4.12); Eq. (5) turns the first
   into $c_0$ and Eq. (7) the pair into $\rho$. The library exposes both:
   `speed_of_sound_iso10534(temperature_c=...)` and
-  `air_density_iso10534(temperature_c=..., atmospheric_pressure_kpa=...)`. Both
-  equations are written in kelvin and both arguments are in degrees Celsius,
-  like every other temperature in the library; the conversion happens inside,
-  so the printed 293 K stays literal against the page. The fiche snippet below
+  `air_density_iso10534(temperature_c=..., atmospheric_pressure_kpa=...)`. The
+  temperature is in degrees Celsius, like every other temperature in the
+  library, and the pressure in kilopascals, as Clause 4.12 states it. Both
+  equations are written in kelvin, and the conversion happens inside, so the
+  printed 293 K stays literal against the page. The fiche snippet below
   feeds them straight into `two_microphone_impedance` instead of literals.
 - **Excitation (Clause 4.10, 7.3).** A stationary signal with a flat spectral
   density over the range of interest: random, pseudo-random, periodic

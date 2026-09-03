@@ -520,11 +520,11 @@ importan:
   atmosférica a ±0,5 kPa (apartado 4.12); la Ec. (5) convierte la primera en
   $c_0$ y la Ec. (7) la pareja en $\rho$. La biblioteca expone las dos:
   `speed_of_sound_iso10534(temperature_c=...)` y
-  `air_density_iso10534(temperature_c=..., atmospheric_pressure_kpa=...)`. Las
-  dos ecuaciones están escritas en kelvin y los dos argumentos van en grados
-  Celsius, como cualquier otra temperatura de la biblioteca; la conversión
-  ocurre dentro, así que los 293 K impresos siguen literales frente a la
-  página. El fragmento de la ficha de abajo las alimenta directamente a
+  `air_density_iso10534(temperature_c=..., atmospheric_pressure_kpa=...)`. La
+  temperatura va en grados Celsius, como cualquier otra temperatura de la
+  biblioteca, y la presión en kilopascales, tal como la enuncia el apartado
+  4.12. Las dos ecuaciones están escritas en kelvin, y la conversión ocurre
+  dentro, así que los 293 K impresos siguen literales frente a la página. El fragmento de la ficha de abajo las alimenta directamente a
   `two_microphone_impedance` en lugar de usar literales.
 - **Excitación (apartados 4.10 y 7.3).** Una señal estacionaria con densidad
   espectral plana en el rango de interés: aleatoria, pseudoaleatoria,

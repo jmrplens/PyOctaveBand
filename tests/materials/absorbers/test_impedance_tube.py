@@ -110,6 +110,8 @@ def test_air_property_domain_errors() -> None:
         speed_of_sound_astm(temperature_c=-300.0)
     with pytest.raises(ValueError, match="'atmospheric_pressure_kpa' must be positive"):
         air_density_iso10534(temperature_c=19.85, atmospheric_pressure_kpa=-1.0)
+    with pytest.raises(ValueError, match="'atmospheric_pressure_kpa' must be positive"):
+        air_density_astm(temperature_c=20.0, atmospheric_pressure_kpa=-1.0)
 
 
 def test_air_density_astm_rejects_temperature_below_absolute_zero() -> None:
