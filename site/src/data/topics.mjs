@@ -123,6 +123,16 @@ export const topics = [
     ],
   },
   {
+    id: 'fluids',
+    label: { en: 'The medium', es: 'El medio' },
+    link: '/fluids/',
+    items: [
+      { slug: 'fluids', label: 'Overview', translations: { es: 'Resumen' } },
+      'fluids/humid-air',
+      apiGroup('fluids'),
+    ],
+  },
+  {
     id: 'io',
     label: { en: 'Audio files', es: 'Archivos de audio' },
     link: '/io/',

@@ -1,0 +1,85 @@
+---
+title: "El medio"
+description: "El fluido por el que viaja el sonido, calculado a partir de las condiciones medidas y no supuestas: aire húmedo según el Anexo F de IEC 61094-2:2009, qué fija su modelo, qué se niega a adivinar y por qué todos los dominios acuden a él."
+---
+
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
+Todas las demás áreas de esta biblioteca miden algo que ocurrió *en* un medio.
+Ésta es el medio. Detrás de cada nivel de potencia sonora, de cada coeficiente
+de absorción, de cada índice de reducción y de cada cálculo de propagación del
+árbol hay una densidad y una velocidad del sonido, y durante casi toda la vida
+de la biblioteca llegaban de la misma manera: como un número que alguien
+escribió una vez.
+
+Eso es lo que esta área existe para cortar. `phonometry.fluids` calcula el
+estado del fluido a partir de las condiciones que de verdad se midieron,
+conserva esas condiciones junto al resultado y dice qué modelo lo produjo.
+
+## Por qué no es un dominio
+
+Diecinueve de los veinte paquetes son dominios de aplicación: uno va a
+`building` porque está midiendo un edificio, a `underwater` porque trabaja en
+el agua. Nadie va a `fluids` porque esté midiendo un fluido. Se va porque lo
+que sea que esté midiendo ocurre dentro de uno.
+
+Así que se sienta con `filters`, `signals` y `metrology` en la caja de
+herramientas transversal: cualquier paquete puede importarlo sin arista de
+arquitectura, porque un medio no es un asunto que unos dominios tengan y otros
+no. Es el cuarto miembro de ese conjunto y el primero añadido desde que la
+biblioteca partió en tres la caja original.
+
+## Tres clases de número, deliberadamente separadas
+
+La razón por la que una biblioteca acaba con una docena de valores distintos
+para la densidad del aire es que tres cosas diferentes se visten igual.
+
+**La física del fluido** es lo que vive aquí. Responde a «qué es este aire, en
+estas condiciones», y una física mejor es una mejora: cuando el modelo gana
+exactitud, todo el que pidió aire debería recibir la respuesta más exacta.
+
+**La fórmula simplificada de una norma** no es eso. Cuando ISO 10534-2 imprime
+$c_0 = 343{,}2\sqrt{T/293}$, esa expresión es parte del procedimiento, y una
+medida que dice seguir la norma tiene que usarla. Ésas se quedan en el módulo
+que implementa su cláusula, con la cita al lado, y no se mudan aquí.
+
+**Una constante congelada por una fila de conformidad** es una tercera cosa
+más. El modelo Johnson-Champoux-Allard lleva un número de Prandtl de 0,71 como
+constante publicada del modelo. El aire en el estado de referencia tiene 0,728.
+Sustituir el valor físico dentro del modelo no corregiría un error, cambiaría
+el modelo, y mueve la impedancia que calcula en 1,5 partes por mil. Esa
+constante se queda congelada donde se publicó.
+
+Mantener las tres separadas es lo que permite que una física mejor llegue a
+quien llama sin que una sola medida deje de reproducir en silencio la norma que
+cita.
+
+<Scope>
+<ScopeClaim status="not-covered">
+**Sin sólidos.** Un `Fluid` no lleva velocidad de cizalla, y los materiales
+elásticos de los solucionadores de onda conservan su propio tipo con su propia
+precondición. Son magnitudes distintas que comparten la palabra «medio», y las
+propiedades de un sólido están tabuladas donde las de un fluido se calculan.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered">
+**Sin campos, sólo estados.** Un `Fluid` es un fluido en un punto. Los perfiles
+estratificados que recorren los trazadores de rayos se quedan en los paquetes
+dueños de sus marchadores, en el océano y en la atmósfera, porque un perfil
+describe un lugar y no una sustancia.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered">
+**Sin dependencia con la frecuencia.** La velocidad del sonido de aquí es la de
+frecuencia cero. La relajación molecular hace que dependa de la frecuencia, y
+el modelo que la describe vive con la absorción atmosférica que lo necesita, en
+`phonometry.environment`.
+</ScopeClaim>
+</Scope>
+
+## Qué hay aquí
+
+- [Aire húmedo](/phonometry/es/fluids/humid-air/): la formulación CIPM-2007 del
+  Anexo F de IEC 61094-2:2009, qué fija y qué no, cuánto vale cada condición y
+  por qué la biblioteca pide la temperatura pero supone la presión en voz alta.

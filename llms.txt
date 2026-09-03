@@ -86,6 +86,11 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Compliance and verification](https://jmrplens.github.io/phonometry/signals/metrology/compliance-verification/)
 - [Data qualification: stationarity, level crossings and peaks (Bendat & Piersol)](https://jmrplens.github.io/phonometry/signals/metrology/data-qualification/)
 
+## The medium
+
+- [Overview](https://jmrplens.github.io/phonometry/fluids/)
+- [Humid air](https://jmrplens.github.io/phonometry/fluids/humid-air/)
+
 ## Audio files
 
 - [Overview](https://jmrplens.github.io/phonometry/io/)
@@ -347,6 +352,7 @@ One file per area, each small enough to fetch whole. `llms-full.txt` is the comp
 - [Levels and weighting](https://jmrplens.github.io/phonometry/llms/llms-signals-levels.txt)
 - [Signals and spectra](https://jmrplens.github.io/phonometry/llms/llms-signals-spectra.txt)
 - [Calibration and uncertainty](https://jmrplens.github.io/phonometry/llms/llms-signals-metrology.txt)
+- [The medium](https://jmrplens.github.io/phonometry/llms/llms-fluids.txt)
 - [Audio files](https://jmrplens.github.io/phonometry/llms/llms-io.txt)
 - [Hearing and perception](https://jmrplens.github.io/phonometry/llms/llms-perception.txt)
 - [Psychoacoustics](https://jmrplens.github.io/phonometry/llms/llms-perception-psychoacoustics.txt)

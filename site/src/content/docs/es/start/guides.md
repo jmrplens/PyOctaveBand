@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 112 guías de phonometry, agrupadas en los once temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 113 guías de phonometry, agrupadas en los doce temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -11,9 +11,9 @@ head:
         "@type": "ItemList",
         "@id": "https://jmrplens.github.io/phonometry/es/start/guides/#areas",
         "name": "Áreas de la documentación de phonometry",
-        "description": "Las once áreas documentadas de las guías de phonometry, cada una con las normas que implementa.",
+        "description": "Las doce áreas documentadas de las guías de phonometry, cada una con las normas que implementa.",
         "inLanguage": "es",
-        "numberOfItems": 11,
+        "numberOfItems": 12,
         "itemListOrder": "https://schema.org/ItemListUnordered",
         "itemListElement": [
           {
@@ -26,69 +26,76 @@ head:
           {
             "@type": "ListItem",
             "position": 2,
+            "name": "El medio",
+            "description": "El fluido por el que viaja el sonido, calculado a partir de las condiciones medidas: aire húmedo según el Anexo F de IEC 61094-2:2009.",
+            "url": "https://jmrplens.github.io/phonometry/es/fluids/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
             "name": "Archivos de audio",
             "description": "Audio de medición de entrada y salida: lectura calibrada, procedencia, flujo por bloques, escritura BWF y conversión sin pérdidas.",
             "url": "https://jmrplens.github.io/phonometry/es/io/"
           },
           {
             "@type": "ListItem",
-            "position": 3,
+            "position": 4,
             "name": "Audición y percepción",
             "description": "Sonoridad, calidad sonora, inteligibilidad del habla, audición y exposición.",
             "url": "https://jmrplens.github.io/phonometry/es/perception/"
           },
           {
             "@type": "ListItem",
-            "position": 4,
+            "position": 5,
             "name": "Salas y edificación",
             "description": "Parámetros de sala, ruido de fondo, aislamiento en campo y laboratorio, predicción.",
             "url": "https://jmrplens.github.io/phonometry/es/buildings/"
           },
           {
             "@type": "ListItem",
-            "position": 5,
+            "position": 6,
             "name": "Materiales y superficies",
             "description": "Absorción, resistencia al flujo de aire, tubo de impedancia, modelos porosos y de metamaterial, difusores, dispersión.",
             "url": "https://jmrplens.github.io/phonometry/es/materials/"
           },
           {
             "@type": "ListItem",
-            "position": 6,
+            "position": 7,
             "name": "Vibración y ruido estructural",
             "description": "Movilidad y FRF, aisladores, potencia radiada, uniones, vibración en humanos.",
             "url": "https://jmrplens.github.io/phonometry/es/vibration/"
           },
           {
             "@type": "ListItem",
-            "position": 7,
+            "position": 8,
             "name": "Medio ambiente y transporte",
             "description": "Propagación en exteriores, barreras, refracción, fuentes viarias, ferroviarias y de aerogenerador, y la valoración construida sobre ellas.",
             "url": "https://jmrplens.github.io/phonometry/es/environment/"
           },
           {
             "@type": "ListItem",
-            "position": 8,
+            "position": 9,
             "name": "Ruido de aeronaves",
             "description": "Niveles de certificación, contornos de aeropuerto y el método del hemisferio.",
             "url": "https://jmrplens.github.io/phonometry/es/aircraft/"
           },
           {
             "@type": "ListItem",
-            "position": 9,
+            "position": 10,
             "name": "Acústica submarina",
             "description": "Niveles re 1 microPa, ruido radiado por buques, hincado de pilotes, ruido ambiente, pérdidas por transmisión.",
             "url": "https://jmrplens.github.io/phonometry/es/underwater/"
           },
           {
             "@type": "ListItem",
-            "position": 10,
+            "position": 11,
             "name": "Fuentes y dispositivos",
             "description": "Potencia acústica, intensidad, declaraciones de emisión, electroacústica, sonoridad de programa.",
             "url": "https://jmrplens.github.io/phonometry/es/devices/"
           },
           {
             "@type": "ListItem",
-            "position": 11,
+            "position": 12,
             "name": "Simulación de ondas",
             "description": "Simulación FDTD 2D determinista, acústica y elástica P-SV, validada frente a oráculos analíticos y no frente a una norma.",
             "url": "https://jmrplens.github.io/phonometry/es/simulation/"
@@ -104,7 +111,7 @@ hay ninguna panorámica del campo: cada página es la documentación de trabajo 
 un módulo, escrita para que un resultado se pueda defender apartado por
 apartado en lugar de darlo por bueno.
 
-Esta página es el mapa. Ciento doce guías repartidas en once temas, y cada
+Esta página es el mapa. Ciento trece guías repartidas en doce temas, y cada
 área tiene su propio índice con el relato largo de cómo encajan sus piezas. Si
 llegas sin una pregunta concreta, lee primero la
 [introducción](/phonometry/es/start/getting-started/): recorre una señal por toda la
@@ -246,6 +253,22 @@ ISO 1996-1, IEC 60942 y la GUM.
 - [Cualificación de datos](/phonometry/es/signals/metrology/data-qualification/): los tests
   de estacionariedad por inversiones de orden y por rachas, y las estadísticas
   de Rice de cruces por nivel y de picos con el factor de irregularidad.
+
+## [El medio](/phonometry/es/fluids/)
+
+El fluido por el que viaja el sonido, calculado a partir de las condiciones
+que se midieron y no de las que se suponen. Detrás de cada nivel de la
+biblioteca hay una densidad y una velocidad del sonido, y aquí es de donde
+salen en vez de escribirse una vez a mano. Se sienta con los filtros, el
+análisis de señal y la metrología en la caja de herramientas transversal,
+porque un medio no es un asunto que unos dominios tengan y otros no.
+Implementa el Anexo F de IEC 61094-2:2009 (CIPM-2007).
+
+- [Aire húmedo](/phonometry/es/fluids/humid-air/): la densidad, la velocidad
+  del sonido, la relación de calores específicos, la viscosidad y la
+  difusividad térmica del aire a partir de la temperatura, la presión y la
+  humedad medidas, cuánto vale cada condición, el dominio que el anexo
+  enuncia para sí mismo y qué se niega el modelo a adivinar.
 
 ## [Archivos de audio](/phonometry/es/io/)
 

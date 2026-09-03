@@ -1,0 +1,203 @@
+---
+title: "Aire húmedo"
+description: "El modelo CIPM-2007 de aire húmedo del Anexo F de IEC 61094-2:2009: densidad, velocidad del sonido, relación de calores específicos, viscosidad y difusividad térmica a partir de la temperatura, la presión y la humedad medidas, con el dominio de validez impreso, cuánto vale cada condición y qué se niega el modelo a adivinar."
+references:
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2009
+    title: "Electroacoustics — Measurement microphones — Part 2: Primary method for pressure calibration of laboratory standard microphones by the reciprocity technique"
+    designation: "IEC 61094-2:2009"
+    url: "https://webstore.iec.ch/publication/4325"
+    note: "El Anexo F lleva el modelo de aire húmedo implementado aquí, sus coeficientes en la Tabla F.2 y los dos conjuntos de condiciones de la Tabla F.1 que lo fijan. La edición leída es su adopción europea BS EN 61094-2:2009."
+---
+
+Una calibración por reciprocidad necesita conocer el aire en el que se hace con
+cinco o seis cifras, y por eso la norma que define esa calibración lleva también
+el modelo de aire húmedo mejor enunciado de la literatura acústica. El Anexo F es
+ese modelo, y esta página es lo que la biblioteca hace con él.
+
+## La llamada útil más corta
+
+```python
+from phonometry import fluids
+
+f = fluids.air(
+    temperature_c=23.0,
+    static_pressure_pa=101325.0,
+    relative_humidity_percent=50.0,
+)
+print(f.density)                    # 1.1860847889882964 kg/m3
+print(f.speed_of_sound)             # 345.86651725321 m/s
+print(f.characteristic_impedance)   # 410.2270151343906 Pa.s/m
+```
+
+Ésas son las condiciones de la primera fila de la Tabla F.1, y los números son
+los que imprime el anexo. Cada una de las diez cifras que tabula vuelve dentro
+del redondeo de su última posición impresa.
+
+## Las tres condiciones no pesan igual
+
+La biblioteca pide la temperatura y supone las otras dos. No es pereza en una
+dirección y rigor en la otra: se sigue de cuánto vale cada una. Barriendo cada
+condición por su rango plausible, con las propias ecuaciones del anexo:
+
+| Condición | Barrida entre | Mueve la densidad un |
+| :--- | :--- | ---: |
+| Presión estática | 80 y 105 kPa | 25 % |
+| Temperatura | 15 y 27 °C | 4,5 % |
+| Humedad relativa | 0 y 100 % | 1,05 % |
+
+La presión domina, y además es la que la gente cree saber ya. Un emplazamiento
+de ensayo a 1000 metros está a unos 90 kPa. Eso es un 11 % por debajo de la
+atmósfera estándar que la biblioteca supondría, y deja la densidad un 13 % alta,
+que en un nivel de potencia sonora es medio decibelio sin nada en la página que
+lo diga.
+
+La humedad es el caso contrario. Es la que menos mueve la densidad, y casi nadie
+conoce la suya sin medirla.
+
+Así que las dos se suponen y las dos se anuncian, una sola vez, en el mismo
+aviso:
+
+```python
+import warnings
+
+with warnings.catch_warnings(record=True) as caught:
+    warnings.simplefilter("always")
+    fluids.air(temperature_c=20.0)
+
+print(caught[0].category.__name__)              # FluidAssumptionWarning
+print(str(caught[0].message))
+# air() assumed 101325 Pa and 50 % relative humidity. Density is the sensitive
+# one: over 80 kPa to 105 kPa it moves by a quarter, so a test site 1000 m up
+# is about 11 % away from the assumed pressure, while the whole span of
+# humidity is worth about 1 %. Pass the conditions to silence this.
+```
+
+Un aviso y no dos, porque quien no pasó ninguna de las dos tiene una cosa que
+arreglar, no dos.
+
+Pasar las dos es silencioso, que es la propiedad que debe recibir quien midió su
+aire. Python muestra el aviso una vez por sitio de llamada, así que explorar en
+un intérprete no queda ahogado en él, y cuelga de `PhonometryWarning`, de modo
+que una sola regla lo convierte en error para quien prefiera que sus ejecuciones
+fallen en vez de avisar:
+
+```python
+from phonometry import PhonometryWarning
+
+warnings.filterwarnings("error", category=PhonometryWarning)
+```
+
+La temperatura no tiene valor por defecto en absoluto. Es la única condición que
+quien llama ha medido de verdad, y no hay ningún valor defendible que inventarle.
+
+La fracción de dióxido de carbono sí se pone por defecto, en silencio, a 0,000 4.
+Eso no es una suposición sobre el aire de nadie: el apartado F.2 la nombra como
+el valor a usar en condiciones de laboratorio a falta de una medida, así que la
+biblioteca está citando el anexo y no rellenando un hueco.
+
+## Qué fija el modelo y qué no se inventa
+
+La Tabla F.1 imprime cinco magnitudes. El apartado F.6 da expresiones para dos
+más, y tres se siguen por identidad de las anteriores:
+
+```python
+f.density                    # impresa en la Tabla F.1
+f.speed_of_sound             # impresa, a frecuencia cero
+f.heat_capacity_ratio        # impresa
+f.viscosity                  # impresa
+f.thermal_diffusivity        # impresa
+f.thermal_conductivity       # expresión del apartado F.6
+f.specific_heat_capacity     # expresión del apartado F.6
+f.characteristic_impedance   # rho c
+f.prandtl_number             # eta / (rho alpha_t)
+f.kinematic_viscosity        # eta / rho
+```
+
+Cualquier otra cosa lanza en vez de devolver un número que nadie imprimió:
+
+```python
+f.properties          # exactamente lo que este modelo determinó
+f.model               # 'IEC 61094-2:2009 Annex F (CIPM-2007)'
+f.composition         # la humedad y el CO2 con los que se calculó
+```
+
+Con un solo fluido en la biblioteca eso parece pedantería, y deja de parecerlo
+con dos: el agua de mar no tiene relación de calores específicos que dar, y un
+`Fluid` que se la inventara estaría entregando un número con la forma de una
+medida y nada de su sustancia.
+
+## El dominio impreso, y la diferencia entre un ajuste y un hecho
+
+El Anexo F enuncia, en su propia página, dónde se validaron sus ecuaciones: 15 °C
+a 27 °C, 60 kPa a 110 kPa y 10 % a 90 % de humedad relativa. No enuncia ningún
+rango para la fracción de dióxido de carbono.
+
+Fuera de esa caja la biblioteca avisa y sigue respondiendo:
+
+```python
+with warnings.catch_warnings(record=True) as caught:
+    warnings.simplefilter("always")
+    hot = fluids.air(temperature_c=60.0, static_pressure_pa=101325.0,
+                     relative_humidity_percent=50.0)
+
+print(caught[0].category.__name__)                    # FluidWarning
+print("temperature 60 degC (stated 15 to 27)" in str(caught[0].message))  # True
+print(round(hot.speed_of_sound, 2))                   # 371.52
+```
+
+La distinción importa y es la regla que sigue toda la biblioteca. El aire a 60 °C
+dentro de un conducto existe; un ajuste más allá de su rango validado sigue
+siendo aritmética, y rechazarlo sería rechazar una medida real. Lo que sí se
+rechaza es un estado que no puede darse: una temperatura igual o por debajo del
+cero absoluto, una presión no positiva, una humedad fuera de cero y la
+saturación.
+
+## Cómo se fijan los números
+
+El oráculo es la Tabla F.1: cinco magnitudes en dos conjuntos de condiciones,
+diez cifras en total. La tolerancia no se elige. Un valor impreso con siete
+cifras significativas está enunciado con media unidad de su última posición, así
+que eso es lo que significa reproducirlo, y el test deriva esa cota de la cadena
+impresa en vez de llevar una constante que alguien escogió:
+
+<details>
+<summary>La tolerancia, derivada de lo impreso</summary>
+
+```python
+from decimal import Decimal
+
+def half_of_the_last_printed_figure(printed: str) -> float:
+    """Media unidad de la última posición que imprimió el anexo."""
+    exponent = int(Decimal(printed).as_tuple().exponent)
+    return float(Decimal(5) * Decimal(10) ** (exponent - 1))
+
+half_of_the_last_printed_figure("1.1860848")    # 5e-08
+half_of_the_last_printed_figure("2.115317e-5")  # 5e-12
+```
+
+Nadie puede aflojarla sin darse cuenta, y una edición futura que cite más cifras
+la aprieta sola.
+
+</details>
+
+Tres filas de conformidad registran cuánto de ese margen consume cada conjunto:
+un 55 % el primero, un 96 % el segundo y nada la identidad que ata la
+conductividad térmica y el calor específico a la difusividad impresa entre las
+dos. El 96 % es la densidad del segundo conjunto, y es el redondeo del propio
+anexo y no holgura de la biblioteca. Publicarlo como porcentaje significa que si
+algún cambio lo empuja fuera, se verá venir.
+
+## Dónde se usa este aire, y dónde no
+
+Pasar un `Fluid` a una función de medida es asunto de los paquetes que lo
+consumen, y viene con una regla que conviene enunciar aquí: donde una norma
+*fija* el aire de su propio procedimiento, usar un aire mejor es apartarse de la
+norma, y la biblioteca lo dice en vez de dejar que una medida deje de reproducir
+en silencio el documento que cita.
+
+Por eso las fórmulas de aire simplificadas de ISO 10534-2, ASTM E2611 e
+ISO 17497-1 se quedan en sus módulos con sus cláusulas, y por eso el número de
+Prandtl 0,71 de Johnson-Champoux-Allard sigue siendo 0,71 aunque el aire en ese
+estado tenga 0,728.
