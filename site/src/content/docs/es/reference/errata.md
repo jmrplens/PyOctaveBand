@@ -216,8 +216,8 @@ dos ediciones con las mismas entradas y en el mismo orden.
   Ec. (4.6) en el folio impreso 127; la densidad del agua de mar citada en el
   apartado 4.4 del folio impreso 177; Ec. (4.13) del folio impreso 135.
 - **Lo impreso:** la Ec. (4.6) da la densidad del agua de mar como
-  $\hat\rho = 1027 + 4{,}3\times10^{-7}\hat P_\mathrm{w} + 0{,}75[S-35]
-  - 0{,}16[\hat T-10] - 0{,}004[\hat T-10]^2$, atribuida a Pierce (1989,
+  $\hat\rho = 1027 + 4{,}3\times10^{-7}\hat P_\mathrm{w} + 0{,}75[S-35] -
+  0{,}16[\hat T-10] - 0{,}004[\hat T-10]^2$, atribuida a Pierce (1989,
   p. 34), con las unidades fijadas por las Ecs. (4.7) a (4.10) del folio 128:
   presión en pascales, temperatura en grados Celsius, densidad en kg/m³. La
   Ec. (4.4) del folio 127 define esa presión como

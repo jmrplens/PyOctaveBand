@@ -193,8 +193,8 @@ in the same order.
   Equation (4.6) on printed folio 127; the sea-water density quoted in
   Section 4.4 on printed folio 177; Equation (4.13) on printed folio 135.
 - **The print:** Equation (4.6) gives the density of sea water as
-  $\hat\rho = 1027 + 4{,}3\times10^{-7}\hat P_\mathrm{w} + 0{,}75[S-35]
-  - 0{,}16[\hat T-10] - 0{,}004[\hat T-10]^2$, attributed to Pierce (1989,
+  $\hat\rho = 1027 + 4{,}3\times10^{-7}\hat P_\mathrm{w} + 0{,}75[S-35] -
+  0{,}16[\hat T-10] - 0{,}004[\hat T-10]^2$, attributed to Pierce (1989,
   p. 34), with the units fixed by Equations (4.7) to (4.10) on folio 128:
   pressure in pascals, temperature in degrees Celsius, density in kg/m³.
   Equation (4.4) on folio 127 defines that pressure as
