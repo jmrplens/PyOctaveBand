@@ -254,12 +254,12 @@ duty = dict(volume_flow=5000 * CFM, fan_static_pressure_pa=2 * IN_WG,
             fan_type="forward_curved")
 
 # One line for one fan: the band spectrum.
-noise_control.fan_sound_power(relative_efficiency_percent=80.0, fan_static_pressure_pa=**duty).plot()
+noise_control.fan_sound_power(relative_efficiency_percent=80.0, **duty).plot()
 plt.show()
 
 fig, ax = plt.subplots()
 for efficiency in (90.0, 80.0, 55.0):
-    res = noise_control.fan_sound_power(relative_efficiency_percent=efficiency, fan_static_pressure_pa=**duty)
+    res = noise_control.fan_sound_power(relative_efficiency_percent=efficiency, **duty)
     ax.semilogx(res.frequencies, res.values, "o-",
                 label=f"{efficiency:.0f} % of peak")
 casing = noise_control.fan_casing_attenuation()

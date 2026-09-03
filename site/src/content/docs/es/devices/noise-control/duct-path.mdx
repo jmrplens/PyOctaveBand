@@ -265,12 +265,12 @@ servicio = dict(volume_flow=5000 * CFM, fan_static_pressure_pa=2 * IN_CA,
                 fan_type="forward_curved")
 
 # Una línea para un ventilador: el espectro por bandas.
-noise_control.fan_sound_power(relative_efficiency_percent=80.0, fan_static_pressure_pa=**servicio).plot(language="es")
+noise_control.fan_sound_power(relative_efficiency_percent=80.0, **servicio).plot(language="es")
 plt.show()
 
 fig, ax = plt.subplots()
 for rendimiento in (90.0, 80.0, 55.0):
-    res = noise_control.fan_sound_power(relative_efficiency_percent=rendimiento, fan_static_pressure_pa=**servicio)
+    res = noise_control.fan_sound_power(relative_efficiency_percent=rendimiento, **servicio)
     ax.semilogx(res.frequencies, res.values, "o-",
                 label=f"{rendimiento:.0f} % del máximo")
 carcasa = noise_control.fan_casing_attenuation()
