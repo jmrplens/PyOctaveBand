@@ -3,13 +3,13 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 609,
-    "passing": 609,
+    "checks": 613,
+    "passing": 613,
     "failing": 0,
-    "domains": 59,
-    "standards": 377,
-    "citations": 545,
-    "designations": 118,
+    "domains": 60,
+    "standards": 378,
+    "citations": 549,
+    "designations": 119,
     "sources": 84
   },
   "units": [
@@ -207,6 +207,12 @@
       "title": "Noise-induced hearing loss (ISO 1999)",
       "checks": 6,
       "passing": 6
+    },
+    {
+      "id": "hearing-protectors-iso-4869-2",
+      "title": "Hearing protectors (ISO 4869-2)",
+      "checks": 4,
+      "passing": 4
     },
     {
       "id": "multiple-shock-whole-body-vibration-iso-2631-5",
@@ -9168,6 +9174,106 @@
         "value": 0.0
       },
       "precision": 1,
+      "verdict": "pass"
+    },
+    {
+      "id": "hearing-protectors-iso-4869-2/iso-4869-2-2018-annex-a-table-a-1/assumed-protection-mean-and-spread-over-16-subjects-8-bands",
+      "domain": "hearing-protectors-iso-4869-2",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 4869-2",
+        "edition": "2018",
+        "clause": "Annex A, Table A.1",
+        "cite": "ISO 4869-2:2018 Annex A, Table A.1"
+      },
+      "quantity": "Assumed protection: mean and spread over 16 subjects, 8 bands",
+      "kind": "scalar",
+      "expected": {
+        "label": "m_f and s_f equal to Table A.1 at 1 dp, all 8 bands"
+      },
+      "computed": {
+        "label": "max deviation 0.000 dB"
+      },
+      "deviation": {
+        "value": 0.0,
+        "label": "0.000 dB"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "hearing-protectors-iso-4869-2/iso-4869-2-2018-formula-2-annex-b/octave-band-method-table-b-1-net-levels-and-l-p-a84",
+      "domain": "hearing-protectors-iso-4869-2",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 4869-2",
+        "edition": "2018",
+        "clause": "Formula (2), Annex B",
+        "cite": "ISO 4869-2:2018 Formula (2), Annex B"
+      },
+      "quantity": "Octave-band method: Table B.1 net levels and L'p,A84",
+      "kind": "scalar",
+      "expected": {
+        "label": "Table B.1 rows exact; L'p,A84 = 81.4 dB"
+      },
+      "computed": {
+        "label": "rows within 0.000 dB; 81.4 dB"
+      },
+      "deviation": {
+        "value": 0.0,
+        "label": "+0.000 dB"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "hearing-protectors-iso-4869-2/iso-4869-2-2018-formulae-12-to-15-annex-c/hml-method-16-subject-triples-statistics-and-h84-m84-l84",
+      "domain": "hearing-protectors-iso-4869-2",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 4869-2",
+        "edition": "2018",
+        "clause": "Formulae (12) to (15), Annex C",
+        "cite": "ISO 4869-2:2018 Formulae (12) to (15), Annex C"
+      },
+      "quantity": "HML method: 16 subject triples, statistics and H84/M84/L84",
+      "kind": "scalar",
+      "expected": {
+        "label": "Table C.2 exact; H84/M84/L84 = (24, 18, 13) dB"
+      },
+      "computed": {
+        "label": "within 0.000 dB; (24, 18, 13) dB"
+      },
+      "deviation": {
+        "value": 0.0,
+        "label": "0.000 dB"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "hearing-protectors-iso-4869-2/iso-4869-2-2018-formulae-16-to-24/hml-and-snr-applications-land-on-the-annexes-82-db",
+      "domain": "hearing-protectors-iso-4869-2",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 4869-2",
+        "edition": "2018",
+        "clause": "Formulae (16) to (24)",
+        "cite": "ISO 4869-2:2018 Formulae (16) to (24)"
+      },
+      "quantity": "HML and SNR applications land on the annexes' 82 dB",
+      "kind": "scalar",
+      "expected": {
+        "label": "PNR84 = 22,5 dB; SNR84 = 21 dB; both report 82 dB"
+      },
+      "computed": {
+        "label": "22.5 dB; 21 dB; 82 and 82 dB"
+      },
+      "deviation": {
+        "value": 0.0,
+        "label": "+0.000 dB"
+      },
+      "precision": 4,
       "verdict": "pass"
     },
     {

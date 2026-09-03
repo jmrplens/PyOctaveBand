@@ -16,7 +16,7 @@ import numpy as np
 
 from phonometry._plot.common import format_frequency_axis, theme_fill, theme_line
 
-from .i18n import _LANG
+from .i18n import _LANG, _fmt_minus
 from .theme import (
     COLOR_FG,
     COLOR_GRID,
@@ -3903,4 +3903,165 @@ def generate_sti_occupancy_adjustment(output_dir: str) -> None:
     fig.align_ylabels((ax, ax_delta))
     plt.tight_layout()
     save_figure(output_dir, "sti_occupancy_adjustment.svg")
+    plt.close()
+
+
+def generate_hearing_protector_methods(output_dir: str) -> None:
+    """ISO 4869-2: the assumed protection values, and the three methods on one noise."""
+    print("Generating hearing_protector_methods...")
+    from phonometry import hearing
+
+    # Annex A: 16 subjects, eight octave bands, the example the whole of
+    # ISO 4869-2 is worked on.
+    attenuation = np.array(
+        [
+            [4, 8, 13, 18, 20, 30, 35, 30],
+            [6, 12, 16, 21, 29, 35, 47, 35],
+            [10, 16, 17, 23, 25, 32, 48, 37],
+            [3, 7, 12, 18, 20, 25, 33, 30],
+            [8, 10, 16, 16, 25, 27, 43, 32],
+            [4, 7, 10, 15, 19, 32, 35, 31],
+            [5, 5, 9, 16, 20, 25, 30, 28],
+            [15, 15, 21, 26, 25, 38, 46, 38],
+            [5, 6, 10, 13, 19, 22, 29, 28],
+            [9, 9, 10, 19, 20, 27, 37, 31],
+            [9, 16, 18, 24, 25, 35, 44, 39],
+            [5, 6, 11, 12, 17, 20, 28, 28],
+            [7, 10, 17, 22, 25, 35, 41, 44],
+            [6, 8, 16, 18, 19, 19, 30, 33],
+            [10, 12, 17, 25, 28, 33, 45, 40],
+            [12, 13, 17, 27, 29, 38, 49, 41],
+        ],
+        dtype=float,
+    )
+    noise = np.array([75.0, 84.0, 86.0, 88.0, 97.0, 99.0, 97.0, 96.0])
+    l_p_a, l_p_c = 104.0, 103.0
+
+    apv = hearing.assumed_protection_value(attenuation)
+    hml = hearing.hml_rating(attenuation)
+    snr = hearing.snr_rating(attenuation)
+    octave = hearing.octave_band_protected_level(noise, apv)
+    by_hml = hearing.hml_protected_level(l_p_a, l_p_c, hml)
+    by_snr = hearing.snr_protected_level(snr, l_p_c=l_p_c)
+
+    _fig, (ax_apv, ax_hml) = plt.subplots(1, 2, figsize=(13.0, 5.6))
+    freqs = np.asarray(apv.frequencies)
+    x = np.arange(freqs.size)
+
+    # Left: what one protector is, once the spread over people is taken off.
+    ax_apv.fill_between(
+        x,
+        apv.mean_attenuation - apv.standard_deviation,
+        apv.mean_attenuation + apv.standard_deviation,
+        color=theme_fill(COLOR_PRIMARY, ax_apv),
+        zorder=1,
+        label=r"$m_f \pm s_f$",
+    )
+    ax_apv.plot(
+        x,
+        apv.mean_attenuation,
+        "-o",
+        color=COLOR_PRIMARY,
+        linewidth=2.4,
+        markersize=6,
+        zorder=4,
+        label=r"mean attenuation $m_f$",
+    )
+    ax_apv.plot(
+        x,
+        apv.apv,
+        "--s",
+        color=COLOR_SECONDARY,
+        linewidth=2.4,
+        markersize=6,
+        zorder=5,
+        label=r"$APV_{f84} = m_f - s_f$",
+    )
+    ax_apv.set_xticks(x)
+    ax_apv.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, fontsize=8)
+    ax_apv.set_xlabel(LABEL_FREQ_HZ)
+    ax_apv.set_ylabel("Sound attenuation [dB]")
+    ax_apv.set_title("What 84 % of wearers get (Clause 5)", pad=12)
+    ax_apv.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax_apv.set_axisbelow(True)
+    ax_apv.legend(loc="upper left", fontsize=9, framealpha=1.0, facecolor=COLOR_PANEL)
+
+    # Right: the HML line, the eight reference noises it was fitted on, and
+    # where this particular noise lands on it.
+    high, medium, low = hml.reported
+    left = np.array([-4.0, 2.0])
+    right = np.array([2.0, 12.0])
+    ax_hml.plot(
+        left,
+        medium - (high - medium) / 4.0 * (left - 2.0),
+        color=COLOR_PRIMARY,
+        linewidth=2.6,
+        zorder=4,
+        label=rf"$PNR_{{84}}$ from $H$={high}, $M$={medium}, $L$={low} dB",
+    )
+    ax_hml.plot(
+        right,
+        medium - (medium - low) / 8.0 * (right - 2.0),
+        color=COLOR_PRIMARY,
+        linewidth=2.6,
+        zorder=4,
+    )
+    ax_hml.plot(
+        [-2.0, 2.0, 10.0],
+        [high, medium, low],
+        "o",
+        color=COLOR_SECONDARY,
+        markersize=9,
+        zorder=6,
+        label=r"$H$, $M$, $L$ anchors",
+    )
+    differences = np.asarray(hearing.HML_REFERENCE_C_MINUS_A)
+    ax_hml.plot(
+        np.repeat(differences, hml.predicted_reduction.shape[0]),
+        hml.predicted_reduction.T.reshape(-1),
+        ".",
+        color=COLOR_TERTIARY,
+        markersize=4,
+        alpha=0.5,
+        zorder=2,
+        label="the 8 reference noises, per subject",
+    )
+    ax_hml.axvline(
+        l_p_c - l_p_a,
+        color=COLOR_FG,
+        linestyle=":",
+        linewidth=1.8,
+        zorder=3,
+        label=f"this noise, $L_{{p,C}} - L_{{p,A}}$ = {_fmt_minus(l_p_c - l_p_a, '.0f')} dB",
+    )
+    ax_hml.set_xlabel(r"$L_{p,C} - L_{p,A}$ [dB]")
+    ax_hml.set_ylabel("Predicted noise level reduction [dB]")
+    ax_hml.set_title("The same protector, judged three ways", pad=12)
+    ax_hml.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax_hml.set_axisbelow(True)
+    ax_hml.legend(loc="upper right", fontsize=9, framealpha=1.0, facecolor=COLOR_PANEL)
+
+    ax_hml.text(
+        0.03,
+        0.03,
+        "\n".join(
+            (
+                rf"octave band: $L'_{{p,A84}}$ = {octave.reported_level} dB",
+                rf"HML: {by_hml.reported_level} dB",
+                rf"SNR ({snr.reported} dB): {by_snr.reported_level} dB",
+            )
+        ),
+        transform=ax_hml.transAxes,
+        va="bottom",
+        ha="left",
+        fontsize=11,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "hearing_protector_methods.png")
     plt.close()

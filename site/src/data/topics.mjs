@@ -172,6 +172,7 @@ export const topics = [
           'perception/hearing/hearing-threshold',
           'perception/hearing/noise-induced-hearing-loss',
           'perception/hearing/occupational-exposure',
+          'perception/hearing/hearing-protectors',
         ],
       },
       apiGroup('psychoacoustics', 'speech', 'hearing'),

@@ -142,6 +142,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.hearing.threshold",
             "phonometry.hearing.noise_induced_hearing_loss",
             "phonometry.hearing.occupational_exposure",
+            "phonometry.hearing.hearing_protectors",
         ),
     ),
     Section(

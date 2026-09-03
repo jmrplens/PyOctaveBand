@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 609 numerical conformance checks against 377 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 613 numerical conformance checks against 378 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 609 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 59 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 613 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 60 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -118,6 +118,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Hearing threshold (age and reference zero)](https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/)
 - [Occupational Noise Exposure (ISO 9612)](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/)
 - [Noise-induced hearing loss (ISO 1999)](https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/)
+- [Hearing Protectors (ISO 4869-2)](https://jmrplens.github.io/phonometry/perception/hearing/hearing-protectors/)
 
 ## Rooms and buildings
 
@@ -449,6 +450,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [filters/phonometry](https://jmrplens.github.io/phonometry/reference/api/filters/phonometry/)
 - [filters/weighting](https://jmrplens.github.io/phonometry/reference/api/filters/weighting/)
 - [filters/weighting-compliance](https://jmrplens.github.io/phonometry/reference/api/filters/weighting-compliance/)
+- [hearing/hearing-protectors](https://jmrplens.github.io/phonometry/reference/api/hearing/hearing-protectors/)
 - [hearing/noise-induced-hearing-loss](https://jmrplens.github.io/phonometry/reference/api/hearing/noise-induced-hearing-loss/)
 - [hearing/occupational-exposure](https://jmrplens.github.io/phonometry/reference/api/hearing/occupational-exposure/)
 - [hearing/threshold](https://jmrplens.github.io/phonometry/reference/api/hearing/threshold/)
@@ -30974,6 +30976,139 @@ tracked in [CONFORMANCE.md](https://jmrplens.github.io/phonometry/reference/conf
 ---
 
 
+<!-- source: docs/perception/hearing/hearing-protectors.md | canonical: https://jmrplens.github.io/phonometry/perception/hearing/hearing-protectors/ -->
+Source: https://jmrplens.github.io/phonometry/perception/hearing/hearing-protectors/
+
+# Hearing Protectors (ISO 4869-2)
+
+A hearing protector is not measured on a coupler. ISO 4869-1 seats it on at
+least sixteen people and records the threshold shift each of them gets, so what
+comes back from the laboratory is a **distribution**: one attenuation per
+subject per octave band, with a spread that is often a third of the mean.
+ISO 4869-2 is the standard that turns that distribution into a number someone
+can act on, and the first thing it does is refuse to use the mean.
+
+## The distribution first (Clause 5)
+
+Every method starts from the assumed protection value, the mean attenuation
+reduced by a multiple of its own spread:
+
+$$
+APV_{fx} = m_f - \alpha\, s_f
+$$
+
+$\alpha$ is the inverse standard normal cumulative distribution at the
+protection performance $x$ (Table 1), so $APV_{f84}$ with $\alpha = 1$ is the
+attenuation 84 % of wearers reach or beat, and $APV_{f98}$ with $\alpha = 2$ is
+what all but one in fifty reach.
+
+```python
+import numpy as np
+from phonometry import hearing
+
+# ISO 4869-1 attenuation: 16 subjects, eight octave bands from 63 Hz to 8 kHz.
+attenuation = np.array([
+    [4, 8, 13, 18, 20, 30, 35, 30],   [6, 12, 16, 21, 29, 35, 47, 35],
+    [10, 16, 17, 23, 25, 32, 48, 37], [3, 7, 12, 18, 20, 25, 33, 30],
+    [8, 10, 16, 16, 25, 27, 43, 32],  [4, 7, 10, 15, 19, 32, 35, 31],
+    [5, 5, 9, 16, 20, 25, 30, 28],    [15, 15, 21, 26, 25, 38, 46, 38],
+    [5, 6, 10, 13, 19, 22, 29, 28],   [9, 9, 10, 19, 20, 27, 37, 31],
+    [9, 16, 18, 24, 25, 35, 44, 39],  [5, 6, 11, 12, 17, 20, 28, 28],
+    [7, 10, 17, 22, 25, 35, 41, 44],  [6, 8, 16, 18, 19, 19, 30, 33],
+    [10, 12, 17, 25, 28, 33, 45, 40], [12, 13, 17, 27, 29, 38, 49, 41],
+], dtype=float)
+
+apv = hearing.assumed_protection_value(attenuation)          # x = 84 % by default
+print(np.round(apv.apv, 1))    # [ 4.1  6.4 10.7 14.9 18.8 23.4 31.3 28.9]
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_protector_methods_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_protector_methods.svg" alt="Left: the mean sound attenuation of a hearing protector across the eight octave bands from 63 Hz to 8 kHz, with its standard deviation shaded either side and the assumed protection value for 84 % of wearers drawn a full standard deviation below the mean. Right: the predicted noise level reduction as a function of the difference between the C-weighted and A-weighted levels of the noise, drawn as two straight segments through the H, M and L anchors, with the eight reference noises scattered at their own differences and the three methods' answers for one noise boxed" width="92%"></picture>
+
+*Left, the protector: the assumed protection value sits a full standard
+deviation below the mean, and the gap is widest where the spread is, at 4 kHz.
+Right, the method: the HML line and the eight reference noises it was fitted
+on, with the three methods' answers for the same noise.*
+
+## Three methods, in decreasing order of what they need
+
+**The octave-band method (Clause 6)** is the most faithful and the only one
+that sees the shape of the noise: subtract the assumed protection value band by
+band from the A-weighted spectrum and sum what is left (Formula (2)).
+
+**The HML method (Clause 7)** collapses the protector to three numbers, the
+predicted noise level reduction it gives for reference noises whose
+$(L_{p,C} - L_{p,A})$ is $-2$, $+2$ and $+10$ dB, fitted across the eight
+reference spectra of Table 2. Applying them needs only the C- and A-weighted
+levels of the real noise, through two straight segments that meet at $+2$ dB.
+
+**The SNR method (Clause 8)** collapses it to one number against a pink noise
+and subtracts it from the C-weighted level.
+
+```python
+noise = [75.0, 84.0, 86.0, 88.0, 97.0, 99.0, 97.0, 96.0]   # LpA = 104, LpC = 103 dB
+octave = hearing.octave_band_protected_level(noise, apv)
+hml = hearing.hml_rating(attenuation)
+snr = hearing.snr_rating(attenuation)
+
+print(octave.reported_level)                                          # 81
+print(hml.reported)                                                   # (24, 18, 13)
+print(hearing.hml_protected_level(104.0, 103.0, hml).reported_level)  # 82
+print(snr.reported)                                                   # 21
+print(hearing.snr_protected_level(snr, l_p_c=103.0).reported_level)   # 82
+```
+
+The three answer the same question and rarely agree exactly: 81 dB, 82 dB and
+82 dB for one protector in one noise. Clause 1's own NOTE puts differences of
+3 dB or less between comparable protectors below the resolution of the
+exercise. The ordering is not a ranking: the octave-band method uses more
+information and is the one to prefer when the spectrum is available, while HML
+and SNR exist precisely for when it is not.
+
+The values that enter the HML and SNR applications are the **rounded** ones:
+Clauses 7.2 and 8.2 round the ratings to the nearest integer, which is what a
+protector is published with. The octave-band method starts at 63 Hz when both the
+noise and the protector have data there and at 125 Hz when either does not
+(Clause 6); the HML and SNR computations start at 125 Hz always.
+
+One caution about the reference spectra: Annex C reprints Table 2 as its
+Table C.1 and the reprint disagrees with the original in two cells. Table 2 is
+the one that reproduces the annex's own worked results, and it is the one this
+library carries; the discrepancy is registered in [ERRATA](https://jmrplens.github.io/phonometry/reference/errata/).
+
+## References
+
+- International Organization for Standardization (2018). *Acoustics — Hearing
+  protectors — Part 2: Estimation of effective A-weighted sound pressure levels
+  when hearing protectors are worn* (ISO 4869-2:2018).
+  [iso.org catalogue](https://www.iso.org/standard/65582.html).
+  The implemented standard: Clauses 5 to 8 and the worked examples of
+  Annexes A to D.
+- International Organization for Standardization (2018). *Acoustics — Hearing
+  protectors — Part 1: Subjective method for the measurement of sound
+  attenuation* (ISO 4869-1:2018).
+  [iso.org catalogue](https://www.iso.org/standard/65581.html).
+  Where the per-subject attenuation values come from.
+
+## Standards
+
+ISO 4869-2:2018, which defines the assumed protection value $APV_{fx}$
+(Clause 5), the octave-band method (Clause 6), the $H$, $M$ and $L$ values
+(Clause 7) and the single number rating $SNR$ (Clause 8). The attenuation they
+all start from is measured to ISO 4869-1:2018.
+
+## See also
+
+- [Occupational Noise Exposure (ISO 9612)](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/): the daily
+  exposure level the protected level feeds into.
+- [Noise-induced hearing loss (ISO 1999)](https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/): what
+  the exposure the protector did not stop does over a working life.
+- [Hearing threshold (age and reference zero)](https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/): the
+  baseline any protected exposure is judged against.
+- API reference: [`hearing.hearing_protectors`](https://jmrplens.github.io/phonometry/reference/api/hearing/hearing-protectors/).
+
+---
+
+
 <!-- source: docs/perception/hearing/hearing-threshold.md | canonical: https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/ -->
 Source: https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/
 
@@ -31261,6 +31396,9 @@ In the order the chain runs.
 - **Damage** — [Noise-induced hearing loss (ISO 1999)](https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/):
   NIPTS and its population distribution, and the combination with age into
   HTLAN.
+- **Protection** — [Hearing Protectors (ISO 4869-2)](https://jmrplens.github.io/phonometry/perception/hearing/hearing-protectors/):
+  the octave-band, HML and SNR methods that say what a protector actually
+  leaves at the ear, and the assumed protection value all three start from.
 
 ## What this section does not cover
 
@@ -36415,6 +36553,15 @@ documents, one page per module.
 | `table_c4_contribution` | `function` | **Sampling contribution c₁u₁ [dB] from Table C.4 (ISO 9612 job/full-day).**<br>• `n_samples`: N (clamped to [3, 30])<br>• `u1`: sampling standard uncertainty [dB]<br>• bilinear interpolation, anchored at u₁ = 0 | `table_c4_contribution(6, 2.0)  # 1.4` |
 | `minimum_cumulative_duration_hours` | `function` | **Minimum cumulative measurement duration [h] (ISO 9612 Table 1).**<br>• `n_workers`: group size n_G (> 40 → 17 h; the standard advises splitting the group) | `minimum_cumulative_duration_hours(18)  # 10.75` |
 | `COVERAGE_FACTOR` | `float` | **ISO 9612 coverage factor k = 1.65 (Clause 14).**<br>One-sided 95 % confidence: U = 1.65 u, upper limit LEX,8h + U | `COVERAGE_FACTOR  # 1.65` |
+| `assumed_protection_value` | `function` | **Assumed protection value APVfx = mf − α·sf (ISO 4869-2 Clause 5, Formula (1)).**<br>• `attenuation`: `(subjects, bands)` ISO 4869-1 grid [dB]<br>• `performance`: 50/75/80/84/90/95/98 % from Table 1 (Default: 84)<br>• `frequencies`: mid-band [Hz] (Default: the eight octaves from 63 Hz) | `apv = hearing.assumed_protection_value(grid)`<br><br>• `AssumedProtectionResult` (`apv`, `mean_attenuation`, `standard_deviation`, `alpha`, `subjects`) |
+| `octave_band_protected_level` | `function` | **Effective A-weighted level, octave-band method (ISO 4869-2 Formula (2)).**<br>• `noise_levels`: unweighted octave-band levels [dB]<br>• `apv`: assumed protection values or the result carrying them<br>• `a_weighting`: [dB] (Default: IEC 61672-1 Table 3) | `res = hearing.octave_band_protected_level(noise, apv)`<br><br>• `ProtectedLevelResult` (`effective_level`, `reported_level`, `noise_reduction`, `band_levels`) |
+| `hml_rating` / `hml_protected_level` | `function` | **H, M and L values and their application (ISO 4869-2 Clause 7).**<br>• `hml_rating(attenuation, performance=84)`: Formulae (3)-(15) over the eight reference noises of Table 2<br>• `hml_protected_level(l_p_a, l_p_c, rating)`: Formulae (16)-(18), consuming the rounded triple | `res = hearing.hml_protected_level(104.0, 103.0, hearing.hml_rating(grid))`<br><br>• `HMLRatingResult` (`high`, `medium`, `low`, `reported`, `subject_h/m/l`, `predicted_reduction`) |
+| `snr_rating` / `snr_protected_level` | `function` | **Single number rating and its application (ISO 4869-2 Clause 8).**<br>• `snr_rating(attenuation, performance=84)`: Formulae (19)-(22) against the pink noise of Table 3<br>• `snr_protected_level(rating, l_p_c=...)`: Formula (23); or `l_p_a=` with `c_minus_a=` for Formula (24) | `res = hearing.snr_protected_level(hearing.snr_rating(grid), l_p_c=103.0)`<br><br>• `SNRRatingResult` (`snr`, `reported`, `subject_snr`, `mean`, `standard_deviation`) |
+| `AssumedProtectionResult` / `HMLRatingResult` / `SNRRatingResult` / `ProtectedLevelResult` | `dataclass` | **ISO 4869-2 protector results.**<br>• Ratings expose the unrounded fit and `reported`, the integer the standard publishes<br>• `ProtectedLevelResult.reported_level` rounds halves away from zero, not to even | `apv = hearing.assumed_protection_value(grid)` |
+| `PROTECTION_PERFORMANCES` | `dict` | **Table 1: the constant α for each protection performance x (ISO 4869-2).**<br>50 → 0.00, 75 → 0.67, 80 → 0.84, 84 → 1.00, 90 → 1.28, 95 → 1.64, 98 → 2.00 | `hearing.PROTECTION_PERFORMANCES[84]` |
+| `PROTECTOR_OCTAVE_BANDS` / `PROTECTOR_A_WEIGHTING` | `tuple` | **The eight octave bands of Formula (2) and frequency weighting A at them.**<br>63 Hz to 8 kHz; the weighting is IEC 61672-1:2013 Table 3, which ISO 4869-2 reprints as its Table B.1 | `hearing.PROTECTOR_OCTAVE_BANDS` |
+| `HML_REFERENCE_NOISES` / `HML_REFERENCE_C_MINUS_A` / `HML_REFERENCE_D` | `tuple` | **Table 2: the eight reference noises the HML method is fitted on.**<br>A-weighted octave-band levels 125 Hz to 8 kHz, their (LpC − LpA) and the empirical weights d | `hearing.HML_REFERENCE_NOISES` |
+| `PINK_NOISE_A_WEIGHTED` | `tuple` | **Table 3: the pink noise the SNR method is defined against.**<br>A-weighted octave-band levels 125 Hz to 8 kHz of a pink noise whose C-weighted level is 100 dB | `hearing.PINK_NOISE_A_WEIGHTED` |
 | `INSTRUMENT_U2` | `mapping` | **Instrument standard uncertainty u2 [dB] (ISO 9612 Table C.5).**<br>Keyed by `'class1'` (0.7), `'class2'` (1.5), `'personal_exposimeter'` (1.5) | `INSTRUMENT_U2['class1']  # 0.7` |
 | `OccupationalExposureWarning` | `warning class` | **ISO 9612 sampling advisory.**<br>Emitted for the 3 dB task spread (Clause 9.3), c₁u₁ > 3.5 dB (Clause 10.4) or a short Table 1 cumulative duration | `warnings.simplefilter('error', OccupationalExposureWarning)` |
 | `SoundPowerWarning` | `warning class` | **ISO 3744/3746/3741/9614-2 qualification issue.**<br>Emitted when the background margin is below the criterion, K2 exceeds the validity limit, a band's power is negative, or the room fails qualification; levels are then upper bounds | `warnings.simplefilter('error', SoundPowerWarning)` |
@@ -51439,7 +51586,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 609 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 613 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -51806,7 +51953,7 @@ sample from the metrology core:
 | IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()`; IEC 61252:2025 has since superseded this print, and the transcription still targets the 1993+A2 text | `tests/signals/test_levels.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-609 numerical conformance checks across 59 domains and 377 standards, covering
+613 numerical conformance checks across 60 domains and 378 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise

@@ -3987,6 +3987,36 @@ in the same order.
   implementation of Annex I does not carry the exponents as printed.
 - **Status:** unreported.
 
+## ISO 4869-2:2018, Table C.1 (the reprint that disagrees with the table it reprints)
+
+- **Location:** Annex C (informative), Table C.1, "A-weighted octave-band sound
+  pressure levels, $L_{p,\mathrm{A}f(k)i}$, **from Table 2**", PDF page 17
+  (printed p. 11), against the normative Table 2 it names, PDF page 11
+  (printed p. 5).
+- **The print:** the two tables carry the same eight reference noises over the
+  same seven octave bands, and seven of the eight rows agree digit for digit.
+  The sixth reads 82,0 / **89,3** / **93,3** / 95,6 / 93,0 / 90,1 / 83,0 in
+  Table 2 and 82,0 / **89,4** / **93,5** / 95,6 / 93,0 / 90,1 / 83,0 in
+  Table C.1. The 250 Hz and 500 Hz cells differ; nothing else does.
+- **The problem:** Table C.1 states in its own caption that it comes from
+  Table 2, so one of the two is wrong, and the annex's own results say which.
+  Formula (15) applied to the sixteen attenuation values of Table A.1 with
+  Table 2's row reproduces all sixteen $PNR_{j6}$ of Table C.2 exactly; with
+  Table C.1's row, thirteen of the sixteen fall 0,1 dB short. Table 2 is
+  therefore the reading the worked example was computed from, and it is also
+  the normative one, Table C.1 being an informative reprint. An implementer
+  who takes the reference spectra from Annex C, where they sit next to the
+  worked example, gets a protector's $H$ and $M$ values a tenth of a decibel
+  low.
+- **Evidence:** Formula (15), PDF page 11 (printed p. 5), evaluated on
+  Table A.1, PDF page 15 (printed p. 9), against the sixth row of Table C.2,
+  PDF page 18 (printed p. 12), all of ISO 4869-2:2018.
+- **Library behaviour:** `HML_REFERENCE_NOISES` carries Table 2. The test
+  suite computes the same row from Table C.1's values and asserts that it
+  misses thirteen of the printed sixteen, so the two readings can never be
+  silently swapped.
+- **Status:** unreported.
+
 ## Related source properties that are not errata
 
 Recorded here to prevent future "fixes" that would break agreement with the

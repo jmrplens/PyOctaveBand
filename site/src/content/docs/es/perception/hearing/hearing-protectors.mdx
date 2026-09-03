@@ -1,0 +1,260 @@
+---
+title: "Protectores auditivos (ISO 4869-2)"
+description: "Los tres métodos de la ISO 4869-2 que convierten la atenuación medida de un protector auditivo en el nivel efectivo ponderado A que queda en el oído: el método por bandas de octava, los valores HML y el índice de número único, todos construidos sobre el valor de protección supuesta."
+references:
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2018
+    title: "Acoustics — Hearing protectors — Part 2: Estimation of effective A-weighted sound pressure levels when hearing protectors are worn"
+    designation: "ISO 4869-2:2018"
+    url: "https://www.iso.org/standard/65582.html"
+    note: "La norma implementada: el valor de proteccion supuesta del apartado 5, el metodo por bandas de octava del apartado 6, el metodo HML del apartado 7 y el metodo SNR del apartado 8, validados contra los ejemplos trabajados de los anexos A a D."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2018
+    title: "Acoustics — Hearing protectors — Part 1: Subjective method for the measurement of sound attenuation"
+    designation: "ISO 4869-1:2018"
+    url: "https://www.iso.org/standard/65581.html"
+    note: "De donde salen las atenuaciones por sujeto: la atenuacion en oido real en el umbral, medida sobre al menos 16 sujetos, que es la entrada de la que parte todo metodo de esta pagina."
+---
+
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import SeeAlso from '../../../../../components/SeeAlso.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+Un protector auditivo no se mide sobre un acoplador. La ISO 4869-1 lo coloca a
+un mínimo de dieciséis personas y registra el desplazamiento del umbral que
+consigue cada una, así que lo que vuelve del laboratorio es una
+**distribución**: una atenuación por sujeto y banda de octava, con una
+dispersión que a menudo es un tercio de la media. La ISO 4869-2 es la norma que
+convierte esa distribución en un número con el que se puede actuar, y lo
+primero que hace es negarse a usar la media.
+
+## Primero la distribución (apartado 5)
+
+Todos los métodos parten del valor de protección supuesta, la atenuación media
+reducida en un múltiplo de su propia dispersión:
+
+$$
+APV_{fx} = m_f - \alpha\, s_f
+$$
+
+$\alpha$ es la inversa de la distribución normal acumulada estándar en el
+rendimiento de protección $x$ (Tabla 1), así que $APV_{f84}$ con $\alpha = 1$
+es la atenuación que alcanza o supera el 84 % de los usuarios, y $APV_{f98}$
+con $\alpha = 2$ es la que alcanzan todos menos uno de cada cincuenta. Citar un
+protector por su media sería describir a un usuario que no existe.
+
+```python
+import numpy as np
+from phonometry import hearing
+
+# Atenuación ISO 4869-1 de un protector: 16 sujetos, ocho bandas de octava de
+# 63 Hz a 8 kHz. Es el ejemplo sobre el que los anexos A a D de la ISO 4869-2
+# trabajan de principio a fin.
+atenuacion = np.array([
+    [4, 8, 13, 18, 20, 30, 35, 30],   [6, 12, 16, 21, 29, 35, 47, 35],
+    [10, 16, 17, 23, 25, 32, 48, 37], [3, 7, 12, 18, 20, 25, 33, 30],
+    [8, 10, 16, 16, 25, 27, 43, 32],  [4, 7, 10, 15, 19, 32, 35, 31],
+    [5, 5, 9, 16, 20, 25, 30, 28],    [15, 15, 21, 26, 25, 38, 46, 38],
+    [5, 6, 10, 13, 19, 22, 29, 28],   [9, 9, 10, 19, 20, 27, 37, 31],
+    [9, 16, 18, 24, 25, 35, 44, 39],  [5, 6, 11, 12, 17, 20, 28, 28],
+    [7, 10, 17, 22, 25, 35, 41, 44],  [6, 8, 16, 18, 19, 19, 30, 33],
+    [10, 12, 17, 25, 28, 33, 45, 40], [12, 13, 17, 27, 29, 38, 49, 41],
+], dtype=float)
+
+apv = hearing.assumed_protection_value(atenuacion)          # x = 84 % por defecto
+print(np.round(apv.mean_attenuation, 1))    # [ 7.4 10.  14.4 19.6 22.8 29.6 38.8 34.1]
+print(np.round(apv.standard_deviation, 1))  # [3.3 3.6 3.6 4.6 4.  6.2 7.4 5.2]
+print(np.round(apv.apv, 1))                 # [ 4.1  6.4 10.7 14.9 18.8 23.4 31.3 28.9]
+
+# Un rendimiento más estricto resta más de esa misma dispersión.
+estricto = hearing.assumed_protection_value(atenuacion, performance=98)
+print(np.round(apv.apv - estricto.apv, 1))  # [3.3 3.6 3.6 4.6 4.  6.2 7.4 5.2]
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_protector_methods_es.svg" alt="Izquierda: la atenuación acústica media de un protector auditivo a lo largo de las ocho bandas de octava de 63 Hz a 8 kHz, con su desviación típica sombreada a ambos lados y el valor de protección supuesta para el 84 % de los usuarios dibujado una desviación típica completa por debajo de la media. Derecha: la reducción prevista del nivel de ruido en función de la diferencia entre los niveles ponderados C y A del ruido, dibujada como dos segmentos rectos por las anclas H, M y L, con los ocho ruidos de referencia dispersos en sus propias diferencias y las respuestas de los tres métodos para un ruido recuadradas" width="92%" loading="eager" />
+
+*A la izquierda, el protector: el valor de protección supuesta queda una
+desviación típica completa por debajo de la media, y la separación es mayor
+donde lo es la dispersión, en 4 kHz. A la derecha, el método: la recta HML y
+los ocho ruidos de referencia con los que se ajustó, con las respuestas de los
+tres métodos para el mismo ruido.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# apv es el AssumedProtectionResult calculado arriba. Una línea:
+apv.plot(language="es")   # media, dispersión sombreada y la protección supuesta
+plt.show()
+
+# El lado HML, a mano.
+hml = hearing.hml_rating(atenuacion)
+alta, media, baja = hml.reported
+izda, dcha = np.array([-4.0, 2.0]), np.array([2.0, 12.0])
+fig, ax = plt.subplots()
+ax.plot(izda, media - (alta - media) / 4 * (izda - 2), color="#1f77b4")
+ax.plot(dcha, media - (media - baja) / 8 * (dcha - 2), color="#1f77b4")
+ax.plot([-2, 2, 10], [alta, media, baja], "o", color="#d62728", label="H, M, L")
+diferencias = np.asarray(hearing.HML_REFERENCE_C_MINUS_A)
+ax.plot(np.repeat(diferencias, 16), hml.predicted_reduction.T.reshape(-1), ".",
+        color="#2ca02c", alpha=0.5, label="ruidos de referencia")
+ax.set(xlabel="LpC - LpA [dB]", ylabel="Reducción prevista del nivel de ruido [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## Tres métodos, en orden decreciente de lo que necesitan saber
+
+### El método por bandas de octava (apartado 6)
+
+El más fiel, y el único que ve la forma del ruido: se resta el valor de
+protección supuesta banda a banda del espectro ponderado A y se suma lo que
+queda.
+
+$$
+L'_{p,Ax} = 10 \lg \sum_{k=1}^{8} 10^{0,1\left(L_{p,f(k)} + A_{f(k)} - APV_{f(k)x}\right)}\ \mathrm{dB}
+$$
+
+```python
+# El ruido del anexo B: niveles por banda de octava de una nave, LpA = 104 dB.
+ruido = [75.0, 84.0, 86.0, 88.0, 97.0, 99.0, 97.0, 96.0]
+octava = hearing.octave_band_protected_level(ruido, apv)
+print(round(octava.effective_level, 1))   # 81.4
+print(octava.reported_level)              # 81
+print(round(octava.noise_reduction, 1))   # 22.6
+```
+
+El sumatorio recorre las ocho octavas desde 63 Hz, o siete desde 125 Hz cuando
+el ruido o el protector no tienen dato en 63 Hz. El apartado 6 redondea el
+resultado al entero más próximo, que es lo que hace `reported_level`;
+`effective_level` conserva el valor sin redondear.
+
+### El método HML (apartado 7)
+
+Tres números en lugar de un espectro. $H$, $M$ y $L$ son la reducción prevista
+del nivel de ruido que da este protector para ruidos de referencia cuya
+$(L_{p,C} - L_{p,A})$ vale $-2$, $+2$ y $+10$ dB, ajustados sobre los ocho
+espectros de referencia de la Tabla 2. Aplicarlos solo necesita los niveles
+ponderados C y A del ruido real:
+
+$$
+PNR_x = M_x - \frac{H_x - M_x}{4}\left(L_{p,C} - L_{p,A} - 2\right)
+\quad\text{si } (L_{p,C} - L_{p,A}) \leq 2\ \mathrm{dB}
+$$
+
+$$
+PNR_x = M_x - \frac{M_x - L_x}{8}\left(L_{p,C} - L_{p,A} - 2\right)
+\quad\text{en otro caso},\qquad L'_{p,Ax} = L_{p,A} - PNR_x
+$$
+
+```python
+hml = hearing.hml_rating(atenuacion)
+print(hml.reported)                       # (24, 18, 13)
+
+por_hml = hearing.hml_protected_level(104.0, 103.0, hml)
+print(round(por_hml.noise_reduction, 1))  # 22.5
+print(por_hml.reported_level)             # 82
+```
+
+Las dos ramas se encuentran en $+2$ dB, que es donde se define la propia $M$,
+así que la recta tiene un codo y no un salto. Los valores que entran en ellas
+son los **redondeados**: el apartado 7.2 redondea $H$, $M$ y $L$ al entero más
+próximo, que es con lo que se publica un protector, así que es lo que consume
+la aplicación.
+
+### El método SNR (apartado 8)
+
+Un número, contra un ruido rosa, restado del nivel ponderado C.
+
+$$
+L'_{p,Ax} = L_{p,C} - SNR_x
+$$
+
+```python
+snr = hearing.snr_rating(atenuacion)
+print(snr.reported)                       # 21
+
+por_snr = hearing.snr_protected_level(snr, l_p_c=103.0)
+print(por_snr.reported_level)             # 82
+
+# Cuando solo se registró el nivel ponderado A, la Fórmula (24) reconstruye el
+# ponderado C a partir de una estimación de la diferencia y cae en el mismo sitio.
+print(hearing.snr_protected_level(snr, l_p_a=104.0, c_minus_a=-1.0).reported_level)  # 82
+```
+
+Como el ruido de referencia es fijo, el índice no dice nada de la forma del
+ruido con el que se va a encontrar, que es justo lo que recuperan los tres
+valores del método HML.
+
+## A qué número hacer caso
+
+Los tres métodos responden a la misma pregunta y rara vez coinciden exactamente.
+Con el ejemplo de arriba, el mismo protector en el mismo ruido da **81 dB,
+82 dB y 82 dB**, y la propia NOTA del apartado 1 sitúa las diferencias de 3 dB
+o menos entre protectores comparables por debajo de la resolución del
+ejercicio. El orden no es una clasificación: el método por bandas de octava usa
+más información y es el preferible cuando se tiene el espectro, mientras que
+HML y SNR existen precisamente para cuando no se tiene.
+
+El método por bandas de octava arranca en 63 Hz cuando el ruido y el protector
+tienen dato ahí, y en 125 Hz cuando alguno no lo tiene (apartado 6). Los
+cálculos HML y SNR arrancan siempre en 125 Hz, haya lo que haya en 63 Hz, que
+es la razón de que los espectros de referencia de la Tabla 2 (apartado 7) y de
+la Tabla 3 (apartado 8) empiecen ahí.
+
+Una advertencia sobre los espectros de referencia: el anexo C reimprime la
+Tabla 2 como su Tabla C.1 y la reimpresión contradice al original en dos
+celdas. La Tabla 2 es la que reproduce los propios resultados del anexo, y es
+la que lleva esta biblioteca; la discrepancia está registrada en
+[ERRATA](/phonometry/es/reference/errata/).
+
+## Qué cubre esta guía
+
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El valor de protección supuesta de la ISO 4869-2:2018 (apartado 5, Fórmula (1),
+con los siete rendimientos de protección de la Tabla 1), el método por bandas
+de octava (apartado 6, Fórmula (2)), el método HML (apartado 7, Fórmulas (3) a
+(18), incluidos los ocho ruidos de referencia y los pesos empíricos de la
+Tabla 2) y el método SNR (apartado 8, Fórmulas (19) a (24), contra el ruido
+rosa de la Tabla 3), mediante `hearing.assumed_protection_value`,
+`hearing.octave_band_protected_level`, `hearing.hml_rating`,
+`hearing.hml_protected_level`, `hearing.snr_rating` y
+`hearing.snr_protected_level`. Todas las cifras impresas del ejemplo que
+recorre los anexos A a D se reproducen en la suite de tests y en el informe de
+conformidad.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered" label="No cubierto">
+La medición que produce las atenuaciones es de la ISO 4869-1 y no está
+implementada: la atenuación en oído real en el umbral, su panel de sujetos, su
+procedimiento de colocación y su propia incertidumbre se dan por hechos, y esta
+biblioteca parte de la rejilla resultante. Tampoco está implementado el
+tratamiento de incertidumbre del anexo E de la ISO 4869-2 sobre atenuaciones e
+índices. Nada de aquí modela la diferencia entre la atenuación de laboratorio y
+lo que un protector consigue en campo, que es el objeto del ISO/TR 4869-5 y es
+sistemáticamente grande; aplicar un factor de reducción es una decisión de
+política que esta biblioteca no toma por ti.
+</ScopeClaim>
+</Scope>
+
+<SeeAlso>
+
+## Véase también
+
+- [Exposición laboral al ruido (ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/):
+  el nivel de exposición diaria al que alimenta el nivel protegido.
+- [Pérdida auditiva inducida por ruido (ISO 1999)](/phonometry/es/perception/hearing/noise-induced-hearing-loss/):
+  lo que hace a lo largo de una vida laboral la exposición que el protector no detuvo.
+- [Umbral de audición (edad y cero de referencia)](/phonometry/es/perception/hearing/hearing-threshold/):
+  la línea base contra la que se juzga cualquier exposición protegida.
+- Referencia de API: [`hearing.hearing_protectors`](/phonometry/es/reference/api/hearing/hearing-protectors/).
+
+</SeeAlso>

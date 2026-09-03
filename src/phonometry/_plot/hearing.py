@@ -16,11 +16,18 @@ from .common import (
     _fractile_band,
     _freq_axis,
     _new_axes,
+    theme_fill,
 )
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
+    from ..hearing.hearing_protectors import (
+        AssumedProtectionResult,
+        HMLRatingResult,
+        ProtectedLevelResult,
+        SNRRatingResult,
+    )
     from ..hearing.noise_induced_hearing_loss import HtlanResult, NiptsResult
     from ..hearing.occupational_exposure import ExposureResult
     from ..hearing.threshold import AgeThresholdResult
@@ -38,11 +45,39 @@ _MEDIAN_FRACTILE_EPS = 1e-9
 #: Labels the renderers repeat; the Spanish table is keyed by the same
 #: constants, so a label is written once.
 _FREQ_LABEL = "Frequency [Hz]"
+_ATTENUATION_LABEL = "Sound attenuation [dB]"
+_BAND_LEVEL_LABEL = "A-weighted band level [dB]"
+_REDUCTION_LABEL = "Predicted noise level reduction [dB]"
+_C_MINUS_A_LABEL = "$L_{p,C} - L_{p,A}$ [dB]"
+_SUBJECT_LABEL = "Test subject"
+_SPREAD_LABEL = r"$\pm s_f$"
+_HML_TITLE = "ISO 4869-2 HML method — $H$ = {h}, $M$ = {m}, $L$ = {l} dB"
+#: The curve of Formulae (16) and (17) carries its own label rather than a
+#: slice of the title: deriving one from the other by splitting on the dash
+#: breaks the moment a translation punctuates differently.
+_HML_CURVE_LABEL = "$PNR$ from $H$ = {h}, $M$ = {m}, $L$ = {l} dB"
 _NIPTS_LABEL = "NIPTS [dB]"
 _FRACTILE_LABEL = "Fractile {v}"
 
 _STRINGS: dict[str, str] = {
     _FREQ_LABEL: "Frecuencia [Hz]",
+    _ATTENUATION_LABEL: "Atenuación acústica [dB]",
+    _BAND_LEVEL_LABEL: "Nivel de banda ponderado A [dB]",
+    _REDUCTION_LABEL: "Reducción prevista del nivel de ruido [dB]",
+    _C_MINUS_A_LABEL: _C_MINUS_A_LABEL,
+    _SUBJECT_LABEL: "Sujeto de ensayo",
+    "mean attenuation $m_f$": r"atenuación media $m_f$",
+    _SPREAD_LABEL: _SPREAD_LABEL,
+    "assumed protection $APV_{{f{x}}}$": "protección supuesta $APV_{{f{x}}}$",
+    "ISO 4869-2 assumed protection values — {x} % performance": "ISO 4869-2 valores de protección supuesta — rendimiento del {x} %",
+    _HML_TITLE: "ISO 4869-2 método HML — $H$ = {h}, $M$ = {m}, $L$ = {l} dB",
+    _HML_CURVE_LABEL: "$PNR$ a partir de $H$ = {h}, $M$ = {m}, $L$ = {l} dB",
+    "ISO 4869-2 single number rating — $SNR$ = {snr} dB": "ISO 4869-2 índice de número único — $SNR$ = {snr} dB",
+    "ISO 4869-2 octave-band method — $L'_{{p,A{x}}}$ = {level} dB": "ISO 4869-2 método por bandas de octava — $L'_{{p,A{x}}}$ = {level} dB",
+    "per subject": "por sujeto",
+    "reference noises (Table 2)": "ruidos de referencia (Tabla 2)",
+    "protected band level": "nivel de banda protegido",
+    r"$H$, $M$, $L$ anchors": r"anclas $H$, $M$, $L$",
     "Median": "Mediana",
     "Median $N_{50}$": "Mediana $N_{50}$",
     "Threshold deviation from age 18 [dB]": "Desviación del umbral respecto a 18 años [dB]",
@@ -312,5 +347,260 @@ def plot_occupational_exposure(
     ax.legend(loc="lower right", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
     # localize_axes leaves the categorical task-label axis (a FuncFormatter) alone.
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_assumed_protection(
+    result: AssumedProtectionResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Assumed protection values against the distribution they came from.
+
+    Draws the mean attenuation with its standard deviation shaded either side,
+    and the assumed protection value on top, so the gap Formula (1) opens
+    between the two is the picture. Works for
+    :class:`~phonometry.hearing.hearing_protectors.AssumedProtectionResult`.
+
+    :param result: An assumed-protection result.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the ``APV`` curve.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    freqs = np.asarray(result.frequencies, dtype=np.float64)
+    mean = np.asarray(result.mean_attenuation, dtype=np.float64)
+    spread = np.asarray(result.standard_deviation, dtype=np.float64)
+    _freq_axis(ax, freqs, language=language)
+    ax.fill_between(
+        freqs,
+        mean - spread,
+        mean + spread,
+        color=theme_fill(_C_PRIMARY, ax),
+        zorder=0,
+        label=_t(_SPREAD_LABEL, language),
+    )
+    ax.plot(
+        freqs,
+        mean,
+        "-o",
+        color=_C_PRIMARY,
+        lw=2.0,
+        ms=4,
+        zorder=3,
+        label=_t("mean attenuation $m_f$", language),
+    )
+    apv_kwargs = dict(kwargs)
+    apv_kwargs.setdefault(
+        "label",
+        _t("assumed protection $APV_{{f{x}}}$", language).format(x=result.performance),
+    )
+    apv_kwargs.setdefault("color", _C_SECONDARY)
+    apv_kwargs.setdefault("linewidth", 2.4)
+    ax.plot(
+        freqs,
+        np.asarray(result.apv, dtype=np.float64),
+        "--s",
+        ms=4,
+        zorder=4,
+        **apv_kwargs,
+    )
+    ax.set_ylabel(_t(_ATTENUATION_LABEL, language))
+    ax.set_title(
+        _t("ISO 4869-2 assumed protection values — {x} % performance", language).format(
+            x=result.performance
+        )
+    )
+    ax.legend(loc="best", fontsize="small")
+    ax.grid(True, alpha=0.3)
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_hml_rating(
+    result: HMLRatingResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """The ``HML`` two-segment line, over the reference noises behind it.
+
+    Draws the predicted noise level reduction Formulas (16) and (17) give as a
+    function of ``LpC - LpA``, with the three anchors marked and the eight
+    reference noises of Table 2 scattered at their own differences. Works for
+    :class:`~phonometry.hearing.hearing_protectors.HMLRatingResult`.
+
+    :param result: An ``HML`` rating result.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the ``PNR`` curve.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+    from ..hearing.hearing_protectors import HML_REFERENCE_C_MINUS_A
+
+    ax = ax if ax is not None else _new_axes()
+    high, medium, low = result.reported
+    # The published triple is what the two segments are built from, so the
+    # drawn line is the one a user of the rating would apply.
+    left = np.linspace(-4.0, 2.0, 2)
+    right = np.linspace(2.0, 12.0, 2)
+    curve_kwargs = dict(kwargs)
+    curve_kwargs.setdefault("color", _C_PRIMARY)
+    curve_kwargs.setdefault("linewidth", 2.4)
+    curve_kwargs.setdefault(
+        "label", _t(_HML_CURVE_LABEL, language).format(h=high, m=medium, l=low)
+    )
+    ax.plot(left, medium - (high - medium) / 4.0 * (left - 2.0), **curve_kwargs)
+    # The two segments are one line with a corner, so the second takes every
+    # option the first did. Only the label is dropped, to keep one legend
+    # entry for what the reader sees as a single curve.
+    right_kwargs = {k: v for k, v in curve_kwargs.items() if k != "label"}
+    ax.plot(right, medium - (medium - low) / 8.0 * (right - 2.0), **right_kwargs)
+    ax.plot(
+        [-2.0, 2.0, 10.0],
+        [high, medium, low],
+        "o",
+        color=_C_SECONDARY,
+        ms=7,
+        zorder=4,
+        label=_t(r"$H$, $M$, $L$ anchors", language),
+    )
+    differences = np.asarray(HML_REFERENCE_C_MINUS_A, dtype=np.float64)
+    ax.plot(
+        np.repeat(differences, result.predicted_reduction.shape[0]),
+        result.predicted_reduction.T.reshape(-1),
+        ".",
+        color=_C_MUTED,
+        ms=3,
+        alpha=0.55,
+        zorder=1,
+        label=_t("reference noises (Table 2)", language),
+    )
+    ax.set_xlabel(_t(_C_MINUS_A_LABEL, language))
+    ax.set_ylabel(_t(_REDUCTION_LABEL, language))
+    ax.set_title(_t(_HML_TITLE, language).format(h=high, m=medium, l=low))
+    ax.legend(loc="best", fontsize="small")
+    ax.grid(True, alpha=0.3)
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_snr_rating(
+    result: SNRRatingResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """The per-subject ratings the single number was reduced from.
+
+    Draws ``SNRj`` for each test subject as a bar with the mean and the
+    reported single number across them, so the spread Formula (19) subtracts
+    is visible. Works for
+    :class:`~phonometry.hearing.hearing_protectors.SNRRatingResult`.
+
+    :param result: An ``SNR`` rating result.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the per-subject bars.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    per_subject = np.asarray(result.subject_snr, dtype=np.float64)
+    positions = np.arange(1, per_subject.size + 1)
+    bar_kwargs = dict(kwargs)
+    bar_kwargs.setdefault("color", _C_PRIMARY)
+    bar_kwargs.setdefault("label", _t("per subject", language))
+    ax.bar(positions, per_subject, width=0.7, zorder=2, **bar_kwargs)
+    ax.axhline(
+        result.mean,
+        color=_C_SECONDARY,
+        ls="--",
+        lw=1.6,
+        zorder=3,
+        label=f"$SNR_m$ = {result.mean:.1f} dB",
+    )
+    ax.axhline(
+        result.reported,
+        color=_C_REFERENCE,
+        ls="-",
+        lw=1.8,
+        zorder=3,
+        label=f"$SNR_{{{result.performance}}}$ = {result.reported} dB",
+    )
+    ax.set_xticks(positions)
+    ax.set_xlabel(_t(_SUBJECT_LABEL, language))
+    ax.set_ylabel(_t(_REDUCTION_LABEL, language))
+    ax.set_title(
+        _t("ISO 4869-2 single number rating — $SNR$ = {snr} dB", language).format(
+            snr=result.reported
+        )
+    )
+    ax.legend(loc="best", fontsize="small")
+    ax.grid(True, axis="y", alpha=0.3)
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_protected_level(
+    result: ProtectedLevelResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """The A-weighted band levels the protector leaves at the ear.
+
+    Only the octave-band method sees a spectrum, so this draws its per-band
+    result with the total marked. Works for
+    :class:`~phonometry.hearing.hearing_protectors.ProtectedLevelResult`.
+
+    :param result: An octave-band protected-level result.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the band bars.
+    :return: The axes.
+    :raises ValueError: for an ``HML`` or ``SNR`` result, which carries no
+        spectrum.
+    """
+    from .._i18n import localize_axes
+
+    if result.band_levels is None or result.frequencies is None:
+        msg = (
+            f"The {result.method} method has no spectrum to draw: it answers "
+            "from the C- and A-weighted levels alone. Only the octave-band "
+            "method carries per-band results."
+        )
+        raise ValueError(msg)
+    ax = ax if ax is not None else _new_axes()
+    freqs = np.asarray(result.frequencies, dtype=np.float64)
+    positions = np.arange(freqs.size)
+    bar_kwargs = dict(kwargs)
+    bar_kwargs.setdefault("color", _C_PRIMARY)
+    bar_kwargs.setdefault("label", _t("protected band level", language))
+    ax.bar(
+        positions,
+        np.asarray(result.band_levels, dtype=np.float64),
+        width=0.7,
+        **bar_kwargs,
+    )
+    ax.set_xticks(positions)
+    ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
+    ax.set_ylabel(_t(_BAND_LEVEL_LABEL, language))
+    performance = result.performance if result.performance is not None else ""
+    ax.set_title(
+        _t(
+            "ISO 4869-2 octave-band method — $L'_{{p,A{x}}}$ = {level} dB", language
+        ).format(x=performance, level=result.reported_level)
+    )
+    ax.legend(loc="best", fontsize="small")
+    ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)
     return ax

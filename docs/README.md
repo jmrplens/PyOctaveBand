@@ -93,6 +93,7 @@ noise costs a hearing threshold.
 - [Hearing threshold](perception/hearing/hearing-threshold.md): the age-related hearing threshold distribution (ISO 7029:2017) and the free-field/diffuse-field reference threshold of hearing (ISO 389-7:2005)
 - [Noise-induced hearing loss](perception/hearing/noise-induced-hearing-loss.md): the ISO 1999:2013 noise-induced permanent threshold shift (NIPTS) and its population distribution, and the combination with age into the hearing threshold level associated with age and noise (HTLAN)
 - [Occupational noise exposure](perception/hearing/occupational-exposure.md): the ISO 9612 task-based, job-based and full-day measurement strategies and the Annex C uncertainty budget behind every $L_\mathrm{EX,8h}$ report
+- [Hearing protectors](perception/hearing/hearing-protectors.md): the ISO 4869-2 octave-band, HML and SNR methods that turn a protector's measured attenuation into the effective A-weighted level left at the ear
 
 ### [Rooms and buildings](buildings/index.md)
 

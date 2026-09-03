@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**609/609 conformance checks pass** across 59 domains and 377 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**613/613 conformance checks pass** across 60 domains and 378 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -559,6 +559,18 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 1999:2013 Annex C, Formulae (C.6) to (C.8) | NIPTS at 1/2/4 kHz, 90 dB, 30 yr, Q = 10 % (annex inputs) | 0, 9, 19 dB | 0, 9, 19 dB | 0 dB | - | ![Pass][cv-pass] Pass |
 | ISO 1999:2013 Annex C, Formula (C.5) | Compressed 4 kHz shift, Formula (1) with the annex's H = 36 dB | 13.3 dB (+/-0.1 dB) | 13.3 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 1999:2013 Annex C, Formula (C.11) | Hearing threshold level with age and noise, 1/2/4 kHz mean, Q = 10 % | 31.1 dB (+/-0.1 dB) | 31.1 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+
+</details>
+
+<details>
+<summary><b>Hearing protectors (ISO 4869-2)</b>: 100% (4/4)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
+|:---|:---|:---|:---|:---|:---:|:---:|
+| ISO 4869-2:2018 Annex A, Table A.1 | Assumed protection: mean and spread over 16 subjects, 8 bands | m_f and s_f equal to Table A.1 at 1 dp, all 8 bands | max deviation 0.000 dB | 0.000 dB | - | ![Pass][cv-pass] Pass |
+| ISO 4869-2:2018 Formula (2), Annex B | Octave-band method: Table B.1 net levels and L'p,A84 | Table B.1 rows exact; L'p,A84 = 81.4 dB | rows within 0.000 dB; 81.4 dB | +0.000 dB | - | ![Pass][cv-pass] Pass |
+| ISO 4869-2:2018 Formulae (12) to (15), Annex C | HML method: 16 subject triples, statistics and H84/M84/L84 | Table C.2 exact; H84/M84/L84 = (24, 18, 13) dB | within 0.000 dB; (24, 18, 13) dB | 0.000 dB | - | ![Pass][cv-pass] Pass |
+| ISO 4869-2:2018 Formulae (16) to (24) | HML and SNR applications land on the annexes' 82 dB | PNR84 = 22,5 dB; SNR84 = 21 dB; both report 82 dB | 22.5 dB; 21 dB; 82 and 82 dB | +0.000 dB | - | ![Pass][cv-pass] Pass |
 
 </details>
 

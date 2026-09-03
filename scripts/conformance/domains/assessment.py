@@ -327,6 +327,138 @@ def _chk_nihl_annex_c_htlan() -> Outcome:
     return numeric(ref.ISO1999_ANNEX_C_HTLAN, value, 0.05, unit="dB", places=1)
 
 
+_HPD = "Hearing protectors (ISO 4869-2)"
+
+
+@register(
+    _HPD,
+    "ISO 4869-2:2018 Annex A, Table A.1",
+    "Assumed protection: mean and spread over 16 subjects, 8 bands",
+)
+def _chk_hpd_annex_a() -> Outcome:
+    """Formula (1) against the printed distribution of the worked example.
+
+    The annex's own ``APV`` row is the difference of the rounded ``m_f`` and
+    ``s_f`` it displays, which is 0,1 dB from Formula (1) applied to the
+    attenuations in three of the eight bands, so what is pinned here is the
+    pair the annex computes from, band for band.
+    """
+    result = ph.hearing.assumed_protection_value(ref.ISO4869_2_ATTENUATION)
+    mean = np.asarray(ref.ISO4869_2_MEAN, dtype=float)
+    spread = np.asarray(ref.ISO4869_2_STANDARD_DEVIATION, dtype=float)
+    worst = max(
+        float(np.max(np.abs(np.round(result.mean_attenuation, 1) - mean))),
+        float(np.max(np.abs(np.round(result.standard_deviation, 1) - spread))),
+    )
+    return Outcome(
+        expected="m_f and s_f equal to Table A.1 at 1 dp, all 8 bands",
+        computed=f"max deviation {worst:.3f} dB",
+        delta=f"{worst:.3f} dB",
+        passed=worst <= 1e-9,
+    )
+
+
+@register(
+    _HPD,
+    "ISO 4869-2:2018 Formula (2), Annex B",
+    "Octave-band method: Table B.1 net levels and L'p,A84",
+)
+def _chk_hpd_octave_band() -> Outcome:
+    """The most faithful of the three methods, on the annex's own spectrum."""
+    result = ph.hearing.octave_band_protected_level(
+        ref.ISO4869_2_ANNEX_B_NOISE, ref.ISO4869_2_APV84_PRINTED
+    )
+    assert result.band_levels is not None
+    net = np.asarray(ref.ISO4869_2_ANNEX_B_NET, dtype=float)
+    band_worst = float(np.max(np.abs(np.round(result.band_levels, 1) - net)))
+    level = float(result.effective_level)
+    passed = (
+        band_worst <= 1e-9
+        and abs(level - ref.ISO4869_2_ANNEX_B_EFFECTIVE) <= 0.05
+        and result.reported_level == ref.ISO4869_2_ANNEX_B_REPORTED
+    )
+    return Outcome(
+        expected=f"Table B.1 rows exact; L'p,A84 = {ref.ISO4869_2_ANNEX_B_EFFECTIVE} dB",
+        computed=f"rows within {band_worst:.3f} dB; {level:.1f} dB",
+        delta=f"{level - ref.ISO4869_2_ANNEX_B_EFFECTIVE:+.3f} dB",
+        passed=passed,
+    )
+
+
+@register(
+    _HPD,
+    "ISO 4869-2:2018 Formulae (12) to (15), Annex C",
+    "HML method: 16 subject triples, statistics and H84/M84/L84",
+)
+def _chk_hpd_hml() -> Outcome:
+    """All 48 printed per-subject values plus the six statistics they reduce to.
+
+    The two cells Table C.1 misprints against Table 2 are what the sixth
+    reference noise is sensitive to, and Table 2 is the reading that
+    reproduces the annex (see docs/ERRATA.md).
+    """
+    rating = ph.hearing.hml_rating(ref.ISO4869_2_ATTENUATION)
+    per_subject = max(
+        float(np.max(np.abs(np.round(values, 1) - np.asarray(printed, dtype=float))))
+        for values, printed in (
+            (rating.subject_h, ref.ISO4869_2_ANNEX_C_H),
+            (rating.subject_m, ref.ISO4869_2_ANNEX_C_M),
+            (rating.subject_l, ref.ISO4869_2_ANNEX_C_L),
+            (rating.predicted_reduction[:, 5], ref.ISO4869_2_ANNEX_C_PNR_NOISE6),
+        )
+    )
+    passed = per_subject <= 1e-9 and rating.reported == ref.ISO4869_2_ANNEX_C_HML84
+    return Outcome(
+        expected=f"Table C.2 exact; H84/M84/L84 = {ref.ISO4869_2_ANNEX_C_HML84} dB",
+        computed=f"within {per_subject:.3f} dB; {rating.reported} dB",
+        delta=f"{per_subject:.3f} dB",
+        passed=passed,
+    )
+
+
+@register(
+    _HPD,
+    "ISO 4869-2:2018 Formulae (16) to (24)",
+    "HML and SNR applications land on the annexes' 82 dB",
+)
+def _chk_hpd_applications() -> Outcome:
+    """The same protector in the same noise, by the two rating methods.
+
+    Clause 7.2 and Clause 8.2 both round their ratings to the nearest integer
+    before the application formulas see them, which is what makes Annex C's
+    PNR84 come out at 22,5 dB rather than at the unrounded fit.
+    """
+    attenuation = ref.ISO4869_2_ATTENUATION
+    hml = ph.hearing.hml_protected_level(
+        ref.ISO4869_2_ANNEX_B_LPA,
+        ref.ISO4869_2_ANNEX_B_LPC,
+        ph.hearing.hml_rating(attenuation),
+    )
+    snr_rating = ph.hearing.snr_rating(attenuation)
+    by_c = ph.hearing.snr_protected_level(snr_rating, l_p_c=ref.ISO4869_2_ANNEX_B_LPC)
+    by_a = ph.hearing.snr_protected_level(
+        snr_rating,
+        l_p_a=ref.ISO4869_2_ANNEX_B_LPA,
+        c_minus_a=ref.ISO4869_2_ANNEX_B_LPC - ref.ISO4869_2_ANNEX_B_LPA,
+    )
+    passed = (
+        abs(hml.noise_reduction - ref.ISO4869_2_ANNEX_C_PNR84) <= 1e-9
+        and hml.reported_level == ref.ISO4869_2_ANNEX_C_REPORTED
+        and snr_rating.reported == ref.ISO4869_2_ANNEX_D_SNR84
+        and by_c.reported_level == ref.ISO4869_2_ANNEX_D_REPORTED
+        and by_a.reported_level == ref.ISO4869_2_ANNEX_D_REPORTED
+    )
+    return Outcome(
+        expected="PNR84 = 22,5 dB; SNR84 = 21 dB; both report 82 dB",
+        computed=(
+            f"{hml.noise_reduction:.1f} dB; {snr_rating.reported} dB; "
+            f"{hml.reported_level} and {by_c.reported_level} dB"
+        ),
+        delta=f"{hml.noise_reduction - ref.ISO4869_2_ANNEX_C_PNR84:+.3f} dB",
+        passed=passed,
+    )
+
+
 _MSV = "Multiple-shock whole-body vibration (ISO 2631-5)"
 
 

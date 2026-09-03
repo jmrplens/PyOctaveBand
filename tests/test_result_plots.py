@@ -139,6 +139,27 @@ def test_plot_raises_helpful_error_without_matplotlib(
 # --------------------------------------------------------------------------
 # Every public .plot() must accept and forward a benign styling kwarg
 # --------------------------------------------------------------------------
+#: ISO 4869-2 Annex A: 16 subjects over the eight octaves from 63 Hz, which
+#: every hearing-protector result is built from.
+_PROTECTOR_ATTENUATION = [
+    [4, 8, 13, 18, 20, 30, 35, 30],
+    [6, 12, 16, 21, 29, 35, 47, 35],
+    [10, 16, 17, 23, 25, 32, 48, 37],
+    [3, 7, 12, 18, 20, 25, 33, 30],
+    [8, 10, 16, 16, 25, 27, 43, 32],
+    [4, 7, 10, 15, 19, 32, 35, 31],
+    [5, 5, 9, 16, 20, 25, 30, 28],
+    [15, 15, 21, 26, 25, 38, 46, 38],
+    [5, 6, 10, 13, 19, 22, 29, 28],
+    [9, 9, 10, 19, 20, 27, 37, 31],
+    [9, 16, 18, 24, 25, 35, 44, 39],
+    [5, 6, 11, 12, 17, 20, 28, 28],
+    [7, 10, 17, 22, 25, 35, 41, 44],
+    [6, 8, 16, 18, 19, 19, 30, 33],
+    [10, 12, 17, 25, 28, 33, 45, 40],
+    [12, 13, 17, 27, 29, 38, 49, 41],
+]
+
 _KWARG_PLOT_CASES = [
     ("zwicker", _zwicker_stationary, "line"),
     ("sti", _sti, "bar"),
@@ -173,6 +194,25 @@ _KWARG_PLOT_CASES = [
     ("diffuse_absorption", _diffuse_absorption, "line"),
     ("monte_carlo", _monte_carlo, "bar"),
     ("exposure", _exposure, "bar"),
+    (
+        "assumed_protection",
+        lambda: ph.hearing.assumed_protection_value(_PROTECTOR_ATTENUATION),
+        "line",
+    ),
+    (
+        "hml_rating",
+        lambda: ph.hearing.hml_rating(_PROTECTOR_ATTENUATION),
+        "line",
+    ),
+    ("snr_rating", lambda: ph.hearing.snr_rating(_PROTECTOR_ATTENUATION), "bar"),
+    (
+        "protected_level",
+        lambda: ph.hearing.octave_band_protected_level(
+            [75.0, 84.0, 86.0, 88.0, 97.0, 99.0, 97.0, 96.0],
+            ph.hearing.assumed_protection_value(_PROTECTOR_ATTENUATION),
+        ),
+        "bar",
+    ),
     ("static_airflow", _static_airflow, "line"),
     ("airborne_prediction", _airborne_prediction, "bar"),
     ("impact_prediction", _impact_prediction, "bar"),
