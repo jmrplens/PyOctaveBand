@@ -457,12 +457,11 @@ def plot_hml_rating(
         "label", _t(_HML_CURVE_LABEL, language).format(h=high, m=medium, l=low)
     )
     ax.plot(left, medium - (high - medium) / 4.0 * (left - 2.0), **curve_kwargs)
-    ax.plot(
-        right,
-        medium - (medium - low) / 8.0 * (right - 2.0),
-        color=curve_kwargs["color"],
-        linewidth=curve_kwargs["linewidth"],
-    )
+    # The two segments are one line with a corner, so the second takes every
+    # option the first did. Only the label is dropped, to keep one legend
+    # entry for what the reader sees as a single curve.
+    right_kwargs = {k: v for k, v in curve_kwargs.items() if k != "label"}
+    ax.plot(right, medium - (medium - low) / 8.0 * (right - 2.0), **right_kwargs)
     ax.plot(
         [-2.0, 2.0, 10.0],
         [high, medium, low],

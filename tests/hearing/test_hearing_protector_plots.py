@@ -165,3 +165,20 @@ def test_the_protected_level_figure_labels_the_bands_it_was_given() -> None:
         f"{f:g}" for f in hearing.PROTECTOR_OCTAVE_BANDS[1:]
     ]
     plt.close("all")
+
+
+def test_the_two_hml_segments_are_styled_as_one_line() -> None:
+    """A corner, not two curves: every option reaches both halves.
+
+    Only the label is withheld from the second segment, so the reader gets one
+    legend entry for what looks like one line.
+    """
+    rating = hearing.hml_rating(ref.ISO4869_2_ATTENUATION)
+    ax = rating.plot(linestyle="--", alpha=0.6, color="#123456", linewidth=3.0)
+    left, right = ax.lines[0], ax.lines[1]
+    for read in ("get_linestyle", "get_alpha", "get_color", "get_linewidth"):
+        assert getattr(left, read)() == getattr(right, read)(), read
+    labels = [str(line.get_label()) for line in (left, right)]
+    assert labels[0].startswith("$PNR$")
+    assert labels[1].startswith("_")
+    plt.close("all")
