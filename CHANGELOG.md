@@ -758,9 +758,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   function differ from the two hundred other parameters that already carry
   those names.
 
-  `Fluid` exposes the same quantity as a property, closed from the two it was
-  built with. The function is for a caller holding a density and a speed of
-  sound with no fluid to go with them.
+  `Fluid` exposes the same quantity as a property, closed by identity from the
+  two it was built with: it is their product exactly, not a fit of it. The
+  function is for a caller holding a density and a speed of sound with no
+  fluid to go with them.
 
 - ISO 3747's Annex C prints its static pressure in pascals, and the library
   says so. It is alone in the ISO 3740 family in doing so: ISO 3741:2010,

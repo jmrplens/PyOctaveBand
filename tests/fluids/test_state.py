@@ -14,6 +14,7 @@ from phonometry.fluids import (
     FluidPropertyUnavailable,
     FluidWarning,
     air,
+    characteristic_impedance,
 )
 
 
@@ -64,6 +65,22 @@ def test_the_mapping_passed_in_cannot_reach_back() -> None:
     )
     mine["density"] = 999.0
     assert fluid.density == pytest.approx(1.0, abs=0.0)
+
+
+@pytest.mark.parametrize("bad", [0.0, -1.0, float("nan"), float("inf")])
+@pytest.mark.parametrize("position", ["density", "speed_of_sound"])
+def test_characteristic_impedance_refuses_what_is_not_a_positive_number(
+    position: str, bad: float
+) -> None:
+    """Every argument that is not a positive finite number raises, NaN included.
+
+    A bare ``<= 0.0`` would let NaN through, because every comparison with NaN
+    is false, and the product would come back as NaN rather than raising. The
+    message has to name the argument that was wrong, not both of them.
+    """
+    kwargs = {"density": 1.2, "speed_of_sound": 343.0} | {position: bad}
+    with pytest.raises(ValueError, match=f"'{position}' must be positive"):
+        characteristic_impedance(**kwargs)
 
 
 def test_prandtl_number_closes_from_the_three_it_is_made_of(

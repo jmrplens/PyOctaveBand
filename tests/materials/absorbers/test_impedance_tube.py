@@ -196,10 +196,12 @@ def test_air_density_scalar_beside_array_still_broadcasts() -> None:
 
 def test_characteristic_impedance_is_real_product() -> None:
     assert characteristic_impedance(RHO, C0) == pytest.approx(RC)
-    with pytest.raises(
-        ValueError, match="'density' and 'speed_of_sound' must be positive"
-    ):
+    # The message names the argument that was wrong, not both of them; the full
+    # contract, NaN and infinity included, is covered in tests/fluids.
+    with pytest.raises(ValueError, match="'density' must be positive"):
         characteristic_impedance(-1.0, C0)
+    with pytest.raises(ValueError, match="'speed_of_sound' must be positive"):
+        characteristic_impedance(RHO, -1.0)
 
 
 # ---------------------------------------------------------------------------

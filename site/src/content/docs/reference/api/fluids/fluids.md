@@ -60,7 +60,7 @@ second everywhere, so there is no second unit to be confused with.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if either argument is not positive. |
+| ValueError | if either argument is not a positive finite number. |
 
 ## Fluid
 

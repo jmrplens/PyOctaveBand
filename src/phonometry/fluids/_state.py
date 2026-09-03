@@ -16,6 +16,7 @@ import dataclasses
 import types
 from typing import TYPE_CHECKING
 
+from .._internal.validation import require_positive
 from .._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:
@@ -63,12 +64,16 @@ def characteristic_impedance(density: float, speed_of_sound: float) -> float:
     :param density: Density ``rho``, in kg/m3.
     :param speed_of_sound: Speed of sound ``c``, in m/s.
     :return: Characteristic impedance ``rho c``, in Pa*s/m (rayl).
-    :raises ValueError: if either argument is not positive.
+    :raises ValueError: if either argument is not a positive finite number.
     """
-    if density <= 0.0 or speed_of_sound <= 0.0:
-        msg = "'density' and 'speed_of_sound' must be positive."
-        raise ValueError(msg)
-    return float(density * speed_of_sound)
+    # A bare `<= 0.0` lets NaN through, since every comparison with NaN is
+    # false, and the product then comes back as NaN rather than raising. The
+    # shared guard rejects non-finite values as well, and names the argument
+    # that was wrong instead of both.
+    return float(
+        require_positive(density, "density")
+        * require_positive(speed_of_sound, "speed_of_sound")
+    )
 
 
 @dataclasses.dataclass(frozen=True)
