@@ -754,4 +754,3 @@ def two_microphone_impedance(
         diameter=diameter,
         shape=canonical if diameter is not None else None,
     )
-
