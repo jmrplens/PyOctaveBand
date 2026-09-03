@@ -106,6 +106,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   would have recorded nothing. That is the fourth transverse package, and the
   first added since 4.0 split the original one in three.
 
+  It is frozen through, not only at the surface. `frozen=True` stops the
+  attribute from being rebound and says nothing about what it points at, so the
+  two mappings are copied and wrapped on construction. Without that, one
+  `air.properties["density"] = 999` anywhere in a process would have moved
+  every model defaulting to a shared state, silently and for the rest of the
+  run.
+
   The `Fluid` says what it was computed for and what fixed it: the conditions,
   the composition, the model by name, and the domain that model states for
   itself. Reading a quantity the model does not determine raises

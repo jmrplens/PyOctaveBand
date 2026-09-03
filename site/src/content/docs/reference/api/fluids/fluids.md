@@ -82,8 +82,10 @@ Ratio of specific heats `kappa` (`gamma`), dimensionless.
 
 `Pr = eta / (rho alpha_t)`, dimensionless.
 
-Closed by identity. Published models that carry their own Prandtl
-number as a fitted constant keep it; this is the fluid's, not theirs.
+A model that prints its own Prandtl number keeps it: a published fit
+carries the value it was fitted with, and closing the identity from a
+better air would silently change the model rather than correct it. A
+model that does not print one has it closed from the three that it did.
 
 ### Fluid.specific_heat_capacity
 

@@ -13,6 +13,7 @@ returning a plausible number nobody printed.
 from __future__ import annotations
 
 import dataclasses
+import types
 from typing import TYPE_CHECKING
 
 from .._internal.warnings import PhonometryWarning
@@ -65,6 +66,26 @@ class Fluid:
     model: str
     validity: str
     properties: Mapping[str, float]
+
+    def __post_init__(self) -> None:
+        """Freeze the two mappings, which ``frozen=True`` does not reach.
+
+        A frozen dataclass stops the attribute from being rebound and says
+        nothing about what it points at, so a plain ``dict`` here stays
+        writable. That matters most for the shared states: ``PUBLISHED_AIR`` is
+        a module-level constant every visco-thermal model defaults to, and one
+        ``air.properties["density"] = 999`` anywhere in a process would have
+        moved every one of those defaults, silently and for good.
+
+        Copied before wrapping, so a caller who keeps a reference to the dict
+        it passed in cannot reach back through it either.
+        """
+        object.__setattr__(
+            self, "composition", types.MappingProxyType(dict(self.composition))
+        )
+        object.__setattr__(
+            self, "properties", types.MappingProxyType(dict(self.properties))
+        )
 
     def _fixed(self, quantity: str) -> float:
         """Return ``quantity``, or say which model failed to determine it."""
@@ -127,9 +148,14 @@ class Fluid:
     def prandtl_number(self) -> float:
         """``Pr = eta / (rho alpha_t)``, dimensionless.
 
-        Closed by identity. Published models that carry their own Prandtl
-        number as a fitted constant keep it; this is the fluid's, not theirs.
+        A model that prints its own Prandtl number keeps it: a published fit
+        carries the value it was fitted with, and closing the identity from a
+        better air would silently change the model rather than correct it. A
+        model that does not print one has it closed from the three that it did.
         """
+        carried = self.properties.get("prandtl_number")
+        if carried is not None:
+            return float(carried)
         return self.viscosity / (self.density * self.thermal_diffusivity)
 
     @property

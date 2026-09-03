@@ -35,6 +35,37 @@ def test_characteristic_impedance_is_rho_c(reference_air: Fluid) -> None:
     )
 
 
+@pytest.mark.parametrize("mapping", ["properties", "composition"])
+def test_the_mappings_are_frozen_too(reference_air: Fluid, mapping: str) -> None:
+    """``frozen=True`` stops the rebinding, not the writing through it.
+
+    The shared states are what make this matter: a module-level air that every
+    visco-thermal model defaults to would have moved for the whole process on
+    one ``air.properties["density"] = 999`` anywhere in it.
+    """
+    with pytest.raises(TypeError, match="does not support item assignment"):
+        getattr(reference_air, mapping)["density"] = 999.0
+
+
+def test_the_mapping_passed_in_cannot_reach_back() -> None:
+    """The mappings are copied before they are wrapped.
+
+    Wrapping without copying would leave the caller's own dict as a live handle
+    on a fluid that reports itself frozen.
+    """
+    mine = {"density": 1.0, "speed_of_sound": 2.0}
+    fluid = Fluid(
+        temperature_c=0.0,
+        static_pressure_pa=1.0,
+        composition={},
+        model="two numbers",
+        validity="",
+        properties=mine,
+    )
+    mine["density"] = 999.0
+    assert fluid.density == pytest.approx(1.0, abs=0.0)
+
+
 def test_prandtl_number_closes_from_the_three_it_is_made_of(
     reference_air: Fluid,
 ) -> None:
@@ -110,3 +141,32 @@ def test_the_fluid_is_frozen(reference_air: Fluid) -> None:
 def test_every_diagnostic_is_filterable_as_one(warning: type[Warning]) -> None:
     """One filterwarnings rule reaches every diagnostic the library raises."""
     assert issubclass(warning, PhonometryWarning)
+
+
+def test_a_printed_prandtl_number_wins_over_the_identity() -> None:
+    """A published fit keeps the constant it was fitted with.
+
+    Johnson-Champoux-Allard carries 0,71. Air at that state has 0,728. Closing
+    the identity from the better air would not correct the model, it would
+    change it, and it moves what the model computes by 1,5 parts in a thousand.
+    So a carried value wins, and a model that prints none has it closed from
+    the three quantities that it did print.
+    """
+    published = Fluid(
+        temperature_c=20.0,
+        static_pressure_pa=101_325.0,
+        composition={},
+        model="a fit that printed its own Prandtl number",
+        validity="",
+        properties={"viscosity": 1.84e-5, "density": 1.205, "prandtl_number": 0.71},
+    )
+    assert published.prandtl_number == pytest.approx(0.71, abs=1e-15)
+
+
+def test_without_a_printed_one_it_closes_from_the_three(reference_air: Fluid) -> None:
+    assert "prandtl_number" not in reference_air.properties
+    assert reference_air.prandtl_number == pytest.approx(
+        reference_air.viscosity
+        / (reference_air.density * reference_air.thermal_diffusivity),
+        rel=1e-15,
+    )
