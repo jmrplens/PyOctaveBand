@@ -116,9 +116,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `temperature_c` is required, because there is no defensible default for the
   one condition a caller has actually measured. The pressure and the humidity
   default, and say so once in a single `FluidAssumptionWarning` naming both and
-  what each is worth: over 80 kPa to 105 kPa the density moves by a quarter, so
-  a site 1000 m up is about 11 % from the assumed pressure, while the whole
-  span of humidity is worth about 1 %. Supplying both is silent, which is the
+  what each is worth: a site 1000 m up sits near 90 kPa, and taking that for
+  one standard atmosphere puts the density about 13 % high, while the whole
+  span of humidity is worth about 1 % of it. Supplying both is silent, which is the
   property a caller who measured their air should get. The carbon dioxide mole
   fraction defaults without warning, because 0,000 4 is a value Clause F.2
   names for laboratory conditions rather than a guess about the caller's air.

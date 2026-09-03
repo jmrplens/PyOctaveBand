@@ -172,10 +172,11 @@ def _warn_assumptions(
     if not assumed:
         return
     msg = (
-        f"air() assumed {' and '.join(assumed)}. Density is the sensitive one: "
-        f"over 80 kPa to 105 kPa it moves by a quarter, so a test site 1000 m up "
-        f"is about 11 % away from the assumed pressure, while the whole span of "
-        f"humidity is worth about 1 %. Pass the conditions to silence this."
+        f"air() assumed {' and '.join(assumed)}. The pressure is the one worth "
+        f"measuring: a site 1000 m up sits near 90 kPa, and taking it for one "
+        f"standard atmosphere puts the density about 13 % high. The whole span "
+        f"of humidity, 0 % to 100 %, is worth about 1 % of the density. Pass "
+        f"the conditions to silence this."
     )
     warnings.warn(msg, FluidAssumptionWarning, stacklevel=3)
 
