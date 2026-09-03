@@ -59,10 +59,11 @@ with warnings.catch_warnings(record=True) as caught:
 
 print(caught[0].category.__name__)              # FluidAssumptionWarning
 print(str(caught[0].message))
-# air() assumed 101325 Pa and 50 % relative humidity. Density is the sensitive
-# one: over 80 kPa to 105 kPa it moves by a quarter, so a test site 1000 m up
-# is about 11 % away from the assumed pressure, while the whole span of
-# humidity is worth about 1 %. Pass the conditions to silence this.
+# air() assumed 101325 Pa and 50 % relative humidity. The pressure is the one
+# worth measuring: a site 1000 m up sits near 90 kPa, and taking it for one
+# standard atmosphere puts the density about 13 % high. The whole span of
+# humidity, 0 % to 100 %, is worth about 1 % of the density. Pass the
+# conditions to silence this.
 ```
 
 One warning, not two, because a caller who supplied neither has one thing to
