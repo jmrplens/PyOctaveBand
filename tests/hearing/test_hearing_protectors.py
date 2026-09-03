@@ -314,6 +314,10 @@ def test_annex_d_both_applications_land_together() -> None:
         {"l_p_c": 103.0, "l_p_a": 104.0, "c_minus_a": -1.0},
         {"l_p_a": 104.0},
         {"c_minus_a": -1.0},
+        # A C-weighted level with half of the other pairing is not a third
+        # way of asking: one of the two arguments would be ignored.
+        {"l_p_c": 103.0, "l_p_a": 104.0},
+        {"l_p_c": 103.0, "c_minus_a": -1.0},
     ],
 )
 def test_the_snr_application_needs_exactly_one_pairing(

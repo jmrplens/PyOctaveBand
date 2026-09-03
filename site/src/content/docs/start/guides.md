@@ -1,6 +1,6 @@
 ---
 title: "Guides"
-description: "The 111 guides of phonometry, grouped into the eleven topics the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
+description: "The 112 guides of phonometry, grouped into the eleven topics the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
 head:
   - tag: script
     attrs:
@@ -103,7 +103,7 @@ makes, then runnable code and the figure it draws. Nothing here is a survey of
 the field; each page is the working documentation of a module, written so that
 a result can be defended clause by clause rather than trusted.
 
-This page is the map. A hundred and eleven guides sit in eleven topics, and each topic has its
+This page is the map. A hundred and twelve guides sit in eleven topics, and each topic has its
 own overview page with the longer story of how its pieces fit together. If you
 are arriving without a specific question, read
 [Getting Started](/phonometry/start/getting-started/) first: it runs one signal
@@ -302,6 +302,9 @@ ISO 9612.
 - [Occupational Noise Exposure (ISO 9612)](/phonometry/perception/hearing/occupational-exposure/):
   the task-based, job-based and full-day strategies for $L_\mathrm{EX,8h}$, with the
   uncertainty budget and the upper limit.
+- [Hearing Protectors (ISO 4869-2)](/phonometry/perception/hearing/hearing-protectors/):
+  the octave-band, HML and SNR methods that say what a protector leaves at the
+  ear, and the assumed protection value all three start from.
 
 ## [Rooms and buildings](/phonometry/buildings/)
 

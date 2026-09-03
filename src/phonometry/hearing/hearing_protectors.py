@@ -856,23 +856,19 @@ def snr_protected_level(
     :raises ValueError: if neither pairing is complete, if both are given, or
         if any level is not finite.
     """
-    by_c = l_p_c is not None
-    by_a = l_p_a is not None and c_minus_a is not None
-    if by_c == by_a:
+    a_level: float | None = None
+    if l_p_c is not None and l_p_a is None and c_minus_a is None:
+        (c_level,) = _finite_levels(l_p_c=l_p_c)
+    elif l_p_c is None and l_p_a is not None and c_minus_a is not None:
+        a_level, difference = _finite_levels(l_p_a=l_p_a, c_minus_a=c_minus_a)
+        c_level = a_level + difference
+    else:
         msg = (
             "give either 'l_p_c' (Formula (23)) or both 'l_p_a' and "
             "'c_minus_a' (Formula (24)), and not both pairings: the second is "
             "the first with the C-weighted level reassembled."
         )
         raise ValueError(msg)
-    a_level: float | None = None
-    if l_p_c is not None:
-        (c_level,) = _finite_levels(l_p_c=l_p_c)
-    else:
-        assert l_p_a is not None  # noqa: S101 - narrowed by the pairing check
-        assert c_minus_a is not None  # noqa: S101
-        a_level, difference = _finite_levels(l_p_a=l_p_a, c_minus_a=c_minus_a)
-        c_level = a_level + difference
     reported = rating.reported
     effective = c_level - reported
     reduction = (a_level - effective) if a_level is not None else (c_level - effective)
