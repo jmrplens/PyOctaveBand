@@ -3264,6 +3264,20 @@ def generate_effective_kappa(output_dir: str) -> None:
     kappa_adiabatic = 1.4008
     freq = np.linspace(1.0, 4.0, 160)
 
+    # The figure draws the annex's own procedure, so it uses the five air
+    # properties the annex prints rather than the library defaults, which are
+    # that same air state computed from IEC 61094-2:2009 Annex F. Two of the
+    # printed five are not IEC 61094-2 values (see docs/ERRATA.md); both air
+    # states give kappa' = 1.370 at 2 Hz, and passing the printed ones is what
+    # keeps the adiabatic line above labelled with the kappa actually in use.
+    printed_air = {
+        "speed_of_sound": 345.9,
+        "air_density": 1.186,
+        "specific_heat_ratio": kappa_adiabatic,
+        "specific_heat_cp": 938.7,
+        "thermal_conductivity": 0.02355,
+    }
+
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     for s_over_v, color in (
         (30.0, COLOR_TERTIARY),
@@ -3276,6 +3290,7 @@ def generate_effective_kappa(output_dir: str) -> None:
                     cavity_surface=s_over_v * volume,
                     cavity_volume=volume,
                     frequency=float(f),
+                    **printed_air,
                 )
                 for f in freq
             ]
@@ -3297,7 +3312,7 @@ def generate_effective_kappa(output_dir: str) -> None:
     )
 
     kappa_a3 = materials.effective_kappa(
-        cavity_surface=0.0471, cavity_volume=volume, frequency=2.0
+        cavity_surface=0.0471, cavity_volume=volume, frequency=2.0, **printed_air
     )
     ax.scatter(
         [2.0],
