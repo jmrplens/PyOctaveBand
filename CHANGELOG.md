@@ -482,7 +482,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
-- A temperature below absolute zero is refused rather than computed with.
+- A temperature at or below absolute zero is refused rather than computed
+  with.
   `sea_water_sound_speed(-273.15, 35.0, 0.0)` returned -31 457 m/s, a negative
   speed of sound; `sound_speed_profile` checked only that its temperatures were
   finite, so -300 degC went straight through to [-44 562, -45 333] m/s; and

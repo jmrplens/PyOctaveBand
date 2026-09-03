@@ -150,8 +150,8 @@ def _resolve_speed(temperature: float, speed_of_sound: float | None) -> float:
 
     Warns when the speed is derived from a temperature outside the 15..30 degC
     validity range of Eq. (6). An explicit ``speed_of_sound`` bypasses the check.
-    Rejects a physically impossible ``temperature`` outright: Eq. (6) applied
-    below absolute zero would hand back a zero or negative speed of sound.
+    Rejects a physically impossible ``temperature`` outright: Eq. (6) applied at
+    or below absolute zero would hand back a zero or negative speed of sound.
     """
     if speed_of_sound is not None:
         # NaN passes a bare <= comparison and propagates into every derived

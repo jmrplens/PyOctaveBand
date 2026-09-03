@@ -46,8 +46,8 @@ def require_above_absolute_zero(value: float, name: str) -> float:
 
     The one bound a temperature always has. A model may state a narrower domain
     for itself, and that is a warning rather than a refusal, because a fit past
-    its validated range is still arithmetic; a temperature below absolute zero
-    is not a state at all, and the arithmetic below one is not wrong so much as
+    its validated range is still arithmetic; a temperature at or below absolute
+    zero is not a state at all, and the arithmetic below one is not wrong so much as
     meaningless. Left unguarded it does not raise, it returns: a sea-water sound
     speed comes back at -31 457 m/s, and an absorption at -300 degC comes back
     at a plausible-looking 0,495 dB/km.
@@ -68,8 +68,8 @@ def require_above_absolute_zero_array(x: ArrayLike, name: str) -> np.ndarray:
     """Require every temperature in ``x`` to be finite and above absolute zero.
 
     The array companion of :func:`require_above_absolute_zero`. A profile is
-    where this bites hardest: one element below absolute zero among a hundred
-    good ones still poisons the whole returned array, and the caller has no
+    where this bites hardest: one element at or below absolute zero among a
+    hundred good ones still poisons the whole returned array, and the caller has no
     reason to look at any single element of it.
 
     :param x: Temperatures, in degrees Celsius.

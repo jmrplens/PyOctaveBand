@@ -196,7 +196,8 @@ def impedance_adjustment(
     :param temperature: Aerodrome air temperature ``T``, in °C (default 15 °C).
     :param pressure: Aerodrome air pressure ``p``, in kPa (default 101.325 kPa).
     :return: The impedance adjustment, in dB (added to the NPD level).
-    :raises ValueError: If the pressure is not positive or inputs are non-finite.
+    :raises ValueError: If the pressure is not positive, the temperature is at
+        or below -273,15 degC, or either input is non-finite.
     """
     t = float(temperature)
     p = float(pressure)
