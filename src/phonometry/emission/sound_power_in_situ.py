@@ -320,9 +320,11 @@ def static_pressure_from_altitude(altitude: float) -> float:
        \qquad a = 2{,}2560 \times 10^{-5}\ \mathrm{m}^{-1},
        \quad b = 5{,}255\,3
 
-    with :math:`p_{\mathrm{s},0}` = 101,325 kPa. The result is in kilopascals
-    so that it feeds ``static_pressure`` of :func:`sound_power_in_situ`
-    directly. A site below sea level is admissible (the base exceeds one);
+    Annex C prints :math:`p_{\mathrm{s},0}` = 1,013 25 x 10^5 Pa and states
+    the quantity in pascals. The result here is in kilopascals so that it feeds
+    ``static_pressure`` of :func:`sound_power_in_situ` directly, matching
+    ISO 3741, ISO 3744 and ISO 3745, which do print kilopascals; the ratio the
+    correction uses is the same either way. A site below sea level is admissible (the base exceeds one);
     the formula stops meaning anything where the base reaches zero, some
     44 km up, and that is refused.
 
@@ -870,7 +872,13 @@ def sound_power_in_situ(
         since the procedure takes one background reading (7.5).
     :param temperature: Air temperature at the test, in degrees Celsius.
     :param static_pressure: Static pressure at the test, in kilopascals
-        (see :func:`static_pressure_from_altitude`).
+        (see :func:`static_pressure_from_altitude`). Annex C prints this
+        quantity in pascals, with :math:`p_{\mathrm{s},0}` = 1,013 25 x 10^5
+        Pa, and is alone in its family in doing so: ISO 3741:2010,
+        ISO 3744:2010 and ISO 3745:2012 all print kilopascals. This argument
+        follows the three, so that one unit serves the whole ISO 3740 family;
+        ``C2`` depends only on the ratio :math:`p_\mathrm{s}/p_{\mathrm{s},0}`,
+        so the choice cannot move a result.
     :param conditions: The :class:`GradeConditions` Table 2 reads to decide
         the accuracy grade: the excess of sound pressure level at each
         microphone position (Annex A) and the range of the directivity survey
@@ -985,7 +993,8 @@ def sound_energy_in_situ(
         (3.4, NOTE 1), so that the margin compares like with like. The two
         coincide at ``T`` = 1 s.
     :param temperature: Air temperature at the test, in degrees Celsius.
-    :param static_pressure: Static pressure at the test, in kilopascals.
+    :param static_pressure: Static pressure at the test, in kilopascals, as
+        for :func:`sound_power_in_situ`; Annex C itself prints pascals.
     :param conditions: The :class:`GradeConditions` of the determination, as
         for :func:`sound_power_in_situ`.
     :param sigma_omc: Operating-and-mounting standard deviation, in decibels.
