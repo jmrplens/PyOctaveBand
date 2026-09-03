@@ -54,28 +54,36 @@ ASTM E2611-19 Eq. (28).
 
 **Returns:** Absorption coefficient `alpha` (real).
 
-## air_density_iso
+## air_density_iso10534
 
 ```python
-air_density_iso(
-    temperature: ArrayLike,
-    atmospheric_pressure: ArrayLike = 101.325,
+air_density_iso10534(
+    *,
+    temperature_c: ArrayLike,
+    atmospheric_pressure_kpa: ArrayLike = 101.325,
 ) -> Real
 ```
 
 Air density (ISO 10534-2:2001, Eq. (7)).
 
 $\rho = \rho_0 (p_\mathrm{a} T_0) / (p_0 T)$ with $\rho_0 = 1.186$
-kg/m3, $T_0 = 293$ K and $p_0 = 101.325$ kPa.
+kg/m3, $T_0 = 293$ K and $p_0 = 101.325$ kPa, and $T$ in
+kelvin.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `temperature` | Air temperature `T`, in **kelvin**. |
-| `atmospheric_pressure` | Atmospheric pressure `pa`, in kilopascals (default 101.325 kPa). |
+| `temperature_c` | Air temperature, in **degrees Celsius**. |
+| `atmospheric_pressure_kpa` | Atmospheric pressure `pa`, in **kilopascals** (default 101.325 kPa). |
 
 **Returns:** Air density `rho`, in kilograms per cubic metre.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | if any temperature is at or below -273.15 degC, or any pressure is not positive. |
 
 ## apply_mic_calibration
 
@@ -490,23 +498,29 @@ the sample to the **farther** microphone (Clause 7.7).
 
 **Returns:** Complex reflection factor `r` at the reference plane.
 
-## speed_of_sound_iso
+## speed_of_sound_iso10534
 
 ```python
-speed_of_sound_iso(temperature: ArrayLike) -> Real
+speed_of_sound_iso10534(*, temperature_c: ArrayLike) -> Real
 ```
 
 Speed of sound in air (ISO 10534-2:2001, Eq. (5)).
 
-$c_0 = 343.2 \sqrt{T / 293}$.
+$c_0 = 343.2 \sqrt{T / 293}$, with $T$ in kelvin.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `temperature` | Air temperature `T`, in **kelvin**. |
+| `temperature_c` | Air temperature, in **degrees Celsius**. |
 
 **Returns:** Speed of sound `c0`, in metres per second.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | if any temperature is at or below -273.15 degC. |
 
 ## surface_impedance
 
@@ -616,7 +630,7 @@ supplied, frequencies outside the plane-wave range (Eqs. (1)-(4)) raise an
 | `frequency` | Frequency vector `f`, in hertz. |
 | `spacing` | Microphone spacing `s`, in metres. |
 | `x1` | Distance from the sample to the farther microphone, in metres. |
-| `speed_of_sound` | Speed of sound `c0`, in m/s (see [`speed_of_sound_iso`](/phonometry/reference/api/materials/impedance-tube/#speed_of_sound_iso)). |
+| `speed_of_sound` | Speed of sound `c0`, in m/s (see [`speed_of_sound_iso10534`](/phonometry/reference/api/materials/impedance-tube/#speed_of_sound_iso10534)). |
 | `characteristic_impedance` | Characteristic impedance `rho c0`, in rayls. |
 | `attenuation` | Optional tube attenuation constant `k0''`, in nepers/m (see [`tube_attenuation_constant`](/phonometry/reference/api/materials/impedance-tube/#tube_attenuation_constant)). |
 | `diameter` | Optional tube diameter/lateral dimension, in metres, that activates the plane-wave range check. |

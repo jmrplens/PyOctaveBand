@@ -229,7 +229,7 @@ situation 2 adds the test sample, still without turntable rotation
 | :--- | :--- |
 | `volume` | Reverberation-room volume `V`, in cubic metres. |
 | `area` | Test-sample area `S`, in square metres. |
-| `c1` | Speed of sound during `t1`, in m/s (see [`speed_of_sound`](/phonometry/reference/api/materials/reverberation-room-scattering/#speed_of_sound)). |
+| `c1` | Speed of sound during `t1`, in m/s (see [`speed_of_sound_iso17497`](/phonometry/reference/api/materials/reverberation-room-scattering/#speed_of_sound_iso17497)). |
 | `t1` | Reverberation time without sample (base plate only), in seconds. |
 | `c2` | Speed of sound during `t2`, in m/s. |
 | `t2` | Reverberation time with the test sample, in seconds. |
@@ -532,10 +532,10 @@ apparent (specular) absorption includes the energy lost to scattering.
 | :--- | :--- |
 | ValueError | for non-positive `V`, `S`, `c` or `T`. |
 
-## speed_of_sound
+## speed_of_sound_iso17497
 
 ```python
-speed_of_sound(temperature: ArrayLike) -> Real
+speed_of_sound_iso17497(*, temperature_c: ArrayLike) -> Real
 ```
 
 Speed of sound in air (ISO 17497-1:2004, Clause 8, Eq. (2)).
@@ -546,7 +546,7 @@ $c = 343.2 \sqrt{(273.15 + t) / 293.15}$ (m/s).
 
 | Name | Description |
 | :--- | :--- |
-| `temperature` | Air temperature `t`, in **degrees Celsius** (scalar or per band). |
+| `temperature_c` | Air temperature, in **degrees Celsius** (scalar or per band). |
 
 **Returns:** Speed of sound `c`, in metres per second.
 

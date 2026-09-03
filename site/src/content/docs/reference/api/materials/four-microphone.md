@@ -36,8 +36,9 @@ that module.
 
 ```python
 air_density_astm(
-    temperature: ArrayLike,
-    atmospheric_pressure: ArrayLike = 101.325,
+    *,
+    temperature_c: ArrayLike,
+    atmospheric_pressure_kpa: ArrayLike = 101.325,
 ) -> Real
 ```
 
@@ -49,10 +50,16 @@ $\rho = 1.290 \, \frac{P}{101.325} \, \frac{273.15}{273.15 + T}$.
 
 | Name | Description |
 | :--- | :--- |
-| `temperature` | Room temperature `T`, in **degrees Celsius**. |
-| `atmospheric_pressure` | Atmospheric pressure `P`, in kilopascals (default 101.325 kPa). |
+| `temperature_c` | Room temperature, in **degrees Celsius**. |
+| `atmospheric_pressure_kpa` | Atmospheric pressure `P`, in **kilopascals** (default 101.325 kPa). |
 
 **Returns:** Air density `rho`, in kilograms per cubic metre.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | if any temperature is at or below -273.15 degC, or any pressure is not positive. |
 
 ## air_layer_transfer_matrix
 
@@ -164,7 +171,7 @@ binding for every microphone pair).
 ## speed_of_sound_astm
 
 ```python
-speed_of_sound_astm(temperature: ArrayLike) -> Real
+speed_of_sound_astm(*, temperature_c: ArrayLike) -> Real
 ```
 
 Speed of sound in air (ASTM E2611-19, Eq. (4)).
@@ -175,9 +182,15 @@ $c = 20.047 \sqrt{273.15 + T}$.
 
 | Name | Description |
 | :--- | :--- |
-| `temperature` | Room temperature `T`, in **degrees Celsius**. |
+| `temperature_c` | Room temperature, in **degrees Celsius**. |
 
 **Returns:** Speed of sound `c`, in metres per second.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | if any temperature is at or below -273.15 degC. |
 
 ## transfer_matrix_one_load
 

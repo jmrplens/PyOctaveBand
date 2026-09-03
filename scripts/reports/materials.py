@@ -198,13 +198,17 @@ def _impedance_tube_example() -> tuple[object, ReportMetadata, str]:
     alpha = 1 - |(-j)/(2 - j)|^2 = 1 - 1/5 = 0.80; at 1600 Hz the reactance is
     mass-like and alpha falls back to 0.68.
     """
-    speed_of_sound_iso = ph.materials.speed_of_sound_iso
-    air_density_iso = ph.materials.air_density_iso
+    speed_of_sound_iso10534 = ph.materials.speed_of_sound_iso10534
+    air_density_iso10534 = ph.materials.air_density_iso10534
 
-    temperature_k = 293.15  # 20 degC
+    temperature_c = 20.0
     pressure_kpa = 101.0
-    c0 = float(speed_of_sound_iso(temperature_k))
-    rho = float(air_density_iso(temperature_k, pressure_kpa))
+    c0 = float(speed_of_sound_iso10534(temperature_c=temperature_c))
+    rho = float(
+        air_density_iso10534(
+            temperature_c=temperature_c, atmospheric_pressure_kpa=pressure_kpa
+        )
+    )
     rc = ph.materials.characteristic_impedance(rho, c0)
 
     diameter, spacing, x1 = 0.100, 0.050, 0.100

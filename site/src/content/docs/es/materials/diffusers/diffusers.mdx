@@ -254,7 +254,8 @@ temps = [20.0, 20.5, 21.0, 21.5]        # degC, media por situación (apartado 7
 # La atenuación en tono puro de ISO 9613-1 a 5 kHz para esos cuatro climas, en
 # dB/m: air_attenuation(5000.0, t, rh) en la guía de propagación exterior.
 alpha = [0.04062, 0.04189, 0.04334, 0.04502]
-c = [float(materials.speed_of_sound(t)) for t in temps]           # ec. (2)
+c = [float(materials.speed_of_sound_iso17497(temperature_c=t))
+     for t in temps]                                             # ec. (2)
 m = [float(materials.air_attenuation_coefficient(a)) for a in alpha]  # ec. (3)
 print(np.round(c, 2))    # [343.2  343.49 343.78 344.08]
 print(np.round(m, 5))    # [0.00935 0.00965 0.00998 0.01037]   1/m a 5 kHz

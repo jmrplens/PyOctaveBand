@@ -27393,9 +27393,10 @@ import numpy as np
 from phonometry import materials, ReportMetadata
 
 # 100 mm tube, s = 50 mm, far microphone at x1 = 100 mm, 20 degC / 101 kPa.
-c0 = float(materials.speed_of_sound_iso(293.15))                    # 343.29 m/s
+c0 = float(materials.speed_of_sound_iso10534(temperature_c=20.0))   # 343.29 m/s
 rho_c = materials.characteristic_impedance(
-    float(materials.air_density_iso(293.15, 101.0)), c0)            # 405.6 Pa.s/m
+    float(materials.air_density_iso10534(
+        temperature_c=20.0, atmospheric_pressure_kpa=101.0)), c0)   # 405.6 Pa.s/m
 diameter, spacing, x1 = 0.100, 0.050, 0.100
 theta, cavity = 1.0, c0 / (4.0 * 1000.0)          # quarter-wave at 1 kHz: 86 mm
 freqs = np.array([400, 500, 630, 800, 1000, 1250, 1600], dtype=float)
@@ -37062,10 +37063,10 @@ documents, one page per module.
 | `plane_wave_frequency_range_astm` | `function` | **Working plane-wave range (f_l, f_u) (ASTM E2611-19 6.2.3–6.2.5, 6.5.4).**<br>• `spacing` s [m]<br>• `speed_of_sound` c [m/s]<br>• `diameter` d [m] (Default: None → spacing bound only)<br>• `shape`: 'circular'/'rectangular'/'square' (Default: 'circular') | `plane_wave_frequency_range_astm(0.05, 343.2, diameter=0.1)  # (68.6, 2011.2)`<br><br>• [Hz]; f_u s < 0.40 c, f_u d < 0.586 c (0.500 rectangular) |
 | `plot_impedance_tube_geometry` | `function` | **To-scale side view of the ISO 10534-2 tube.**<br>• `spacing` s, `x1` [m]<br>• `diameter` d [m], `shape` (Default: 'circular')<br>• `sample_thickness` [m] (Default: 50 mm nominal)<br>• `language` | `plot_impedance_tube_geometry(spacing=0.05, x1=0.15, diameter=0.10)`<br><br>• Dimensioned drawing + plane-wave range; also `ImpedanceTubeResult.plot_geometry()` |
 | `plot_transmission_tube_geometry` | `function` | **To-scale side view of the ASTM E2611 tube.**<br>• `l1`, `s1`, `l2`, `s2`, `thickness` [m]<br>• `diameter` d [m], `shape` (Default: 'circular')<br>• `language` | `plot_transmission_tube_geometry(l1=0.10, s1=0.05, l2=0.20, s2=0.05, thickness=0.05, diameter=0.10)`<br><br>• Four microphones + termination; also `TransferMatrix.plot_geometry()` |
-| `speed_of_sound_iso` | `function` | **Speed of sound (ISO 10534-2 Eq. 5).**<br>• `temperature` T [K] | `speed_of_sound_iso(293.0)  # 343.2`<br><br>• c0 = 343.2 √(T/293) [m/s] |
-| `air_density_iso` | `function` | **Air density (ISO 10534-2 Eq. 7).**<br>• `temperature` T [K]<br>• `atmospheric_pressure` [kPa] (Default: 101.325) | `air_density_iso(293.0)  # 1.186`<br><br>• ρ [kg/m³] |
-| `speed_of_sound_astm` | `function` | **Speed of sound (ASTM E2611-19 Eq. 4).**<br>• `temperature` T [°C] | `speed_of_sound_astm(20.0)  # 343.2`<br><br>• 20.047 √(273.15 + T) [m/s] |
-| `air_density_astm` | `function` | **Air density (ASTM E2611-19 Eq. 5).**<br>• `temperature` T [°C]<br>• `atmospheric_pressure` P [kPa] (Default: 101.325) | `air_density_astm(20.0)  # 1.202`<br><br>• ρ [kg/m³] |
+| `speed_of_sound_iso10534` | `function` | **Speed of sound (ISO 10534-2 Eq. 5).**<br>• `temperature_c` t [°C] | `speed_of_sound_iso10534(temperature_c=19.85)  # 343.2`<br><br>• c0 = 343.2 √(T/293) [m/s], T = 273.15 + t |
+| `air_density_iso10534` | `function` | **Air density (ISO 10534-2 Eq. 7).**<br>• `temperature_c` t [°C]<br>• `atmospheric_pressure_kpa` [kPa] (Default: 101.325) | `air_density_iso10534(temperature_c=19.85)  # 1.186`<br><br>• ρ [kg/m³] |
+| `speed_of_sound_astm` | `function` | **Speed of sound (ASTM E2611-19 Eq. 4).**<br>• `temperature_c` T [°C] | `speed_of_sound_astm(temperature_c=20.0)  # 343.2`<br><br>• 20.047 √(273.15 + T) [m/s] |
+| `air_density_astm` | `function` | **Air density (ASTM E2611-19 Eq. 5).**<br>• `temperature_c` T [°C]<br>• `atmospheric_pressure_kpa` P [kPa] (Default: 101.325) | `air_density_astm(temperature_c=20.0)  # 1.202`<br><br>• ρ [kg/m³] |
 | `characteristic_impedance` | `function` | **Characteristic impedance of air ρc.**<br>• `density` ρ [kg/m³]<br>• `speed_of_sound` c [m/s] | `characteristic_impedance(1.186, 343.2)  # 407.0`<br><br>• [rayl] |
 | `hydraulic_diameter` | `function` | **Hydraulic diameter of a rectangular tube, 4A/P (ISO 10534-2 A.2.1.5).**<br>• `width` w [m]<br>• `height` h [m] | `hydraulic_diameter(0.08, 0.04)  # 0.0533`<br><br>• d_h = 2wh/(w + h) [m]; feed to `tube_attenuation_constant` |
 | `tube_attenuation_constant` | `function` | **Lower-bound tube attenuation k0″ (ISO 10534-2 Eq. A.18).**<br>• `frequency` f [Hz]<br>• `speed_of_sound` c0 [m/s]<br>• `diameter` d [m] (hydraulic for rectangular) | `tube_attenuation_constant(1000.0, 343.2, 0.1)  # 0.0179`<br><br>• [Np/m] |
@@ -37159,7 +37160,7 @@ documents, one page per module.
 | `OCTAVE_BANDS` | `tuple` | **ISO 11654 octave rating bands [Hz].**<br>(250, 500, 1000, 2000, 4000) | `OCTAVE_BANDS  # (250, ..., 4000)` |
 | `THIRD_OCTAVE_BANDS` | `tuple` | **ISO 11654 one-third-octave input bands [Hz].**<br>200 Hz to 5000 Hz (15 bands) | `THIRD_OCTAVE_BANDS[0]  # 200` |
 | `REFERENCE_CURVE` | `mapping` | **ISO 11654 Figure 1 reference curve (read-only).**<br>Keyed by octave band [Hz] → coefficient | `REFERENCE_CURVE[250]  # 0.8` |
-| `speed_of_sound` | `function` | **Speed of sound (ISO 17497-1 Eq. 2).**<br>• `temperature` t [°C] | `speed_of_sound(20.0)  # 343.2`<br><br>• 343.2 √((273.15 + t)/293.15) [m/s] |
+| `speed_of_sound_iso17497` | `function` | **Speed of sound (ISO 17497-1 Eq. 2).**<br>• `temperature_c` t [°C] | `speed_of_sound_iso17497(temperature_c=20.0)  # 343.2`<br><br>• 343.2 √((273.15 + t)/293.15) [m/s] |
 | `air_attenuation_coefficient` | `function` | **Energy attenuation m from ISO 9613-1 α (ISO 17497-1 Eq. 3).**<br>• `pressure_attenuation_db_per_m`: α [dB/m] | `air_attenuation_coefficient(0.005)  # 0.00115`<br><br>• m ≈ α/4.343 [1/m] |
 | `random_incidence_absorption` | `function` | **Random-incidence absorption αs (ISO 17497-1 Eq. 1).**<br>• `volume` V [m³], `area` S [m²]<br>• `c1`/`T1`: static base plate, no sample<br>• `c2`/`T2`: with the test sample<br>• `m1`/`m2`: air attenuation [1/m] (Default: 0) | `a_s = materials.random_incidence_absorption(200.0, 10.8, c1=343.0, t1=2.5, c2=343.2, t2=1.8)  # 0.463` |
 | `specular_absorption_coefficient` | `function` | **Specular absorption αspec (Eq. 4).**<br>• `volume`, `area`<br>• `c3`/`T3`: rotating base plate, no sample<br>• `c4`/`T4`: sample on the rotating turntable<br>• `m3`/`m4` (Default: 0) | `a_spec = materials.specular_absorption_coefficient(200.0, 10.8, c3=c3, t3=t3, c4=c4, t4=t4)`<br><br>• Includes the energy lost to scattering |

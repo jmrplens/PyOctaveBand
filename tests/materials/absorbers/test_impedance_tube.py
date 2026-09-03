@@ -39,7 +39,7 @@ from phonometry.materials.absorbers.impedance_tube import (
     ImpedanceTubeResult,
     ImpedanceTubeWarning,
     absorption_from_reflection,
-    air_density_iso,
+    air_density_iso10534,
     apply_mic_calibration,
     characteristic_impedance,
     hydraulic_diameter,
@@ -48,7 +48,7 @@ from phonometry.materials.absorbers.impedance_tube import (
     normalized_surface_impedance,
     plane_wave_frequency_range,
     reflection_factor,
-    speed_of_sound_iso,
+    speed_of_sound_iso10534,
     surface_impedance,
     tube_attenuation_constant,
     tube_wavenumber,
@@ -71,37 +71,47 @@ RC = RHO * C0
 # Air properties.
 # ---------------------------------------------------------------------------
 def test_speed_of_sound_iso_20c() -> None:
-    # 20 degC = 293.15 K; ISO Eq. (5) c0 = 343.2*sqrt(T/293).
-    assert float(speed_of_sound_iso(293.15)) == pytest.approx(343.2, abs=0.1)
-    # Exactly the reference constant at the reference temperature.
-    assert float(speed_of_sound_iso(293.0)) == pytest.approx(343.2, abs=1e-9)
+    # ISO Eq. (5) c0 = 343.2*sqrt(T/293), with T = 273.15 + t.
+    c20 = float(speed_of_sound_iso10534(temperature_c=20.0))
+    assert c20 == pytest.approx(343.2, abs=0.1)
+    # 19,85 degC is the reference 293 K exactly, so the constant comes back.
+    c_ref = float(speed_of_sound_iso10534(temperature_c=19.85))
+    assert c_ref == pytest.approx(343.2, abs=1e-9)
 
 
 def test_speed_of_sound_astm_20c() -> None:
     # ASTM Eq. (4) c = 20.047*sqrt(273.15 + T), T in degC.
-    assert float(speed_of_sound_astm(20.0)) == pytest.approx(343.24, abs=0.02)
+    assert float(speed_of_sound_astm(temperature_c=20.0)) == pytest.approx(
+        343.24, abs=0.02
+    )
 
 
 def test_both_speed_formulas_agree_at_20c() -> None:
-    iso = float(speed_of_sound_iso(293.15))
-    astm = float(speed_of_sound_astm(20.0))
+    iso = float(speed_of_sound_iso10534(temperature_c=20.0))
+    astm = float(speed_of_sound_astm(temperature_c=20.0))
     assert iso == pytest.approx(astm, abs=0.2)
 
 
 def test_air_density_reference_values() -> None:
-    # ISO Eq. (7): rho0 at the reference state.
-    assert float(air_density_iso(293.0, 101.325)) == pytest.approx(1.186, abs=1e-9)
+    # ISO Eq. (7): rho0 at the reference state (19,85 degC is 293 K exactly).
+    rho_iso = air_density_iso10534(
+        temperature_c=19.85, atmospheric_pressure_kpa=101.325
+    )
+    assert float(rho_iso) == pytest.approx(1.186, abs=1e-9)
     # ASTM Eq. (5) at 20 degC, 101.325 kPa -> 1.2020 kg/m3 (notes 2.11).
-    assert float(air_density_astm(20.0, 101.325)) == pytest.approx(1.2020, abs=1e-3)
+    rho_astm = air_density_astm(temperature_c=20.0, atmospheric_pressure_kpa=101.325)
+    assert float(rho_astm) == pytest.approx(1.2020, abs=1e-3)
 
 
 def test_air_property_domain_errors() -> None:
-    with pytest.raises(ValueError, match="'temperature' must be positive"):
-        speed_of_sound_iso(-1.0)
-    with pytest.raises(ValueError, match="'temperature' must exceed"):
-        speed_of_sound_astm(-300.0)
-    with pytest.raises(ValueError, match="'atmospheric_pressure' must be positive"):
-        air_density_iso(293.0, -1.0)
+    with pytest.raises(ValueError, match="'temperature_c' must exceed"):
+        speed_of_sound_iso10534(temperature_c=-300.0)
+    with pytest.raises(ValueError, match="'temperature_c' must exceed"):
+        speed_of_sound_astm(temperature_c=-300.0)
+    with pytest.raises(ValueError, match="'atmospheric_pressure_kpa' must be positive"):
+        air_density_iso10534(temperature_c=19.85, atmospheric_pressure_kpa=-1.0)
+    with pytest.raises(ValueError, match="'atmospheric_pressure_kpa' must be positive"):
+        air_density_astm(temperature_c=20.0, atmospheric_pressure_kpa=-1.0)
 
 
 def test_air_density_astm_rejects_temperature_below_absolute_zero() -> None:
@@ -112,20 +122,66 @@ def test_air_density_astm_rejects_temperature_below_absolute_zero() -> None:
     reduction builds on. The temperature is refused at the door, exactly as
     ``speed_of_sound_astm`` refuses it above.
     """
-    with pytest.raises(ValueError, match="'temperature' must exceed"):
-        air_density_astm(-300.0, 101.325)
+    with pytest.raises(ValueError, match="'temperature_c' must exceed"):
+        air_density_astm(temperature_c=-300.0, atmospheric_pressure_kpa=101.325)
 
 
 def test_air_density_mismatched_arrays_raise() -> None:
     # Two arrays of different lengths must be refused by name, not left to
     # numpy's two-shapes broadcast error.
-    with pytest.raises(ValueError, match="'temperature'.*'atmospheric_pressure'"):
-        air_density_iso([293.0, 300.0], [101.0, 100.0, 99.0])
+    with pytest.raises(ValueError, match="'temperature_c'.*'atmospheric_pressure_kpa'"):
+        air_density_iso10534(
+            temperature_c=[19.85, 26.85],
+            atmospheric_pressure_kpa=[101.0, 100.0, 99.0],
+        )
+
+
+_AIR_HELPERS = (
+    (speed_of_sound_iso10534, {}),
+    (air_density_iso10534, {}),
+    (speed_of_sound_astm, {}),
+    (air_density_astm, {}),
+)
+
+
+@pytest.mark.parametrize(("helper", "extra"), _AIR_HELPERS)
+def test_air_helpers_refuse_a_positional_temperature(
+    helper: object, extra: dict[str, float]
+) -> None:
+    """The unit lives in the keyword, so it cannot be dropped at the call site.
+
+    Before these were keyword-only, ``speed_of_sound_iso(20.0)`` read as a room
+    temperature, was taken as 20 K and returned 89,7 m/s with no exception.
+    """
+    with pytest.raises(TypeError, match="positional"):
+        helper(20.0, **extra)  # type: ignore[operator]
+
+
+@pytest.mark.parametrize(("helper", "extra"), _AIR_HELPERS)
+def test_air_helpers_bound_only_absolute_zero(
+    helper: object, extra: dict[str, float]
+) -> None:
+    """Nothing but the physical bound is refused.
+
+    Neither ISO 10534-2 Eq. (5)/(7) nor ASTM E2611-19 Eq. (4)/(5) states a
+    temperature range, so the helpers must accept any temperature that can
+    exist. A magnitude guard drawn at laboratory bounds would reject an
+    extreme but conforming call, and would still not catch a caller who means
+    a different unit.
+    """
+    for temperature_c in (-272.0, -50.0, 0.0, 100.0, 500.0):
+        assert np.isfinite(float(helper(temperature_c=temperature_c, **extra)))  # type: ignore[operator]
+    with pytest.raises(ValueError, match="'temperature_c' must exceed"):
+        helper(temperature_c=-273.15, **extra)  # type: ignore[operator]
 
 
 def test_air_density_scalar_beside_array_still_broadcasts() -> None:
     # One shared temperature against several pressures stays legal.
-    rho = np.asarray(air_density_iso(293.0, [101.325, 100.0]))
+    rho = np.asarray(
+        air_density_iso10534(
+            temperature_c=19.85, atmospheric_pressure_kpa=[101.325, 100.0]
+        )
+    )
     assert rho.shape == (2,)
     assert rho[0] == pytest.approx(1.186, abs=1e-9)
 
@@ -935,9 +991,9 @@ def test_public_exports() -> None:
         "normalized_surface_impedance",
         "normalized_surface_admittance",
         "characteristic_impedance",
-        "speed_of_sound_iso",
+        "speed_of_sound_iso10534",
         "speed_of_sound_astm",
-        "air_density_iso",
+        "air_density_iso10534",
         "air_density_astm",
         "tube_wavenumber",
         "tube_attenuation_constant",

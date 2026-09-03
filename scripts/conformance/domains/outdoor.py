@@ -389,7 +389,7 @@ _SCATTERING = "Scattering & diffusion (ISO 17497)"
 
 @register(_SCATTERING, "ISO 17497-1:2004 Eq (2)", "Reference speed of sound at 20 C")
 def _chk_iso17497_1_speed() -> Outcome:
-    c = float(ph.materials.speed_of_sound(20.0))
+    c = float(ph.materials.speed_of_sound_iso17497(temperature_c=20.0))
     return numeric(ref.ISO17497_1_SPEED_OF_SOUND_20C, c, 1e-6, unit="m/s", places=4)
 
 

@@ -52,7 +52,7 @@ from phonometry.materials.diffusers.reverberation_room_scattering import (
     scattering_coefficient_spectrum,
     scattering_coefficient_uncertainty,
     specular_absorption_coefficient,
-    speed_of_sound,
+    speed_of_sound_iso17497,
 )
 from phonometry.materials.diffusers.scattering_diffusion import (
     TWO_DIMENSIONAL_SOURCE_WEIGHTS,
@@ -78,11 +78,13 @@ K = 55.3  # ISO 17497-1 Sabine constant (Eqs. (1), (4), (6)).
 # ---------------------------------------------------------------------------
 def test_speed_of_sound_20c_is_reference() -> None:
     # Eq. (2): c = 343.2 * sqrt((273.15 + 20) / 293.15) = 343.2 exactly.
-    assert float(speed_of_sound(20.0)) == pytest.approx(343.2, abs=1e-9)
+    assert float(speed_of_sound_iso17497(temperature_c=20.0)) == pytest.approx(
+        343.2, abs=1e-9
+    )
 
 
 def test_speed_of_sound_monotonic_and_array() -> None:
-    c = speed_of_sound([0.0, 20.0, 40.0])
+    c = speed_of_sound_iso17497(temperature_c=[0.0, 20.0, 40.0])
     assert c[0] < c[1] < c[2]
 
 
@@ -470,6 +472,23 @@ def test_random_incidence_two_dimensional_weighting() -> None:
 # ---------------------------------------------------------------------------
 # Input-validation guards.
 # ---------------------------------------------------------------------------
+def test_speed_of_sound_refuses_a_positional_temperature() -> None:
+    """The unit lives in the keyword, so it cannot be dropped at the call site.
+
+    The name was ``speed_of_sound`` and said nothing about its unit, so a
+    caller carrying kelvin from ISO 10534-2 got 477 m/s with no exception.
+    """
+    with pytest.raises(TypeError, match="positional"):
+        speed_of_sound_iso17497(20.0)  # type: ignore[misc]
+
+
+def test_speed_of_sound_bounds_only_absolute_zero() -> None:
+    """ISO 17497-1 Clause 8 states no temperature range, so none is imposed."""
+    for temperature_c in (-272.0, 0.0, 100.0, 500.0):
+        c = float(speed_of_sound_iso17497(temperature_c=temperature_c))
+        assert np.isfinite(c)
+
+
 def test_speed_of_sound_rejects_temperature_below_absolute_zero() -> None:
     """Eq. (2) takes the square root of (273,15 + t)/293,15.
 
@@ -477,8 +496,8 @@ def test_speed_of_sound_rejects_temperature_below_absolute_zero() -> None:
     hands back a NaN, which would then travel silently into the Sabine
     Eqs. (1)/(4) that consume c. The temperature is refused first.
     """
-    with pytest.raises(ValueError, match="'temperature' must exceed"):
-        speed_of_sound(-300.0)
+    with pytest.raises(ValueError, match="'temperature_c' must exceed"):
+        speed_of_sound_iso17497(temperature_c=-300.0)
 
 
 def test_diffusion_requires_two_receivers() -> None:
