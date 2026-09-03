@@ -34,7 +34,7 @@ from .reverberation_room_scattering import (
     scattering_coefficient_spectrum,
     scattering_coefficient_uncertainty,
     specular_absorption_coefficient,
-    speed_of_sound,
+    speed_of_sound_iso17497,
 )
 from .scattering_diffusion import (
     TWO_DIMENSIONAL_SOURCE_WEIGHTS,
@@ -84,5 +84,5 @@ __all__ = [
     "scattering_coefficient_spectrum",
     "scattering_coefficient_uncertainty",
     "specular_absorption_coefficient",
-    "speed_of_sound",
+    "speed_of_sound_iso17497",
 ]

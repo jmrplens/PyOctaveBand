@@ -36,9 +36,9 @@ from report_assertions import assert_one_page
 from phonometry import ReportMetadata
 from phonometry.materials import (
     ImpedanceTubeResult,
-    air_density_iso,
+    air_density_iso10534,
     characteristic_impedance,
-    speed_of_sound_iso,
+    speed_of_sound_iso10534,
     tube_wavenumber,
     two_microphone_impedance,
 )
@@ -46,14 +46,18 @@ from phonometry.materials import (
 if TYPE_CHECKING:
     from pathlib import Path
 
-_TEMPERATURE_K = 293.15  # 20 degC
+_TEMPERATURE_C = 20.0
 _DIAMETER, _SPACING, _X1 = 0.100, 0.050, 0.100
 _FREQS = np.array([400, 500, 630, 800, 1000, 1250, 1600], dtype=float)
 
 
 def _result() -> ImpedanceTubeResult:
-    c0 = float(speed_of_sound_iso(_TEMPERATURE_K))
-    rho = float(air_density_iso(_TEMPERATURE_K, 101.0))
+    c0 = float(speed_of_sound_iso10534(temperature_c=_TEMPERATURE_C))
+    rho = float(
+        air_density_iso10534(
+            temperature_c=_TEMPERATURE_C, atmospheric_pressure_kpa=101.0
+        )
+    )
     rc = characteristic_impedance(rho, c0)
     cavity = c0 / (4.0 * 1000.0)
     k0 = 2.0 * np.pi * _FREQS / c0

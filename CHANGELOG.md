@@ -633,6 +633,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The five air-property helpers of `materials` take degrees Celsius, spell the
+  unit in the argument name and refuse a positional call. Two of them took
+  kelvin under the same `temperature` name their three siblings read as degrees
+  Celsius, so `speed_of_sound_iso(20.0)` returned 89,7 m/s and
+  `air_density_iso(20.0)` returned 17,4 kg/m3, fourteen times the density of
+  air, with no exception raised and nothing in the signature to say which unit
+  was wanted. The helpers are now
+  `speed_of_sound_iso10534(temperature_c=...)`,
+  `air_density_iso10534(temperature_c=..., atmospheric_pressure_kpa=...)`,
+  `speed_of_sound_astm(temperature_c=...)`,
+  `air_density_astm(temperature_c=..., atmospheric_pressure_kpa=...)` and
+  `speed_of_sound_iso17497(temperature_c=...)`.
+
+  `speed_of_sound` is gone as a bare name and will not be reassigned. It was
+  the ISO 17497-1 Clause 8 formula, and nothing in the name said which of the
+  three speeds of sound in the package it was, nor what unit it wanted. The
+  ISO 10534-2 pair carries its standard's number for the same reason: `_iso`
+  did not distinguish it from the ISO 17497-1 one.
+
+  Eqs. (5) and (7) of ISO 10534-2 are still evaluated in kelvin and the printed
+  293 K, 343,2 m/s and 1,186 kg/m3 are still literal in the source; the
+  conversion happens inside the helper. Both reference states reproduce to the
+  bit, because 19,85 degC is 293 K exactly in binary floating point.
+
+  The only temperature refused is one at or below -273,15 degC. Neither
+  ISO 10534-2 nor ISO 17497-1 nor ASTM E2611-19 states a temperature range, so
+  none is imposed: a bound drawn at laboratory temperatures would refuse an
+  extreme but conforming measurement, and would still not catch a caller who
+  means a different unit. What catches that is the unit in the argument name,
+  which is why the helpers are keyword-only.
+
 - The weighting fit takes its logarithms from `filters._pinned_log` instead of
   from a `math.log` loop, and a cold design costs about 200 ms where it had
   come to cost about 260. The loop was the price of determinism: numpy's `log`

@@ -499,12 +499,12 @@ trustworthy are most of ISO 10534-2. In the order they matter:
   must be measured and held to ±1 K with a transducer accurate to ±0.5 K, and
   the atmospheric pressure to ±0.5 kPa (Clause 4.12); Eq. (5) turns the first
   into $c_0$ and Eq. (7) the pair into $\rho$. The library exposes both:
-  `speed_of_sound_iso(temperature)` takes kelvin, and
-  `air_density_iso(temperature, atmospheric_pressure)` takes kelvin and
-  kilopascals — the fiche snippet below feeds them straight into
-  `two_microphone_impedance` instead of literals. Note that the ASTM E2611
-  helpers of section 4 take degrees Celsius, and the two are not
-  interchangeable.
+  `speed_of_sound_iso10534(temperature_c=...)` and
+  `air_density_iso10534(temperature_c=..., atmospheric_pressure_kpa=...)`. Both
+  equations are written in kelvin and both arguments are in degrees Celsius,
+  like every other temperature in the library; the conversion happens inside,
+  so the printed 293 K stays literal against the page. The fiche snippet below
+  feeds them straight into `two_microphone_impedance` instead of literals.
 - **Excitation (Clause 4.10, 7.3).** A stationary signal with a flat spectral
   density over the range of interest: random, pseudo-random, periodic
   pseudo-random or chirp. The level must sit at least 10 dB above the
@@ -639,9 +639,10 @@ import numpy as np
 from phonometry import materials, ReportMetadata
 
 # 100 mm tube, s = 50 mm, far microphone at x1 = 100 mm, 20 degC / 101 kPa.
-c0 = float(materials.speed_of_sound_iso(293.15))                    # 343.29 m/s
+c0 = float(materials.speed_of_sound_iso10534(temperature_c=20.0))   # 343.29 m/s
 rho_c = materials.characteristic_impedance(
-    float(materials.air_density_iso(293.15, 101.0)), c0)            # 405.6 Pa.s/m
+    float(materials.air_density_iso10534(
+        temperature_c=20.0, atmospheric_pressure_kpa=101.0)), c0)   # 405.6 Pa.s/m
 diameter, spacing, x1 = 0.100, 0.050, 0.100
 theta, cavity = 1.0, c0 / (4.0 * 1000.0)          # quarter-wave at 1 kHz: 86 mm
 freqs = np.array([400, 500, 630, 800, 1000, 1250, 1600], dtype=float)
@@ -964,7 +965,7 @@ The impedance-tube trio. The ISO 10534-1 standing-wave-ratio method
 (`two_microphone_impedance`, `plane_wave_frequency_range`,
 `reflection_factor`, `absorption_from_reflection`,
 `normalized_surface_impedance`, `normalized_surface_admittance`, the Clause
-7.2 air properties `speed_of_sound_iso` and `air_density_iso`, the Clause 7.5
+7.2 air properties `speed_of_sound_iso10534` and `air_density_iso10534`, the Clause 7.5
 mismatch pair `mic_calibration_factor` and `apply_mic_calibration`, and
 `tube_attenuation_constant`). The ASTM E2611 four-microphone transfer-matrix
 method (`transfer_matrix_two_load`, `transfer_matrix_one_load`,

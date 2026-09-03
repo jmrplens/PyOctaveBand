@@ -89,43 +89,48 @@ __all__ = [
 
 
 # ---------------------------------------------------------------------------
-# Air properties (ASTM E2611-19 works in degrees Celsius; the ISO 10534-2
-# pair, in kelvin, lives with the two-microphone method).
+# Air properties. The ISO 10534-2 pair lives with the two-microphone method;
+# both pairs take degrees Celsius.
 # ---------------------------------------------------------------------------
-def speed_of_sound_astm(temperature: ArrayLike) -> Real:
+def speed_of_sound_astm(*, temperature_c: ArrayLike) -> Real:
     r"""Speed of sound in air (ASTM E2611-19, Eq. (4)).
 
     :math:`c = 20.047 \sqrt{273.15 + T}`.
 
-    :param temperature: Room temperature ``T``, in **degrees Celsius**.
+    :param temperature_c: Room temperature, in **degrees Celsius**.
     :return: Speed of sound ``c``, in metres per second.
+    :raises ValueError: if any temperature is at or below -273.15 degC.
     """
-    t = np.asarray(temperature, dtype=np.float64)
+    t = np.asarray(temperature_c, dtype=np.float64)
     if np.any(t <= -_ASTM_T0):
-        msg = "'temperature' must exceed -273.15 degC."
+        msg = "'temperature_c' must exceed -273.15 degC."
         raise ValueError(msg)
     return np.asarray(_ASTM_C_CONST * np.sqrt(_ASTM_T0 + t), dtype=np.float64)
 
 
 def air_density_astm(
-    temperature: ArrayLike, atmospheric_pressure: ArrayLike = _ASTM_P_REF
+    *,
+    temperature_c: ArrayLike,
+    atmospheric_pressure_kpa: ArrayLike = _ASTM_P_REF,
 ) -> Real:
     r"""Air density (ASTM E2611-19, Eq. (5)).
 
     :math:`\rho = 1.290 \, \frac{P}{101.325} \, \frac{273.15}{273.15 + T}`.
 
-    :param temperature: Room temperature ``T``, in **degrees Celsius**.
-    :param atmospheric_pressure: Atmospheric pressure ``P``, in kilopascals
-        (default 101.325 kPa).
+    :param temperature_c: Room temperature, in **degrees Celsius**.
+    :param atmospheric_pressure_kpa: Atmospheric pressure ``P``, in
+        **kilopascals** (default 101.325 kPa).
     :return: Air density ``rho``, in kilograms per cubic metre.
+    :raises ValueError: if any temperature is at or below -273.15 degC, or any
+        pressure is not positive.
     """
-    t = np.asarray(temperature, dtype=np.float64)
-    p = np.asarray(atmospheric_pressure, dtype=np.float64)
+    t = np.asarray(temperature_c, dtype=np.float64)
+    p = np.asarray(atmospheric_pressure_kpa, dtype=np.float64)
     if np.any(t <= -_ASTM_T0):
-        msg = "'temperature' must exceed -273.15 degC."
+        msg = "'temperature_c' must exceed -273.15 degC."
         raise ValueError(msg)
     if np.any(p <= 0.0):
-        msg = "'atmospheric_pressure' must be positive (kPa)."
+        msg = "'atmospheric_pressure_kpa' must be positive (kPa)."
         raise ValueError(msg)
     return np.asarray(
         _ASTM_RHO_REF * (p / _ASTM_P_REF) * (_ASTM_T0 / (_ASTM_T0 + t)),

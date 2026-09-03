@@ -64,7 +64,7 @@ __all__ = [
     "scattering_coefficient_spectrum",
     "scattering_coefficient_uncertainty",
     "specular_absorption_coefficient",
-    "speed_of_sound",
+    "speed_of_sound_iso17497",
 ]
 
 
@@ -184,20 +184,20 @@ def _nonneg_array(value: ArrayLike, name: str) -> Real:
 # ---------------------------------------------------------------------------
 # ISO 17497-1: air properties (Clause 8, Eqs. (2)/(3), after ISO 9613-1).
 # ---------------------------------------------------------------------------
-def speed_of_sound(temperature: ArrayLike) -> Real:
+def speed_of_sound_iso17497(*, temperature_c: ArrayLike) -> Real:
     r"""Speed of sound in air (ISO 17497-1:2004, Clause 8, Eq. (2)).
 
     :math:`c = 343.2 \sqrt{(273.15 + t) / 293.15}` (m/s).
 
-    :param temperature: Air temperature ``t``, in **degrees Celsius** (scalar
-        or per band).
+    :param temperature_c: Air temperature, in **degrees Celsius** (scalar or
+        per band).
     :return: Speed of sound ``c``, in metres per second.
     :raises ValueError: if any temperature is at or below -273.15 degC.
     """
-    t = np.asarray(temperature, dtype=np.float64)
+    t = np.asarray(temperature_c, dtype=np.float64)
     kelvin = _T0 + t
     if np.any(kelvin <= 0.0):
-        msg = "'temperature' must exceed -273.15 degC."
+        msg = "'temperature_c' must exceed -273.15 degC."
         raise ValueError(msg)
     return np.asarray(_C_REF * np.sqrt(kelvin / _T_REF_K), dtype=np.float64)
 
@@ -285,7 +285,7 @@ def random_incidence_absorption(
 
     :param volume: Reverberation-room volume ``V``, in cubic metres.
     :param area: Test-sample area ``S``, in square metres.
-    :param c1: Speed of sound during ``t1``, in m/s (see :func:`speed_of_sound`).
+    :param c1: Speed of sound during ``t1``, in m/s (see :func:`speed_of_sound_iso17497`).
     :param t1: Reverberation time without sample (base plate only), in seconds.
     :param c2: Speed of sound during ``t2``, in m/s.
     :param t2: Reverberation time with the test sample, in seconds.

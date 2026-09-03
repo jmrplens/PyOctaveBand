@@ -58,6 +58,9 @@ Complex = NDArray[np.complex128]
 _ISO_C_REF = 343.2
 #: Reference temperature of ISO 10534-2 Eqs. (5)/(7), in kelvin (293 exactly).
 _ISO_T_REF = 293.0
+#: Celsius-to-kelvin offset, in kelvin. Eqs. (5) and (7) are written in kelvin;
+#: the public arguments are in degrees Celsius, like the rest of the library.
+_ABSOLUTE_ZERO_C_OFFSET = 273.15
 #: Reference air density of ISO 10534-2 Eq. (7), in kg/m3 (1,186 exactly).
 _ISO_RHO_REF = 1.186
 #: Reference atmospheric pressure of ISO 10534-2 Eq. (7), in kPa (101,325).
@@ -94,7 +97,7 @@ __all__ = [
     "ImpedanceTubeResult",
     "ImpedanceTubeWarning",
     "absorption_from_reflection",
-    "air_density_iso",
+    "air_density_iso10534",
     "apply_mic_calibration",
     "characteristic_impedance",
     "hydraulic_diameter",
@@ -103,7 +106,7 @@ __all__ = [
     "normalized_surface_impedance",
     "plane_wave_frequency_range",
     "reflection_factor",
-    "speed_of_sound_iso",
+    "speed_of_sound_iso10534",
     "surface_impedance",
     "tube_attenuation_constant",
     "tube_wavenumber",
@@ -116,53 +119,59 @@ class ImpedanceTubeWarning(PhonometryWarning):
 
 
 # ---------------------------------------------------------------------------
-# Air properties (ISO 10534-2 works in kelvin; the ASTM E2611-19 pair, in
-# degrees Celsius, lives with the four-microphone method).
+# Air properties. Eqs. (5) and (7) are written in kelvin; the argument is in
+# degrees Celsius, as everywhere else in the library, and converted here.
 # ---------------------------------------------------------------------------
-def speed_of_sound_iso(temperature: ArrayLike) -> Real:
+def speed_of_sound_iso10534(*, temperature_c: ArrayLike) -> Real:
     r"""Speed of sound in air (ISO 10534-2:2001, Eq. (5)).
 
-    :math:`c_0 = 343.2 \sqrt{T / 293}`.
+    :math:`c_0 = 343.2 \sqrt{T / 293}`, with :math:`T` in kelvin.
 
-    :param temperature: Air temperature ``T``, in **kelvin**.
+    :param temperature_c: Air temperature, in **degrees Celsius**.
     :return: Speed of sound ``c0``, in metres per second.
+    :raises ValueError: if any temperature is at or below -273.15 degC.
     """
-    t = np.asarray(temperature, dtype=np.float64)
-    if np.any(t <= 0.0):
-        msg = "'temperature' must be positive (kelvin)."
+    kelvin = _ABSOLUTE_ZERO_C_OFFSET + np.asarray(temperature_c, dtype=np.float64)
+    if np.any(kelvin <= 0.0):
+        msg = "'temperature_c' must exceed -273.15 degC."
         raise ValueError(msg)
-    return np.asarray(_ISO_C_REF * np.sqrt(t / _ISO_T_REF), dtype=np.float64)
+    return np.asarray(_ISO_C_REF * np.sqrt(kelvin / _ISO_T_REF), dtype=np.float64)
 
 
-def air_density_iso(
-    temperature: ArrayLike, atmospheric_pressure: ArrayLike = _ISO_P_REF
+def air_density_iso10534(
+    *,
+    temperature_c: ArrayLike,
+    atmospheric_pressure_kpa: ArrayLike = _ISO_P_REF,
 ) -> Real:
     r"""Air density (ISO 10534-2:2001, Eq. (7)).
 
     :math:`\rho = \rho_0 (p_\mathrm{a} T_0) / (p_0 T)` with :math:`\rho_0 = 1.186`
-    kg/m3, :math:`T_0 = 293` K and :math:`p_0 = 101.325` kPa.
+    kg/m3, :math:`T_0 = 293` K and :math:`p_0 = 101.325` kPa, and :math:`T` in
+    kelvin.
 
-    :param temperature: Air temperature ``T``, in **kelvin**.
-    :param atmospheric_pressure: Atmospheric pressure ``pa``, in kilopascals
-        (default 101.325 kPa).
+    :param temperature_c: Air temperature, in **degrees Celsius**.
+    :param atmospheric_pressure_kpa: Atmospheric pressure ``pa``, in
+        **kilopascals** (default 101.325 kPa).
     :return: Air density ``rho``, in kilograms per cubic metre.
+    :raises ValueError: if any temperature is at or below -273.15 degC, or any
+        pressure is not positive.
     """
-    t = np.asarray(temperature, dtype=np.float64)
-    pa = np.asarray(atmospheric_pressure, dtype=np.float64)
-    if t.ndim != 0 and pa.ndim != 0:
+    kelvin = _ABSOLUTE_ZERO_C_OFFSET + np.asarray(temperature_c, dtype=np.float64)
+    pa = np.asarray(atmospheric_pressure_kpa, dtype=np.float64)
+    if kelvin.ndim != 0 and pa.ndim != 0:
         require_equal_shapes(
-            "air_density_iso",
-            {"temperature": t.shape, "atmospheric_pressure": pa.shape},
+            "air_density_iso10534",
+            {"temperature_c": kelvin.shape, "atmospheric_pressure_kpa": pa.shape},
             "measurement",
         )
-    if np.any(t <= 0.0):
-        msg = "'temperature' must be positive (kelvin)."
+    if np.any(kelvin <= 0.0):
+        msg = "'temperature_c' must exceed -273.15 degC."
         raise ValueError(msg)
     if np.any(pa <= 0.0):
-        msg = "'atmospheric_pressure' must be positive (kPa)."
+        msg = "'atmospheric_pressure_kpa' must be positive (kPa)."
         raise ValueError(msg)
     return np.asarray(
-        _ISO_RHO_REF * (pa * _ISO_T_REF) / (_ISO_P_REF * t), dtype=np.float64
+        _ISO_RHO_REF * (pa * _ISO_T_REF) / (_ISO_P_REF * kelvin), dtype=np.float64
     )
 
 
@@ -711,7 +720,7 @@ def two_microphone_impedance(
     :param spacing: Microphone spacing ``s``, in metres.
     :param x1: Distance from the sample to the farther microphone, in metres.
     :param speed_of_sound: Speed of sound ``c0``, in m/s (see
-        :func:`speed_of_sound_iso`).
+        :func:`speed_of_sound_iso10534`).
     :param characteristic_impedance: Characteristic impedance ``rho c0``, in
         rayls.
     :param attenuation: Optional tube attenuation constant ``k0''``, in

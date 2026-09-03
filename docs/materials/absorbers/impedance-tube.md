@@ -352,9 +352,10 @@ import numpy as np
 from phonometry import materials, ReportMetadata
 
 # 100 mm tube, s = 50 mm, far microphone at x1 = 100 mm, 20 degC / 101 kPa.
-c0 = float(materials.speed_of_sound_iso(293.15))                    # 343.29 m/s
+c0 = float(materials.speed_of_sound_iso10534(temperature_c=20.0))   # 343.29 m/s
 rho_c = materials.characteristic_impedance(
-    float(materials.air_density_iso(293.15, 101.0)), c0)            # 405.6 Pa.s/m
+    float(materials.air_density_iso10534(
+        temperature_c=20.0, atmospheric_pressure_kpa=101.0)), c0)   # 405.6 Pa.s/m
 diameter, spacing, x1 = 0.100, 0.050, 0.100
 theta, cavity = 1.0, c0 / (4.0 * 1000.0)          # quarter-wave at 1 kHz: 86 mm
 freqs = np.array([400, 500, 630, 800, 1000, 1250, 1600], dtype=float)
