@@ -2,9 +2,9 @@
 
 # API Reference
 
-All core functionality lives in nineteen domain subpackages, and every public
+All core functionality lives in twenty domain subpackages, and every public
 name is reached through the one that owns it. The top-level `phonometry`
-package publishes those nineteen and four names that belong to no domain:
+package publishes those twenty and four names that belong to no domain:
 `Signal`, `ReportMetadata`, `PhonometryWarning` and `__version__`.
 
 > **Note.** This page is the curated quick table for the GitHub/PyPI audience:
@@ -15,7 +15,7 @@ package publishes those nineteen and four names that belong to no domain:
 
 ## Namespaces
 
-The library is organized into nineteen domain subpackages, and importing the
+The library is organized into twenty domain subpackages, and importing the
 domain namespace is the primary form used throughout the documentation:
 
 ```python
@@ -29,6 +29,7 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | `phonometry.filters` | Octave and fractional-octave filter banks, frequency weightings and time weighting, parametric EQ, IEC 61260-1 and IEC 61672-1 class verification |
 | `phonometry.signals` | Levels (Leq, LAeq, percentiles), Welch and multitaper spectra, coherence, time-frequency, correlation, envelope, cepstrum, phase, synchronous averaging, test signals |
 | `phonometry.metrology` | Calibration, GUM uncertainty and Monte Carlo, data qualification (stationarity, trends, peak statistics) |
+| `phonometry.fluids` | The state of the propagating medium: humid air from IEC 61094-2:2009 Annex F (CIPM-2007), with the conditions it was computed for and the domain its model states for itself |
 | `phonometry.io` | Measurement audio files: WAV/BWF/RF64 read and write with `bext` provenance (EBU Tech 3285), headers-only `info`, block streaming, lossless conversion, calibration sidecar; FLAC, AIFF, Ogg/Opus and MP3 via the `[audio]` extra |
 | `phonometry.psychoacoustics` | Two families: `loudness` (ISO 532-1 Zwicker, ISO 532-2 and ISO 532-3 Moore-Glasberg, ECMA-418-2, ISO 226 equal-loudness contours) and `quality` (sharpness, roughness, fluctuation strength, tonality, tone audibility, annoyance), plus the ERB scale both measure on |
 | `phonometry.speech` | Speech Transmission Index (IEC 60268-16), Speech Intelligibility Index (ANSI S3.5), STOI and ESTOI |
@@ -1067,6 +1068,14 @@ documents, one page per module.
 | `tapping_machine_characteristic_power_level` / `tapping_machine_coupling_term` | `function` | **Tapping machine as a force source (EN 12354-5 Formulae D.9a/D.9b).**<br>• power: L_Ws,c = L_F − 5 − 10 lg f (≈115 dB re 1 pW per 1/3 octave)<br>• coupling: −10 lg(ωMYi) + 10 lg[1 + (ωMYi)²], `hammer_mass` M (Default: 0,5 kg) | `tapping_machine_coupling_term(500.0, 1.07e-6)` |
 | `structure_to_airborne_adjustment` | `function` | **Adjustment term D_sa (EN 12354-5 Formula F.3).**<br>• `frequency` f [Hz], `critical_frequency` fc [Hz], `mass_per_area` m [kg/m²]<br>• `radiation_factor` σ (Default: 1.0)<br>D_sa = 10 lg(400 fc σ/(m f²)); normally negative, and Formula 18a subtracts it | `structure_to_airborne_adjustment(500.0, 200.0, 92.0)  # -24.6 dB` |
 | `multi_junction_adjustment` / `MINIMUM_MULTI_JUNCTION_KIJ` | `function` / `float` | **Multi-junction ΔK (EN 12354-5 clause F.1).**<br>• `junctions` ≥ 1 → 0 dB (single), 4 dB (two), 6 dB (three or more)<br>• the resulting Kij is floored at `MINIMUM_MULTI_JUNCTION_KIJ` = −5.0 dB | `multi_junction_adjustment(2)  # 4.0` |
+| `air` | `function` | **Humid air (IEC 61094-2:2009 Annex F, CIPM-2007).**<br>• `temperature_c` t [°C], required<br>• `static_pressure_pa` p_s [Pa] (Default: None → 101 325, warns)<br>• `relative_humidity_percent` H [%] (Default: None → 50, warns)<br>• `co2_mole_fraction` x_c (Default: None → 0,000 4, silent) | `f = fluids.air(temperature_c=23.0, static_pressure_pa=101325.0, relative_humidity_percent=50.0)`<br><br>• `Fluid`; rho = 1.1860848 kg/m³, c0 = 345.86652 m/s |
+| `Fluid` | `dataclass` | **One fluid at one state, and what its model fixed there.**<br>• `temperature_c`, `static_pressure_pa`, `composition`, `model`, `validity`, `properties`<br>• accessors `density`, `speed_of_sound`, `heat_capacity_ratio`, `viscosity`, `thermal_diffusivity`, `thermal_conductivity`, `specific_heat_capacity`<br>• closed by identity: `characteristic_impedance`, `prandtl_number`, `kinematic_viscosity` | `f.characteristic_impedance  # rho c` |
+| `FluidWarning` | `warning class` | **State outside the domain its model states for itself.**<br>Annex F states 15 °C to 27 °C, 60 kPa to 110 kPa, 10 % to 90 % RH; outside it the result is an extrapolation, not a refusal | `warnings.simplefilter("error", fluids.FluidWarning)` |
+| `FluidAssumptionWarning` | `warning class` | **A condition the caller did not supply was assumed.**<br>Names the assumed values and what they are worth; passing every condition silences it | `warnings.simplefilter("error", fluids.FluidAssumptionWarning)` |
+| `FluidPropertyUnavailable` | `exception` | **A quantity the model does not determine.**<br>Raised instead of returning a number no source printed; names the model and what it does fix | `f.density  # on a model that fixes only a speed of sound` |
+| `DEFAULT_STATIC_PRESSURE_PA` | `float` | **One standard atmosphere [Pa].**<br>101325.0 | `DEFAULT_STATIC_PRESSURE_PA  # 101325.0` |
+| `DEFAULT_RELATIVE_HUMIDITY_PERCENT` | `float` | **Humidity assumed when none is supplied [%].**<br>50.0. There is no standard humidity: Annex F's own examples use 50 % and 65 % | `DEFAULT_RELATIVE_HUMIDITY_PERCENT  # 50.0` |
+| `DEFAULT_CO2_MOLE_FRACTION` | `float` | **CO₂ mole fraction assumed when none is supplied.**<br>0.0004, the value Clause F.2 recommends for laboratory conditions | `DEFAULT_CO2_MOLE_FRACTION  # 0.0004` |
 | `combine_uncertainty` | `function` | **GUM law of propagation of uncertainty (ISO/IEC Guide 98-3 clause 5).**<br>• `model`: measurement function f(x1…xN)<br>• `quantities`: input `Quantity` objects, in argument order<br>• `correlation`: optional N×N matrix r_ij (Default: None → uncorrelated; non-identity with finite input dof → effective dof undefined, `expanded()` needs `coverage_factor_override`) | `u = metrology.combine_uncertainty(lambda a, b: a*b, [metrology.Quantity(10.0, 0.1), metrology.Quantity(5.0, 0.2)])`<br><br>• `UncertaintyResult`; uc = 2.062 |
 | `monte_carlo` | `function` | **Monte Carlo propagation (Guide 98-3-1, Supplement 1).**<br>• `model`: vectorised f(x1…xN)<br>• `quantities`: input `Quantity` objects<br>• `trials`: M ≥ 2 (Default: 1000000; fixed, no adaptive 7.9)<br>• `coverage`: interval probability (Default: 0.95)<br>• `seed`: reproducibility (Default: None)<br>• inputs sampled independently (no 6.4.8 multivariate path) | `mc = metrology.monte_carlo(model, quantities, seed=1)`<br><br>• `MonteCarloResult` (mean, u, coverage interval) |
 | `rectangular` | `function` | **Type B quantity, rectangular PDF (GUM 4.3.7).**<br>• `value`, `half_width` a, `name` | `rectangular(20.0, 0.5)`<br><br>• `Quantity` with u = a/√3 = 0.289 |

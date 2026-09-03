@@ -89,6 +89,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `phonometry.fluids`, a twentieth domain package holding the state of the
+  medium a sound travels through. `fluids.air()` computes humid air from
+  IEC 61094-2:2009 Annex F, the CIPM-2007 formulation, and returns a frozen
+  `Fluid` carrying the density, speed of sound, ratio of specific heats,
+  viscosity and thermal diffusivity Table F.1 tabulates, the thermal
+  conductivity and specific heat capacity Clause F.6 gives expressions for, and
+  the characteristic impedance, Prandtl number and kinematic viscosity those
+  close by identity. All ten printed figures of Table F.1 reproduce, at both
+  printed condition sets, inside the rounding of the last figure the annex
+  gives; three conformance rows say by how much.
+
+  Every domain may import it without an architecture edge, as they already
+  import `filters`, `signals` and `metrology`. A medium is not a domain of
+  application but something every domain needs, and eleven identical edges
+  would have recorded nothing. That is the fourth transverse package, and the
+  first added since 4.0 split the original one in three.
+
+  The `Fluid` says what it was computed for and what fixed it: the conditions,
+  the composition, the model by name, and the domain that model states for
+  itself. Reading a quantity the model does not determine raises
+  `FluidPropertyUnavailable` naming the model, rather than returning a
+  plausible number nobody printed. This matters as soon as a second fluid
+  arrives: sea water has no ratio of specific heats to give.
+
+  `temperature_c` is required, because there is no defensible default for the
+  one condition a caller has actually measured. The pressure and the humidity
+  default, and say so once in a single `FluidAssumptionWarning` naming both and
+  what each is worth: over 80 kPa to 105 kPa the density moves by a quarter, so
+  a site 1000 m up is about 11 % from the assumed pressure, while the whole
+  span of humidity is worth about 1 %. Supplying both is silent, which is the
+  property a caller who measured their air should get. The carbon dioxide mole
+  fraction defaults without warning, because 0,000 4 is a value Clause F.2
+  names for laboratory conditions rather than a guess about the caller's air.
+
+  Nothing is refused but what cannot exist. Annex F states 15 °C to 27 °C,
+  60 kPa to 110 kPa and 10 % to 90 % relative humidity, and a state outside
+  that warns and still answers: the annex states where its equations were
+  validated, not what air can be. Air at 60 °C in a duct is real.
+
+
 - `hearing.assumed_protection_value()`, `hearing.octave_band_protected_level()`,
   `hearing.hml_rating()`, `hearing.hml_protected_level()`,
   `hearing.snr_rating()` and `hearing.snr_protected_level()` estimate what a

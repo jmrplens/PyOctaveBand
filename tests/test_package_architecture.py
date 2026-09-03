@@ -20,9 +20,11 @@ import pytest
 SRC = Path(__file__).resolve().parent.parent / "src" / "phonometry"
 
 #: The transverse toolbox every domain is allowed to import: normalized
-#: frequency selectivity, general signal analysis and the metrology proper.
-#: One package until 4.0 split it in three; the policy is unchanged.
-TOOLBOX: frozenset[str] = frozenset({"filters", "signals", "metrology"})
+#: frequency selectivity, general signal analysis, the metrology proper and the
+#: state of the medium. One package until 4.0 split it in three; ``fluids``
+#: joined because every domain needs a medium and eleven identical edges would
+#: have recorded nothing.
+TOOLBOX: frozenset[str] = frozenset({"filters", "fluids", "signals", "metrology"})
 
 #: Cross-package edges allowed IN ADDITION to `pkg -> pkg` (internal),
 #: `* -> _internal` and `* -> TOOLBOX`. "root" = modules still at the top

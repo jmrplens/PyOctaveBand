@@ -3,13 +3,13 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 613,
-    "passing": 613,
+    "checks": 616,
+    "passing": 616,
     "failing": 0,
-    "domains": 60,
-    "standards": 378,
-    "citations": 549,
-    "designations": 119,
+    "domains": 61,
+    "standards": 379,
+    "citations": 551,
+    "designations": 120,
     "sources": 84
   },
   "units": [
@@ -55,6 +55,7 @@
     "modes/Hz",
     "ms",
     "m²",
+    "m²/s",
     "m³",
     "m·Hz",
     "nm",
@@ -75,6 +76,12 @@
       "title": "Filters & weightings",
       "checks": 12,
       "passing": 12
+    },
+    {
+      "id": "humid-air-iec-61094-2-2009-annex-f",
+      "title": "Humid air (IEC 61094-2:2009 Annex F)",
+      "checks": 3,
+      "passing": 3
     },
     {
       "id": "levels-dosimetry",
@@ -878,6 +885,91 @@
         "label": "headroom +0.169 dB"
       },
       "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "humid-air-iec-61094-2-2009-annex-f/iec-61094-2-2009-table-f-1/set-a-23-c-101-325-pa-50-rh-rho-c0-kappa-eta-and-alpha-t-as-a-fraction-of-the-rounding-of-the-last-printed-figure",
+      "domain": "humid-air-iec-61094-2-2009-annex-f",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 61094-2",
+        "edition": "2009",
+        "clause": "Table F.1",
+        "cite": "IEC 61094-2:2009 Table F.1"
+      },
+      "quantity": "Set A (23 C, 101 325 Pa, 50 % RH): rho, c0, kappa, eta and alpha_t, as a fraction of the rounding of the last printed figure",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.549
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1.0
+      },
+      "deviation": {
+        "value": 0.549
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "humid-air-iec-61094-2-2009-annex-f/iec-61094-2-2009-table-f-1/set-b-20-c-80-000-pa-65-rh-rho-c0-kappa-eta-and-alpha-t-as-a-fraction-of-the-rounding-of-the-last-printed-figure",
+      "domain": "humid-air-iec-61094-2-2009-annex-f",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 61094-2",
+        "edition": "2009",
+        "clause": "Table F.1",
+        "cite": "IEC 61094-2:2009 Table F.1"
+      },
+      "quantity": "Set B (20 C, 80 000 Pa, 65 % RH): rho, c0, kappa, eta and alpha_t, as a fraction of the rounding of the last printed figure",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.96
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1.0
+      },
+      "deviation": {
+        "value": 0.96
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "humid-air-iec-61094-2-2009-annex-f/iec-61094-2-2009-formula-f-5/thermal-conductivity-and-specific-heat-capacity-close-the-printed-thermal-diffusivity-alpha-t-k-a-rho-c-p",
+      "domain": "humid-air-iec-61094-2-2009-annex-f",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 61094-2",
+        "edition": "2009",
+        "clause": "Formula (F.5)",
+        "cite": "IEC 61094-2:2009 Formula (F.5)"
+      },
+      "quantity": "Thermal conductivity and specific heat capacity close the printed thermal diffusivity, alpha_t = k_a / (rho C_P)",
+      "kind": "scalar",
+      "expected": {
+        "value": 2.115317215641638e-05
+      },
+      "computed": {
+        "value": 2.1153e-05
+      },
+      "unit": "m²/s",
+      "tolerance": {
+        "mode": "relative",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 9,
       "verdict": "pass"
     },
     {

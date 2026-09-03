@@ -8,7 +8,7 @@ exported name. This gate closes that gap: it parses every backticked name in
 the first column of the file's tables and fails when a public name has no row.
 Public means what the library publishes since 4.0: the union of the domain
 packages' ``__all__`` plus the four names the top level holds itself. Reading
-``phonometry.__all__`` instead would see the twenty-three names the top level
+``phonometry.__all__`` instead would see the twenty-four names the top level
 publishes and call the other thirteen hundred private.
 
 Extra rows are fine and expected: methods (``OctaveFilterBank.spectrogram``),
