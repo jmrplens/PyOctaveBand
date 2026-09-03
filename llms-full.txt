@@ -25613,6 +25613,8 @@ So both are assumed and both are announced, once, in the same warning:
 ```python
 import warnings
 
+from phonometry import fluids
+
 with warnings.catch_warnings(record=True) as caught:
     warnings.simplefilter("always")
     fluids.air(temperature_c=20.0)
@@ -25636,6 +25638,8 @@ rule escalates it to an error for anyone who wants their runs to fail rather
 than warn:
 
 ```python
+import warnings
+
 from phonometry import PhonometryWarning
 
 warnings.filterwarnings("error", category=PhonometryWarning)
@@ -25668,18 +25672,43 @@ f.prandtl_number             # eta / (rho alpha_t)
 f.kinematic_viscosity        # eta / rho
 ```
 
-Anything else raises rather than returning a number nobody printed:
+A quantity this model did not determine raises rather than returning a number
+nobody printed. The error names the model, what it does determine, and the two
+ways out:
 
 ```python
-f.properties          # exactly what this model determined
-f.model               # 'IEC 61094-2:2009 Annex F (CIPM-2007)'
-f.composition         # the humidity and CO2 it was computed with
+from phonometry.fluids import Fluid, FluidPropertyUnavailable
+
+measured = Fluid(
+    temperature_c=10.0,
+    static_pressure_pa=1.1e6,
+    composition={"salinity_psu": 35.0},
+    model="a density and a sound speed, measured",
+    validity="",
+    properties={"density": 1027.0, "speed_of_sound": 1491.0},
+)
+try:
+    measured.heat_capacity_ratio
+except FluidPropertyUnavailable as exc:
+    print(exc)
+# 'a density and a sound speed, measured' does not determine
+# 'heat_capacity_ratio'; it determines density, speed_of_sound. Supply the
+# quantity yourself, or use a model that prints it.
 ```
 
 That looks like pedantry with one fluid in the library, and stops looking like
 it with two: sea water has no ratio of specific heats to give, and a
 `Fluid` that invented one would be handing a caller a number with the shape of
 a measurement and none of the substance.
+
+Three attributes are not quantities and never raise. They are the record of
+where the numbers came from:
+
+```python
+f.properties          # exactly what this model determined
+f.model               # 'IEC 61094-2:2009 Annex F (CIPM-2007)'
+f.composition         # the humidity and CO2 it was computed with
+```
 
 ## The printed domain, and the difference between a fit and a fact
 
@@ -25690,6 +25719,10 @@ for the carbon dioxide fraction.
 Outside that box the library warns and still answers:
 
 ```python
+import warnings
+
+from phonometry import fluids
+
 with warnings.catch_warnings(record=True) as caught:
     warnings.simplefilter("always")
     hot = fluids.air(temperature_c=60.0, static_pressure_pa=101325.0,
@@ -25703,16 +25736,20 @@ print(round(hot.speed_of_sound, 2))                   # 371.52
 The distinction matters and it is the rule the whole library follows. Air at
 60 °C in a duct exists; a fit past its validated range is still arithmetic, and
 refusing it would refuse a real measurement. What is refused is a state that
-cannot be: a temperature at or below absolute zero, a pressure that is not
-positive, a humidity outside nought to saturation.
+cannot be, and that is the whole list: a temperature at or below absolute zero,
+a pressure that is not positive, a relative humidity outside 0 % to 100 %, a
+carbon dioxide mole fraction outside 0 to 1, and a non-finite value for any of
+the four. Each raises `ValueError` naming the argument.
 
 ## How the numbers are pinned
 
 The oracle is Table F.1: five quantities at two condition sets, ten figures in
-all. The tolerance is not chosen. A value printed to seven significant figures
-is stated to within half of its last figure, so that is what reproducing it
-means, and the test derives that bound from the printed string rather than
-carrying a constant somebody picked:
+all. The tolerance is not chosen. A value is stated to within half a unit of
+the last place it was printed to, so that is what reproducing it means, and the
+test derives that bound from the printed string rather than carrying a constant
+somebody picked. It is the last *place* that sets the bound, not a count of
+significant figures: `1,186 084 8` carries eight of them and `2,115 317 x 10^-5`
+seven, and the same rule reads both:
 
 <details>
 <summary>The tolerance, derived from the print</summary>
