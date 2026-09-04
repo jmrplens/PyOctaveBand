@@ -689,6 +689,42 @@ def _message_text(node: ast.Assign) -> str | None:
     return None
 
 
+def test_no_source_compares_a_float_for_equality() -> None:
+    """Floating point does not answer `==`, and the tree had stopped asking.
+
+    `array_directivity_index` reintroduced the one case: its sine-integral
+    footprint guarded a removable singularity with ``x == 0.0``, which an
+    endfire steer reaches exactly and nothing near it does. Writing the term as
+    ``x sinc(x)^2`` removes both the singularity and the comparison. Nothing in
+    the repository could see the regression; SonarCloud reported it after the
+    branch was already pushed, so the class is closed here instead.
+    """
+    import ast
+    import pathlib
+
+    equalities: list[str] = []
+    for path in sorted(pathlib.Path("src/phonometry").rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Compare):
+                continue
+            for operator, right in zip(node.ops, node.comparators, strict=True):
+                if not isinstance(operator, (ast.Eq, ast.NotEq)):
+                    continue
+                operands = (node.left, right)
+                if any(
+                    isinstance(side, ast.Constant) and isinstance(side.value, float)
+                    for side in operands
+                ):
+                    equalities.append(
+                        f"{path.relative_to('src')}:{node.lineno} {ast.unparse(node)}"
+                    )
+
+    assert not equalities, "source comparing a float for equality:\n  " + "\n  ".join(
+        equalities
+    )
+
+
 def test_no_error_message_carries_a_comma_decimal() -> None:
     """Error messages are English prose, and English prose takes a point.
 

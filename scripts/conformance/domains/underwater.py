@@ -614,3 +614,82 @@ def _chk_uwn_pe() -> Outcome:
         unit="dB",
         places=3,
     )
+
+
+# ---------------------------------------------------------------------------
+# Sonar processing gain and detection threshold (Ainslie 2010).
+#
+# The oracles are the limits the book states in closed form, which are exact
+# rather than fitted: Section 6.1.2.1 gives the directivity index as
+# 10 log10(2L/lambda) at high frequency away from endfire and 10 log10(4L/lambda)
+# near endfire, and Equation (11.22) gives the detection threshold in closed
+# form from the false-alarm probability.
+# ---------------------------------------------------------------------------
+_UW_SONAR = "Sonar processing gain and detection (Ainslie 2010)"
+
+
+@register(
+    _UW_SONAR,
+    "Ainslie (2010) Sect. 6.1.2.1, printed folio 267",
+    "Line-array DI at broadside, high-frequency limit 10 log10(2L/lambda), dB",
+)
+def _chk_uw_di_broadside() -> Outcome:
+    length, wavelength = 100.0, 1.0
+    return numeric(
+        10.0 * math.log10(2.0 * length / wavelength),
+        ph.underwater.array_directivity_index(length, wavelength),
+        0.01,
+        unit="dB",
+        places=3,
+    )
+
+
+@register(
+    _UW_SONAR,
+    "Ainslie (2010) Sect. 6.1.2.1, printed folio 267",
+    "Line-array DI at endfire, where the footprint halves: 10 log10(4L/lambda), dB",
+)
+def _chk_uw_di_endfire() -> Outcome:
+    length, wavelength = 100.0, 1.0
+    return numeric(
+        10.0 * math.log10(4.0 * length / wavelength),
+        ph.underwater.array_directivity_index(
+            length, wavelength, steer_angle_rad=math.pi / 2.0
+        ),
+        0.01,
+        unit="dB",
+        places=3,
+    )
+
+
+@register(
+    _UW_SONAR,
+    "Ainslie (2010) Eq. (11.20), Fig. 11.1",
+    "Unsteered DI vs the book's own approximation 1 + G0 tanh(pi^2 G0/36) at 2L/lambda = 20",
+)
+def _chk_uw_di_against_approximation() -> Outcome:
+    g0 = 20.0
+    approximation = 10.0 * math.log10(1.0 + g0 * math.tanh(math.pi**2 * g0 / 36.0))
+    return numeric(
+        approximation,
+        ph.underwater.array_directivity_index(g0 / 2.0, 1.0),
+        0.5,
+        unit="dB",
+        places=2,
+    )
+
+
+@register(
+    _UW_SONAR,
+    "Ainslie (2010) Eq. (11.22), printed folio 581",
+    "Detection threshold at 50 % detection probability, p_fa = 1e-4, dB",
+)
+def _chk_uw_detection_threshold() -> Outcome:
+    p_fa = 1.0e-4
+    return numeric(
+        10.0 * math.log10(math.log2(1.0 / (2.0 * p_fa))) - 0.8,
+        ph.underwater.detection_threshold(p_fa),
+        1e-9,
+        unit="dB",
+        places=4,
+    )

@@ -8,6 +8,7 @@ pure arithmetic, independent of the implementation.
 from __future__ import annotations
 
 import dataclasses
+import math
 
 import matplotlib as mpl
 
@@ -18,7 +19,9 @@ import pytest
 from phonometry.underwater.sonar_equation import (
     SonarEquationResult,
     active_sonar_equation,
+    array_directivity_index,
     detection_range_from_curve,
+    detection_threshold,
     passive_sonar_equation,
 )
 
@@ -256,3 +259,151 @@ def test_a_detection_curve_of_two_axes_is_refused_by_name() -> None:
     grid_r, grid_pl = ranges.reshape(2, 2), losses.reshape(2, 2)
     with pytest.raises(ValueError, match=r"'range_m' must have one axis"):
         detection_range_from_curve(55.0, grid_r, grid_pl)
+
+
+# ---------------------------------------------------------------------------
+# Directivity index and detection threshold (Ainslie 2010).
+#
+# The oracle for the directivity index is the book's own closed-form
+# approximation, Equation (11.20) plotted as the dashed line of Figure 11.1
+# against the full Chapter 6 integral:
+#
+#     G ~ 1 + G0 tanh(pi^2 G0 / 36),   G0 = 2L/lambda
+#
+# It is a different expression from the one implemented, fitted rather than
+# derived, so agreeing with it to within the spread the figure shows is an
+# independent check rather than a restatement. The three stated limits of
+# Section 6.1.2.1 are checked separately, since they are exact.
+# ---------------------------------------------------------------------------
+def _di_approximation_db(g0: float) -> float:
+    """Ainslie Eq. (11.20), the dashed curve of Figure 11.1."""
+    return 10.0 * math.log10(1.0 + g0 * math.tanh(math.pi**2 * g0 / 36.0))
+
+
+@pytest.mark.parametrize("g0", [1.0, 2.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0])
+def test_directivity_index_tracks_the_books_own_approximation(g0: float) -> None:
+    """The integral and Eq. (11.20) agree over the range Figure 11.1 plots."""
+    exact = array_directivity_index(array_length_m=g0 / 2.0, wavelength_m=1.0)
+    assert exact == pytest.approx(_di_approximation_db(g0), abs=0.5)
+
+
+def test_directivity_index_reaches_its_three_printed_limits() -> None:
+    """Section 6.1.2.1 states all three, and they are exact rather than fitted.
+
+    High frequency gives 2L/lambda for every steer direction but endfire, where
+    the footprint halves and the factor doubles to 4L/lambda; low frequency
+    gives unity, since an array much shorter than a wavelength resolves
+    nothing at all.
+    """
+    length, wavelength = 100.0, 1.0
+    broadside = array_directivity_index(length, wavelength)
+    endfire = array_directivity_index(length, wavelength, steer_angle_rad=math.pi / 2.0)
+    assert broadside == pytest.approx(
+        10.0 * math.log10(2.0 * length / wavelength), abs=0.01
+    )
+    assert endfire == pytest.approx(
+        10.0 * math.log10(4.0 * length / wavelength), abs=0.01
+    )
+    # Endfire buys exactly the 3 dB the halved footprint is worth.
+    assert endfire - broadside == pytest.approx(10.0 * math.log10(2.0), abs=0.01)
+    # The low-frequency limit is approached, not reached at any finite length,
+    # so it is checked as the convergence it is.
+    short = [array_directivity_index(length, 1.0) for length in (1e-2, 1e-3, 1e-4)]
+    assert short == sorted(short, reverse=True)
+    assert 0.0 < short[-1] < 1.0e-7
+
+
+@pytest.mark.parametrize(
+    ("length", "wavelength"),
+    [
+        (5e-324, 1.0),
+        (1.0, 1.7976931348623157e308),
+        (5e-324, 1.7976931348623157e308),
+        (1e-200, 1e100),
+    ],
+)
+def test_an_array_too_short_to_measure_returns_its_limit(
+    length: float, wavelength: float
+) -> None:
+    """The dimensions are valid, so the answer is the limit and not an error.
+
+    ``L/lambda`` underflows to nought for these, and the closed form divides by
+    it: the first two used to raise a `math` domain error and the third a
+    `ZeroDivisionError`, from a length and a wavelength that are both positive
+    and finite. Cancelling that factor by hand leaves the low-frequency limit,
+    which is what an array this short is worth.
+    """
+    assert array_directivity_index(length, wavelength) == 0.0
+
+
+def test_the_low_frequency_limit_is_not_a_cutoff_at_one_wavelength() -> None:
+    """An array a wavelength long still resolves something.
+
+    The docstring used to read "0 dB below a wavelength", which is the limit
+    described as a threshold. A finite array of one wavelength returns
+    3.45 dB and half a wavelength 1.11 dB, both far from nought, and the
+    approach to nought is smooth rather than a step.
+    """
+    assert array_directivity_index(1.0, 1.0) == pytest.approx(3.4543, abs=1e-4)
+    assert array_directivity_index(0.5, 1.0) == pytest.approx(1.1143, abs=1e-4)
+    ratios = [1.0, 0.5, 0.2, 0.1, 0.01]
+    values = [array_directivity_index(r, 1.0) for r in ratios]
+    assert values == sorted(values, reverse=True)
+    assert all(value > 0.0 for value in values)
+
+
+def test_directivity_index_is_symmetric_about_broadside() -> None:
+    """Only the sine of the steer angle enters, so the two sides agree."""
+    for psi in (0.2, 0.7, 1.3):
+        assert array_directivity_index(5.0, 1.0, steer_angle_rad=psi) == pytest.approx(
+            array_directivity_index(5.0, 1.0, steer_angle_rad=-psi), rel=1e-12
+        )
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "match"),
+    [
+        ({"array_length_m": 0.0}, "'array_length_m' must be positive"),
+        ({"array_length_m": float("nan")}, "'array_length_m' must be positive"),
+        ({"wavelength_m": 0.0}, "'wavelength_m' must be positive"),
+        ({"wavelength_m": -1.0}, "'wavelength_m' must be positive"),
+        ({"steer_angle_rad": float("inf")}, "'steer_angle_rad' must be"),
+    ],
+)
+def test_directivity_index_refuses_what_is_not_an_array(
+    kwargs: dict[str, float], match: str
+) -> None:
+    base = {"array_length_m": 5.0, "wavelength_m": 1.0}
+    base.update(kwargs)
+    with pytest.raises(ValueError, match=match):
+        array_directivity_index(**base)  # type: ignore[arg-type]
+
+
+def test_detection_threshold_reproduces_equation_11_22() -> None:
+    """DT50 = 10 log10(log2(1/(2 pfa))) - 0,8 dB, printed on folio 581.
+
+    The inner logarithm is base two, not a square: the two are typeset alike
+    and the distinction is worth a test of its own, since taking it as a
+    square would give 10,5 dB where the book gives 10,1 at pfa = 1e-4.
+    """
+    for p_fa in (1.0e-2, 1.0e-3, 1.0e-4, 1.0e-6):
+        expected = 10.0 * math.log10(math.log2(1.0 / (2.0 * p_fa))) - 0.8
+        assert detection_threshold(p_fa) == pytest.approx(expected, rel=1e-12)
+    # And it is not the squared-logarithm reading.
+    squared = 10.0 * math.log10(math.log10(1.0 / (2.0e-4)) ** 2) - 0.8
+    assert detection_threshold(1.0e-4) != pytest.approx(squared, abs=0.05)
+
+
+def test_detection_threshold_rises_as_false_alarms_get_rarer() -> None:
+    """Demanding fewer false alarms costs signal-to-noise ratio."""
+    values = [detection_threshold(p) for p in (1.0e-2, 1.0e-3, 1.0e-4, 1.0e-6)]
+    assert values == sorted(values)
+
+
+@pytest.mark.parametrize("bad", [0.0, 0.5, 0.7, 1.0, -0.1, float("nan")])
+def test_detection_threshold_refuses_an_impossible_false_alarm_rate(
+    bad: float,
+) -> None:
+    """At one half the inner logarithm is zero and the threshold diverges."""
+    with pytest.raises(ValueError, match="'false_alarm_probability' must"):
+        detection_threshold(bad)

@@ -17,6 +17,12 @@ propagation loss at the detection limit :math:`\mathrm{SE} = 0`):
   :math:`\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{PL} + \mathrm{TS} -
   \mathrm{RL} - \mathrm{DT}`.
 
+Two of those terms have their own model here rather than having to be supplied
+from outside: :func:`array_directivity_index` gives ``DI`` from the length of a
+line array and the wavelength, which is also its array gain when the noise is
+isotropic, and :func:`detection_threshold` gives ``DT`` from the false-alarm
+probability alone. Both are Ainslie (2010).
+
 All quantities are in dB (levels re a plane wave of 1 µPa rms; the terms are
 spectrum levels, i.e. referred to a 1 Hz band). Source: Urick, *Principles of
 Underwater Sound*, via Etter (2003), Table 10.2. The loss term is the
@@ -41,6 +47,7 @@ range at which the detection probability is 50 %:
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -49,12 +56,23 @@ import numpy as np
 from .._internal.validation import (
     require_axis_rank,
     require_equal_shapes,
+    require_positive,
     require_same_shape,
 )
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
+
+#: The false-alarm probability at which Equation (11.22) diverges: its inner
+#: logarithm is log2(1/(2 p_fa)), which is zero here. Half the empty beams are
+#: already being declared detections, so no threshold makes the decision.
+_DIVERGENT_FALSE_ALARM_PROBABILITY = 0.5
+
+#: Below this argument, sigma(x)/x of Equation (6.54) is taken from its
+#: series. The first omitted term, 2 x^4 / 225, is worth 9e-19 here, three
+#: orders below the last bit of a double.
+_SIGMA_SERIES_LIMIT = 1e-4
 
 #: Fewest points a range grid may have: two, the least that define a curve
 #: segment between two bracketing samples.
@@ -478,3 +496,130 @@ def detection_range_from_curve(
     # positive and the linear interpolation cannot divide by zero.
     frac = (fom - pl[i]) / (pl[i + 1] - pl[i])
     return float(r[i] + frac * (r[i + 1] - r[i]))
+
+
+def array_directivity_index(
+    array_length_m: float,
+    wavelength_m: float,
+    *,
+    steer_angle_rad: float = 0.0,
+) -> float:
+    r"""Directivity index of an unshaded line array (Ainslie 2010, Eq. (6.49)).
+
+    :math:`\mathrm{DI} = 10 \log_{10} G_\mathrm{D}` with the directivity factor
+    :math:`G_\mathrm{D} = 4\pi / \delta\Omega` the reciprocal of the solid-angle
+    footprint of the beam. For a steered unshaded line array, Equation (6.56)
+    on printed folio 267 gives that footprint in closed form:
+
+    .. math::
+
+       \delta\Omega = \frac{4}{G_0} \left\{
+       \sigma\!\left[\frac{\pi G_0}{2}(1 - \sin\psi)\right] +
+       \sigma\!\left[\frac{\pi G_0}{2}(1 + \sin\psi)\right] \right\}
+
+    with :math:`\sigma(x) = \int_0^x \mathrm{d}u \sin^2 u / u^2
+    = \mathrm{Si}(2x) - \sin^2 x / x` (Eq. (6.54)) and
+    :math:`G_0 = 2L/\lambda` (Eq. (6.57)), the high-frequency limit of the
+    broadside directivity factor.
+
+    This is the **array gain** whenever the noise is isotropic and the signal a
+    plane wave, which is the case the sonar equation is written for
+    (Section 6.1.3.1): the two coincide in that limit, so this is what
+    :func:`passive_sonar_equation` wants for its ``directivity_index``.
+
+    The book states three limits, and they are what the implementation is
+    checked against: :math:`10 \log_{10}(2L/\lambda)` at high frequency for
+    every steer direction but endfire, :math:`10 \log_{10}(4L/\lambda)` near
+    endfire, where the footprint halves, and 0 dB as :math:`L/\lambda \to 0`,
+    where the array stops resolving anything. That last one is a limit and not
+    a cutoff: a finite array a wavelength long still returns 3.45 dB, and half
+    a wavelength 1.11 dB. It is reached exactly only where the ratio itself
+    underflows, and the value there is 0 dB rather than an error.
+
+    :param array_length_m: Array length ``L``, in metres (> 0).
+    :param wavelength_m: Acoustic wavelength ``lambda``, in metres (> 0).
+    :param steer_angle_rad: Steer angle ``psi`` from broadside, in radians
+        (Default: 0, broadside). Only its sine enters, so the two sides of
+        broadside give the same index.
+    :return: The directivity index ``DI``, in dB (>= 0).
+    :raises ValueError: for a non-positive or non-finite length or wavelength,
+        or a non-finite steer angle.
+    """
+    from scipy.special import sici
+
+    length = require_positive(array_length_m, "array_length_m")
+    wavelength = require_positive(wavelength_m, "wavelength_m")
+    psi = _finite(steer_angle_rad, "steer_angle_rad")
+
+    def sigma_ratio(x: float) -> float:
+        """``sigma(x) / x`` of Equation (6.54), which is one at the origin.
+
+        The ratio rather than ``sigma`` itself, because dividing the footprint
+        by ``G0`` afterwards is what breaks: ``G0 = 2L/lambda`` underflows to
+        nought for a short enough array, and ``4 / G0`` then raises rather than
+        returning the low-frequency limit. Both factors of ``G0`` cancel by
+        hand, so it never appears in a denominator.
+
+        Below ``x = 1e-4`` the series :math:`1 - x^2/9 + 2x^4/225` is used. The
+        omitted term is worth 9e-19 there, three orders below the last bit, and
+        the closed form is the one that suffers: ``Si(2x)`` and ``x sinc(x)^2``
+        agree to their leading ``x``, so the subtraction cancels a digit that
+        the series never computes. It also puts ``sigma(0)/0`` at its limit
+        without comparing a float for equality, which an endfire steer needs:
+        it lands on ``x = 0`` exactly.
+        """
+        if x < _SIGMA_SERIES_LIMIT:
+            return 1.0 - x * x / 9.0
+        sinc = float(np.sinc(x / math.pi))
+        return (float(sici(2.0 * x)[0]) - x * sinc * sinc) / x
+
+    half = math.pi * length / wavelength
+    sin_psi = math.sin(psi)
+    # delta_Omega / (4 pi) with G0 cancelled: the beam's share of the sphere.
+    beam_share = (
+        (1.0 - sin_psi) * sigma_ratio(half * (1.0 - sin_psi))
+        + (1.0 + sin_psi) * sigma_ratio(half * (1.0 + sin_psi))
+    ) / 2.0
+    # Plus nought, so that the low-frequency limit reads 0.0 rather than -0.0.
+    return float(-10.0 * math.log10(beam_share) + 0.0)
+
+
+def detection_threshold(false_alarm_probability: float) -> float:
+    r"""Detection threshold at 50 % detection probability (Ainslie Eq. (11.22)).
+
+    .. math::
+
+       \mathrm{DT}_{50}(p_\mathrm{fa}) \approx
+       10 \log_{10}\left(\log_2 \frac{1}{2 p_\mathrm{fa}}\right) - 0.8 \ \mathrm{dB}
+
+    printed on folio 581. ``DT`` is :math:`10 \log_{10} R_{50}`, the
+    signal-to-noise ratio after all processing that a 50 % detection
+    probability needs (Eq. (3.31)); this closed form estimates it from the
+    false-alarm probability alone.
+
+    The logarithm inside is **base two**, not a square. The book states the
+    approximation is accurate to +/- 0.1 dB for :math:`p_\mathrm{fa} < 10^{-2}`
+    with one-dominant-plus-Rayleigh signal statistics, which is the
+    intermediate choice to make when the target statistics are unknown, and
+    that assuming those statistics anyway costs no more than 0.8 dB even for a
+    stable signal or a fully Rayleigh one.
+
+    :param false_alarm_probability: ``p_fa``, the probability of declaring a
+        detection with no target present, in (0, 1/2).
+    :return: The detection threshold ``DT``, in dB.
+    :raises ValueError: for a non-finite ``p_fa``, or one outside (0, 1/2).
+        At :math:`p_\mathrm{fa} = 1/2` the inner logarithm is zero and the
+        threshold diverges: half the empty beams are already called detections.
+    """
+    p_fa = _finite(false_alarm_probability, "false_alarm_probability")
+    if not 0.0 < p_fa < _DIVERGENT_FALSE_ALARM_PROBABILITY:
+        msg = (
+            "'false_alarm_probability' must lie in (0, 1/2), got "
+            f"{p_fa!r}. At 1/2 the threshold diverges, since half the empty "
+            "beams are already declared detections."
+        )
+        raise ValueError(msg)
+    # ``-log2(2 p)`` rather than ``log2(1 / (2 p))``: the reciprocal overflows
+    # to infinity for the smallest subnormal, where the threshold is a perfectly
+    # finite 1073 bits' worth, and the two are the same number everywhere else.
+    return float(10.0 * math.log10(-math.log2(2.0 * p_fa)) - 0.8)
