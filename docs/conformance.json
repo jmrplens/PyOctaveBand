@@ -3,12 +3,12 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 662,
-    "passing": 662,
+    "checks": 664,
+    "passing": 664,
     "failing": 0,
     "domains": 64,
-    "standards": 399,
-    "citations": 571,
+    "standards": 401,
+    "citations": 573,
     "designations": 121,
     "sources": 84
   },
@@ -447,8 +447,8 @@
     {
       "id": "hvac-noise-vdi-2081",
       "title": "HVAC noise (VDI 2081)",
-      "checks": 39,
-      "passing": 39
+      "checks": 41,
+      "passing": 41
     },
     {
       "id": "cnossos-eu-railway-source-directive-2002-49-ec-annex-ii",
@@ -18798,6 +18798,62 @@
       },
       "deviation": {
         "value": -0.039
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-section-1-1/spectral-assessment-correction-k-a-db-per-octave",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Section 1.1",
+        "cite": "VDI 2081 Blatt 2 Section 1.1"
+      },
+      "quantity": "Spectral assessment correction K_A, dB per octave",
+      "kind": "scalar",
+      "expected": {
+        "value": 13.0
+      },
+      "computed": {
+        "value": 13.0
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-elements-1-to-3/chained-level-after-fan-silencer-and-junction-sum-over-the-octaves-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, elements 1 to 3",
+        "cite": "VDI 2081 Blatt 2 Table 1, elements 1 to 3"
+      },
+      "quantity": "Chained level after fan, silencer and junction, sum over the octaves, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 81.04311008280237
+      },
+      "computed": {
+        "value": 80.982
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.1
+      },
+      "deviation": {
+        "value": -0.061
       },
       "precision": 3,
       "verdict": "pass"

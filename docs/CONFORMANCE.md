@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**662/662 conformance checks pass** across 64 domains and 399 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**664/664 conformance checks pass** across 64 domains and 401 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -1182,7 +1182,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>HVAC noise (VDI 2081)</b>: 100% (39/39)</summary>
+<summary><b>HVAC noise (VDI 2081)</b>: 100% (41/41)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -1225,6 +1225,8 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | VDI 2081 Blatt 2 Table 1, element 2 | Splitter silencer self-noise at 4000 Hz, dB | 38.6 dB (+/-0.05 dB) | 38.62 dB | 0.017 dB | 34 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2 Table 1, element 2 | Splitter silencer self-noise at 8000 Hz, dB | 35.6 dB (+/-0.05 dB) | 35.56 dB | -0.041 dB | 82 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2 Table 2, element 18 | End reflection of a 200 mm nozzle in a ceiling, sum over the octaves, dB | 34.5 dB (+/-0.05 dB) | 34.461 dB | -0.039 dB | 78 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Section 1.1 | Spectral assessment correction K_A, dB per octave | 13 dB (+/-0 dB) | 13 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, elements 1 to 3 | Chained level after fan, silencer and junction, sum over the octaves, dB | 81.043 dB (+/-0.1 dB) | 80.982 dB | -0.061 dB | 61 % | ![Pass][cv-pass] Pass |
 
 </details>
 

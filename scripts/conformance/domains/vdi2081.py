@@ -435,3 +435,87 @@ def _chk_end_reflection() -> Outcome:
         unit="dB",
         places=3,
     )
+
+
+# ---------------------------------------------------------------------------
+# The chain, and the curve it is measured against
+# ---------------------------------------------------------------------------
+#: Section 1.1 of Blatt 2: the spectral assessment correction, dB.
+_PRINTED_KA = (21.0, 11.0, 4.0, -2.0, -5.0, -6.0, -6.0, -4.0)
+#: Table 1, element 3: the running total after the fan, the splitter silencer
+#: and the first junction, which is where three separate models compose.
+_PRINTED_AFTER_JUNCTION = (80.8, 68.3, 48.9, 44.9, 40.2, 39.5, 44.0, 39.1)
+_SILENCER_ATTENUATION = (6.0, 17.0, 42.0, 41.0, 47.0, 33.0, 20.0, 18.0)
+
+
+@register(
+    _VDI2081,
+    "VDI 2081 Blatt 2 Section 1.1",
+    "Spectral assessment correction K_A, dB per octave",
+)
+def _chk_assessment_curve() -> Outcome:
+    """``K_A = -A - 5``, the inverse A-weighting less the eight-band allowance."""
+    computed = ph.noise_control.VDI2081_SPECTRAL_CORRECTION
+    return numeric(
+        float(np.sum(_PRINTED_KA)),
+        float(np.sum(computed)),
+        1e-9,
+        unit="dB",
+        places=3,
+    )
+
+
+@register(
+    _VDI2081,
+    "VDI 2081 Blatt 2 Table 1, elements 1 to 3",
+    "Chained level after fan, silencer and junction, sum over the octaves, dB",
+)
+def _chk_chain() -> Outcome:
+    """Three models composed, which is what the worked example exists to check.
+
+    Each piece is pinned against its own printed row elsewhere in this domain;
+    this row is the one that fails if they do not compose. The example rounds
+    to one decimal at every step and carries the rounded value forward, so the
+    running total is held to a tenth.
+    """
+    bands = np.array(_PRINTED_BANDS)
+    fan = _fan()
+    fan = fan + (96.0 - 10.0 * math.log10(float(np.sum(10.0 ** (fan / 10.0)))))
+
+    silencer = ph.noise_control.silencer_self_noise(
+        bands,
+        _SILENCER_GAP_VELOCITY,
+        5,
+        0.6,
+        model="vdi2081",
+        pressure_drop_pa=_SILENCER_PRESSURE_DROP,
+        approach_area=_SILENCER_APPROACH_AREA,
+        airway_width=_SILENCER_GAP,
+    ).values
+    running = 10.0 * np.log10(
+        10.0 ** ((fan - np.array(_SILENCER_ATTENUATION)) / 10.0)
+        + 10.0 ** (silencer / 10.0)
+    )
+
+    split = ph.noise_control.split_loss(
+        0.30 + 0.36 + 0.42, [0.30, 0.36, 0.42], branch=0, model="vdi2081"
+    )
+    junction = ph.noise_control.flow_noise_bend(
+        bands,
+        _JUNCTION_BRANCH,
+        0.30,
+        0.6,
+        model="vdi2081",
+        branch_diameter=0.62,
+        approach_velocity=_JUNCTION_APPROACH,
+        rounding_ratio=0.025,
+    ).values
+    running = 10.0 * np.log10(
+        10.0 ** ((running - split) / 10.0) + 10.0 ** (junction / 10.0)
+    )
+
+    printed = 10.0 * math.log10(
+        float(np.sum(10.0 ** (np.array(_PRINTED_AFTER_JUNCTION) / 10.0)))
+    )
+    computed = 10.0 * math.log10(float(np.sum(10.0 ** (running / 10.0))))
+    return numeric(printed, computed, 0.1, unit="dB", places=3)

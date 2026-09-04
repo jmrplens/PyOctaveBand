@@ -192,6 +192,6 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](../signals/filters/filter-gallery.md): choose an architecture and inspect responses
 - [Calibration and dBFS](../signals/metrology/calibration.md): get real-world SPL values
 - [Why phonometry](why-phonometry.md): the conformance-first design philosophy
-- [Conformance report](../CONFORMANCE.md): the expected and computed value of all 662 checks
+- [Conformance report](../CONFORMANCE.md): the expected and computed value of all 664 checks
 - [API Reference](../reference/api/index.md): every parameter of every function
 - [Bibliography](../reference/bibliography.md): the books and papers behind every guide, each with a verified link

@@ -756,3 +756,111 @@ def test_the_vdi_silencer_and_nozzle_refuse_what_they_cannot_answer() -> None:
         hvac.end_reflection_loss(
             hvac.OCTAVE_BANDS, 0.2, termination="duct", method="vdi2081"
         )
+
+
+# ---------------------------------------------------------------------------
+# The chain, and the assessment curve it is measured against
+# ---------------------------------------------------------------------------
+#: Section 1.1 of Blatt 2: the correction that turns an A-weighted room
+#: requirement into a per-octave one.
+PRINTED_KA_DB = (21.0, 11.0, 4.0, -2.0, -5.0, -6.0, -6.0, -4.0)
+#: Table 1, element 1 again: the note under the fan row recommends adding the
+#: difference of the two summed levels to every octave, because the relative
+#: spectrum is fitted to the shape rather than to the total.
+PRINTED_FAN_CORRECTED_DB = (92.3, 90.7, 88.2, 84.8, 80.5, 75.3, 69.2, 62.1)
+#: Table 1, elements 2 and 3: the running total after each one.
+PRINTED_AFTER_SILENCER_DB = (86.3, 73.9, 54.4, 50.5, 45.7, 45.1, 49.5, 44.7)
+PRINTED_AFTER_JUNCTION_DB = (80.8, 68.3, 48.9, 44.9, 40.2, 39.5, 44.0, 39.1)
+#: Table 1, element 2: the splitter attenuation, which is manufacturer's data
+#: rather than anything the guideline computes.
+SILENCER_ATTENUATION_DB = (6.0, 17.0, 42.0, 41.0, 47.0, 33.0, 20.0, 18.0)
+
+
+def _energy_sum(*spectra: object) -> np.ndarray:
+    """Add sound power levels band by band."""
+    total = np.zeros(len(hvac.OCTAVE_BANDS))
+    for spectrum in spectra:
+        total += 10.0 ** (np.asarray(spectrum, dtype=float) / 10.0)
+    return 10.0 * np.log10(total)
+
+
+def test_the_assessment_curve_is_the_inverse_a_weighting_less_five() -> None:
+    """Section 1.1: ``K_A = -A - 5``, and Equation (1) applies it.
+
+    The 5 dB is what the guideline allows for the sum of eight octave bands. A
+    spectrum flat in A-weighted terms would earn 9 dB; 5 is taken because the
+    noise of an air-conditioning system does not follow the inverse A curve.
+    """
+    assert hvac.VDI2081_SPECTRAL_CORRECTION == pytest.approx(PRINTED_KA_DB, abs=1e-9)
+    inverse = -np.array(PRINTED_A_WEIGHTING_DB) - 5.0
+    assert np.round(inverse) == pytest.approx(PRINTED_KA_DB, abs=1e-9)
+
+    limits = hvac.octave_band_limits(25.0)
+    assert limits.values == pytest.approx(25.0 + np.array(PRINTED_KA_DB), abs=1e-9)
+
+    # The same requirement read the other way round, which is what the worked
+    # example does: weight the spectrum and compare against a flat L_A - 5.
+    weighted_limit = 25.0 - 5.0
+    assert limits.values + np.array(PRINTED_A_WEIGHTING_DB) == pytest.approx(
+        weighted_limit, abs=0.5
+    )
+
+
+def test_the_fan_spectrum_is_corrected_onto_its_own_total() -> None:
+    """The note under element 1, applied as the table applies it.
+
+    Equation (15) fits the shape of the spectrum, not its total, so the eight
+    bands do not sum back to Equation (13). The guideline recommends adding the
+    difference to every octave, which is what its own next row carries forward.
+    """
+    fan = _supply_fan().values
+    total = 10.0 * math.log10(float(np.sum(10.0 ** (fan / 10.0))))
+    corrected = fan + (PRINTED_OVERALL_DB - total)
+    assert corrected == pytest.approx(PRINTED_FAN_CORRECTED_DB, abs=0.1)
+
+
+def test_the_chain_carries_the_example_from_the_fan_to_the_second_junction() -> None:
+    """Elements 1 to 3 in sequence: attenuate, then add what the element makes.
+
+    Each of the three pieces has been checked against its own printed row
+    above; this is the check that they compose. The example rounds to one
+    decimal at every step and carries the rounded value forward, so a tenth of
+    a decibel is the most the running total can be held to.
+    """
+    fan = _supply_fan().values
+    total = 10.0 * math.log10(float(np.sum(10.0 ** (fan / 10.0))))
+    running = fan + (PRINTED_OVERALL_DB - total)
+
+    silencer_noise = hvac.silencer_self_noise(
+        hvac.OCTAVE_BANDS,
+        SILENCER_GAP_VELOCITY,
+        5,
+        0.6,
+        model="vdi2081",
+        pressure_drop_pa=SILENCER_PRESSURE_DROP_PA,
+        approach_area=SILENCER_APPROACH_AREA_M2,
+        airway_width=SILENCER_GAP_M,
+    ).values
+    running = _energy_sum(running - np.array(SILENCER_ATTENUATION_DB), silencer_noise)
+    assert running == pytest.approx(PRINTED_AFTER_SILENCER_DB, abs=0.1)
+
+    split = hvac.split_loss(
+        0.30 + 0.36 + 0.42, [0.30, 0.36, 0.42], branch=0, model="vdi2081"
+    )
+    junction_noise = hvac.flow_noise_bend(
+        hvac.OCTAVE_BANDS,
+        JUNCTION_BRANCH_VELOCITY,
+        0.30,
+        0.6,
+        model="vdi2081",
+        branch_diameter=JUNCTION_BRANCH_DIAMETER,
+        approach_velocity=JUNCTION_APPROACH_VELOCITY,
+        rounding_ratio=JUNCTION_ROUNDING_RATIO,
+    ).values
+    running = _energy_sum(running - split, junction_noise)
+    assert running == pytest.approx(PRINTED_AFTER_JUNCTION_DB, abs=0.1)
+
+
+def test_the_octave_limits_refuse_a_level_that_is_not_one() -> None:
+    with pytest.raises(ValueError, match=r"'a_weighted_limit_db' must be finite"):
+        hvac.octave_band_limits(float("nan"))

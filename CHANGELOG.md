@@ -96,6 +96,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   regenerated noise octave by octave, and the nozzle's reflection. The domain
   now stands at thirty-nine.
 
+- `noise_control.octave_band_limits` turns an A-weighted room requirement into
+  a per-octave one by Equation (1) of VDI 2081 Part 2, and
+  `VDI2081_SPECTRAL_CORRECTION` publishes the curve it uses. The curve is the
+  inverse A-weighting less 5 dB: a spectrum flat in A-weighted terms would earn
+  9 dB for the sum of eight octaves, and the guideline takes 5 because the
+  noise of an air-conditioning system does not follow that curve.
+
+  Two further conformance rows, one of which is the point of the whole
+  exercise: the fan, the splitter silencer and the first junction chained in
+  sequence, each attenuating and then adding what it makes, against the running
+  total the worked example prints. Every piece is pinned against its own row
+  elsewhere; this is the row that fails if they do not compose. The domain
+  closes at forty-one.
+
 - Two more entries in `docs/ERRATA.md`, both from Table 1 element 2 of
   VDI 2081 Part 2. The first is substantive: the table prints a hydraulic
   diameter of 0,171 m for the gap between splitters and computes its Strouhal

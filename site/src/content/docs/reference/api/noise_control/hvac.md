@@ -858,6 +858,42 @@ ducts). Flanking limits the total to 40 dB.
 
 **Returns:** An [`HvacSpectrumResult`](/phonometry/reference/api/noise_control/hvac/#hvacspectrumresult) of the attenuation, dB.
 
+## octave_band_limits
+
+```python
+octave_band_limits(
+    a_weighted_limit_db: float,
+    frequencies: ArrayLike | None = None,
+) -> HvacSpectrumResult
+```
+
+Octave limits from an A-weighted room requirement (VDI 2081 Part 2 Eq. (1)).
+
+$$
+L_{\mathrm{Okt,max}} = L_A + K_A
+$$
+
+with the correction [`VDI2081_SPECTRAL_CORRECTION`](/phonometry/reference/api/noise_control/hvac/#vdi2081_spectral_correction), which is the
+inverse A-weighting less 5 dB. The 5 dB is what Section 1.1 allows for
+summing eight octave bands: a spectrum flat in A-weighted terms would earn
+9 dB, and the guideline takes 5 because the noise of an air-conditioning
+system does not follow the inverse A curve.
+
+The result is the **unweighted** octave level each band may reach. The same
+requirement can be read the other way round, which is what the guideline's
+own worked example does: add the A-weighting to the computed spectrum and
+compare every band against the flat `L_A - 5`. The two are the same
+test, since `K_A = -A - 5`.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `a_weighted_limit_db` | The A-weighted level the room is required to meet `L_A`, dB. |
+| `frequencies` | Octave-band centres, Hz; `None` (default) uses the 63 Hz to 8 kHz bands of [`OCTAVE_BANDS`](/phonometry/reference/api/materials/rating/#octave_bands). |
+
+**Returns:** An [`HvacSpectrumResult`](/phonometry/reference/api/noise_control/hvac/#hvacspectrumresult) of the per-band limit, dB.
+
 ## plenum_attenuation
 
 ```python
@@ -1242,3 +1278,7 @@ fits a continuous power law of the perimeter-to-area ratio, VDI 2081
 tabulates four size bands of 1 mm steel sheet, and where the two overlap
 they differ by a decibel or two per metre. `wrapped` has no meaning there
 and is refused.
+
+## VDI2081_SPECTRAL_CORRECTION
+
+*Constant* (`numpy.ndarray, shape (8,)`).

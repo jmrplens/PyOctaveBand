@@ -342,6 +342,18 @@ _VDI2081_SOLID_ANGLE: dict[str, float] = {
 _VDI2081_END_REFLECTION_CAP = 15.0
 
 
+#: VDI 2081 Part 2 Section 1.1 -- the spectral assessment curve ``K_A``, dB,
+#: over the octaves 63 Hz to 8 kHz. It is the inverse A-weighting less the 5 dB
+#: the guideline allows for summing eight octave bands, rounded to whole
+#: decibels as printed.
+VDI2081_SPECTRAL_CORRECTION: NDArray[np.float64] = np.array(
+    [21, 11, 4, -2, -5, -6, -6, -4], dtype=float
+)
+#: The level increase Section 1.1 assumes for the sum of eight octave bands,
+#: dB. A flat spectrum would earn 9 dB; the guideline takes 5, because the
+#: noise of an air-conditioning system does not follow the inverse A curve.
+_VDI2081_BAND_SUM_ALLOWANCE = 5.0
+
 #: Section 6.3 -- VDI 3733's recommendation that no more than 5 dB be taken
 #: from a change of cross-section, since the printed reduction is only reached
 #: when the duct is anechoically terminated at both ends.
@@ -1454,6 +1466,47 @@ def fan_sound_power(  # noqa: PLR0913 - two models, each with its own arguments
         values=lw,
         quantity="sound_power_level",
         label=f"Fan ({kind.replace('_', ' ')}, {q * 3600:.0f} m3/h, {p:.0f} Pa)",
+    )
+
+
+def octave_band_limits(
+    a_weighted_limit_db: float,
+    frequencies: ArrayLike | None = None,
+) -> HvacSpectrumResult:
+    r"""Octave limits from an A-weighted room requirement (VDI 2081 Part 2 Eq. (1)).
+
+    .. math::
+
+       L_{\mathrm{Okt,max}} = L_A + K_A
+
+    with the correction :data:`VDI2081_SPECTRAL_CORRECTION`, which is the
+    inverse A-weighting less 5 dB. The 5 dB is what Section 1.1 allows for
+    summing eight octave bands: a spectrum flat in A-weighted terms would earn
+    9 dB, and the guideline takes 5 because the noise of an air-conditioning
+    system does not follow the inverse A curve.
+
+    The result is the **unweighted** octave level each band may reach. The same
+    requirement can be read the other way round, which is what the guideline's
+    own worked example does: add the A-weighting to the computed spectrum and
+    compare every band against the flat ``L_A - 5``. The two are the same
+    test, since ``K_A = -A - 5``.
+
+    :param a_weighted_limit_db: The A-weighted level the room is required to
+        meet ``L_A``, dB.
+    :param frequencies: Octave-band centres, Hz; ``None`` (default) uses the
+        63 Hz to 8 kHz bands of :data:`OCTAVE_BANDS`.
+    :return: An :class:`HvacSpectrumResult` of the per-band limit, dB.
+    """
+    f, idx = _octave_slots(frequencies)
+    limit = float(a_weighted_limit_db)
+    if not math.isfinite(limit):
+        msg = "'a_weighted_limit_db' must be finite."
+        raise ValueError(msg)
+    return HvacSpectrumResult(
+        frequencies=f,
+        values=limit + VDI2081_SPECTRAL_CORRECTION[idx],
+        quantity="sound_power_level",
+        label=f"VDI 2081 octave limits for {limit:.0f} dB(A)",
     )
 
 
