@@ -107,26 +107,6 @@ $H_{12} = H_{12,\text{uncorrected}} / H_\mathrm{c}$.
 
 **Returns:** Corrected transfer function `H12`.
 
-## characteristic_impedance
-
-```python
-characteristic_impedance(density: float, speed_of_sound: float) -> float
-```
-
-Characteristic impedance of air `rho c` (rayls).
-
-A convenience for both standards (ISO 10534-2 Clause 7.2; ASTM E2611-19
-Clause 8.2/8.3): the real product of air density and speed of sound.
-
-**Parameters**
-
-| Name | Description |
-| :--- | :--- |
-| `density` | Air density `rho`, in kg/m3. |
-| `speed_of_sound` | Speed of sound `c`, in m/s. |
-
-**Returns:** Characteristic impedance `rho c`, in rayls.
-
 ## hydraulic_diameter
 
 ```python

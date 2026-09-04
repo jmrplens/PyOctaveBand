@@ -34,10 +34,10 @@ import result_factories
 from report_assertions import assert_one_page
 
 from phonometry import ReportMetadata
+from phonometry.fluids import characteristic_impedance
 from phonometry.materials import (
     ImpedanceTubeResult,
     air_density_iso10534,
-    characteristic_impedance,
     speed_of_sound_iso10534,
     tube_wavenumber,
     two_microphone_impedance,

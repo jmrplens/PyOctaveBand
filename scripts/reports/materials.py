@@ -209,7 +209,7 @@ def _impedance_tube_example() -> tuple[object, ReportMetadata, str]:
             temperature_c=temperature_c, atmospheric_pressure_kpa=pressure_kpa
         )
     )
-    rc = ph.materials.characteristic_impedance(rho, c0)
+    rc = ph.fluids.characteristic_impedance(rho, c0)
 
     diameter, spacing, x1 = 0.100, 0.050, 0.100
     theta, cavity = 1.0, c0 / (4.0 * 1000.0)
