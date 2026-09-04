@@ -621,3 +621,138 @@ def test_the_vdi_flow_noise_asks_for_the_branch_it_is_written_on() -> None:
     """Equation (18) is written on the branch diameter, which Bies does not take."""
     with pytest.raises(ValueError, match=r"model='vdi2081' needs 'branch_diameter'"):
         hvac.flow_noise_bend(hvac.OCTAVE_BANDS, 5.0, 0.2, 0.4, model="vdi2081")
+
+
+# ---------------------------------------------------------------------------
+# The silencer and the nozzle: Sections 7.2.4.2 and 6.6
+# ---------------------------------------------------------------------------
+#: Table 1, element 2: a splitter silencer, 1500 x 600 mm over 2 m, five
+#: 200 mm splitters with 100 mm gaps, and the two quantities the table prints
+#: for it beside its manufacturer's attenuation.
+SILENCER_GAP_VELOCITY = 14.81
+SILENCER_PRESSURE_DROP_PA = 145.0
+SILENCER_APPROACH_AREA_M2 = 1.5 * 0.6
+SILENCER_GAP_M = 0.100
+PRINTED_SILENCER_LWA_DB = 52.0
+PRINTED_SILENCER_NOISE_DB = (62.7, 58.3, 53.7, 49.4, 45.4, 41.9, 38.6, 35.6)
+#: Table 1, element 2 again: the Strouhal row, which is what shows the printed
+#: hydraulic diameter is not the one the example computes with.
+PRINTED_SILENCER_STROUHAL = (0.9, 1.7, 3.4, 6.8, 13.5, 27.0, 54.0, 108.0)
+PRINTED_SILENCER_HYDRAULIC_DIAMETER_M = 0.171
+#: Table 2, element 18: the end reflection of a 200 mm nozzle in a ceiling,
+#: printed both as computed and capped at 15 dB.
+NOZZLE_DIAMETER_M = 0.200
+PRINTED_NOZZLE_DB = (15.8, 10.2, 5.3, 2.1, 0.7, 0.2, 0.1, 0.1)
+PRINTED_NOZZLE_CAPPED_DB = (15.0, 10.2, 5.3, 2.1, 0.7, 0.2, 0.1, 0.1)
+
+
+def test_the_silencer_self_noise_reproduces_element_2() -> None:
+    """Equations (49), (46), (50) and (51), band by band."""
+    weighted = (
+        56.6 * math.log10(SILENCER_GAP_VELOCITY)
+        - 0.5 * math.log10(SILENCER_PRESSURE_DROP_PA)
+        + 10.0 * math.log10(SILENCER_APPROACH_AREA_M2)
+        - 12.7
+    )
+    assert weighted == pytest.approx(PRINTED_SILENCER_LWA_DB, abs=0.05)
+
+    noise = hvac.silencer_self_noise(
+        hvac.OCTAVE_BANDS,
+        SILENCER_GAP_VELOCITY,
+        5,
+        0.6,
+        model="vdi2081",
+        pressure_drop_pa=SILENCER_PRESSURE_DROP_PA,
+        approach_area=SILENCER_APPROACH_AREA_M2,
+        airway_width=SILENCER_GAP_M,
+    )
+    assert noise.values == pytest.approx(PRINTED_SILENCER_NOISE_DB, abs=0.05)
+
+
+def test_the_example_computes_on_twice_the_gap_not_on_the_diameter_it_prints() -> None:
+    """Element 2 prints one hydraulic diameter and works with another.
+
+    Section 7.2.4.2 sets ``St = f d_h / v_i``, so the printed ``d_h`` and the
+    printed Strouhal row determine each other. They disagree: with the printed
+    0,171 m not one of the eight rounds onto the row, and with ``2 s`` all
+    eight do. Both are defensible diameters for the gap, ``4 A / P`` and the
+    parallel-plate limit, and ``docs/ERRATA.md`` records which the example
+    used.
+    """
+    printed = np.array(PRINTED_SILENCER_STROUHAL)
+    from_printed_diameter = (
+        hvac.OCTAVE_BANDS
+        * PRINTED_SILENCER_HYDRAULIC_DIAMETER_M
+        / SILENCER_GAP_VELOCITY
+    )
+    from_twice_the_gap = (
+        hvac.OCTAVE_BANDS * 2.0 * SILENCER_GAP_M / SILENCER_GAP_VELOCITY
+    )
+    # The row is printed to one decimal, so the test is whether each value
+    # rounds onto its cell, which is the only comparison the print supports.
+    assert np.round(from_twice_the_gap, 1) == pytest.approx(printed, abs=1e-9)
+    assert not np.any(np.round(from_printed_diameter, 1) == printed)
+
+
+def test_the_nozzle_reflection_reproduces_element_18() -> None:
+    """Figure 28 in closed form, and the flat 15 dB ceiling of Section 6.6.
+
+    The area comes from the nozzle's own bore, so a 200 mm outlet gives the
+    0,0314 m2 the example prints, and the ceiling is what turns its computed
+    15,8 dB at 63 Hz into the 15,0 it carries forward.
+    """
+    uncapped = hvac.end_reflection_loss(
+        hvac.OCTAVE_BANDS,
+        NOZZLE_DIAMETER_M,
+        termination="wall",
+        method="vdi2081",
+        speed_of_sound=EXAMPLE_SPEED_OF_SOUND,
+        maximum_reduction_db=None,
+    )
+    assert uncapped.values == pytest.approx(PRINTED_NOZZLE_DB, abs=0.05)
+
+    capped = hvac.end_reflection_loss(
+        hvac.OCTAVE_BANDS,
+        NOZZLE_DIAMETER_M,
+        termination="wall",
+        method="vdi2081",
+        speed_of_sound=EXAMPLE_SPEED_OF_SOUND,
+    )
+    assert capped.values == pytest.approx(PRINTED_NOZZLE_CAPPED_DB, abs=0.05)
+
+
+def test_the_nozzle_knows_all_four_solid_angles() -> None:
+    """Figure 28 tabulates a nozzle in the room, in a wall, on an edge and in a corner.
+
+    Halving the solid angle doubles the pressure the same power makes, so each
+    step towards a corner is worth 3 dB of reflection at low frequency, where
+    the piston term dominates.
+    """
+    levels = [
+        hvac.end_reflection_loss(
+            np.array([63.0]),
+            NOZZLE_DIAMETER_M,
+            termination=where,
+            method="vdi2081",
+            speed_of_sound=EXAMPLE_SPEED_OF_SOUND,
+            maximum_reduction_db=None,
+        ).values[0]
+        for where in ("room", "wall", "edge", "corner")
+    ]
+    steps = np.diff(levels)
+    assert np.all(steps < 0.0)
+    # Not exactly 3 dB: the piston term is 10 lg(1 + x) rather than 10 lg(x),
+    # so the leading one holds each step a little short of the halving.
+    assert steps == pytest.approx([-3.0, -3.0, -3.0], abs=0.25)
+    assert np.all(steps > -3.0)
+
+
+def test_the_vdi_silencer_and_nozzle_refuse_what_they_cannot_answer() -> None:
+    """Each asks for what its own equation needs, and nothing else."""
+    with pytest.raises(ValueError, match=r"model='vdi2081' needs"):
+        hvac.silencer_self_noise(None, 14.0, 5, 0.6, model="vdi2081")
+
+    with pytest.raises(ValueError, match=r"'termination' must be one of"):
+        hvac.end_reflection_loss(
+            hvac.OCTAVE_BANDS, 0.2, termination="duct", method="vdi2081"
+        )

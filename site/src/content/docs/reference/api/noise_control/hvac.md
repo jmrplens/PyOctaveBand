@@ -317,6 +317,8 @@ end_reflection_loss(
     termination: str = 'flush',
     method: str = 'bies',
     speed_of_sound: float = 343.0,
+    aspect_ratio: float = 1.0,
+    maximum_reduction_db: float | None = 15.0,
 ) -> HvacSpectrumResult
 ```
 
@@ -343,7 +345,9 @@ The two agree within a couple of decibels over the bands both cover.
 | `frequencies` | Frequencies `f`, Hz (1-D array). |
 | `diameter` | Duct internal diameter `D`, m (use [`equivalent_diameter`](/phonometry/reference/api/noise_control/hvac/#equivalent_diameter) for a rectangular duct of area `S`). |
 | `termination` | `"flush"` (duct flush with a wall/ceiling) or `"free"` (free space / suspended in the room). |
-| `method` | `"bies"` (Table 8.14 look-up) or `"long"` (closed form). |
+| `method` | `"bies"` (Table 8.14 look-up), `"long"` (closed form) or `"vdi2081"` (VDI 2081 Part 1 Figure 28). |
+| `aspect_ratio` | **VDI 2081 only.** Nozzle length over height `m` (default 1, a square opening). Figure 28 is drawn from 1 to 30. |
+| `maximum_reduction_db` | **VDI 2081 only.** Ceiling on the reduction, dB (default 15). Section 6.6 says the theoretical value is not reached because the duct walls radiate what the nozzle reflects, and the guideline's own worked example applies exactly this cap. `None` returns the uncapped closed form. |
 | `speed_of_sound` | Speed of sound `c`, m/s (used by the closed form; the table is indexed by frequency directly). |
 
 **Returns:** A [`HvacSpectrumResult`](/phonometry/reference/api/noise_control/hvac/#hvacspectrumresult) of the reflection loss, dB.
@@ -982,6 +986,11 @@ silencer_self_noise(
     airway_velocity: float,
     passages: int,
     height: float,
+    *,
+    model: str = 'ashrae',
+    pressure_drop_pa: float | None = None,
+    approach_area: float | None = None,
+    airway_width: float | None = None,
 ) -> HvacSpectrumResult
 ```
 
@@ -1017,6 +1026,10 @@ correction because the face size enters through `N` and `H`.
 | `airway_velocity` | Velocity `V` in the splitter airway, m/s. |
 | `passages` | Number of air passages `N` between the splitters. |
 | `height` | Silencer height `H` (or circumference, if round), m. |
+| `model` | `"ashrae"` (default, Long Eq. 14.31) or `"vdi2081"` (Section 7.2.4.2). |
+| `pressure_drop_pa` | **VDI 2081 only.** Total pressure drop across the silencer, Pa, which Equation (49) takes. |
+| `approach_area` | **VDI 2081 only.** Frontal area the silencer is approached over `S`, m2. That is the duct's whole section, not the clear area between the splitters. |
+| `airway_width` | **VDI 2081 only.** Clear gap between splitters `s`, m. The Strouhal number is taken on the hydraulic diameter of that gap, which the guideline's own worked example computes as `2 s`, the parallel-plate limit, rather than as `4 A / P`; `docs/ERRATA.md` records the difference. |
 
 **Returns:** An [`HvacSpectrumResult`](/phonometry/reference/api/noise_control/hvac/#hvacspectrumresult) of the band sound power level, dB re 1e-12 W.
 

@@ -4135,6 +4135,68 @@ in the same order.
   Blatt 2:2022-10) and neither successor is held, so whether the translation was
   corrected is not known here.
 
+## VDI 2081 Blatt 2:2005-05, Table 1, element 2 (the hydraulic diameter it prints is not the one it computes with)
+
+- **Location:** Table 1, printed folio 12 (PDF page 12), element 2, the splitter
+  silencer: the rows "Hydr. Durchmesser $d_\mathrm{h}$ (m)" and "Strouhalzahl
+  $St$".
+- **The print:** $d_\mathrm{h} = 0{,}171$ m, and the eight Strouhal numbers
+  $0{,}9$, $1{,}7$, $3{,}4$, $6{,}8$, $13{,}5$, $27{,}0$, $54{,}0$ and
+  $108{,}0$ over the octaves 63 Hz to 8 kHz, for a clear gap $s = 0{,}100$ m,
+  a splitter height $H = 0{,}600$ m and a gap speed $v = 14{,}81$ m/s.
+- **The problem:** the two rows disagree. VDI 2081 Blatt 1 Section 7.2.4.2
+  defines $St = f_\mathrm{m} d_\mathrm{h} / v_\mathrm{i}$, so the printed
+  $d_\mathrm{h}$ and the printed $St$ determine each other. With the printed
+  $0{,}171$ m the eight numbers would be $0{,}73$, $1{,}45$, $2{,}89$,
+  $5{,}79$, $11{,}57$, $23{,}15$, $46{,}29$ and $92{,}59$: not one of them
+  rounds onto the printed row. With $d_\mathrm{h} = 2s = 0{,}200$ m they come
+  out as $0{,}851$, $1{,}688$, $3{,}376$, $6{,}752$, $13{,}504$, $27{,}009$,
+  $54{,}018$ and $108{,}035$, which round onto all eight.
+
+  Both values are defensible as a hydraulic diameter, which is why this is an
+  internal inconsistency rather than a wrong number: $4A/P$ for a $0{,}100$ m
+  by $0{,}600$ m gap is $0{,}171$ m, while the parallel-plate limit that a long
+  narrow gap tends to is $2s = 0{,}200$ m. The table prints the first and
+  computes with the second.
+- **Consequence:** following the printed $d_\mathrm{h}$ reproduces neither the
+  Strouhal row nor the flow-noise spectrum beneath it. With $2s$ the whole
+  element falls out to the last printed decimal: $L_\mathrm{WA} = 52$ dB from
+  Equation (49) and the eight octave levels $62{,}7$ down to $35{,}6$ dB from
+  Equations (46), (50) and (51), the worst of them 0,046 dB from its printed
+  cell.
+- **Evidence:** the two rows of the same printed element read against Section
+  7.2.4.2 of Blatt 1 (printed folio 53); both candidate diameters evaluated
+  over the eight octaves; and the flow-noise spectrum recomputed from each.
+  Verified on PDF page 12 (printed p. 12) of VDI 2081 Blatt 2:2005-05 and PDF
+  page 53 (printed p. 53) of VDI 2081 Blatt 1:2001-07.
+- **Library behaviour:**
+  [`silencer_self_noise`](../src/phonometry/noise_control/hvac.py) with
+  `model="vdi2081"` takes the clear gap and uses $2s$, so it reproduces the
+  worked example. The docstring says which of the two it takes.
+- **Status:** unreported. Both prints are superseded and neither successor is
+  held.
+
+## VDI 2081 Blatt 2:2005-05, Table 1, element 2 (a cross-reference to the wrong clause)
+
+- **Location:** Table 1, printed folio 12 (PDF page 12), element 2, the box
+  reading "Tabelle aus VDI 2081 Blatt 1/7.3.2" beside the coefficients
+  $a_1$, $a_2$, $b_1$ and $b_2$.
+- **The print:** the coefficients $0{,}255$, $0{,}015$, $-2{,}82$ and $-2{,}91$
+  are credited to Section 7.3.2 of Blatt 1.
+- **The problem:** Section 7.3 of VDI 2081 Blatt 1:2001-07 is "Luftschalldämmung
+  eines Bauteils", the airborne sound insulation of a building component, and
+  has no such table. The coefficients are printed in Section **7.2.3.2**,
+  "Kulissenschalldämpfer", on printed folio 52, whose table gives exactly those
+  four values in its 200 mm row, which is the splitter thickness the element
+  uses.
+- **Consequence:** a reader following the reference lands in the wrong chapter.
+  The values themselves are right.
+- **Evidence:** the cited clause and the actual one, both read from the printed
+  pages. Verified on PDF page 12 (printed p. 12) of VDI 2081 Blatt 2:2005-05
+  and PDF page 52 (printed p. 52) of VDI 2081 Blatt 1:2001-07.
+- **Library behaviour:** none; the library cites Section 7.2.3.2.
+- **Status:** unreported.
+
 ## Related source properties that are not errata
 
 Recorded here to prevent future "fixes" that would break agreement with the

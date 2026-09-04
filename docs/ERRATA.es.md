@@ -4463,6 +4463,70 @@ dos ediciones con las mismas entradas y en el mismo orden.
   y Blatt 2:2022-10) y no se dispone de ninguno de los sucesores, así que aquí
   no consta si la traducción se corrigió.
 
+## VDI 2081 Blatt 2:2005-05, tabla 1, elemento 2 (el diámetro hidráulico que imprime no es con el que calcula)
+
+- **Ubicación:** tabla 1, folio impreso 12 (página 12 del PDF), elemento 2, el
+  silenciador de bafles: las filas "Hydr. Durchmesser $d_\mathrm{h}$ (m)" y
+  "Strouhalzahl $St$".
+- **Lo impreso:** $d_\mathrm{h} = 0{,}171$ m, y los ocho números de Strouhal
+  $0{,}9$, $1{,}7$, $3{,}4$, $6{,}8$, $13{,}5$, $27{,}0$, $54{,}0$ y $108{,}0$
+  en las octavas de 63 Hz a 8 kHz, para una ranura libre $s = 0{,}100$ m, una
+  altura de bafle $H = 0{,}600$ m y una velocidad de ranura $v = 14{,}81$ m/s.
+- **El problema:** las dos filas se contradicen. El apartado 7.2.4.2 del
+  Blatt 1 define $St = f_\mathrm{m} d_\mathrm{h} / v_\mathrm{i}$, así que el
+  $d_\mathrm{h}$ impreso y el $St$ impreso se determinan mutuamente. Con los
+  $0{,}171$ m impresos los ocho números serían $0{,}73$, $1{,}45$, $2{,}89$,
+  $5{,}79$, $11{,}57$, $23{,}15$, $46{,}29$ y $92{,}59$: ninguno redondea sobre
+  la fila impresa. Con $d_\mathrm{h} = 2s = 0{,}200$ m salen $0{,}851$,
+  $1{,}688$, $3{,}376$, $6{,}752$, $13{,}504$, $27{,}009$, $54{,}018$ y
+  $108{,}035$, que redondean sobre los ocho.
+
+  Los dos valores son defendibles como diámetro hidráulico, y por eso esto es
+  una incoherencia interna y no un número mal puesto: $4A/P$ de una ranura de
+  $0{,}100$ m por $0{,}600$ m vale $0{,}171$ m, mientras que el límite de
+  placas paralelas al que tiende una ranura larga y estrecha es
+  $2s = 0{,}200$ m. La tabla imprime el primero y calcula con el segundo.
+- **Consecuencia:** seguir el $d_\mathrm{h}$ impreso no reproduce ni la fila de
+  Strouhal ni el espectro de ruido que va debajo. Con $2s$ el elemento entero
+  sale hasta el último decimal impreso: $L_\mathrm{WA} = 52$ dB por la
+  ecuación (49) y los ocho niveles de octava de $62{,}7$ a $35{,}6$ dB por las
+  ecuaciones (46), (50) y (51), el peor de ellos a 0,046 dB de su celda.
+- **Evidencia:** las dos filas del mismo elemento impreso leídas contra el
+  apartado 7.2.4.2 del Blatt 1 (folio impreso 53); los dos diámetros candidatos
+  evaluados en las ocho octavas; y el espectro de ruido recalculado con cada
+  uno. Verificado en la página 12 del PDF (p. impresa 12) de VDI 2081
+  Blatt 2:2005-05 y en la página 53 del PDF (p. impresa 53) de VDI 2081
+  Blatt 1:2001-07.
+- **Comportamiento de la biblioteca:**
+  [`silencer_self_noise`](../src/phonometry/noise_control/hvac.py) con
+  `model="vdi2081"` toma la ranura libre y usa $2s$, así que reproduce el
+  ejemplo resuelto. El docstring dice cuál de los dos toma.
+- **Estado:** sin comunicar. Los dos impresos están sustituidos y no se dispone
+  de ninguno de los sucesores.
+
+## VDI 2081 Blatt 2:2005-05, tabla 1, elemento 2 (una referencia cruzada al apartado equivocado)
+
+- **Ubicación:** tabla 1, folio impreso 12 (página 12 del PDF), elemento 2, el
+  recuadro que dice "Tabelle aus VDI 2081 Blatt 1/7.3.2" junto a los
+  coeficientes $a_1$, $a_2$, $b_1$ y $b_2$.
+- **Lo impreso:** los coeficientes $0{,}255$, $0{,}015$, $-2{,}82$ y $-2{,}91$
+  se atribuyen al apartado 7.3.2 del Blatt 1.
+- **El problema:** el apartado 7.3 de VDI 2081 Blatt 1:2001-07 es
+  "Luftschalldämmung eines Bauteils", el aislamiento a ruido aéreo de un
+  elemento constructivo, y no tiene tal tabla. Los coeficientes están impresos
+  en el apartado **7.2.3.2**, "Kulissenschalldämpfer", en el folio impreso 52,
+  cuya tabla da exactamente esos cuatro valores en la fila de 200 mm, que es el
+  espesor de bafle del elemento.
+- **Consecuencia:** quien siga la referencia aterriza en otro capítulo. Los
+  valores en sí son correctos.
+- **Evidencia:** el apartado citado y el real, leídos los dos de las páginas
+  impresas. Verificado en la página 12 del PDF (p. impresa 12) de VDI 2081
+  Blatt 2:2005-05 y en la página 52 del PDF (p. impresa 52) de VDI 2081
+  Blatt 1:2001-07.
+- **Comportamiento de la biblioteca:** ninguno; la biblioteca cita el apartado
+  7.2.3.2.
+- **Estado:** sin comunicar.
+
 ## Propiedades de las fuentes, relacionadas, que no son erratas
 
 Registradas aquí para prevenir futuros «arreglos» que romperían la

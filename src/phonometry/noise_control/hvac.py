@@ -324,6 +324,24 @@ _VDI2081_BEND_BANDS: tuple[float, ...] = (
     4000.0,
     8000.0,
 )
+#: VDI 2081 Part 1 Figure 28 -- the solid angle a duct nozzle radiates into,
+#: as a multiple of pi: into the room, into a wall, along an edge, into a
+#: corner. The library's own two terminations are the first two of these.
+_VDI2081_SOLID_ANGLE: dict[str, float] = {
+    "room": 4.0,
+    "wall": 2.0,
+    "edge": 1.0,
+    "corner": 0.5,
+    # the names this function already takes, mapped onto the same geometry
+    "free": 4.0,
+    "flush": 2.0,
+}
+#: Section 6.6 -- the practical ceiling on the reduction, dB. The theoretical
+#: value is not reached because the duct walls radiate what the nozzle
+#: reflects; the guideline's worked example applies it as a flat 15 dB.
+_VDI2081_END_REFLECTION_CAP = 15.0
+
+
 #: Section 6.3 -- VDI 3733's recommendation that no more than 5 dB be taken
 #: from a change of cross-section, since the printed reduction is only reached
 #: when the duct is anechoically terminated at both ends.
@@ -663,6 +681,8 @@ def end_reflection_loss(
     termination: str = "flush",
     method: str = "bies",
     speed_of_sound: float = _C_AIR,
+    aspect_ratio: float = 1.0,
+    maximum_reduction_db: float | None = _VDI2081_END_REFLECTION_CAP,
 ) -> HvacSpectrumResult:
     """Duct end reflection loss (Bies Table 8.14, ASHRAE; or Long's closed form).
 
@@ -685,11 +705,44 @@ def end_reflection_loss(
         :func:`equivalent_diameter` for a rectangular duct of area ``S``).
     :param termination: ``"flush"`` (duct flush with a wall/ceiling) or
         ``"free"`` (free space / suspended in the room).
-    :param method: ``"bies"`` (Table 8.14 look-up) or ``"long"`` (closed form).
+    :param method: ``"bies"`` (Table 8.14 look-up), ``"long"`` (closed form)
+        or ``"vdi2081"`` (VDI 2081 Part 1 Figure 28).
+    :param aspect_ratio: **VDI 2081 only.** Nozzle length over height ``m``
+        (default 1, a square opening). Figure 28 is drawn from 1 to 30.
+    :param maximum_reduction_db: **VDI 2081 only.** Ceiling on the reduction,
+        dB (default 15). Section 6.6 says the theoretical value is not reached
+        because the duct walls radiate what the nozzle reflects, and the
+        guideline's own worked example applies exactly this cap. ``None``
+        returns the uncapped closed form.
     :param speed_of_sound: Speed of sound ``c``, m/s (used by the closed form;
         the table is indexed by frequency directly).
     :return: A :class:`HvacSpectrumResult` of the reflection loss, dB.
     """
+    if method == "vdi2081":
+        bands = _frequencies(frequencies)
+        bore = require_positive(diameter, "diameter")
+        angle = _VDI2081_SOLID_ANGLE.get(termination)
+        if angle is None:
+            options = sorted(set(_VDI2081_SOLID_ANGLE))
+            msg = f"'termination' must be one of {options} for method='vdi2081'."
+            raise ValueError(msg)
+        values = _vdi2081_end_reflection(
+            bands,
+            area=math.pi * bore**2 / 4.0,
+            solid_angle_over_pi=angle,
+            aspect_ratio=require_positive(aspect_ratio, "aspect_ratio"),
+            speed_of_sound=require_positive(speed_of_sound, "speed_of_sound"),
+        )
+        if maximum_reduction_db is not None:
+            values = np.minimum(
+                values, require_positive(maximum_reduction_db, "maximum_reduction_db")
+            )
+        return HvacSpectrumResult(
+            frequencies=bands,
+            values=values,
+            quantity="attenuation",
+            label=f"End reflection, VDI 2081 ({termination}, dia {bore * 1000:.0f} mm)",
+        )
     if require_choice(method, "method", ("bies", "long")) == "long":
         return end_reflection_loss_closed_form(
             frequencies,
@@ -1434,6 +1487,56 @@ def fan_casing_attenuation(
 # ---------------------------------------------------------------------------
 # Straight-duct attenuation (Long Chapter 14)
 # ---------------------------------------------------------------------------
+def _vdi2081_silencer_self_noise(
+    bands: NDArray[np.float64],
+    *,
+    airway_velocity: float,
+    pressure_drop_pa: float,
+    approach_area: float,
+    hydraulic_diameter: float,
+) -> NDArray[np.float64]:
+    """Equations (46), (49), (50) and (51) of VDI 2081 Part 1 Section 7.2.4.2.
+
+    The A-weighted level comes from the speed in the clear section, the
+    pressure drop across the silencer and the area it is approached over; the
+    shape is a quartic in ``lg St`` and the offset a term in the same speed.
+    """
+    weighted = (
+        56.6 * math.log10(airway_velocity)
+        - 0.5 * math.log10(pressure_drop_pa)
+        + 10.0 * math.log10(approach_area)
+        - 12.7
+    )
+    offset = -13.0 * math.log10(airway_velocity) + 13.5
+    lg_st = np.log10(bands * hydraulic_diameter / airway_velocity)
+    shape = 11.4 - 14.9 * lg_st - 1.4 * lg_st**2 + 2.2 * lg_st**3 - 0.5 * lg_st**4
+    return np.asarray(weighted + shape + offset, dtype=np.float64)
+
+
+def _vdi2081_end_reflection(
+    bands: NDArray[np.float64],
+    *,
+    area: float,
+    solid_angle_over_pi: float,
+    aspect_ratio: float,
+    speed_of_sound: float,
+) -> NDArray[np.float64]:
+    """Figure 28 of VDI 2081 Part 1 Section 6.6, in its printed closed form.
+
+    The first term is the reflection of a piston small against the wavelength;
+    the second is the correction for a slot-shaped rather than square nozzle,
+    which is why it carries the aspect ratio.
+    """
+    piston = 10.0 * np.log10(
+        1.0
+        + (speed_of_sound / (4.0 * math.pi * bands)) ** 2
+        * (solid_angle_over_pi * math.pi)
+        / area
+    )
+    slot = aspect_ratio * (0.04283 * np.log10(bands * math.sqrt(area)) - 0.0303)
+    return np.asarray(piston + slot, dtype=np.float64)
+
+
 def _vdi2081_octave_bandwidth(bands: NDArray[np.float64]) -> NDArray[np.float64]:
     """Table 1 of VDI 2081 Part 1: an octave is ``f_m / sqrt(2)`` wide.
 
@@ -2088,6 +2191,11 @@ def silencer_self_noise(
     airway_velocity: float,
     passages: int,
     height: float,
+    *,
+    model: str = "ashrae",
+    pressure_drop_pa: float | None = None,
+    approach_area: float | None = None,
+    airway_width: float | None = None,
 ) -> HvacSpectrumResult:
     r"""Regenerated (self) noise of a splitter silencer (Long Eq. 14.31).
 
@@ -2121,7 +2229,51 @@ def silencer_self_noise(
     :return: An :class:`HvacSpectrumResult` of the band sound power level,
         dB re 1e-12 W.
     :raises ValueError: If ``passages`` is not a positive integer.
+    :param model: ``"ashrae"`` (default, Long Eq. 14.31) or ``"vdi2081"``
+        (Section 7.2.4.2).
+    :param pressure_drop_pa: **VDI 2081 only.** Total pressure drop across the
+        silencer, Pa, which Equation (49) takes.
+    :param approach_area: **VDI 2081 only.** Frontal area the silencer is
+        approached over ``S``, m2. That is the duct's whole section, not the
+        clear area between the splitters.
+    :param airway_width: **VDI 2081 only.** Clear gap between splitters ``s``,
+        m. The Strouhal number is taken on the hydraulic diameter of that gap,
+        which the guideline's own worked example computes as ``2 s``, the
+        parallel-plate limit, rather than as ``4 A / P``; ``docs/ERRATA.md``
+        records the difference.
     """
+    if require_choice(model, "model", ("ashrae", "vdi2081")) == "vdi2081":
+        missing = [
+            name
+            for name, value in (
+                ("pressure_drop_pa", pressure_drop_pa),
+                ("approach_area", approach_area),
+                ("airway_width", airway_width),
+            )
+            if value is None
+        ]
+        if pressure_drop_pa is None or approach_area is None or airway_width is None:
+            msg = (
+                f"model='vdi2081' needs {missing}: Equation (49) is written on "
+                "the pressure drop and the approach area, and its Strouhal "
+                "number on the gap between splitters, none of which the Long "
+                "form takes."
+            )
+            raise ValueError(msg)
+        bands = _frequencies(OCTAVE_BANDS if frequencies is None else frequencies)
+        gap = require_positive(airway_width, "airway_width")
+        return HvacSpectrumResult(
+            frequencies=bands,
+            values=_vdi2081_silencer_self_noise(
+                bands,
+                airway_velocity=require_positive(airway_velocity, "airway_velocity"),
+                pressure_drop_pa=require_positive(pressure_drop_pa, "pressure_drop_pa"),
+                approach_area=require_positive(approach_area, "approach_area"),
+                hydraulic_diameter=2.0 * gap,
+            ),
+            quantity="sound_power_level",
+            label=f"Splitter silencer self-noise, VDI 2081 ({airway_velocity:.1f} m/s)",
+        )
     f, idx = _octave_slots(frequencies)
     v = require_positive(airway_velocity, "airway_velocity")
     if passages <= 0 or not float(passages).is_integer():

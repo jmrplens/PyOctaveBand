@@ -82,6 +82,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   an oracle, and it has one now. Eleven further conformance rows, all Table 1
   of the worked example, take the domain to twenty-nine.
 
+- `silencer_self_noise` and `end_reflection_loss` complete the chain.
+  `model="vdi2081"` on the first is Equations (46), (49), (50) and (51) of
+  Section 7.2.4.2: the A-weighted level from the speed in the clear section,
+  the pressure drop and the approach area, shaped by a quartic in `lg St`.
+  `method="vdi2081"` on the second is Figure 28 of Section 6.6 in the closed
+  form printed beneath it, which knows all four solid angles a nozzle can
+  radiate into, from the middle of a room to a corner, and carries the flat
+  15 dB ceiling the guideline puts on the theoretical value because the duct
+  walls radiate what the nozzle reflects.
+
+  Ten further conformance rows: the silencer's A-weighted level, its
+  regenerated noise octave by octave, and the nozzle's reflection. The domain
+  now stands at thirty-nine.
+
+- Two more entries in `docs/ERRATA.md`, both from Table 1 element 2 of
+  VDI 2081 Part 2. The first is substantive: the table prints a hydraulic
+  diameter of 0,171 m for the gap between splitters and computes its Strouhal
+  row from 0,200 m instead. Both are defensible for that gap, `4 A / P` and the
+  parallel-plate limit `2 s`, but only the second reproduces the eight printed
+  Strouhal numbers, and with it the whole element falls out to the last printed
+  decimal. The second is a cross-reference: the coefficients of the pressure
+  drop are credited to Section 7.3.2, which is the airborne sound insulation of
+  a building component; they are printed in Section 7.2.3.2.
+
 - `docs/ERRATA.md` records that the two columns of VDI 2081 Part 1 Section 6.4
   contradict each other. The German says the junction's level reduction is
   independent of frequency and the English, on the same page, says it depends

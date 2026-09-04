@@ -345,3 +345,93 @@ def _chk_bend_flow_noise() -> Outcome:
     )
     computed = 10.0 * math.log10(float(np.sum(10.0 ** (values / 10.0))))
     return numeric(printed, computed, _PRINTED_TOLERANCE, unit="dB", places=3)
+
+
+# ---------------------------------------------------------------------------
+# The silencer and the nozzle
+# ---------------------------------------------------------------------------
+#: Table 1, element 2: a splitter silencer, five 200 mm splitters with 100 mm
+#: gaps in a 1500 x 600 mm duct, 2 m long.
+_SILENCER_GAP_VELOCITY = 14.81
+_SILENCER_PRESSURE_DROP = 145.0
+_SILENCER_APPROACH_AREA = 1.5 * 0.6
+_SILENCER_GAP = 0.100
+_PRINTED_SILENCER_NOISE = (62.7, 58.3, 53.7, 49.4, 45.4, 41.9, 38.6, 35.6)
+#: Table 2, element 18: a 200 mm nozzle in a ceiling, the reduction printed
+#: both as computed and capped at the 15 dB of Section 6.6.
+_NOZZLE_DIAMETER = 0.200
+_PRINTED_NOZZLE = (15.8, 10.2, 5.3, 2.1, 0.7, 0.2, 0.1, 0.1)
+
+
+@register(
+    _VDI2081,
+    "VDI 2081 Blatt 1 Eq. (49)",
+    "Splitter silencer self-noise, A-weighted sound power level, dB",
+)
+def _chk_silencer_a_weighted() -> Outcome:
+    """Element 2 of Table 1, printed as 52 dB."""
+    weighted = (
+        56.6 * math.log10(_SILENCER_GAP_VELOCITY)
+        - 0.5 * math.log10(_SILENCER_PRESSURE_DROP)
+        + 10.0 * math.log10(_SILENCER_APPROACH_AREA)
+        - 12.7
+    )
+    return numeric(52.0, weighted, 0.5, unit="dB", places=3)
+
+
+def _silencer_outcome(index: int) -> Outcome:
+    """One octave of element 2's regenerated noise."""
+    values = ph.noise_control.silencer_self_noise(
+        np.array(_PRINTED_BANDS),
+        _SILENCER_GAP_VELOCITY,
+        5,
+        0.6,
+        model="vdi2081",
+        pressure_drop_pa=_SILENCER_PRESSURE_DROP,
+        approach_area=_SILENCER_APPROACH_AREA,
+        airway_width=_SILENCER_GAP,
+    ).values
+    return numeric(
+        _PRINTED_SILENCER_NOISE[index],
+        float(values[index]),
+        _PRINTED_TOLERANCE,
+        unit="dB",
+        places=2,
+    )
+
+
+def _register_silencer_noise() -> None:
+    """Register the eight octaves of element 2's flow-noise row."""
+    for index, band in enumerate(_PRINTED_BANDS):
+        register(
+            _VDI2081,
+            "VDI 2081 Blatt 2 Table 1, element 2",
+            f"Splitter silencer self-noise at {band:g} Hz, dB",
+        )(functools.partial(_silencer_outcome, index))
+
+
+_register_silencer_noise()
+
+
+@register(
+    _VDI2081,
+    "VDI 2081 Blatt 2 Table 2, element 18",
+    "End reflection of a 200 mm nozzle in a ceiling, sum over the octaves, dB",
+)
+def _chk_end_reflection() -> Outcome:
+    """Figure 28 in closed form, before the 15 dB ceiling of Section 6.6."""
+    values = ph.noise_control.end_reflection_loss(
+        np.array(_PRINTED_BANDS),
+        _NOZZLE_DIAMETER,
+        termination="wall",
+        method="vdi2081",
+        speed_of_sound=_EXAMPLE_SPEED,
+        maximum_reduction_db=None,
+    ).values
+    return numeric(
+        float(np.sum(_PRINTED_NOZZLE)),
+        float(np.sum(values)),
+        0.05,
+        unit="dB",
+        places=3,
+    )

@@ -3,12 +3,12 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 652,
-    "passing": 652,
+    "checks": 662,
+    "passing": 662,
     "failing": 0,
     "domains": 64,
-    "standards": 396,
-    "citations": 568,
+    "standards": 399,
+    "citations": 571,
     "designations": 121,
     "sources": 84
   },
@@ -447,8 +447,8 @@
     {
       "id": "hvac-noise-vdi-2081",
       "title": "HVAC noise (VDI 2081)",
-      "checks": 29,
-      "passing": 29
+      "checks": 39,
+      "passing": 39
     },
     {
       "id": "cnossos-eu-railway-source-directive-2002-49-ec-annex-ii",
@@ -18518,6 +18518,286 @@
       },
       "deviation": {
         "value": -0.002
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-1-eq-49/splitter-silencer-self-noise-a-weighted-sound-power-level-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 1 Eq. (49)",
+        "cite": "VDI 2081 Blatt 1 Eq. (49)"
+      },
+      "quantity": "Splitter silencer self-noise, A-weighted sound power level, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 52.0
+      },
+      "computed": {
+        "value": 52.015
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.5
+      },
+      "deviation": {
+        "value": 0.015
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-2/splitter-silencer-self-noise-at-63-hz-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 2",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 2"
+      },
+      "quantity": "Splitter silencer self-noise at 63 Hz, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 62.7
+      },
+      "computed": {
+        "value": 62.74
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.036
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-2/splitter-silencer-self-noise-at-125-hz-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 2",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 2"
+      },
+      "quantity": "Splitter silencer self-noise at 125 Hz, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 58.3
+      },
+      "computed": {
+        "value": 58.26
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.038
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-2/splitter-silencer-self-noise-at-250-hz-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 2",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 2"
+      },
+      "quantity": "Splitter silencer self-noise at 250 Hz, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 53.7
+      },
+      "computed": {
+        "value": 53.72
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.019
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-2/splitter-silencer-self-noise-at-500-hz-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 2",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 2"
+      },
+      "quantity": "Splitter silencer self-noise at 500 Hz, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 49.4
+      },
+      "computed": {
+        "value": 49.39
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.005
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-2/splitter-silencer-self-noise-at-1000-hz-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 2",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 2"
+      },
+      "quantity": "Splitter silencer self-noise at 1000 Hz, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 45.4
+      },
+      "computed": {
+        "value": 45.43
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.026
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-2/splitter-silencer-self-noise-at-2000-hz-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 2",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 2"
+      },
+      "quantity": "Splitter silencer self-noise at 2000 Hz, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 41.9
+      },
+      "computed": {
+        "value": 41.85
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.046
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-2/splitter-silencer-self-noise-at-4000-hz-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 2",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 2"
+      },
+      "quantity": "Splitter silencer self-noise at 4000 Hz, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 38.6
+      },
+      "computed": {
+        "value": 38.62
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.017
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-2/splitter-silencer-self-noise-at-8000-hz-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 2",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 2"
+      },
+      "quantity": "Splitter silencer self-noise at 8000 Hz, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 35.6
+      },
+      "computed": {
+        "value": 35.56
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.041
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-2-element-18/end-reflection-of-a-200-mm-nozzle-in-a-ceiling-sum-over-the-octaves-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 2, element 18",
+        "cite": "VDI 2081 Blatt 2 Table 2, element 18"
+      },
+      "quantity": "End reflection of a 200 mm nozzle in a ceiling, sum over the octaves, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 34.5
+      },
+      "computed": {
+        "value": 34.461
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.039
       },
       "precision": 3,
       "verdict": "pass"

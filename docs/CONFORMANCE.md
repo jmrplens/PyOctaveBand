@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**652/652 conformance checks pass** across 64 domains and 396 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**662/662 conformance checks pass** across 64 domains and 399 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -1182,7 +1182,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>HVAC noise (VDI 2081)</b>: 100% (29/29)</summary>
+<summary><b>HVAC noise (VDI 2081)</b>: 100% (39/39)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -1215,6 +1215,16 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | VDI 2081 Blatt 2 Table 1, element 3 | Junction flow noise at 4000 Hz, dB | -1.5 dB (+/-0.05 dB) | -1.53 dB | -0.028 dB | 56 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2 Table 1, element 3 | Junction flow noise at 8000 Hz, dB | -9.6 dB (+/-0.05 dB) | -9.61 dB | -0.006 dB | 12 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2 Table 1, element 14 | Bend flow noise, sum over the eight octaves, dB | 28.906 dB (+/-0.05 dB) | 28.904 dB | -0.002 dB | 4 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1 Eq. (49) | Splitter silencer self-noise, A-weighted sound power level, dB | 52 dB (+/-0.5 dB) | 52.015 dB | 0.015 dB | 3 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 2 | Splitter silencer self-noise at 63 Hz, dB | 62.7 dB (+/-0.05 dB) | 62.74 dB | 0.036 dB | 72 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 2 | Splitter silencer self-noise at 125 Hz, dB | 58.3 dB (+/-0.05 dB) | 58.26 dB | -0.038 dB | 76 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 2 | Splitter silencer self-noise at 250 Hz, dB | 53.7 dB (+/-0.05 dB) | 53.72 dB | 0.019 dB | 38 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 2 | Splitter silencer self-noise at 500 Hz, dB | 49.4 dB (+/-0.05 dB) | 49.39 dB | -0.005 dB | 10 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 2 | Splitter silencer self-noise at 1000 Hz, dB | 45.4 dB (+/-0.05 dB) | 45.43 dB | 0.026 dB | 52 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 2 | Splitter silencer self-noise at 2000 Hz, dB | 41.9 dB (+/-0.05 dB) | 41.85 dB | -0.046 dB | 92 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 2 | Splitter silencer self-noise at 4000 Hz, dB | 38.6 dB (+/-0.05 dB) | 38.62 dB | 0.017 dB | 34 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 2 | Splitter silencer self-noise at 8000 Hz, dB | 35.6 dB (+/-0.05 dB) | 35.56 dB | -0.041 dB | 82 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 2, element 18 | End reflection of a 200 mm nozzle in a ceiling, sum over the octaves, dB | 34.5 dB (+/-0.05 dB) | 34.461 dB | -0.039 dB | 78 % | ![Pass][cv-pass] Pass |
 
 </details>
 
