@@ -95,6 +95,15 @@ _SECTION_LIST: tuple[Section, ...] = (
         ),
     ),
     Section(
+        key="fluids",
+        label_en="The medium",
+        label_es="El medio",
+        modules=(
+            "phonometry.fluids",
+            "phonometry.fluids.air",
+        ),
+    ),
+    Section(
         key="io",
         label_en="Audio files",
         label_es="Archivos de audio",
@@ -363,6 +372,7 @@ _SECTION_SUBPACKAGES: dict[str, tuple[str, ...]] = {
     "filters": ("", "filters"),
     # ``phonometry.io`` is documented as the package itself (two dotted
     # parts), which the parent derivation reports as the top level.
+    "fluids": ("", "fluids"),
     "io": ("",),
     "signals": ("signals",),
     "psychoacoustics": ("psychoacoustics",),
@@ -390,6 +400,18 @@ _SECTION_SUBPACKAGES: dict[str, tuple[str, ...]] = {
 OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     # Defined in phonometry/__init__.py (reported as module "phonometry").
     "__version__": "phonometry",
+    # The fluid state type and its diagnostics are defined in the private
+    # phonometry/fluids/_state.py and published by the package, which is where
+    # they are documented.
+    "Fluid": "phonometry.fluids",
+    "FluidAssumptionWarning": "phonometry.fluids",
+    "FluidPropertyUnavailable": "phonometry.fluids",
+    "FluidWarning": "phonometry.fluids",
+    # The three assumed conditions are owned by the air model and re-exported
+    # by the package, so a plain scan sees them in both.
+    "DEFAULT_CO2_MOLE_FRACTION": "phonometry.fluids.air",
+    "DEFAULT_RELATIVE_HUMIDITY_PERCENT": "phonometry.fluids.air",
+    "DEFAULT_STATIC_PRESSURE_PA": "phonometry.fluids.air",
     # The ERB_N / Cam constants are owned by erb_scale and imported by the
     # ISO 532-2 loudness model, so a plain scan sees them in both modules.
     "ERB_C1": "phonometry.psychoacoustics.erb_scale",
@@ -529,12 +551,12 @@ _MODULE_TO_SECTION: dict[str, Section] = _build_module_index()
 def public_names() -> dict[str, ModuleType]:
     """Every public name in the library, mapped to the package that owns it.
 
-    Since 4.0 the top level publishes the nineteen domain packages and the
+    Since 4.0 the top level publishes the twenty domain packages and the
     four names that belong to no domain, and a function is reached through its
     package. "The public API" is therefore the union of the domain ``__all__``
     plus those four, which is what the coverage gate walks and what the
     generator renders. Reading ``phonometry.__all__`` instead would now see
-    twenty-three names and call the other thirteen hundred private.
+    twenty-four names and call the other thirteen hundred private.
 
     The value is the module to read the name off, which is the owning package
     for a domain name and ``phonometry`` itself for the four at the top.

@@ -89,6 +89,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `phonometry.fluids`, a twentieth domain package holding the state of the
+  medium a sound travels through. `fluids.air()` computes humid air from
+  IEC 61094-2:2009 Annex F, the CIPM-2007 formulation, and returns a frozen
+  `Fluid` carrying the density, speed of sound, ratio of specific heats,
+  viscosity and thermal diffusivity Table F.1 tabulates, the thermal
+  conductivity and specific heat capacity Clause F.6 gives expressions for, and
+  the characteristic impedance, Prandtl number and kinematic viscosity those
+  close by identity. All ten printed figures of Table F.1 reproduce, at both
+  printed condition sets, inside the rounding of the last figure the annex
+  gives; three conformance rows say by how much.
+
+  Every domain may import it without an architecture edge, as they already
+  import `filters`, `signals` and `metrology`. A medium is not a domain of
+  application but something every domain needs, and eleven identical edges
+  would have recorded nothing. That is the fourth transverse package, and the
+  first added since 4.0 split the original one in three.
+
+  Three conditions that each exist can still describe air that does not, so
+  `air()` refuses the combination as well as the arguments. At 20 degC and
+  1 kPa, 50 % relative humidity asks for a water vapour mole fraction of 1,17,
+  which is more water vapour than total pressure; every argument passes its own
+  guard, and without one on the fraction the CIPM equations carry on and return
+  a density and a speed of sound that look like measurements. Saturated air at
+  60 degC reaches 0,198 and passes, so the bound is the only one that can be
+  set: a mole fraction cannot reach 1.
+
+  The assumption warning is now raised after the refusals rather than before
+  them. A caller who promotes it with `simplefilter("error", ...)` used to
+  receive it in place of the `ValueError` an invalid humidity earns, and never
+  learn which argument was wrong.
+
+  It is frozen through, not only at the surface. `frozen=True` stops the
+  attribute from being rebound and says nothing about what it points at, so the
+  two mappings are copied and wrapped on construction. Without that, one
+  `air.properties["density"] = 999` anywhere in a process would have moved
+  every model defaulting to a shared state, silently and for the rest of the
+  run.
+
+  The `Fluid` says what it was computed for and what fixed it: the conditions,
+  the composition, the model by name, and the domain that model states for
+  itself. Reading a quantity the model does not determine raises
+  `FluidPropertyUnavailable` naming the model, rather than returning a
+  plausible number nobody printed. This matters as soon as a second fluid
+  arrives: sea water has no ratio of specific heats to give.
+
+  `temperature_c` is required, because there is no defensible default for the
+  one condition a caller has actually measured. The pressure and the humidity
+  default, and say so once in a single `FluidAssumptionWarning` naming both and
+  what each is worth: a site 1000 m up sits near 90 kPa, and taking that for
+  one standard atmosphere puts the density about 13 % high, while the whole
+  span of humidity is worth about 1 % of it. Supplying both is silent, which is the
+  property a caller who measured their air should get. The carbon dioxide mole
+  fraction defaults without warning, because 0,000 4 is a value Clause F.2
+  names for laboratory conditions rather than a guess about the caller's air.
+
+  Nothing is refused but what cannot exist. Annex F states 15 °C to 27 °C,
+  60 kPa to 110 kPa and 10 % to 90 % relative humidity, and a state outside
+  that warns and still answers: the annex states where its equations were
+  validated, not what air can be. Air at 60 °C in a duct is real.
+
+
 - `hearing.assumed_protection_value()`, `hearing.octave_band_protected_level()`,
   `hearing.hml_rating()`, `hearing.hml_protected_level()`,
   `hearing.snr_rating()` and `hearing.snr_protected_level()` estimate what a

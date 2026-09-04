@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**613/613 conformance checks pass** across 60 domains and 378 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**616/616 conformance checks pass** across 61 domains and 379 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -39,10 +39,10 @@
 | ISO 5136:2003 Table D.1 | C3,4 of the sampling tube for d = 0,5 m at U = +/-5, +/-15, +/-30 m/s, 27 bands | max absolute deviation 0.049 dB | 0.049 dB | 98 % |
 | ISO 9053-2:2020 Annex A.3 | Thermal boundary-layer thickness b | 0.00183 m | 0 m | 97 % |
 | Long, Architectural Acoustics 2e, Table 8.1 | Room modes of a 7 x 5 x 3 m room: the six printed frequencies, Hz | 42.27 Hz | -0.126 Hz | 97 % |
+| IEC 61094-2:2009 Table F.1 | Set B (20 C, 80 000 Pa, 65 % RH): rho, c0, kappa, eta and alpha_t, as a fraction of the rounding of the last printed figure | 0.96 | 0.96 | 96 % |
 | ISO 12354-2:2017 Annex C / Annex G Table G.4 | Floating floor: fo = 160 sqrt(s'/m') = 52,8 Hz, DeltaL = 30 lg(f/fo) over 21 bands, DeltaLw = 32,2 dB | 0.048 dB | 0.048 dB | 96 % |
 | ASA WG S3-79 CB_1.TST | Critical band, alternative importance | 0.41 | 0 | 95 % |
 | ASA WG S3-79 ECB_1.TST | Equally contributing, alternative importance | 0.41 | 0 | 95 % |
-| IEC 60268-16 Annex M | Step 4a printed intermediates: 98 effective signal-to-noise ratios | worst cell 0.074 dB from its printed value | 0.074 dB | 92 % |
 
 <details>
 <summary><b>Numerical validation - filters &amp; weightings</b>: class showcase (IEC 61260-1 · IEC 61672-1 · ISO 7196)</summary>
@@ -87,6 +87,17 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ANSI S1.4-1983 Tables IV/V | B-weighting (historical) deviation vs Type 0 limits (fs=48 kHz) | deviation within limits @ 200 Hz | -0.049 dB in [-0.70, +0.70] dB | headroom +0.651 dB | - | ![Pass][cv-pass] Pass |
 | IEC 61012:1990 Table 1 / 2.2 | AU-weighting deviation vs separate-unit tolerances (fs=96 kHz) | deviation within limits @ 158 Hz | +0.051 dB in [-1.00, +1.00] dB | headroom +0.949 dB | - | ![Pass][cv-pass] Pass |
 | IEC 537:1976 (withdrawn) via NASA CR-3406 Table SLD-I | D-weighting response vs the published tabulated curve (fs=48 kHz) | abs(response - table) <= 0.2 dB (0.45 dB at 1600/2500 Hz) | -0.281 dB @ 2500 Hz (bound 0.45 dB) | headroom +0.169 dB | - | ![Pass][cv-pass] Pass |
+
+</details>
+
+<details>
+<summary><b>Humid air (IEC 61094-2:2009 Annex F)</b>: 100% (3/3)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
+|:---|:---|:---|:---|:---|:---:|:---:|
+| IEC 61094-2:2009 Table F.1 | Set A (23 C, 101 325 Pa, 50 % RH): rho, c0, kappa, eta and alpha_t, as a fraction of the rounding of the last printed figure | 0 (+/-1) | 0.549 | 0.549 | 55 % | ![Pass][cv-pass] Pass |
+| IEC 61094-2:2009 Table F.1 | Set B (20 C, 80 000 Pa, 65 % RH): rho, c0, kappa, eta and alpha_t, as a fraction of the rounding of the last printed figure | 0 (+/-1) | 0.96 | 0.96 | 96 % | ![Pass][cv-pass] Pass |
+| IEC 61094-2:2009 Formula (F.5) | Thermal conductivity and specific heat capacity close the printed thermal diffusivity, alpha_t = k_a / (rho C_P) | 0.000021153 m²/s (+/-1e-10%) | 0.000021153 m²/s | 0 m²/s | 0 % | ![Pass][cv-pass] Pass |
 
 </details>
 

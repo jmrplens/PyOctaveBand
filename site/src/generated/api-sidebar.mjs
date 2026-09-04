@@ -45,6 +45,15 @@ export const apiSections = {
       'reference/api/metrology/data-qualification',
     ],
   },
+  'fluids': {
+    label: 'The medium',
+    translations: { es: 'El medio' },
+    collapsed: true,
+    items: [
+      'reference/api/fluids/fluids',
+      'reference/api/fluids/air',
+    ],
+  },
   'io': {
     label: 'Audio files',
     translations: { es: 'Archivos de audio' },

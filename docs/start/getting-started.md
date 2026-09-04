@@ -181,7 +181,7 @@ rescaled to full scale, so keep calibrator and measurement in the same format;
 
 ## Where to go next
 
-The octave analysis above uses the `filters` core, one of nineteen domain
+The octave analysis above uses the `filters` core, one of twenty domain
 namespaces; the documentation index walks through the rest, from
 psychoacoustics and room, building and vibration acoustics to environmental,
 aircraft and underwater noise, electroacoustics and FDTD wave simulation.
@@ -192,6 +192,6 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](../signals/filters/filter-gallery.md): choose an architecture and inspect responses
 - [Calibration and dBFS](../signals/metrology/calibration.md): get real-world SPL values
 - [Why phonometry](why-phonometry.md): the conformance-first design philosophy
-- [Conformance report](../CONFORMANCE.md): the expected and computed value of all 613 checks
+- [Conformance report](../CONFORMANCE.md): the expected and computed value of all 616 checks
 - [API Reference](../reference/api/index.md): every parameter of every function
 - [Bibliography](../reference/bibliography.md): the books and papers behind every guide, each with a verified link
