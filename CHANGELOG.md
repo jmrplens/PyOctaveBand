@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- `corrugated_plate_stiffness` computes its `Bx` by calling
+  `plate_bending_stiffness` instead of spelling out `E h^3 / (12 (1 - nu^2))` a
+  second time. `Bx` is that stiffness divided by the profile factor, so the two
+  were the same derivation written twice; `Bxz` keeps its own expression, since
+  its denominator is `(1 + nu)` and it shares only the `E h^3 / 12`. Results move
+  by at most one unit in the last place, from the order of the divisions.
+
+- The three nominal solids of the elastic solver say where they stand. They
+  carry **bulk** wave speeds, which is what the solver integrates, consistent to
+  a per cent or two with the textbook modulus, Poisson's ratio and density of
+  each material, and transcribed from no standard.
+
+  The note also records the citation not to make. EN 12354-1 Table B.3 is the
+  obvious candidate and the wrong one: it tabulates the quasi-longitudinal phase
+  velocity of a *plate*, a different quantity that runs eleven per cent below
+  the bulk speed for steel and fifteen for aluminium, and it lists neither steel
+  nor aluminium at all. A test holds the three constants to the bulk formulas
+  and to being above the plate ones, so re-sourcing them from that table would
+  fail rather than quietly change the physics.
+
 ### Fixed
 
 - `phonometry.environment` publishes all six digits of the CNOSSOS-EU track

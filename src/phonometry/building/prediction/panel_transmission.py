@@ -100,6 +100,7 @@ from ..._internal.validation import (
     require_ranks,
     require_same_length,
 )
+from ...vibration.structural.point_mobility import plate_bending_stiffness
 from ...vibration.structural.radiation_efficiency import coincidence_frequency
 
 if TYPE_CHECKING:
@@ -794,7 +795,10 @@ def corrugated_plate_stiffness(
     nu = float(poisson_ratio)
     shape = (math.pi * amplitude / wavelength) ** 2
     flat = e * h**3 / 12.0
-    b_x = flat / ((1.0 - nu**2) * (1.0 + shape))
+    # B_x is the flat-plate bending stiffness divided by the profile factor, so
+    # it is `plate_bending_stiffness` rather than a second spelling of it. B_xz
+    # below shares only the E h^3 / 12, since its denominator is (1 + nu).
+    b_x = plate_bending_stiffness(e, h, nu) / (1.0 + shape)
     b_z = (
         0.5
         * e
