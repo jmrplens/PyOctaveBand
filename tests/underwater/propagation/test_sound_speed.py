@@ -20,13 +20,17 @@ mpl.use("Agg")
 import numpy as np
 import pytest
 
-from phonometry.underwater.propagation.sound_speed import (
+# The four fits and the two pressure conversions moved to the medium; the
+# profile they build stays here, so this file reaches for both.
+from phonometry.fluids.water import (
     _KGCM2_PER_BAR,
-    SoundSpeedProfile,
     _del_grosso,
     _unesco,
-    depth_to_pressure,
+    depth_to_gauge_pressure_mpa,
     sea_water_sound_speed,
+)
+from phonometry.underwater.propagation.sound_speed import (
+    SoundSpeedProfile,
     sound_speed_profile,
 )
 
@@ -111,8 +115,10 @@ def test_mackenzie_canonical_check_value() -> None:
 
 def test_depth_to_pressure_leroy_parthiot() -> None:
     # 1000 m at 45 deg -> ~10.106 MPa (standard ocean); ~1 MPa per 100 m.
-    assert depth_to_pressure(1000.0, 45.0) == pytest.approx(10.1064, abs=1e-3)
-    assert depth_to_pressure(0.0) == pytest.approx(0.0, abs=1e-9)
+    assert depth_to_gauge_pressure_mpa(
+        depth_m=1000.0, latitude_deg=45.0
+    ) == pytest.approx(10.1064, abs=1e-3)
+    assert depth_to_gauge_pressure_mpa(depth_m=0.0) == pytest.approx(0.0, abs=1e-9)
 
 
 def test_three_models_agree_in_common_domain() -> None:

@@ -918,9 +918,9 @@ plt.show()
 
 ```python
 import numpy as np
-from phonometry import underwater
+from phonometry import fluids, underwater
 
-c = underwater.sea_water_sound_speed(25.0, 35.0, 1000.0, model="mackenzie")  # 1550.744
+c = fluids.sea_water_sound_speed(25.0, 35.0, 1000.0, model="mackenzie")  # 1550.744
 
 # A profile: warm mixed layer, thermocline, isothermal deep layer.
 depths = np.linspace(0.0, 3000.0, 121)

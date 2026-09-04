@@ -59,7 +59,7 @@ def require_above_absolute_zero(value: float, name: str) -> float:
         -273,15 degC.
     """
     if not math.isfinite(value) or value <= ABSOLUTE_ZERO_C:
-        msg = f"'{name}' must be a finite temperature above -273.15 degC."
+        msg = f"'{name}' must be finite and above -273.15 degC."
         raise ValueError(msg)
     return float(value)
 
@@ -80,7 +80,9 @@ def require_above_absolute_zero_array(x: ArrayLike, name: str) -> np.ndarray:
     """
     values = _as_float64(x, name)
     if not np.all(np.isfinite(values)) or np.any(values <= ABSOLUTE_ZERO_C):
-        msg = f"'{name}' must be finite temperatures above -273.15 degC."
+        # Phrased so it reads for a single value and for a column alike: the
+        # same helper serves 'temperature' and 'temperatures'.
+        msg = f"'{name}' must be finite and above -273.15 degC."
         raise ValueError(msg)
     return values
 

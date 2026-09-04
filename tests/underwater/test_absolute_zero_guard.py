@@ -12,25 +12,25 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from phonometry import underwater
+from phonometry import fluids, underwater
 from phonometry._internal.validation import ABSOLUTE_ZERO_C
 
 
 def test_sea_water_sound_speed_refuses_absolute_zero() -> None:
     """It used to return -31 457 m/s, a negative speed of sound."""
-    with pytest.raises(ValueError, match="'temperature' must be a finite temperature"):
-        underwater.sea_water_sound_speed(ABSOLUTE_ZERO_C, 35.0, 0.0)
+    with pytest.raises(ValueError, match="'temperature' must be finite and above"):
+        fluids.sea_water_sound_speed(ABSOLUTE_ZERO_C, 35.0, 0.0)
 
 
 def test_sound_speed_profile_refuses_absolute_zero() -> None:
     """The array path checked only finiteness, so -300 degC went straight through."""
-    with pytest.raises(ValueError, match="'temperatures' must be finite temperatures"):
+    with pytest.raises(ValueError, match="'temperatures' must be finite and above"):
         underwater.sound_speed_profile([0.0, 100.0], -300.0, 35.0)
 
 
 def test_seawater_absorption_refuses_absolute_zero() -> None:
     """It returned 0.495 dB/km at -300 degC, beside 0.0185 for real cold water."""
-    with pytest.raises(ValueError, match="'temperature' must be a finite temperature"):
+    with pytest.raises(ValueError, match="'temperature' must be finite and above"):
         underwater.seawater_absorption(1e3, temperature=-300.0)
 
 
@@ -67,6 +67,6 @@ def test_the_other_models_have_no_pole_of_their_own(model: str) -> None:
 
 def test_ordinary_water_is_untouched() -> None:
     """The guards bound what cannot exist and nothing else."""
-    assert underwater.sea_water_sound_speed(10.0, 35.0, 0.0) == pytest.approx(
+    assert fluids.sea_water_sound_speed(10.0, 35.0, 0.0) == pytest.approx(
         1489.832, abs=1e-3
     )

@@ -1,111 +1,18 @@
 ---
 title: "underwater.propagation.sound_speed"
-description: "Speed of sound in sea water (empirical equations)."
+description: "Sound-speed profiles over a column of water."
 sidebar:
   label: "sound_speed"
 ---
 
-Speed of sound in sea water (empirical equations).
+Sound-speed profiles over a column of water.
 
-Four coexisting equations for the sound speed `c` as a function of
-temperature, salinity and depth/pressure, selectable through `model`:
-
-* `"unesco"` -- the UNESCO / Chen & Millero (1977) algorithm, the
-  international standard, in the Wong & Zhu (1995) ITS-90 recalculation. Default.
-* `"del_grosso"` -- the Del Grosso (1974) equation (Wong & Zhu 1995 form),
-  a high-accuracy alternative over a narrower domain.
-* `"mackenzie"` -- the Mackenzie (1981) nine-term depth-based equation.
-* `"medwin"` -- the Medwin (1975) six-term short formula, the simplest member
-  of the family, whose partial derivatives are the classic rules of thumb
-  $\partial c/\partial T \approx 4.6 - 0.110 T$ m/s per °C and
-  $\partial c/\partial z \approx 0.016$ m/s per m.
-
-The UNESCO and Del Grosso equations use pressure, not depth, so a depth is first
-converted with the Leroy & Parthiot (1998) standard-ocean formula
-([`depth_to_pressure`](/phonometry/reference/api/underwater/sound-speed/#depth_to_pressure)). [`SoundSpeedProfile`](/phonometry/reference/api/underwater/sound-speed/#soundspeedprofile) evaluates `c` over a
-depth profile and exposes the sound-speed gradient.
-
-Sources (clean-room, implemented from the equations, validated by cross-model
-agreement and the canonical Mackenzie check value 1550.744 m/s at 25 °C, 35 ppt,
-1000 m): NPL Technical Guide "Speed of Sound in Sea-Water" (Wong & Zhu 1995
-coefficient tables), Mackenzie (1981) JASA 70, Del Grosso (1974) JASA 56,
-Leroy & Parthiot (1998) JASA 103, Medwin (1975) as printed in Ainslie,
-*Principles of Sonar Performance Modelling* (Springer 2010), Equations
-(1.2)-(1.4), printed p. 20.
+A profile is a description of a place rather than of a substance, so it stays
+with the marchers that consume it while the point state of sea water lives in
+[`phonometry.fluids.water`](/phonometry/reference/api/fluids/water/). The four sound-speed equations moved there with
+it; this module builds a column out of them.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
-## depth_to_pressure
-
-```python
-depth_to_pressure(depth: float, latitude: float = 45.0) -> float
-```
-
-Gauge pressure at a given ocean depth (Leroy & Parthiot 1998), in
-MPa.
-
-Standard-ocean formula (an ideal medium of 0 °C and 35 ppt); no local
-corrections are applied.
-
-**Parameters**
-
-| Name | Description |
-| :--- | :--- |
-| `depth` | Depth below the surface `Z`, in metres (`>= 0`). |
-| `latitude` | Latitude $\varphi$, in degrees (default 45°). |
-
-**Returns:** Gauge pressure, in megapascals.
-
-**Raises**
-
-| Exception | When |
-| :--- | :--- |
-| ValueError | If the depth is negative or non-finite. |
-
-## sea_water_sound_speed
-
-```python
-sea_water_sound_speed(
-    temperature: float,
-    salinity: float,
-    depth: float,
-    *,
-    model: str = 'unesco',
-    latitude: float = 45.0,
-) -> float
-```
-
-Speed of sound in sea water, in metres per second.
-
-**Parameters**
-
-| Name | Description |
-| :--- | :--- |
-| `temperature` | Temperature `T`, in degrees Celsius. |
-| `salinity` | Salinity `S`, in parts per thousand (PSU). |
-| `depth` | Depth below the surface, in metres (`>= 0`). |
-| `model` | `"unesco"` (default), `"del_grosso"`, `"mackenzie"` or `"medwin"`. |
-| `latitude` | Latitude for the depth→pressure conversion, in degrees (used by `"unesco"` and `"del_grosso"`; default 45°). |
-
-**Returns:** The sound speed `c`, in m/s.
-
-**Raises**
-
-| Exception | When |
-| :--- | :--- |
-| ValueError | If `model` is unknown or an input is non-finite. |
-
-:::note
-Each equation is a fit over a bounded oceanographic domain and
-**extrapolates silently outside it** (e.g. Del Grosso abused at
-T = 40 °C, S = 0, z = 11 km returns an unphysical ~1995 m/s).
-Published validity domains: UNESCO/Chen-Millero T 0-40 °C, S 0-40,
-P 0-1000 bar; Del Grosso T 0-30 °C, S 30-40, P 0-1000 kg/cm²;
-Mackenzie T 2-30 °C, S 25-40, depth 0-8000 m. Medwin is a
-deliberately simplified fit ("not accurate by modern standards", in
-Ainslie's words) and drifts by a few m/s against the UNESCO standard
-away from mid-range temperatures and shallow depths.
-:::
 
 ## sound_speed_profile
 
@@ -129,7 +36,7 @@ Evaluate a sound-speed profile over a depth column.
 | `depths` | Depths, in metres (1-D, non-negative, increasing). |
 | `temperatures` | Temperature per depth, in °C (array or a scalar broadcast to every depth). |
 | `salinities` | Salinity per depth, in PSU (array or scalar). |
-| `model` | Sound-speed equation (see [`sea_water_sound_speed`](/phonometry/reference/api/underwater/sound-speed/#sea_water_sound_speed)). |
+| `model` | Sound-speed equation (see [`sea_water_sound_speed`](/phonometry/reference/api/fluids/water/#sea_water_sound_speed)). |
 | `latitude` | Latitude for the depth→pressure conversion, in degrees. |
 
 **Returns:** A [`SoundSpeedProfile`](/phonometry/reference/api/underwater/sound-speed/#soundspeedprofile).

@@ -333,16 +333,12 @@ def test_temperature_outside_eq6_range_warns() -> None:
 def test_temperature_below_absolute_zero_raises() -> None:
     # Below -273,15 degC Eq. (6) would hand back a non-positive speed of
     # sound; the refusal is a hard error, not the out-of-range advisory.
-    with pytest.raises(
-        ValueError, match="'temperature' must be a finite temperature above"
-    ):
+    with pytest.raises(ValueError, match="'temperature' must be finite and above"):
         materials.absorption_area(3.0, 200.0, temperature=-600.0)
 
 
 def test_nan_temperature_raises() -> None:
-    with pytest.raises(
-        ValueError, match="'temperature' must be a finite temperature above"
-    ):
+    with pytest.raises(ValueError, match="'temperature' must be finite and above"):
         materials.absorption_area(3.0, 200.0, temperature=float("nan"))
 
 

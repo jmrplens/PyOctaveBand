@@ -84,6 +84,7 @@ UNITS: frozenset[str] = frozenset(
         "m/s²",
         "m²",
         "m²/s",
+        "Pa",
         "m³",
         "m·Hz",
         "modes/Hz",

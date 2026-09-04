@@ -89,6 +89,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `fluids.sea_water()` and `fluids.sea_water_density()` give the library a
+  density of sea water, which it had nowhere. The density implements Ainslie,
+  *Principles of Sonar Performance Modelling* (Springer 2010), Equation (4.6)
+  on printed folio 127, which that book attributes to Pierce (1989, p. 34). Three conformance
+  rows pin it: the 1027 kg/m3 the book gives for the standard ocean, the
+  atmosphere its Equation (4.11) puts at the surface, and the 0,043 855 kg/m3
+  the pressure term is worth.
+
+  The four sound-speed equations move here with it, because a medium's own
+  properties belong with the medium: `fluids.sea_water_sound_speed` is the
+  UNESCO, Del Grosso, Mackenzie and Medwin fits, unchanged, and it now accepts
+  a column as readily as a point. `underwater.sound_speed_profile` and
+  `SoundSpeedProfile` stay where they are: a profile describes a place rather
+  than a substance, and it belongs with the marcher that walks it. It asks for
+  the whole column in one call now instead of restating the model dispatch and
+  the pressure conversion a second time.
+
+  The two depth-to-pressure conversions are told apart by name, because they
+  are not the same quantity. `depth_to_gauge_pressure_mpa` is Leroy & Parthiot,
+  gauge, in megapascals, zero at the surface, and it is what the UNESCO and Del
+  Grosso sound speeds want. `depth_to_absolute_pressure_pa` is Ainslie's
+  Equation (4.11), absolute, in pascals, one atmosphere at the surface, and it
+  is what the density wants. Between them lie a factor of a million and an
+  offset of an atmosphere, so each name carries its unit and its datum.
+
+  Sea water has no ratio of specific heats, viscosity or thermal diffusivity
+  here, because no source in this library prints one. Reading any of them
+  raises `FluidPropertyUnavailable` naming the model, which is the case that
+  accessor was built for and the reason air and water can share a type at all.
+
 - `phonometry.fluids`, a twentieth domain package holding the state of the
   medium a sound travels through. `fluids.air()` computes humid air from
   IEC 61094-2:2009 Annex F, the CIPM-2007 formulation, and returns a frozen
@@ -743,6 +773,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the two branches above had already taken, is gone.
 
 ### Changed
+
+- Two errata registered against Ainslie (2010). Its folio 177 quotes
+  1024,2 kg/m3 for sea water at 23 degC, salinity 35 and atmospheric pressure,
+  where its own Equation (4.6) read with its own Equation (4.4) gives
+  1024,287 9, which prints as 1024,3; the printed value is what the equation
+  gives with the pressure term at zero, against the definition the same chapter
+  states. And its Equation (4.13), which rearranges (4.6), prints the pressure
+  coefficient as 4,3e-5 where (4.6) has 4,3e-7, two orders of magnitude and
+  0,42 % on the density. The library implements (4.6) with the absolute
+  pressure its own (4.4) defines, because a printed definition outranks a
+  rounded quotation three chapters later; the discrepancy is 4,3 parts in a
+  hundred thousand and below every tolerance here, so what mattered was not
+  picking a side silently.
 
 - `characteristic_impedance` is published by `phonometry.fluids` rather than by
   `phonometry.materials`. `rho c` is a property of the medium, not of the
