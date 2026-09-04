@@ -392,6 +392,8 @@ def test_regions_that_meet_leave_no_middle_one() -> None:
         ((10.0, -5.0), (0.5, 0.5), 1.0, 1.0, "must be positive"),
         ((10.0,), (1.5,), 1.0, 1.0, r"within \[0, 1\]"),
         ((10.0,), (0.5,), -1.0, 1.0, "non-negative"),
+        ((10.0,), (0.5,), math.nan, 1.0, "non-negative"),
+        ((10.0,), (0.5,), 1.0, math.inf, "non-negative"),
     ],
 )
 def test_region_ground_factors_rejects_a_path_it_cannot_average(
@@ -449,7 +451,9 @@ def test_a_given_distance_overrides_the_one_the_profile_implies() -> None:
         ((0.0,), (0.0,), 1.0, 1.0, None, "at least two points"),
         ((0.0, 10.0, 5.0), (0.0, 0.0, 0.0), 1.0, 1.0, None, "strictly increasing"),
         ((0.0, 10.0), (0.0, 0.0), -1.0, 1.0, None, "non-negative"),
+        ((0.0, 10.0), (0.0, 0.0), math.nan, 1.0, None, "non-negative"),
         ((0.0, 10.0), (0.0, 0.0), 1.0, 1.0, 0.0, "must be positive"),
+        ((0.0, 10.0), (0.0, 0.0), 1.0, 1.0, math.inf, "must be positive"),
     ],
 )
 def test_mean_path_height_rejects_a_profile_it_cannot_integrate(
@@ -469,3 +473,35 @@ def test_both_helpers_are_reachable_from_the_package_root() -> None:
     """They are part of the public surface, not module-private conveniences."""
     assert "region_ground_factors" in environment.__all__
     assert "mean_path_height" in environment.__all__
+
+
+def test_a_height_that_is_not_a_number_cannot_pass_as_one() -> None:
+    """A comparison against nought lets NaN through; a finiteness check does not.
+
+    Both guards used to read ``height < 0``, which is false for NaN, so a NaN
+    source height produced ground factors and a mean path height that were
+    themselves NaN, with nothing said. An infinite ``distance`` was worse: it
+    divided a finite area and returned a mean height of exactly nought.
+    """
+    with pytest.raises(ValueError, match="non-negative"):
+        environment.region_ground_factors((10.0,), (0.5,), math.nan, 1.0)
+    with pytest.raises(ValueError, match="non-negative"):
+        environment.mean_path_height((0.0, 10.0), (0.0, 0.0), 1.0, math.nan)
+    with pytest.raises(ValueError, match="must be positive"):
+        environment.mean_path_height(
+            (0.0, 10.0), (0.0, 0.0), 1.0, 1.0, distance=math.inf
+        )
+
+
+def test_the_profile_heights_themselves_may_go_below_the_datum() -> None:
+    """Only the two source and receiver heights are bounded below.
+
+    A profile is read on whatever datum the terrain model uses, so ground
+    below it is a negative number and not a mistake; what the guard is about
+    is a source or receiver standing under the ground it stands on.
+    """
+    below = environment.mean_path_height(
+        (0.0, 50.0, 100.0), (-3.0, -5.0, -3.0), 2.0, 2.0
+    )
+    above = environment.mean_path_height((0.0, 50.0, 100.0), (7.0, 5.0, 7.0), 2.0, 2.0)
+    assert below == pytest.approx(above)

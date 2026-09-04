@@ -441,7 +441,7 @@ difference the slant distance is built from.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If the two sequences disagree in length, describe fewer than two points, the distances are not strictly increasing, a height is negative, or `distance` is not positive. |
+| ValueError | If the two sequences disagree in length, describe fewer than two points, the distances are not strictly increasing, `source_height` or `receiver_height` is negative or not finite, or `distance` is not positive and finite. The profile heights themselves are unrestricted: they are read on any datum, so a ground below it is a negative number rather than a mistake. |
 
 :::note
 Ground rising above the ray subtracts from `F`, exactly as the area of
@@ -756,7 +756,7 @@ the source.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If the two sequences disagree in length or are empty, a length is not positive, a factor is outside `[0, 1]`, or a height is negative. |
+| ValueError | If the two sequences disagree in length or are empty, a length is not positive, a factor is outside `[0, 1]`, or a height is negative or not finite. |
 
 :::note
 Where the two outer regions meet or overlap there is no middle region,

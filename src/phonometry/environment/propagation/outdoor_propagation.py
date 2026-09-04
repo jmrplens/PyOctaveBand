@@ -51,6 +51,8 @@ import numpy as np
 from ..._internal.validation import (
     check_engine,
     require_finite_array,
+    require_non_negative,
+    require_positive,
     require_ranks,
     require_same_length,
 )
@@ -67,10 +69,6 @@ _D0 = 1.0
 #: Message of the shared guard on the source-to-receiver distance: every term of
 #: the method divides by ``d`` or takes ``log10(d)``, so ``d`` must be positive.
 _DISTANCE_NOT_POSITIVE = "'distance' must be positive."
-#: Message of the shared guard on the two heights: every region of the
-#: ground method is a length measured up from the ground, so a negative one
-#: is not a geometry the method can be read for.
-_HEIGHTS_NEGATIVE = "Source and receiver heights must be non-negative."
 #: Speed of sound used for the barrier wavelength ``lambda = c/f``
 #: (ISO 9613-2:1996, clause 7.5 writes ``lambda = 340/f``), in m/s.
 _C_SOUND = 340.0
@@ -616,8 +614,8 @@ def ground_attenuation(
             raise ValueError(msg)
     if distance <= 0.0:
         raise ValueError(_DISTANCE_NOT_POSITIVE)
-    if source_height < 0.0 or receiver_height < 0.0:
-        raise ValueError(_HEIGHTS_NEGATIVE)
+    require_non_negative(source_height, "source_height")
+    require_non_negative(receiver_height, "receiver_height")
     freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if np.any(freqs <= 0.0):
         msg = "'frequencies' must be positive."
@@ -757,7 +755,7 @@ def region_ground_factors(
         regions.
     :raises ValueError: If the two sequences disagree in length or are empty, a
         length is not positive, a factor is outside ``[0, 1]``, or a height is
-        negative.
+        negative or not finite.
 
     .. note::
 
@@ -787,8 +785,8 @@ def region_ground_factors(
     if np.any(factors < 0.0) or np.any(factors > 1.0):
         msg = "'segment_ground_factors' must be within [0, 1]."
         raise ValueError(msg)
-    if source_height < 0.0 or receiver_height < 0.0:
-        raise ValueError(_HEIGHTS_NEGATIVE)
+    require_non_negative(source_height, "source_height")
+    require_non_negative(receiver_height, "receiver_height")
 
     edges = _segment_edges(lengths)
     dp = float(edges[-1])
@@ -839,8 +837,11 @@ def mean_path_height(
         in metres; ``None`` takes the slant distance the profile implies.
     :return: ``hm``, in metres.
     :raises ValueError: If the two sequences disagree in length, describe fewer
-        than two points, the distances are not strictly increasing, a height is
-        negative, or ``distance`` is not positive.
+        than two points, the distances are not strictly increasing,
+        ``source_height`` or ``receiver_height`` is negative or not finite, or
+        ``distance`` is not positive and finite. The profile heights themselves
+        are unrestricted: they are read on any datum, so a ground below it is a
+        negative number rather than a mistake.
 
     .. note::
 
@@ -871,16 +872,17 @@ def mean_path_height(
     if np.any(np.diff(us) <= 0.0):
         msg = "'profile_distances' must be strictly increasing."
         raise ValueError(msg)
-    if source_height < 0.0 or receiver_height < 0.0:
-        raise ValueError(_HEIGHTS_NEGATIVE)
+    require_non_negative(source_height, "source_height")
+    require_non_negative(receiver_height, "receiver_height")
 
     dp = float(us[-1] - us[0])
     rise = float(zs[-1] + receiver_height - zs[0] - source_height)
     ray = zs[0] + source_height + rise * (us - us[0]) / dp
     area = float(np.trapezoid(ray - zs, us))
-    span = float(np.hypot(dp, rise)) if distance is None else float(distance)
-    if span <= 0.0:
-        raise ValueError(_DISTANCE_NOT_POSITIVE)
+    span = require_positive(
+        float(np.hypot(dp, rise)) if distance is None else float(distance),
+        "distance",
+    )
     return area / span
 
 

@@ -583,7 +583,9 @@ debajo.
 ```python
 from phonometry import environment
 
-# Un camino de 194,16 m que cruza tres suelos; fuente a 1 m, receptor a 4 m
+# Un camino que cruza tres suelos; fuente a 1 m, receptor a 4 m. Los tres
+# tramos son las longitudes que imprime la propia guía, redondeadas al
+# centímetro, así que suman 194,17 m donde el camino mide 194,16 m.
 g = environment.region_ground_factors(
     [40.88, 102.19, 51.10], [0.9, 0.5, 0.2], 1.0, 4.0)
 print(round(g.source, 2), round(g.middle, 2), round(g.receiver, 2))  # 0.9 0.6 0.37

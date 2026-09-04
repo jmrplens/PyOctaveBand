@@ -357,7 +357,9 @@ integrating the area between the straight ray and the ground beneath it.
 ```python
 from phonometry import environment
 
-# A 194.16 m path crossing three grounds; source 1 m up, receiver 4 m up
+# One path crossing three grounds; source 1 m up, receiver 4 m up. The three
+# stretches are the guideline's own printed lengths, each rounded to the
+# centimetre, so they sum to 194.17 m where the path itself is 194.16 m.
 g = environment.region_ground_factors(
     [40.88, 102.19, 51.10], [0.9, 0.5, 0.2], 1.0, 4.0)
 print(round(g.source, 2), round(g.middle, 2), round(g.receiver, 2))  # 0.9 0.6 0.37
