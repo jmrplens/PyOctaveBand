@@ -788,6 +788,47 @@ def end_reflection_loss(
     )
 
 
+#: The Table 7 row a sharp-edged rectangular bend takes, keyed by whether it
+#: carries turning vanes and by how it is lined ("bare", or which side of the
+#: corner). ``None`` marks the one combination the table does not print.
+_VDI2081_SQUARE_BEND_ROW: dict[tuple[bool, str], str | None] = {
+    (False, "bare"): "sharp",
+    (True, "bare"): "sharp_vaned",
+    (False, "one"): "sharp_lined_one",
+    (True, "one"): None,
+    (False, "both"): "sharp_lined_both",
+    (True, "both"): "sharp_lined_both_vaned",
+}
+
+
+def _vdi2081_bend_row(
+    *, bend_type: str, vanes: bool, lined: bool, lined_side: str
+) -> tuple[str, str]:
+    """The duct shape and the Table 7 row the arguments name.
+
+    :return: The shape ``_vdi2081_bend`` reads the limit frequency with, and
+        the key of the printed row.
+    :raises ValueError: If the bend type is not one of the two, a round bend
+        is given vanes or lining, or the combination has no printed row.
+    """
+    if bend_type == "round":
+        if vanes or lined:
+            msg = "round bends take neither vanes nor lining."
+            raise ValueError(msg)
+        return "circular", "round_radiused"
+    if bend_type != "square":
+        msg = "'bend_type' must be 'square' or 'round'."
+        raise ValueError(msg)
+    key = _VDI2081_SQUARE_BEND_ROW[vanes, lined_side if lined else "bare"]
+    if key is None:
+        msg = (
+            "VDI 2081 Table 7 prints no row for a bend lined on one "
+            "side with a baffle plate; use lined_side='both'."
+        )
+        raise ValueError(msg)
+    return "rectangular", key
+
+
 def _vdi2081_bend_result(
     bands: NDArray[np.float64],
     *,
@@ -802,28 +843,9 @@ def _vdi2081_bend_result(
     side = require_choice(lined_side, "lined_side", ("both", "one"))
     size = require_positive(width, "width")
     c = require_positive(speed_of_sound, "speed_of_sound")
-    if bend_type == "round":
-        if vanes or lined:
-            msg = "round bends take neither vanes nor lining."
-            raise ValueError(msg)
-        shape, key = "circular", "round_radiused"
-    elif bend_type == "square":
-        shape = "rectangular"
-        if not lined:
-            key = "sharp_vaned" if vanes else "sharp"
-        elif side == "one":
-            if vanes:
-                msg = (
-                    "VDI 2081 Table 7 prints no row for a bend lined on one "
-                    "side with a baffle plate; use lined_side='both'."
-                )
-                raise ValueError(msg)
-            key = "sharp_lined_one"
-        else:
-            key = "sharp_lined_both_vaned" if vanes else "sharp_lined_both"
-    else:
-        msg = "'bend_type' must be 'square' or 'round'."
-        raise ValueError(msg)
+    shape, key = _vdi2081_bend_row(
+        bend_type=bend_type, vanes=vanes, lined=lined, lined_side=side
+    )
     return HvacSpectrumResult(
         frequencies=bands,
         values=_vdi2081_bend(
@@ -1285,7 +1307,9 @@ def fan_sound_power(
 ) -> HvacSpectrumResult: ...
 
 
-def fan_sound_power(  # noqa: PLR0913 - two models, each with its own arguments
+# Two models with two argument groups, and the overloads above fix which
+# group a given call may use.
+def fan_sound_power(  # noqa: PLR0913
     volume_flow: float,
     *,
     fan_static_pressure_pa: float | None = None,
