@@ -20,6 +20,7 @@ import numpy as np
 import pytest
 
 from phonometry import building, vibration
+from phonometry.fluids import Fluid
 from phonometry.materials import miki
 
 # ISO 717-1 one-third-octave band centres, 100 Hz to 3150 Hz.
@@ -276,6 +277,18 @@ def test_plot_language_spanish_and_validation() -> None:
 
 NORTON_AIR_DENSITY = 1.21
 
+#: Norton's air as the `Fluid` the models now take, built here from the two
+#: constants the book prints, so the oracle stays independent of the library's
+#: own air, which is 1,205 rather than 1,21.
+NORTON_AIR = Fluid(
+    temperature_c=20.0,
+    static_pressure_pa=101_325.0,
+    composition={},
+    model="Norton & Karczub, rho0 = 1,21 kg/m3 with c0 = 343 m/s",
+    validity="",
+    properties={"speed_of_sound": 343.0, "density": NORTON_AIR_DENSITY},
+)
+
 #: Norton octave bands of problem 3.11.
 P311_BANDS = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
 #: Printed answer to problem 3.11, in dB.
@@ -295,7 +308,7 @@ def _brick_wall() -> building.SoundReductionResult:
         P311_BANDS,
         material="brick",
         thickness_mm=110.0,
-        air_density=NORTON_AIR_DENSITY,
+        fluid=NORTON_AIR,
     )
 
 
@@ -365,7 +378,7 @@ def test_plateau_construction_points() -> None:
         231.0,
         incidence="field",
         field_correction=5.0,
-        air_density=NORTON_AIR_DENSITY,
+        fluid=NORTON_AIR,
     )
     assert float(mass_law) == pytest.approx(37.0, abs=1e-9)
 
@@ -379,14 +392,14 @@ def test_plateau_degenerates_to_the_mass_law_below_point_a() -> None:
         low,
         material="brick",
         thickness_mm=110.0,
-        air_density=NORTON_AIR_DENSITY,
+        fluid=NORTON_AIR,
     )
     reference = building.mass_law_transmission_loss(
         low,
         231.0,
         incidence="field",
         field_correction=5.0,
-        air_density=NORTON_AIR_DENSITY,
+        fluid=NORTON_AIR,
     )
     np.testing.assert_allclose(res.transmission_loss, reference, rtol=1e-12)
     assert res.transmission_loss[1] - res.transmission_loss[0] == pytest.approx(
@@ -403,7 +416,7 @@ def test_plateau_explicit_panel_matches_the_table() -> None:
         mass_per_area=2.10 * 110.0,
         plateau_height=37.0,
         frequency_ratio=4.5,
-        air_density=NORTON_AIR_DENSITY,
+        fluid=NORTON_AIR,
     )
     np.testing.assert_allclose(
         by_hand.transmission_loss, by_table.transmission_loss, rtol=1e-12
@@ -425,7 +438,7 @@ def test_plateau_construction_uses_every_column_of_the_named_row(
         bands,
         material=material,
         thickness_mm=thickness_mm,
-        air_density=NORTON_AIR_DENSITY,
+        fluid=NORTON_AIR,
     )
     assert res.plateau_height == height
     assert res.plateau_end == pytest.approx(ratio * res.plateau_start, rel=1e-12)
@@ -436,7 +449,7 @@ def test_plateau_construction_uses_every_column_of_the_named_row(
         density_per_mm * thickness_mm,
         incidence="field",
         field_correction=5.0,
-        air_density=NORTON_AIR_DENSITY,
+        fluid=NORTON_AIR,
     )
     assert at_a[0] == pytest.approx(height, abs=1e-9)
 
@@ -451,7 +464,7 @@ def test_cremer_problem_314_printed_answers() -> None:
         loss_factor=1.5e-3,
         coincidence_model="cremer",
         field_correction=5.0,
-        air_density=NORTON_AIR_DENSITY,
+        fluid=NORTON_AIR,
     )
     assert res.model == "cremer-single"
     np.testing.assert_allclose(res.transmission_loss, P314_TL, atol=0.1)

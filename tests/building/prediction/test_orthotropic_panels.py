@@ -36,6 +36,8 @@ import reference_data
 from scipy.integrate import quad
 
 from phonometry import building, vibration
+from phonometry.fluids import Fluid
+from phonometry.materials.absorbers.porous import PUBLISHED_AIR
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -111,6 +113,17 @@ HOPKINS_TABLE_A2_NAMES: tuple[str, ...] = (
 #: Air density that makes ``rho0 c0`` the 414 Pa.s/m Bies quotes for his
 #: design-chart constants.
 BIES_AIR_DENSITY = 414.0 / 343.0
+
+#: The air behind those constants: the published speed of sound with the
+#: density above, so that ``rho0 c0`` comes out at exactly 414 N.s/m3.
+BIES_AIR = Fluid(
+    temperature_c=20.0,
+    static_pressure_pa=101_325.0,
+    composition={},
+    model="Bies 5e Appendix D, the air giving rho c = 414 N.s/m3",
+    validity="",
+    properties={"speed_of_sound": 343.0, "density": BIES_AIR_DENSITY},
+)
 
 
 def _vigran_flat_stiffness() -> float:
@@ -318,7 +331,7 @@ def _fig627(
     loss_factor: float = 0.01,
     area: float | None = None,
     limiting_angle: float = 78.0,
-    air_density: float = 1.205,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> building.SoundReductionResult:
     """The Figure 6.27 panel: 7,5 kg/m2 with the range 400 Hz to 4000 Hz."""
     return building.orthotropic_transmission_loss(
@@ -330,12 +343,12 @@ def _fig627(
         loss_factor=loss_factor,
         area=area,
         limiting_angle=limiting_angle,
-        air_density=air_density,
+        fluid=fluid,
     )
 
 
-def _heckl(freq: np.ndarray, air_density: float = 1.205) -> np.ndarray:
-    res = _fig627(freq, method="heckl", air_density=air_density)
+def _heckl(freq: np.ndarray, fluid: Fluid = PUBLISHED_AIR) -> np.ndarray:
+    res = _fig627(freq, method="heckl", fluid=fluid)
     return np.asarray(res.transmission_loss, dtype=np.float64)
 
 
@@ -348,7 +361,7 @@ def test_heckl_coincidence_branch_matches_bies_equation_759() -> None:
     """
     f = np.array([400.0, 800.0, 1600.0, 2000.0])
     constant = (
-        _heckl(f, BIES_AIR_DENSITY)
+        _heckl(f, BIES_AIR)
         - 20.0 * np.log10(f)
         - 10.0 * math.log10(FIG627_MASS)
         + 10.0 * math.log10(FIG627_FC1)
@@ -368,7 +381,7 @@ def test_heckl_recovery_branch_matches_bies_equation_760() -> None:
     """
     f = np.array([8000.0, 12500.0, 20000.0])
     constant = (
-        _heckl(f, BIES_AIR_DENSITY)
+        _heckl(f, BIES_AIR)
         - 20.0 * np.log10(f)
         - 10.0 * math.log10(FIG627_MASS)
         + 5.0 * math.log10(FIG627_FC1)
@@ -388,7 +401,7 @@ def test_heckl_design_chart_points_a_and_d() -> None:
     """
     fc1 = FIG627_FC1
     fc2 = FIG627_FC2
-    tl = _heckl(np.array([0.5 * fc1, 2.0 * fc2]), BIES_AIR_DENSITY)
+    tl = _heckl(np.array([0.5 * fc1, 2.0 * fc2]), BIES_AIR)
     point_a = 20.0 * math.log10(fc1 * FIG627_MASS) - 54.0
     point_d = (
         10.0 * math.log10(FIG627_MASS)

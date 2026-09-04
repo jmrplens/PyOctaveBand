@@ -69,11 +69,13 @@ import numpy as np
 from scipy.special import hankel2
 
 from .._internal.validation import require_equal_shapes
+from ..fluids import Fluid
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
 
 __all__ = [
+    "SIMULATION_AIR",
     "ContourPhasors",
     "far_field_from_contour",
 ]
@@ -218,14 +220,28 @@ class ContourPhasors:
         )
 
 
+#: The air this package works in, as a :class:`~phonometry.fluids.Fluid`: the
+#: same 343 m/s and 1,2 kg/m3 that :data:`~phonometry.simulation.AIR` gives the
+#: FDTD solver, so the transform and the simulation it reads from agree. It is
+#: not the 1,205 of the visco-thermal absorber models; a package keeps the air
+#: its own solvers run in.
+SIMULATION_AIR = Fluid(
+    temperature_c=20.0,
+    static_pressure_pa=101_325.0,
+    composition={},
+    model="air at room conditions, the acoustic solver's default medium",
+    validity="",
+    properties={"speed_of_sound": 343.0, "density": 1.2},
+)
+
+
 def far_field_from_contour(
     contour: ContourPhasors,
     angles: ArrayLike,
     *,
     distance: float | None = None,
     origin: tuple[float, float] = (0.0, 0.0),
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.2,
+    fluid: Fluid = SIMULATION_AIR,
 ) -> NDArray[np.complex128]:
     r"""Exterior field of a closed contour: the 2D Kirchhoff-Helmholtz integral.
 
@@ -280,8 +296,8 @@ def far_field_from_contour(
     :param origin: Phase-reference point ``(x, y)`` [m]; the centre of the
         observation circle when ``distance`` is given. Default the grid
         origin.
-    :param speed_of_sound: Speed of sound ``c`` [m/s] (default 343).
-    :param air_density: Density ``rho`` [kg/m3] (default 1.2).
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid` (Default:
+        :data:`SIMULATION_AIR`, the air this package's solvers run in).
     :return: Complex array, one value per angle: the far-field pattern
         ``F(a)`` (units Pa sqrt(m)), or the pressure [Pa] at ``distance``.
     :raises ValueError: For invalid angles, a non-positive ``distance``, or
@@ -294,14 +310,8 @@ def far_field_from_contour(
     if ang.ndim != 1 or ang.size == 0 or not np.all(np.isfinite(ang)):
         msg = "angles must be a non-empty 1D sequence of finite values in degrees"
         raise ValueError(msg)
-    c = float(speed_of_sound)
-    rho = float(air_density)
-    if not np.isfinite(c) or c <= 0.0:
-        msg = "speed_of_sound must be positive and finite"
-        raise ValueError(msg)
-    if not np.isfinite(rho) or rho <= 0.0:
-        msg = "air_density must be positive and finite"
-        raise ValueError(msg)
+    c = fluid.speed_of_sound
+    rho = fluid.density
     omega = 2.0 * np.pi * contour.frequency
     k = omega / c
     ox, oy = float(origin[0]), float(origin[1])

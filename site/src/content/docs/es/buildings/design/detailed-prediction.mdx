@@ -616,8 +616,7 @@ constructiva nueva.
 | `frequencies` | array | Hz | > 0 | Frecuencias centrales de banda |
 | `bands` | str | — | `'third'` (por defecto) / `'octave'` | Fija la banda que lleva la rama $f \approx f_\mathrm{c}$ |
 | `resonant_only` | bool | — | por defecto `False` | Elimina el término de transmisión forzada por debajo de $f_\mathrm{c}$ (Anexo B.1, trayectorias por flancos) |
-| `speed_of_sound` | float | m/s | por defecto `340` | El valor que fija el Anexo A de ISO 12354-1 |
-| `air_density` | float | kg/m³ | por defecto `1.29` | $\rho_\mathrm{o}$ del modelo del Anexo B |
+| `fluid` | `Fluid` | — | por defecto `EN_12354_AIR` | Los 340 m/s del Anexo A con los 1,29 kg/m³ del Anexo B; pásale un `fluids.air()` calculado para predecir en el aire del edificio |
 
 ## Parámetros de `airborne_flanking_path()` / `impact_flanking_path()`
 

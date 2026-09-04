@@ -375,8 +375,7 @@ this module does, a useful sanity target for a new floor build-up.
 | `frequencies` | array | Hz | > 0 | Band centres |
 | `bands` | str | — | `'third'` (default) / `'octave'` | Sets the band that carries the $f \approx f_\mathrm{c}$ branch |
 | `resonant_only` | bool | — | default `False` | Drops the forced-transmission term below $f_\mathrm{c}$ (Annex B.1, flanking paths) |
-| `speed_of_sound` | float | m/s | default `340` | The value ISO 12354-1 Annex A fixes |
-| `air_density` | float | kg/m³ | default `1.29` | $\rho_\mathrm{o}$ of the Annex B model |
+| `fluid` | `Fluid` | — | default `EN_12354_AIR` | The 340 m/s of Annex A with the 1,29 kg/m³ of Annex B; pass a computed `fluids.air()` to predict in the air of the building |
 
 ## `airborne_flanking_path()` / `impact_flanking_path()` parameters
 

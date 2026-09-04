@@ -205,8 +205,7 @@ double_wall_transmission_loss(
     cavity_medium: PorousMediumResult | None = None,
     tie_stiffness_per_area: float = 0.0,
     band: str = 'third',
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
+    fluid: Fluid = ...,
 ) -> SoundReductionResult
 ```
 
@@ -235,8 +234,7 @@ unit area as *tie_stiffness_per_area* (see
 | `cavity_medium` | Optional porous fill; see [`mass_spring_mass_resonance`](/phonometry/reference/api/building/panel-transmission/#mass_spring_mass_resonance). |
 | `tie_stiffness_per_area` | Stiffness per unit area $N k / S$ of a connection array bridging the cavity, in N/m^3 (>= 0, Default: 0). |
 | `band` | Band width for the field correction (`"third"`/`"octave"`). |
-| `speed_of_sound` | Speed of sound in air `c0` (Default: 343 m/s). |
-| `air_density` | Air density `rho0` (Default: 1.205 kg/m^3). |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`PUBLISHED_AIR`](/phonometry/reference/api/materials/porous/#published_air), the air these models are published with). |
 
 **Returns:** A [`SoundReductionResult`](/phonometry/reference/api/building/panel-transmission/#soundreductionresult) (model `"double-wall"`).
 
@@ -278,8 +276,7 @@ mass_law_transmission_loss(
     incidence: str = 'field',
     band: str = 'third',
     field_correction: float | None = None,
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
+    fluid: Fluid = ...,
 ) -> np.ndarray
 ```
 
@@ -300,8 +297,7 @@ builds its estimate on).
 | `incidence` | `"normal"` or `"field"` (Default: `"field"`). |
 | `band` | Band width for the field correction (`"third"`/`"octave"`). |
 | `field_correction` | Explicit field-incidence correction, in dB (>= 0), overriding the band table (Default: `None`). |
-| `speed_of_sound` | Speed of sound in air `c0` (Default: 343 m/s). |
-| `air_density` | Air density `rho0` (Default: 1.205 kg/m^3). |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`PUBLISHED_AIR`](/phonometry/reference/api/materials/porous/#published_air), the air these models are published with). |
 
 **Returns:** The transmission loss `TL`, in dB.
 
@@ -321,8 +317,7 @@ mass_spring_mass_resonance(
     *,
     cavity_medium: PorousMediumResult | None = None,
     tie_stiffness_per_area: float = 0.0,
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
+    fluid: Fluid = ...,
 ) -> float
 ```
 
@@ -351,8 +346,7 @@ tie density and Hopkins' Table A4.
 | `gap` | Cavity depth `d`, in m (> 0). |
 | `cavity_medium` | Optional porous fill (a [`PorousMediumResult`](/phonometry/reference/api/materials/porous/#porousmediumresult)) whose effective bulk modulus sets the cavity stiffness. |
 | `tie_stiffness_per_area` | Stiffness per unit area $N k / S$ of a connection array bridging the cavity, in N/m^3 (>= 0, Default: 0). |
-| `speed_of_sound` | Speed of sound in air `c0` (Default: 343 m/s). |
-| `air_density` | Air density `rho0` (Default: 1.205 kg/m^3). |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`PUBLISHED_AIR`](/phonometry/reference/api/materials/porous/#published_air), the air these models are published with). |
 
 **Returns:** The mass-spring-mass resonance `f0`, in hertz.
 
@@ -470,8 +464,7 @@ orthotropic_transmission_loss(
     area: float | None = None,
     limiting_angle: float = 78.0,
     band: str = 'third',
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
+    fluid: Fluid = ...,
 ) -> SoundReductionResult
 ```
 
@@ -540,8 +533,7 @@ no smooth model predicts.
 | `area` | Panel area `S`, in m^2 (> 0), selecting the size-dependent limiting angle of Bies Eq. (7.36) (Default: `None`); used only by `method="integral"`, but validated on both routes. |
 | `limiting_angle` | Fixed limiting angle `theta_L`, in degrees ($0 < \theta_\mathrm{L} < 90$, Default: 78.0), used when *area* is `None` and only by `method="integral"`, but validated on both routes. |
 | `band` | Band width for the field correction of the Heckl mass-law branch (`"third"`/`"octave"`). |
-| `speed_of_sound` | Speed of sound in air `c0` (Default: 343 m/s). |
-| `air_density` | Air density `rho0` (Default: 1.205 kg/m^3). |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`PUBLISHED_AIR`](/phonometry/reference/api/materials/porous/#published_air), the air these models are published with). |
 
 **Returns:** A [`SoundReductionResult`](/phonometry/reference/api/building/panel-transmission/#soundreductionresult) (model `"orthotropic-integral"` or `"orthotropic-heckl"`) carrying `fc1` in [`critical_frequency`](/phonometry/reference/api/building/flanking-transmission/#critical_frequency) and `fc2` in [`critical_frequency_upper`](/phonometry/reference/api/building/panel-transmission/#soundreductionresult).
 
@@ -570,8 +562,7 @@ plateau_transmission_loss(
     plateau_height: float | None = ...,
     frequency_ratio: float | None = ...,
     field_correction: float = ...,
-    speed_of_sound: float = ...,
-    air_density: float = ...,
+    fluid: Fluid = ...,
 ) -> SoundReductionResult
 
 plateau_transmission_loss(
@@ -583,8 +574,7 @@ plateau_transmission_loss(
     plateau_height: float | None = ...,
     frequency_ratio: float | None = ...,
     field_correction: float = ...,
-    speed_of_sound: float = ...,
-    air_density: float = ...,
+    fluid: Fluid = ...,
 ) -> SoundReductionResult
 
 plateau_transmission_loss(
@@ -594,8 +584,7 @@ plateau_transmission_loss(
     plateau_height: float,
     frequency_ratio: float,
     field_correction: float = ...,
-    speed_of_sound: float = ...,
-    air_density: float = ...,
+    fluid: Fluid = ...,
 ) -> SoundReductionResult
 ```
 
@@ -636,8 +625,7 @@ then follows from the table), or give *mass_per_area* together with
 | `plateau_height` | Coincidence plateau height, in dB (> 0). |
 | `frequency_ratio` | Ratio $B/A$ locating the 10 dB/octave recovery (> 1). |
 | `field_correction` | Field-incidence correction of the mass-law line, in dB (Default: 5.0, Norton Eq. 3.106). |
-| `speed_of_sound` | Speed of sound in air `c0` (Default: 343 m/s). |
-| `air_density` | Air density `rho0` (Default: 1.205 kg/m^3). |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`PUBLISHED_AIR`](/phonometry/reference/api/materials/porous/#published_air), the air these models are published with). |
 
 **Returns:** A [`SoundReductionResult`](/phonometry/reference/api/building/panel-transmission/#soundreductionresult) (model `"plateau"`) carrying [`plateau_height`](/phonometry/reference/api/building/panel-transmission/#soundreductionresult), [`plateau_start`](/phonometry/reference/api/building/panel-transmission/#soundreductionresult) (point A) and [`plateau_end`](/phonometry/reference/api/building/panel-transmission/#soundreductionresult) (point B).
 
@@ -701,8 +689,7 @@ single_panel_transmission_loss(
     band: str = 'third',
     coincidence_model: str = 'sharp',
     field_correction: float | None = None,
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
+    fluid: Fluid = ...,
 ) -> SoundReductionResult
 ```
 
@@ -749,8 +736,7 @@ let it be computed from *bending_stiffness* and *mass_per_area* through
 | `band` | Band width for the field correction (`"third"`/`"octave"`). |
 | `coincidence_model` | `"sharp"` (Default, Bies Eq. 7.44 above `fc` with the interpolated bridge from $f_\mathrm{c}/2$) or `"cremer"` (Norton Eq. 3.110, mass law right up to `fc`). |
 | `field_correction` | Explicit field-incidence correction of the mass-law region, in dB (>= 0), overriding the band table (Default: `None`; Norton's Eq. 3.106 uses a flat 5 dB). |
-| `speed_of_sound` | Speed of sound in air `c0` (Default: 343 m/s). |
-| `air_density` | Air density `rho0` (Default: 1.205 kg/m^3). |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`PUBLISHED_AIR`](/phonometry/reference/api/materials/porous/#published_air), the air these models are published with). |
 
 **Returns:** A [`SoundReductionResult`](/phonometry/reference/api/building/panel-transmission/#soundreductionresult) (model `"sharp-single"` or `"cremer-single"`).
 

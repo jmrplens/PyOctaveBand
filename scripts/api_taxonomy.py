@@ -414,6 +414,8 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     # otherwise. It belongs to the model that publishes those constants.
     "PUBLISHED_AIR": "phonometry.materials.absorbers.porous",
     "ANNEX_A_AIR": "phonometry.materials.absorbers.airflow_resistance",
+    "EN_12354_AIR": "phonometry.building.prediction.detailed_model",
+    "SIMULATION_AIR": "phonometry.simulation.ntff",
     # The three assumed conditions are owned by the air model and re-exported
     # by the package, so a plain scan sees them in both.
     "DEFAULT_CO2_MOLE_FRACTION": "phonometry.fluids.air",

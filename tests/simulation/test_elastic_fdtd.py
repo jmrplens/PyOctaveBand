@@ -28,6 +28,7 @@ import pytest
 from scipy.optimize import brentq
 
 from phonometry.building.prediction.panel_transmission import mass_law_transmission_loss
+from phonometry.fluids import Fluid
 from phonometry.simulation.elastic_fdtd import (
     ALUMINIUM,
     CONCRETE,
@@ -46,6 +47,17 @@ from phonometry.simulation.fdtd import FDTD2D, GaussianPulse
 CP_AL, CS_AL, RHO_AL = 6320.0, 3130.0, 2700.0
 CP_ST, CS_ST, RHO_ST = 5900.0, 3200.0, 7850.0
 CP_W, RHO_W = 1480.0, 1000.0
+
+#: The same water as a fluid, for the mass law: the plate here is immersed,
+#: so the medium either side of it is water, not air.
+WATER_FLUID = Fluid(
+    temperature_c=20.0,
+    static_pressure_pa=101_325.0,
+    composition={},
+    model="the water this simulation integrates",
+    validity="",
+    properties={"speed_of_sound": CP_W, "density": RHO_W},
+)
 
 
 def test_the_nominal_solids_are_bulk_speeds_not_plate_speeds() -> None:
@@ -417,8 +429,7 @@ def test_immersed_plate_reproduces_normal_incidence_mass_law() -> None:
             f0,
             RHO_ST * 0.003,
             incidence="normal",
-            speed_of_sound=CP_W,
-            air_density=RHO_W,
+            fluid=WATER_FLUID,
         )
     )
     assert tl_meas == pytest.approx(tl_exact, abs=0.3)

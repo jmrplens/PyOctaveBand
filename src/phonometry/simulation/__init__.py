@@ -29,10 +29,11 @@ from .fdtd import (
     SignalSource,
     fdtd_simulation,
 )
-from .ntff import ContourPhasors, far_field_from_contour
+from .ntff import SIMULATION_AIR, ContourPhasors, far_field_from_contour
 
 __all__ = [
     "AIR",
+    "SIMULATION_AIR",
     "ALUMINIUM",
     "CONCRETE",
     "FDTD2D",

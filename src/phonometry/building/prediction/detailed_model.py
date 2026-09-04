@@ -110,6 +110,7 @@ from ..._internal.validation import (
     require_ranks,
     require_same_length,
 )
+from ...fluids import Fluid
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -125,6 +126,20 @@ SPEED_OF_SOUND: float = 340.0
 
 #: Density of air ``ρo`` of the Annex B transmission model, in kg/m³.
 AIR_DENSITY: float = 1.29
+
+#: The air EN/ISO 12354 works in, as a :class:`~phonometry.fluids.Fluid`: the
+#: 340 m/s its Annex A uses throughout and the 1,29 kg/m3 of the Annex B
+#: transmission model, transcribed rather than recomputed. It is not the air the
+#: visco-thermal absorber models default to, which is 343,0 m/s and
+#: 1,205 kg/m3: a standard's own constants stay with the clause that prints them.
+EN_12354_AIR = Fluid(
+    temperature_c=20.0,
+    static_pressure_pa=101_325.0,
+    composition={},
+    model="EN/ISO 12354 Annex A speed of sound with the Annex B air density",
+    validity="",
+    properties={"speed_of_sound": SPEED_OF_SOUND, "density": AIR_DENSITY},
+)
 
 #: Reference frequency ``fref`` of Formulae (11), (C.4) and Part 2 (B.2): 1 kHz.
 REFERENCE_FREQUENCY: float = 1000.0
@@ -415,8 +430,7 @@ def calculated_sound_reduction_index(
     resonant_only: bool = False,
     density: float | None = None,
     longitudinal_velocity: float | None = None,
-    speed_of_sound: float = SPEED_OF_SOUND,
-    air_density: float = AIR_DENSITY,
+    fluid: Fluid = EN_12354_AIR,
 ) -> np.ndarray:
     r"""Sound reduction index of a homogeneous element (Formulae B.2, B.10).
 
@@ -470,8 +484,8 @@ def calculated_sound_reduction_index(
         ``longitudinal_velocity`` it enables the Formula (B.10) plateau.
     :param longitudinal_velocity: Quasi-longitudinal phase velocity ``cL`` of
         the material, in m/s.
-    :param speed_of_sound: Speed of sound in air ``co``, in m/s.
-    :param air_density: Density of air ``ρo``, in kg/m³.
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid` (Default:
+        :data:`EN_12354_AIR`, the air EN/ISO 12354 works in, 340 m/s and 1,29 kg/m3).
     :return: The sound reduction index ``R`` per band, in dB.
     :raises ValueError: If an input is not positive/finite or the per-band
         arrays do not share the band count.
@@ -479,8 +493,8 @@ def calculated_sound_reduction_index(
     f = require_positive_array(frequencies, "frequencies")
     m = require_positive(mass_per_area, "mass_per_area")
     fc = require_positive(critical_frequency, "critical_frequency")
-    c0 = require_positive(speed_of_sound, "speed_of_sound")
-    rho0 = require_positive(air_density, "air_density")
+    c0 = fluid.speed_of_sound
+    rho0 = fluid.density
     eta = _band_array(total_loss_factor, f.size, "total_loss_factor", positive=True)
     sigma = _band_array(radiation_factor, f.size, "radiation_factor", positive=True)
     sigma_f = _band_array(forced_radiation_factor, f.size, "forced_radiation_factor")
@@ -612,8 +626,7 @@ def in_situ_total_loss_factor(
     critical_frequency: float,
     radiation_factor: ArrayLike,
     perimeter_absorption: float,
-    speed_of_sound: float = SPEED_OF_SOUND,
-    air_density: float = AIR_DENSITY,
+    fluid: Fluid = EN_12354_AIR,
 ) -> np.ndarray:
     r"""Total loss factor in situ ``ηtot,situ`` (Formula C.1).
 
@@ -634,8 +647,8 @@ def in_situ_total_loss_factor(
     :param radiation_factor: Radiation factor ``σ`` per band.
     :param perimeter_absorption: :math:`\sum l_k \alpha_k` over the element's
         perimeter, in m (may be zero for a free-edged element).
-    :param speed_of_sound: Speed of sound in air ``co``, in m/s.
-    :param air_density: Density of air ``ρo``, in kg/m³.
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid` (Default:
+        :data:`EN_12354_AIR`, the air EN/ISO 12354 works in, 340 m/s and 1,29 kg/m3).
     :return: The total loss factor ``ηtot,situ`` per band (dimensionless).
     :raises ValueError: If an input is not positive/finite, the perimeter sum
         is negative, or the band counts disagree.
@@ -645,8 +658,8 @@ def in_situ_total_loss_factor(
     m = require_positive(mass_per_area, "mass_per_area")
     s = require_positive(area, "area")
     fc = require_positive(critical_frequency, "critical_frequency")
-    c0 = require_positive(speed_of_sound, "speed_of_sound")
-    rho0 = require_positive(air_density, "air_density")
+    c0 = fluid.speed_of_sound
+    rho0 = fluid.density
     sigma = _band_array(radiation_factor, f.size, "radiation_factor", positive=True)
     perimeter_sum = float(perimeter_absorption)
     if not np.isfinite(perimeter_sum) or perimeter_sum < 0.0:
@@ -1391,8 +1404,7 @@ def in_situ_element(
     *,
     bands: BandType = "third",
     resonant_only: bool = False,
-    speed_of_sound: float = SPEED_OF_SOUND,
-    air_density: float = AIR_DENSITY,
+    fluid: Fluid = EN_12354_AIR,
 ) -> InSituElementResult:
     r"""Evaluate one homogeneous element in situ, per band (Clause 4.2.2).
 
@@ -1412,8 +1424,8 @@ def in_situ_element(
     :param bands: ``"third"`` (default) or ``"octave"``.
     :param resonant_only: Drop the forced-transmission term of Formula (B.2)
         below ``fc`` (Annex B.1, flanking paths).
-    :param speed_of_sound: Speed of sound in air ``co``, in m/s.
-    :param air_density: Density of air ``ρo``, in kg/m³.
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid` (Default:
+        :data:`EN_12354_AIR`, the air EN/ISO 12354 works in, 340 m/s and 1,29 kg/m3).
     :return: The :class:`InSituElementResult`.
     :raises ValueError: If any element property is not positive and finite.
     """
@@ -1423,13 +1435,13 @@ def in_situ_element(
         critical_frequency=element.critical_frequency,
         length1=element.length1,
         length2=element.length2,
-        speed_of_sound=speed_of_sound,
+        speed_of_sound=fluid.speed_of_sound,
     )
     sigma_f = forced_radiation_factor(
         f,
         length1=element.length1,
         length2=element.length2,
-        speed_of_sound=speed_of_sound,
+        speed_of_sound=fluid.speed_of_sound,
     )
     eta = in_situ_total_loss_factor(
         f,
@@ -1439,8 +1451,7 @@ def in_situ_element(
         critical_frequency=element.critical_frequency,
         radiation_factor=sigma,
         perimeter_absorption=element.perimeter_absorption,
-        speed_of_sound=speed_of_sound,
-        air_density=air_density,
+        fluid=fluid,
     )
     ts = structural_reverberation_time(f, eta)
     r = calculated_sound_reduction_index(
@@ -1454,8 +1465,7 @@ def in_situ_element(
         resonant_only=resonant_only,
         density=element.density,
         longitudinal_velocity=element.longitudinal_velocity,
-        speed_of_sound=speed_of_sound,
-        air_density=air_density,
+        fluid=fluid,
     )
     ln = bare_floor_impact_level(
         f,
@@ -1467,7 +1477,7 @@ def in_situ_element(
         f,
         area=element.area,
         situ_reverberation_time=ts,
-        speed_of_sound=speed_of_sound,
+        speed_of_sound=fluid.speed_of_sound,
     )
     return InSituElementResult(
         label=element.label,
@@ -1925,6 +1935,7 @@ def detailed_impact_prediction(
 
 
 __all__ = [
+    "EN_12354_AIR",
     "BandPath",
     "DetailedAirborneResult",
     "DetailedImpactResult",

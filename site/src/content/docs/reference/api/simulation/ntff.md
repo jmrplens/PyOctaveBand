@@ -122,8 +122,7 @@ far_field_from_contour(
     *,
     distance: float | None = None,
     origin: tuple[float, float] = (0.0, 0.0),
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.2,
+    fluid: Fluid = ...,
 ) -> NDArray[np.complex128]
 ```
 
@@ -176,8 +175,7 @@ cancellation (below 0.01 dB on the validation scenes).
 | `angles` | Observation angles [degrees], 1D. `0` is `+x`, `90` is `+y` of the coordinates `contour.positions` live in. |
 | `distance` | Observation radius [m] for the exact evaluation, or `None` (default) for the far-field pattern. |
 | `origin` | Phase-reference point `(x, y)` [m]; the centre of the observation circle when `distance` is given. Default the grid origin. |
-| `speed_of_sound` | Speed of sound `c` [m/s] (default 343). |
-| `air_density` | Density `rho` [kg/m3] (default 1.2). |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`SIMULATION_AIR`](/phonometry/reference/api/simulation/ntff/#simulation_air), the air this package's solvers run in). |
 
 **Returns:** Complex array, one value per angle: the far-field pattern `F(a)` (units Pa sqrt(m)), or the pressure [Pa] at `distance`.
 
@@ -186,3 +184,7 @@ cancellation (below 0.01 dB on the validation scenes).
 | Exception | When |
 | :--- | :--- |
 | ValueError | For invalid angles, a non-positive `distance`, or an observation circle that does not clear the contour. |
+
+## SIMULATION_AIR
+
+*Constant* (`phonometry.fluids.Fluid`).
