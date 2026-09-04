@@ -83,6 +83,7 @@ import numpy as np
 from .._internal.validation import (
     check_engine,
     require_choice,
+    require_non_negative,
     require_positive,
     require_ranks,
     require_same_length,
@@ -957,8 +958,12 @@ def flow_noise_bend(
     height: float,
     *,
     density: float = 1.206,
+    model: str = "ashrae",
+    branch_diameter: float | None = None,
+    approach_velocity: float | None = None,
+    rounding_ratio: float | None = None,
 ) -> HvacSpectrumResult:
-    r"""Flow-generated octave-band sound power of a mitred bend (Bies Eqs. (8.252), (8.254)).
+    r"""Flow-generated octave-band sound power of a bend or junction, by either method.
 
     .. math::
 
@@ -976,16 +981,72 @@ def flow_noise_bend(
     quadrupole); equivalently, the *efficiency* referenced to the stream power
     grows as :math:`U^3` and :math:`U^5` respectively.
 
+    ``model="vdi2081"`` is Equation (18) of VDI 2081 Part 1 Section 5.2.2,
+    which covers a junction and a bend with one law:
+
+    .. math::
+
+       L_W = L_W^{*} + 10 \log_{10} \Delta f + 30 \log_{10} d_\mathrm{a}
+       + 50 \log_{10} v_\mathrm{a} + K
+
+    with the normalised level of Figure 17,
+    :math:`L_W^{*} = 12 - 21{,}5 (\lg St)^{1{,}268} + (32 + 13 \lg St)
+    \lg (v_\mathrm{h}/v_\mathrm{a})`, the rounding correction of Figure 18,
+    :math:`K = 13{,}9 (3{,}43 - \lg St)(0{,}15 - r/d_\mathrm{a})`, and
+    :math:`St = f d_\mathrm{a} / v_\mathrm{a}`. A bend is the same law with
+    the two velocities equal, which sends the second term of :math:`L_W^{*}`
+    and the velocity ratio to nought.
+
+    Both figures state that they hold only for :math:`St > 1`, so a band below
+    that returns negative infinity, the level of no contribution at all, rather
+    than an extrapolation: the fit turns over there and its fractional power of
+    :math:`\lg St` is not real below one.
+
     :param frequencies: Octave-band centre frequencies ``f``, Hz (1-D array).
     :param flow_velocity: Mean flow speed ``U``, m/s.
     :param area: Duct cross-sectional area ``S``, m2.
     :param height: Duct height ``H`` in the plane of the bend, m.
     :param density: Air density ``rho``, kg/m3.
+    :param model: ``"ashrae"`` (default, Bies) or ``"vdi2081"``.
+    :param branch_diameter: **VDI 2081 only.** Diameter of the branch duct
+        ``d_a``, m; for a bend, the duct's own diameter.
+    :param approach_velocity: **VDI 2081 only.** Flow speed in the main duct
+        ahead of the junction ``v_h``, m/s. ``None`` (default) takes it equal
+        to ``flow_velocity``, which is the bend case.
+    :param rounding_ratio: **VDI 2081 only.** Rounding radius over branch
+        diameter ``r / d_a``, which applies the correction of Figure 18.
+        ``None`` (default) leaves it out altogether, which is how the
+        guideline's own worked example treats a bend: Figure 18 is drawn for
+        the rounding of a **junction**, and its curves all cross zero at
+        ``r / d_a = 0,15``, so passing 0 asks for a sharp-cornered junction and
+        is worth over 6 dB rather than nothing. Figure 18 is drawn from 0
+        to 0,20.
     :return: A :class:`HvacSpectrumResult` of the band sound power level,
         dB re 1e-12 W.
     """
     f = _frequencies(frequencies)
     u = require_positive(flow_velocity, "flow_velocity")
+    if require_choice(model, "model", ("ashrae", "vdi2081")) == "vdi2081":
+        if branch_diameter is None:
+            msg = (
+                "model='vdi2081' needs 'branch_diameter': Equation (18) is "
+                "written on the diameter of the branch duct, which the Bies "
+                "form does not take."
+            )
+            raise ValueError(msg)
+        approach = u if approach_velocity is None else approach_velocity
+        return HvacSpectrumResult(
+            frequencies=f,
+            values=_vdi2081_branch_flow_noise(
+                f,
+                branch_diameter=require_positive(branch_diameter, "branch_diameter"),
+                branch_velocity=u,
+                approach_velocity=require_positive(approach, "approach_velocity"),
+                rounding_ratio=rounding_ratio,
+            ),
+            quantity="sound_power_level",
+            label=f"Junction flow noise, VDI 2081 (v_a = {u:.1f} m/s)",
+        )
     s = require_positive(area, "area")
     h = require_positive(height, "height")
     rho = require_positive(density, "density")
@@ -1373,6 +1434,66 @@ def fan_casing_attenuation(
 # ---------------------------------------------------------------------------
 # Straight-duct attenuation (Long Chapter 14)
 # ---------------------------------------------------------------------------
+def _vdi2081_octave_bandwidth(bands: NDArray[np.float64]) -> NDArray[np.float64]:
+    """Table 1 of VDI 2081 Part 1: an octave is ``f_m / sqrt(2)`` wide.
+
+    Its edges are ``f_m / sqrt(2)`` and ``f_m sqrt(2)``, so the width is the
+    difference, which reduces to the centre over the root of two: 44,55 Hz at
+    63 Hz, as the guideline's own tables print in their header row.
+    """
+    return np.asarray(bands / math.sqrt(2.0), dtype=np.float64)
+
+
+def _vdi2081_straight_flow_noise(
+    bands: NDArray[np.float64], *, velocity: float, area: float
+) -> NDArray[np.float64]:
+    """Equations (16) and Figure 16 of VDI 2081 Part 1 Section 5.2.1.
+
+    The overall level does not depend on how long the run is, only on how fast
+    the air moves through how large a section; the shape is a single closed
+    curve in ``f / v``.
+    """
+    overall = 7.0 + 50.0 * math.log10(velocity) + 10.0 * math.log10(area)
+    shape = -2.0 - 26.0 * np.log10(1.14 + 0.02 * bands / velocity)
+    return np.asarray(overall + shape, dtype=np.float64)
+
+
+def _vdi2081_branch_flow_noise(
+    bands: NDArray[np.float64],
+    *,
+    branch_diameter: float,
+    branch_velocity: float,
+    approach_velocity: float,
+    rounding_ratio: float | None,
+) -> NDArray[np.float64]:
+    """Equation (18) with Figures 17 and 18, Section 5.2.2.
+
+    Both figures are printed with a closed form beside them and both are
+    stated to hold only above a Strouhal number of one, so a band below that
+    is returned as no contribution rather than extrapolated: the fit turns
+    over there and ``(lg St)^1.268`` is not real for ``St < 1``.
+    """
+    strouhal = bands * branch_diameter / branch_velocity
+    lg_st = np.log10(np.where(strouhal > 1.0, strouhal, 1.0))
+    ratio = math.log10(approach_velocity / branch_velocity)
+    normalised = 12.0 - 21.5 * lg_st**1.268 + (32.0 + 13.0 * lg_st) * ratio
+    correction = (
+        0.0
+        if rounding_ratio is None
+        else 13.9
+        * (3.43 - lg_st)
+        * (0.15 - require_non_negative(rounding_ratio, "rounding_ratio"))
+    )
+    level = (
+        normalised
+        + 10.0 * np.log10(_vdi2081_octave_bandwidth(bands))
+        + 30.0 * math.log10(branch_diameter)
+        + 50.0 * math.log10(branch_velocity)
+        + correction
+    )
+    return np.asarray(np.where(strouhal > 1.0, level, -np.inf), dtype=np.float64)
+
+
 def _vdi2081_limit_frequency(shape: str, size: float, speed_of_sound: float) -> float:
     """Equation (33) or (34): the frequency below which only plane waves run.
 

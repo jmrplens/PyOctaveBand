@@ -242,3 +242,106 @@ def _register_junctions() -> None:
 
 
 _register_junctions()
+
+
+# ---------------------------------------------------------------------------
+# Table 1 once more: the flow noise each element regenerates
+# ---------------------------------------------------------------------------
+#: Table 1, element 5: the straight run, whose flow noise the table carries
+#: only as the two overall levels of Equations (16) and (17).
+_STRAIGHT_AREA = 0.5 * 0.4
+_STRAIGHT_VELOCITY = (4200.0 / 3600.0) / _STRAIGHT_AREA
+#: Table 1, element 3: the junction. Its approach velocity comes from the whole
+#: system's 16 000 m3/h over the 0,90 m2 feeder, not from the branch's own duty.
+_JUNCTION_APPROACH = (16000.0 / 3600.0) / 0.90
+_JUNCTION_BRANCH = (4200.0 / 3600.0) / 0.30
+_PRINTED_JUNCTION_NOISE = (39.1, 33.5, 27.4, 20.7, 13.7, 6.2, -1.5, -9.6)
+#: Table 1, element 14: the bend, the same law with one velocity and no
+#: rounding correction.
+_BEND_AREA = math.pi * 0.08**2
+_BEND_VELOCITY = (280.0 / 3600.0) / _BEND_AREA
+_PRINTED_BEND_NOISE = (26.9, 23.0, 18.1, 12.5, 6.5, -0.1, -7.0, -14.4)
+
+
+@register(
+    _VDI2081,
+    "VDI 2081 Blatt 1 Eq. (16)",
+    "Flow noise of a straight duct, overall sound power level, dB",
+)
+def _chk_straight_flow_noise() -> Outcome:
+    """Element 5 of Table 1, printed as 38 dB."""
+    overall = (
+        7.0 + 50.0 * math.log10(_STRAIGHT_VELOCITY) + 10.0 * math.log10(_STRAIGHT_AREA)
+    )
+    return numeric(38.0, overall, 0.5, unit="dB", places=2)
+
+
+@register(
+    _VDI2081,
+    "VDI 2081 Blatt 1 Eq. (17)",
+    "Flow noise of a straight duct, A-weighted sound power level, dB",
+)
+def _chk_straight_flow_noise_a() -> Outcome:
+    """The same element, printed as 22 dB."""
+    weighted = (
+        -25.0
+        + 70.0 * math.log10(_STRAIGHT_VELOCITY)
+        + 10.0 * math.log10(_STRAIGHT_AREA)
+    )
+    return numeric(22.0, weighted, 0.5, unit="dB", places=2)
+
+
+def _flow_noise_outcome(index: int) -> Outcome:
+    """One octave of element 3's junction flow noise."""
+    values = ph.noise_control.flow_noise_bend(
+        np.array(_PRINTED_BANDS),
+        _JUNCTION_BRANCH,
+        0.30,
+        0.6,
+        model="vdi2081",
+        branch_diameter=0.62,
+        approach_velocity=_JUNCTION_APPROACH,
+        rounding_ratio=0.025,
+    ).values
+    return numeric(
+        _PRINTED_JUNCTION_NOISE[index],
+        float(values[index]),
+        _PRINTED_TOLERANCE,
+        unit="dB",
+        places=2,
+    )
+
+
+def _register_junction_flow_noise() -> None:
+    """Register the eight octaves of the element 3 flow-noise row."""
+    for index, band in enumerate(_PRINTED_BANDS):
+        register(
+            _VDI2081,
+            "VDI 2081 Blatt 2 Table 1, element 3",
+            f"Junction flow noise at {band:g} Hz, dB",
+        )(functools.partial(_flow_noise_outcome, index))
+
+
+_register_junction_flow_noise()
+
+
+@register(
+    _VDI2081,
+    "VDI 2081 Blatt 2 Table 1, element 14",
+    "Bend flow noise, sum over the eight octaves, dB",
+)
+def _chk_bend_flow_noise() -> Outcome:
+    """A bend is Equation (18) with the two velocities equal and no ``K``."""
+    values = ph.noise_control.flow_noise_bend(
+        np.array(_PRINTED_BANDS),
+        _BEND_VELOCITY,
+        _BEND_AREA,
+        0.16,
+        model="vdi2081",
+        branch_diameter=0.160,
+    ).values
+    printed = 10.0 * math.log10(
+        float(np.sum(10.0 ** (np.array(_PRINTED_BEND_NOISE) / 10.0)))
+    )
+    computed = 10.0 * math.log10(float(np.sum(10.0 ** (values / 10.0))))
+    return numeric(printed, computed, _PRINTED_TOLERANCE, unit="dB", places=3)

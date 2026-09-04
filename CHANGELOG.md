@@ -56,6 +56,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   both straight runs, the bend and its 1245 Hz limit frequency, and the three
   junctions.
 
+- `flow_noise_bend` takes `model="vdi2081"`, which is Equation (18) of
+  Section 5.2.2 with the normalised level of Figure 17 and the rounding
+  correction of Figure 18. One law covers a junction and a bend: a bend is the
+  same expression with the two velocities equal.
+
+  The approach velocity is the one in the duct **ahead** of the junction, so it
+  comes from what the feeder carries rather than from the branch's own duty.
+  In the worked example the two differ by a factor of four and reading the
+  wrong one loses five decibels at 63 Hz.
+
+  `rounding_ratio` defaults to leaving Figure 18 out rather than to nought.
+  Figure 18 is drawn for the rounding of a junction and all its curves cross
+  zero at `r / d_a = 0,15`, so nought asks for a sharp-cornered junction and is
+  worth over 6 dB at 63 Hz. That is how the guideline's own example treats its
+  bend, and passing 0,15 lands back on the uncorrected law.
+
+  Both figures state that they hold only above a Strouhal number of one, so a
+  band below that returns negative infinity, the level of no contribution,
+  rather than an extrapolation: the fit turns over there and its fractional
+  power of `lg St` is not real.
+
+  `flow_noise_straight_duct` needs no second model. Bies Eq. (8.251) already
+  reproduces Section 5.2.1 and says so in its own docstring; what it lacked was
+  an oracle, and it has one now. Eleven further conformance rows, all Table 1
+  of the worked example, take the domain to twenty-nine.
+
 - `docs/ERRATA.md` records that the two columns of VDI 2081 Part 1 Section 6.4
   contradict each other. The German says the junction's level reduction is
   independent of frequency and the English, on the same page, says it depends

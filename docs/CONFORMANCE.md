@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**641/641 conformance checks pass** across 64 domains and 394 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**652/652 conformance checks pass** across 64 domains and 396 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -1182,7 +1182,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>HVAC noise (VDI 2081)</b>: 100% (18/18)</summary>
+<summary><b>HVAC noise (VDI 2081)</b>: 100% (29/29)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -1204,6 +1204,17 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | VDI 2081 Blatt 2 Table 1, element 3 | Junction into 0.3 m2 of 1.08 m2 total, dB | 5.6 dB (+/-0.05 dB) | 5.563 dB | -0.037 dB | 74 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2 Table 1, element 7 | Junction into 0.049 m2 of 0.147 m2 total, dB | 4.8 dB (+/-0.05 dB) | 4.771 dB | -0.029 dB | 58 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2 Table 1, element 16 | Junction into 0.02 m2 of 0.04 m2 total, dB | 3 dB (+/-0.05 dB) | 3.01 dB | 0.01 dB | 20 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1 Eq. (16) | Flow noise of a straight duct, overall sound power level, dB | 38 dB (+/-0.5 dB) | 38.31 dB | 0.306 dB | 61 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1 Eq. (17) | Flow noise of a straight duct, A-weighted sound power level, dB | 22 dB (+/-0.5 dB) | 21.62 dB | -0.376 dB | 75 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 3 | Junction flow noise at 63 Hz, dB | 39.1 dB (+/-0.05 dB) | 39.09 dB | -0.011 dB | 22 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 3 | Junction flow noise at 125 Hz, dB | 33.5 dB (+/-0.05 dB) | 33.53 dB | 0.031 dB | 62 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 3 | Junction flow noise at 250 Hz, dB | 27.4 dB (+/-0.05 dB) | 27.36 dB | -0.039 dB | 78 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 3 | Junction flow noise at 500 Hz, dB | 20.7 dB (+/-0.05 dB) | 20.72 dB | 0.021 dB | 42 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 3 | Junction flow noise at 1000 Hz, dB | 13.7 dB (+/-0.05 dB) | 13.67 dB | -0.034 dB | 68 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 3 | Junction flow noise at 2000 Hz, dB | 6.2 dB (+/-0.05 dB) | 6.24 dB | 0.038 dB | 76 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 3 | Junction flow noise at 4000 Hz, dB | -1.5 dB (+/-0.05 dB) | -1.53 dB | -0.028 dB | 56 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 3 | Junction flow noise at 8000 Hz, dB | -9.6 dB (+/-0.05 dB) | -9.61 dB | -0.006 dB | 12 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 14 | Bend flow noise, sum over the eight octaves, dB | 28.906 dB (+/-0.05 dB) | 28.904 dB | -0.002 dB | 4 % | ![Pass][cv-pass] Pass |
 
 </details>
 

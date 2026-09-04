@@ -605,10 +605,14 @@ flow_noise_bend(
     height: float,
     *,
     density: float = 1.206,
+    model: str = 'ashrae',
+    branch_diameter: float | None = None,
+    approach_velocity: float | None = None,
+    rounding_ratio: float | None = None,
 ) -> HvacSpectrumResult
 ```
 
-Flow-generated octave-band sound power of a mitred bend (Bies Eqs. (8.252), (8.254)).
+Flow-generated octave-band sound power of a bend or junction, by either method.
 
 $$
 L_{W\mathrm{B}} = L_{W\mathrm{s}} - 10 \log_{10}(1 + 0.165 N_\mathrm{s}^2) + 30 \log_{10}(U) - 103
@@ -626,6 +630,25 @@ dipole) and the eighth power at high `N_\mathrm{s}` (the outer-corner shear
 quadrupole); equivalently, the *efficiency* referenced to the stream power
 grows as $U^3$ and $U^5$ respectively.
 
+`model="vdi2081"` is Equation (18) of VDI 2081 Part 1 Section 5.2.2,
+which covers a junction and a bend with one law:
+
+$$
+L_W = L_W^{*} + 10 \log_{10} \Delta f + 30 \log_{10} d_\mathrm{a} + 50 \log_{10} v_\mathrm{a} + K
+$$
+
+with the normalised level of Figure 17,
+$L_W^{*} = 12 - 21{,}5 (\lg St)^{1{,}268} + (32 + 13 \lg St) \lg (v_\mathrm{h}/v_\mathrm{a})$, the rounding correction of Figure 18,
+$K = 13{,}9 (3{,}43 - \lg St)(0{,}15 - r/d_\mathrm{a})$, and
+$St = f d_\mathrm{a} / v_\mathrm{a}$. A bend is the same law with
+the two velocities equal, which sends the second term of $L_W^{*}$
+and the velocity ratio to nought.
+
+Both figures state that they hold only for $St > 1$, so a band below
+that returns negative infinity, the level of no contribution at all, rather
+than an extrapolation: the fit turns over there and its fractional power of
+$\lg St$ is not real below one.
+
 **Parameters**
 
 | Name | Description |
@@ -635,6 +658,10 @@ grows as $U^3$ and $U^5$ respectively.
 | `area` | Duct cross-sectional area `S`, m2. |
 | `height` | Duct height `H` in the plane of the bend, m. |
 | `density` | Air density `rho`, kg/m3. |
+| `model` | `"ashrae"` (default, Bies) or `"vdi2081"`. |
+| `branch_diameter` | **VDI 2081 only.** Diameter of the branch duct `d_a`, m; for a bend, the duct's own diameter. |
+| `approach_velocity` | **VDI 2081 only.** Flow speed in the main duct ahead of the junction `v_h`, m/s. `None` (default) takes it equal to `flow_velocity`, which is the bend case. |
+| `rounding_ratio` | **VDI 2081 only.** Rounding radius over branch diameter `r / d_a`, which applies the correction of Figure 18. `None` (default) leaves it out altogether, which is how the guideline's own worked example treats a bend: Figure 18 is drawn for the rounding of a **junction**, and its curves all cross zero at `r / d_a = 0,15`, so passing 0 asks for a sharp-cornered junction and is worth over 6 dB rather than nothing. Figure 18 is drawn from 0 to 0,20. |
 
 **Returns:** A [`HvacSpectrumResult`](/phonometry/reference/api/noise_control/hvac/#hvacspectrumresult) of the band sound power level, dB re 1e-12 W.
 

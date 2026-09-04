@@ -434,3 +434,190 @@ def test_lining_one_side_of_a_corner_is_its_own_row() -> None:
     )
     assert np.all(one.values <= both.values)
     assert not np.allclose(one.values, both.values)
+
+
+# ---------------------------------------------------------------------------
+# Flow noise: Section 5.2, and the rows of Table 1 that carry it
+# ---------------------------------------------------------------------------
+#: Table 1, element 3: the junction's flow noise, band by band. Its approach
+#: velocity is the whole system's 16 000 m3/h over the 0,90 m2 feeder, not the
+#: 4200 m3/h of the branch that carries on.
+JUNCTION_APPROACH_VELOCITY = (16000.0 / 3600.0) / 0.90
+JUNCTION_BRANCH_VELOCITY = (4200.0 / 3600.0) / 0.30
+JUNCTION_BRANCH_DIAMETER = 0.62
+JUNCTION_ROUNDING_RATIO = 0.025
+PRINTED_JUNCTION_NOISE_DB = (39.1, 33.5, 27.4, 20.7, 13.7, 6.2, -1.5, -9.6)
+PRINTED_JUNCTION_STROUHAL = (10.01, 19.87, 39.73, 79.46, 158.9, 317.8, 635.7, 1271.0)
+PRINTED_JUNCTION_NORMALISED_DB = (
+    -4.8,
+    -12.9,
+    -21.5,
+    -30.6,
+    -40.2,
+    -50.1,
+    -60.3,
+    -70.9,
+)
+PRINTED_JUNCTION_K_DB = (4.2, 3.7, 3.2, 2.7, 2.1, 1.6, 1.1, 0.6)
+#: Table 1, element 14: the bend's flow noise. A bend is the same law with the
+#: two velocities equal, and the example applies no rounding correction to it.
+BEND_AREA_M2 = math.pi * 0.08**2
+BEND_VELOCITY = (280.0 / 3600.0) / BEND_AREA_M2
+PRINTED_BEND_NOISE_DB = (26.9, 23.0, 18.1, 12.5, 6.5, -0.1, -7.0, -14.4)
+#: Table 1, element 5: the straight run's flow noise, printed only as the two
+#: overall levels, which is all the example carries forward.
+STRAIGHT_AREA_M2 = 0.5 * 0.4
+STRAIGHT_VELOCITY = (4200.0 / 3600.0) / STRAIGHT_AREA_M2
+PRINTED_STRAIGHT_OVERALL_DB = 38.0
+PRINTED_STRAIGHT_OVERALL_A_DB = 22.0
+
+
+def test_the_straight_run_flow_noise_is_equations_16_and_17() -> None:
+    """Element 5, and element 13 in the round duct, to one decibel as printed.
+
+    The table rounds these to whole decibels and prints the velocity rounded
+    too: reading 5,8 m/s off the table instead of the 5,8333 the duty gives
+    would move the level by a tenth.
+    """
+    overall = (
+        7.0 + 50.0 * math.log10(STRAIGHT_VELOCITY) + 10.0 * math.log10(STRAIGHT_AREA_M2)
+    )
+    weighted = (
+        -25.0
+        + 70.0 * math.log10(STRAIGHT_VELOCITY)
+        + 10.0 * math.log10(STRAIGHT_AREA_M2)
+    )
+    assert round(overall) == PRINTED_STRAIGHT_OVERALL_DB
+    assert round(weighted) == PRINTED_STRAIGHT_OVERALL_A_DB
+
+    round_area = math.pi * 0.08**2
+    round_velocity = (280.0 / 3600.0) / round_area
+    assert (
+        round(7.0 + 50.0 * math.log10(round_velocity) + 10.0 * math.log10(round_area))
+        == 19
+    )
+    assert (
+        round(-25.0 + 70.0 * math.log10(round_velocity) + 10.0 * math.log10(round_area))
+        == -1
+    )
+
+
+def test_the_straight_run_model_is_already_the_german_one() -> None:
+    """`flow_noise_straight_duct` is Equation (16) with the Figure 16 shape.
+
+    Bies Eq. (8.251) reproduces VDI 2081 Part 1 Section 5.2.1 and says so, so
+    there is no second model to add here, only the oracle it never had. The
+    spectrum does not sum back to the overall level of Equation (16): the
+    relative shape is a fit, and the guideline prints the two separately.
+    """
+    spectrum = hvac.flow_noise_straight_duct(
+        hvac.OCTAVE_BANDS, STRAIGHT_VELOCITY, STRAIGHT_AREA_M2
+    )
+    overall = (
+        7.0 + 50.0 * math.log10(STRAIGHT_VELOCITY) + 10.0 * math.log10(STRAIGHT_AREA_M2)
+    )
+    shape = -2.0 - 26.0 * np.log10(1.14 + 0.02 * hvac.OCTAVE_BANDS / STRAIGHT_VELOCITY)
+    assert spectrum.values == pytest.approx(overall + shape, abs=1e-9)
+
+
+def test_the_junction_flow_noise_reproduces_element_3() -> None:
+    """Equation (18) with Figures 17 and 18, band by band.
+
+    The approach velocity is the one in the duct **ahead** of the junction, so
+    it comes from the flow the feeder carries and not from the branch: reading
+    it off the element's own 4200 m3/h would put the ratio at one and lose five
+    decibels at 63 Hz.
+    """
+    strouhal = hvac.OCTAVE_BANDS * JUNCTION_BRANCH_DIAMETER / JUNCTION_BRANCH_VELOCITY
+    assert strouhal == pytest.approx(PRINTED_JUNCTION_STROUHAL, rel=5e-3)
+
+    lg_st = np.log10(strouhal)
+    ratio = math.log10(JUNCTION_APPROACH_VELOCITY / JUNCTION_BRANCH_VELOCITY)
+    normalised = 12.0 - 21.5 * lg_st**1.268 + (32.0 + 13.0 * lg_st) * ratio
+    assert normalised == pytest.approx(PRINTED_JUNCTION_NORMALISED_DB, abs=0.1)
+
+    correction = 13.9 * (3.43 - lg_st) * (0.15 - JUNCTION_ROUNDING_RATIO)
+    assert correction == pytest.approx(PRINTED_JUNCTION_K_DB, abs=0.05)
+
+    noise = hvac.flow_noise_bend(
+        hvac.OCTAVE_BANDS,
+        JUNCTION_BRANCH_VELOCITY,
+        0.30,
+        0.6,
+        model="vdi2081",
+        branch_diameter=JUNCTION_BRANCH_DIAMETER,
+        approach_velocity=JUNCTION_APPROACH_VELOCITY,
+        rounding_ratio=JUNCTION_ROUNDING_RATIO,
+    )
+    assert noise.values == pytest.approx(PRINTED_JUNCTION_NOISE_DB, abs=0.05)
+
+
+def test_a_bend_is_the_same_law_with_one_velocity() -> None:
+    """Element 14: the two velocities equal, and no rounding correction.
+
+    Figure 18 is drawn for the rounding of a junction, and all its curves cross
+    zero at ``r / d_a = 0,15``, so leaving it out is not the same as passing
+    nought: a sharp-cornered junction earns over 6 dB there.
+    """
+    bend = hvac.flow_noise_bend(
+        hvac.OCTAVE_BANDS,
+        BEND_VELOCITY,
+        BEND_AREA_M2,
+        0.16,
+        model="vdi2081",
+        branch_diameter=0.160,
+    )
+    assert bend.values == pytest.approx(PRINTED_BEND_NOISE_DB, abs=0.05)
+
+    sharp = hvac.flow_noise_bend(
+        hvac.OCTAVE_BANDS,
+        BEND_VELOCITY,
+        BEND_AREA_M2,
+        0.16,
+        model="vdi2081",
+        branch_diameter=0.160,
+        rounding_ratio=0.0,
+    )
+    # K falls with frequency, from 6,3 dB at 63 Hz to 1,9 dB at 8 kHz, so a
+    # sharp corner is louder in every band and most of all in the lowest.
+    assert np.all(sharp.values > bend.values)
+    assert sharp.values[0] - bend.values[0] > 6.0
+
+    # A junction rounded to 0,15 of its branch diameter is the crossing point,
+    # so it lands back on the uncorrected law.
+    crossing = hvac.flow_noise_bend(
+        hvac.OCTAVE_BANDS,
+        BEND_VELOCITY,
+        BEND_AREA_M2,
+        0.16,
+        model="vdi2081",
+        branch_diameter=0.160,
+        rounding_ratio=0.15,
+    )
+    assert crossing.values == pytest.approx(bend.values, abs=1e-9)
+
+
+def test_below_a_strouhal_number_of_one_the_fit_does_not_apply() -> None:
+    """Both figures say so, so those bands carry no contribution at all.
+
+    Returning an extrapolation would be worse than returning nothing: the fit
+    turns over below one and its fractional power of ``lg St`` is not real
+    there.
+    """
+    slow = hvac.flow_noise_bend(
+        hvac.OCTAVE_BANDS,
+        20.0,
+        0.05,
+        0.2,
+        model="vdi2081",
+        branch_diameter=0.05,
+    )
+    below = hvac.OCTAVE_BANDS * 0.05 / 20.0 <= 1.0
+    assert np.all(np.isneginf(slow.values[below]))
+    assert np.all(np.isfinite(slow.values[~below]))
+
+
+def test_the_vdi_flow_noise_asks_for_the_branch_it_is_written_on() -> None:
+    """Equation (18) is written on the branch diameter, which Bies does not take."""
+    with pytest.raises(ValueError, match=r"model='vdi2081' needs 'branch_diameter'"):
+        hvac.flow_noise_bend(hvac.OCTAVE_BANDS, 5.0, 0.2, 0.4, model="vdi2081")
