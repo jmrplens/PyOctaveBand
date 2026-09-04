@@ -76,6 +76,7 @@ import numpy as np
 
 from ..._internal.validation import check_engine, require_equal_shapes
 from ..._internal.warnings import PhonometryWarning
+from ...fluids import Fluid
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -131,6 +132,31 @@ _ANNEX_A_PRINTED_AIR_DENSITY = 1.186  # rho0 (kg/m3)
 _ANNEX_A_PRINTED_HEAT_RATIO = 1.4008  # kappa, adiabatic
 _ANNEX_A_PRINTED_THERMAL_CONDUCTIVITY = 0.02355  # k_a (J/(s*m*K))
 _ANNEX_A_PRINTED_SPECIFIC_HEAT_CP = 938.7  # C_P (J/(kg*K))
+#: The air the two Annex A helpers default to, as a :class:`~phonometry.fluids.Fluid`:
+#: the five constants above, transcribed rather than recomputed, so the numbers the
+#: conformance rows pin do not move. Pass a computed one to work in the air of the
+#: laboratory instead of the air of the annex.
+ANNEX_A_AIR = Fluid(
+    temperature_c=23.0,
+    static_pressure_pa=_STANDARD_STATIC_PRESSURE,
+    composition={"relative_humidity_percent": 50.0},
+    model=(
+        "IEC 61094-2:2009 Annex F (CIPM-2007) at the ISO 9053-2:2020 "
+        "Annex A.3 reference state"
+    ),
+    validity=(
+        "IEC 61094-2:2009 Annex F states 15 degC to 27 degC, 60 kPa to 110 kPa "
+        "and 10 % to 90 % relative humidity."
+    ),
+    properties={
+        "speed_of_sound": _ANNEX_A_SPEED_OF_SOUND,
+        "density": _ANNEX_A_AIR_DENSITY,
+        "heat_capacity_ratio": _ANNEX_A_HEAT_RATIO,
+        "thermal_conductivity": _ANNEX_A_THERMAL_CONDUCTIVITY,
+        "specific_heat_capacity": _ANNEX_A_SPECIFIC_HEAT_CP,
+    },
+)
+
 #: Reference linear airflow velocity, ISO 9053-1:2018 clause 7.5 (m/s).
 _STATIC_REFERENCE_VELOCITY = 0.5e-3
 #: Upper linear-velocity limit of the static method, ISO 9053-1:2018 clause 7.5 (m/s).
@@ -527,10 +553,7 @@ def piston_volume_flow_rate(
 def thermal_boundary_layer_thickness(
     frequency: float,
     *,
-    speed_of_sound: float = _ANNEX_A_SPEED_OF_SOUND,
-    air_density: float = _ANNEX_A_AIR_DENSITY,
-    specific_heat_cp: float = _ANNEX_A_SPECIFIC_HEAT_CP,
-    thermal_conductivity: float = _ANNEX_A_THERMAL_CONDUCTIVITY,
+    fluid: Fluid = ANNEX_A_AIR,
 ) -> float:
     r"""Thermal boundary-layer thickness ``b`` (ISO 9053-2:2020, Formulae (A.4)/(A.5)).
 
@@ -556,23 +579,11 @@ def thermal_boundary_layer_thickness(
     """
     if frequency <= 0.0:
         raise ValueError(_FREQUENCY_POSITIVE_MSG)
-    if speed_of_sound <= 0.0:
-        msg = "'speed_of_sound' must be positive."
-        raise ValueError(msg)
-    if air_density <= 0.0:
-        msg = "'air_density' must be positive."
-        raise ValueError(msg)
-    if specific_heat_cp <= 0.0:
-        msg = "'specific_heat_cp' must be positive."
-        raise ValueError(msg)
-    if thermal_conductivity <= 0.0:
-        msg = "'thermal_conductivity' must be positive."
-        raise ValueError(msg)
     omega = 2.0 * math.pi * frequency
-    diffusion_length = thermal_conductivity / (
-        air_density * speed_of_sound * specific_heat_cp
+    diffusion_length = fluid.thermal_conductivity / (
+        fluid.density * fluid.speed_of_sound * fluid.specific_heat_capacity
     )
-    return math.sqrt(2.0 * speed_of_sound * diffusion_length / omega)
+    return math.sqrt(2.0 * fluid.speed_of_sound * diffusion_length / omega)
 
 
 def effective_kappa(
@@ -580,11 +591,7 @@ def effective_kappa(
     cavity_volume: float,
     frequency: float,
     *,
-    speed_of_sound: float = _ANNEX_A_SPEED_OF_SOUND,
-    air_density: float = _ANNEX_A_AIR_DENSITY,
-    specific_heat_ratio: float = _ANNEX_A_HEAT_RATIO,
-    specific_heat_cp: float = _ANNEX_A_SPECIFIC_HEAT_CP,
-    thermal_conductivity: float = _ANNEX_A_THERMAL_CONDUCTIVITY,
+    fluid: Fluid = ANNEX_A_AIR,
 ) -> float:
     r"""Effective ratio of specific heats ``kappa'`` (ISO 9053-2:2020, Annex A, Formula (A.7)).
 
@@ -616,19 +623,11 @@ def effective_kappa(
     if cavity_volume <= 0.0:
         msg = "'cavity_volume' must be positive."
         raise ValueError(msg)
-    if specific_heat_ratio <= 0.0:
-        msg = "'specific_heat_ratio' must be positive."
-        raise ValueError(msg)
-    boundary_thickness = thermal_boundary_layer_thickness(
-        frequency,
-        speed_of_sound=speed_of_sound,
-        air_density=air_density,
-        specific_heat_cp=specific_heat_cp,
-        thermal_conductivity=thermal_conductivity,
-    )
+    boundary_thickness = thermal_boundary_layer_thickness(frequency, fluid=fluid)
+    kappa = fluid.heat_capacity_ratio
     surface_to_volume = cavity_surface / cavity_volume
-    term = (specific_heat_ratio - 1.0) * surface_to_volume * boundary_thickness
-    return specific_heat_ratio / math.sqrt(1.0 + term + 0.5 * term**2)
+    term = (kappa - 1.0) * surface_to_volume * boundary_thickness
+    return kappa / math.sqrt(1.0 + term + 0.5 * term**2)
 
 
 def _warn_alternating_validity(

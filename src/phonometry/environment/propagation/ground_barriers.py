@@ -113,18 +113,15 @@ from ..._internal.validation import (
     require_ranks,
     require_same_length,
 )
-from ...materials.absorbers.porous import delany_bazley, miki
+from ...materials.absorbers.porous import PUBLISHED_AIR, delany_bazley, miki
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
     from ..._report.metadata import ReportMetadata
+    from ...fluids import Fluid
     from ...materials.absorbers.porous import PorousMediumResult
 
-#: Default speed of sound ``c`` in air, in m/s (matches the materials domain).
-_C_SOUND = 343.0
-#: Default air density ``rho``, in kg/m3 (matches the materials domain).
-_AIR_DENSITY = 1.205
 #: Nominal octave-band midband frequencies, in hertz (as ISO 9613-2 clause 1).
 DEFAULT_FREQUENCIES: tuple[float, ...] = (
     63.0,
@@ -160,8 +157,7 @@ def _normalized_ground_impedance(
     impedance: ArrayLike | PorousMediumResult | None,
     flow_resistivity: float | None,
     model: str,
-    speed_of_sound: float,
-    air_density: float,
+    fluid: Fluid,
 ) -> Complex:
     r"""Resolve the normalized (by ``rho c``) surface impedance of the ground.
 
@@ -188,13 +184,9 @@ def _normalized_ground_impedance(
     if flow_resistivity is not None:
         sigma = require_positive(flow_resistivity, "flow_resistivity")
         if model == "delany_bazley":
-            medium = delany_bazley(
-                frequency, sigma, speed_of_sound=speed_of_sound, air_density=air_density
-            )
+            medium = delany_bazley(frequency, sigma, fluid=fluid)
         elif model == "miki":
-            medium = miki(
-                frequency, sigma, speed_of_sound=speed_of_sound, air_density=air_density
-            )
+            medium = miki(frequency, sigma, fluid=fluid)
         else:
             msg = f"unknown ground model {model!r}; options: 'delany_bazley', 'miki'."
             raise ValueError(msg)
@@ -287,7 +279,7 @@ def spherical_reflection_coefficient(
     source_height: float,
     receiver_height: float,
     distance: float,
-    speed_of_sound: float = _C_SOUND,
+    speed_of_sound: float = PUBLISHED_AIR.speed_of_sound,
 ) -> Complex:
     r"""Spherical-wave reflection coefficient ``Q`` (Weyl-Van der Pol).
 
@@ -339,8 +331,7 @@ def ground_effect(
     *,
     impedance: ArrayLike | PorousMediumResult,
     model: Literal["delany_bazley", "miki"] = ...,
-    speed_of_sound: float = ...,
-    air_density: float = ...,
+    fluid: Fluid = ...,
 ) -> SphericalGroundResult: ...
 
 
@@ -353,8 +344,7 @@ def ground_effect(
     *,
     flow_resistivity: float,
     model: Literal["delany_bazley", "miki"] = ...,
-    speed_of_sound: float = ...,
-    air_density: float = ...,
+    fluid: Fluid = ...,
 ) -> SphericalGroundResult: ...
 
 
@@ -367,8 +357,7 @@ def ground_effect(
     impedance: ArrayLike | PorousMediumResult | None = None,
     flow_resistivity: float | None = None,
     model: Literal["delany_bazley", "miki"] = "delany_bazley",
-    speed_of_sound: float = _C_SOUND,
-    air_density: float = _AIR_DENSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> SphericalGroundResult:
     r"""Spherical-wave ground effect above a finite-impedance ground.
 
@@ -415,11 +404,9 @@ def ground_effect(
     if distance <= 0.0:
         msg = "'distance' must be positive."
         raise ValueError(msg)
-    speed_of_sound = require_positive(speed_of_sound, "speed_of_sound")
+    speed_of_sound = fluid.speed_of_sound
     f = require_positive_array(frequencies, "frequencies")
-    z = _normalized_ground_impedance(
-        f, impedance, flow_resistivity, model, speed_of_sound, air_density
-    )
+    z = _normalized_ground_impedance(f, impedance, flow_resistivity, model, fluid)
     k = 2.0 * np.pi * f / speed_of_sound
     r1 = float(np.hypot(distance, source_height - receiver_height))
     r2 = float(np.hypot(distance, source_height + receiver_height))
@@ -450,7 +437,7 @@ def fresnel_number(
     edge_to_receiver: float,
     direct_distance: float,
     frequencies: ArrayLike,
-    speed_of_sound: float = _C_SOUND,
+    speed_of_sound: float = PUBLISHED_AIR.speed_of_sound,
 ) -> Real:
     r"""Fresnel number :math:`N = (2/\lambda)(A + B - d)` (Bies Eq. (5.134)).
 
@@ -865,8 +852,7 @@ def barrier_insertion_loss(
     ground_impedance: ArrayLike | PorousMediumResult | None = None,
     ground_flow_resistivity: float | None = None,
     ground_model: Literal["delany_bazley", "miki"] = "delany_bazley",
-    speed_of_sound: float = _C_SOUND,
-    air_density: float = _AIR_DENSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> BarrierInsertionLoss:
     r"""Insertion loss of a thin, thick or ground-coupled barrier.
 
@@ -927,7 +913,7 @@ def barrier_insertion_loss(
         thickness,
     )
     has_ground = ground_impedance is not None or ground_flow_resistivity is not None
-    speed_of_sound = require_positive(speed_of_sound, "speed_of_sound")
+    speed_of_sound = fluid.speed_of_sound
     f = require_positive_array(frequencies, "frequencies")
     k = 2.0 * np.pi * f / speed_of_sound
 
@@ -959,8 +945,7 @@ def barrier_insertion_loss(
                 receiver=receiver,
                 thickness=thickness,
                 receiver_distance=receiver_distance,
-                speed_of_sound=speed_of_sound,
-                air_density=air_density,
+                fluid=fluid,
                 ground_impedance=ground_impedance,
                 ground_flow_resistivity=ground_flow_resistivity,
                 ground_model=ground_model,
@@ -1016,8 +1001,7 @@ class _ExactBarrierSetup:
     receiver: tuple[float, float]
     thickness: float | None
     receiver_distance: float
-    speed_of_sound: float
-    air_density: float
+    fluid: Fluid
     ground_impedance: ArrayLike | PorousMediumResult | None
     ground_flow_resistivity: float | None
     ground_model: str
@@ -1052,8 +1036,7 @@ def _exact_barrier_il(setup: _ExactBarrierSetup) -> Real:
         setup.ground_impedance,
         setup.ground_flow_resistivity,
         setup.ground_model,
-        setup.speed_of_sound,
-        setup.air_density,
+        setup.fluid,
     )
     hs, hr = source[1], receiver[1]
     src_img = (source[0], -hs)
@@ -1061,7 +1044,12 @@ def _exact_barrier_il(setup: _ExactBarrierSetup) -> Real:
     # Spherical-wave reflection coefficient for the source-side and receiver-side
     # ground bounces (evaluated over the full source-receiver geometry).
     q_src = spherical_reflection_coefficient(
-        setup.frequencies, z, hs, hr, setup.receiver_distance, setup.speed_of_sound
+        setup.frequencies,
+        z,
+        hs,
+        hr,
+        setup.receiver_distance,
+        setup.fluid.speed_of_sound,
     )
     q_rec = q_src
     # Four diffracted paths: {source, source image} x {receiver, receiver image}.

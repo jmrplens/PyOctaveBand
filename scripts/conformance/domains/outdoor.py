@@ -312,10 +312,7 @@ _AIR = ref.ISO9053_2_ANNEX_A_PRINTED_AIR
 def _chk_iso9053_2_boundary() -> Outcome:
     b = ph.materials.thermal_boundary_layer_thickness(
         frequency=ref.ISO9053_2_ANNEX_A_FREQUENCY,
-        speed_of_sound=_AIR["speed_of_sound"],
-        air_density=_AIR["air_density"],
-        specific_heat_cp=_AIR["specific_heat_cp"],
-        thermal_conductivity=_AIR["thermal_conductivity"],
+        fluid=_AIR,
     )
     return numeric(
         ref.ISO9053_2_ANNEX_A_BOUNDARY_LAYER,
@@ -334,7 +331,7 @@ def _chk_iso9053_2_kappa() -> Outcome:
         cavity_surface=ref.ISO9053_2_ANNEX_A_SURFACE,
         cavity_volume=ref.ISO9053_2_ANNEX_A_VOLUME,
         frequency=ref.ISO9053_2_ANNEX_A_FREQUENCY,
-        **_AIR,
+        fluid=_AIR,
     )
     return numeric(ref.ISO9053_2_ANNEX_A_KAPPA_PRIME, kp, 5e-4, places=3)
 

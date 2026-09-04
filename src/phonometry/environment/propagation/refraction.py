@@ -48,6 +48,7 @@ frequencies in Hz.
 
 from __future__ import annotations
 
+import dataclasses
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -60,11 +61,13 @@ from ..._internal.validation import (
     require_ranks,
     require_same_length,
 )
+from ...materials.absorbers.porous import PUBLISHED_AIR
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import ArrayLike, NDArray
 
+    from ...fluids import Fluid
     from ...materials.absorbers.porous import PorousMediumResult
 
 #: Default reference speed of sound ``c`` in air at the ground, in m/s (matches
@@ -632,16 +635,13 @@ def _resolve_pe_impedance(
     impedance: ArrayLike | PorousMediumResult | None,
     flow_resistivity: float | None,
     model: str,
-    speed_of_sound: float,
-    air_density: float,
+    fluid: Fluid,
 ) -> complex:
     """Resolve a single complex normalized ground impedance at ``frequency``."""
     from .ground_barriers import _normalized_ground_impedance
 
     f = np.array([float(frequency)], dtype=np.float64)
-    z = _normalized_ground_impedance(
-        f, impedance, flow_resistivity, model, speed_of_sound, air_density
-    )
+    z = _normalized_ground_impedance(f, impedance, flow_resistivity, model, fluid)
     return complex(z[0])
 
 
@@ -657,7 +657,7 @@ def atmospheric_parabolic_equation(
     max_height: float = 100.0,
     range_step: float | None = None,
     height_step: float | None = None,
-    air_density: float = _AIR_DENSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> AtmosphericPEResult:
     r"""Relative-level field from the Green's Function Parabolic Equation (GFPE).
 
@@ -739,9 +739,13 @@ def atmospheric_parabolic_equation(
     if dr > rmax:
         msg = "'range_step' must not exceed 'max_range'."
         raise ValueError(msg)
-    z_imp = _resolve_pe_impedance(
-        f, impedance, flow_resistivity, model, c_ref, air_density
+    # The ground impedance is evaluated in the caller's air at the speed the
+    # profile actually has there, which is not the same as the air's own: a
+    # temperature gradient is the whole point of a refracting atmosphere.
+    ground_air = dataclasses.replace(
+        fluid, properties={**fluid.properties, "speed_of_sound": c_ref}
     )
+    z_imp = _resolve_pe_impedance(f, impedance, flow_resistivity, model, ground_air)
 
     # Grid: physical region [0, zmax] plus a 50-wavelength absorbing layer, then
     # padded to N = 2M so only the lower half carries the (positive-height) field

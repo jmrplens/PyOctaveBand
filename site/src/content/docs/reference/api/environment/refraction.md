@@ -68,7 +68,7 @@ atmospheric_parabolic_equation(
     max_height: float = 100.0,
     range_step: float | None = None,
     height_step: float | None = None,
-    air_density: float = 1.205,
+    fluid: Fluid = ...,
 ) -> AtmosphericPEResult
 ```
 

@@ -303,8 +303,7 @@ def delany_bazley(
     flow_resistivity: float,
     *,
     coefficients: str | tuple[float, ...] = "delany_bazley",
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> PorousMediumResult:
     r"""Delany-Bazley one-parameter porous model (power laws in ``X``).
 
@@ -329,8 +328,8 @@ def delany_bazley(
     """
     f = require_positive_array(frequency, "frequency")
     sigma = require_positive(flow_resistivity, "flow_resistivity")
-    c0 = require_positive(speed_of_sound, "speed_of_sound")
-    rho0 = require_positive(air_density, "air_density")
+    c0 = fluid.speed_of_sound
+    rho0 = fluid.density
     if isinstance(coefficients, str):
         try:
             coeffs = DELANY_BAZLEY_COEFFICIENTS[coefficients]
@@ -365,8 +364,7 @@ def miki(
     frequency: ArrayLike,
     flow_resistivity: float,
     *,
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> PorousMediumResult:
     r"""Miki (1990) positive-real modification of the Delany-Bazley model.
 
@@ -389,8 +387,8 @@ def miki(
     """
     f = require_positive_array(frequency, "frequency")
     sigma = require_positive(flow_resistivity, "flow_resistivity")
-    c0 = require_positive(speed_of_sound, "speed_of_sound")
-    rho0 = require_positive(air_density, "air_density")
+    c0 = fluid.speed_of_sound
+    rho0 = fluid.density
     y = np.asarray(f / sigma, dtype=np.float64)
     _warn_fit_range(y, MIKI_VALIDITY, "f / sigma", "Miki")
     zc = rho0 * c0 * (1.0 + 0.070 * y**-0.632 - 1j * 0.107 * y**-0.632)
@@ -414,12 +412,7 @@ def johnson_champoux_allard(
     tortuosity: float,
     viscous_length: float,
     thermal_length: float,
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
-    viscosity: float = _AIR_VISCOSITY,
-    prandtl_number: float = _PRANDTL_NUMBER,
-    heat_capacity_ratio: float = _HEAT_CAPACITY_RATIO,
-    atmospheric_pressure: float = _ATMOSPHERIC_PRESSURE,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> PorousMediumResult:
     r"""Johnson-Champoux-Allard five-parameter rigid-frame model.
 
@@ -477,12 +470,12 @@ def johnson_champoux_allard(
         raise ValueError(msg)
     lam_v = require_positive(viscous_length, "viscous_length")
     lam_t = require_positive(thermal_length, "thermal_length")
-    c0 = require_positive(speed_of_sound, "speed_of_sound")
-    rho0 = require_positive(air_density, "air_density")
-    eta = require_positive(viscosity, "viscosity")
-    pr = require_positive(prandtl_number, "prandtl_number")
-    gamma = require_positive(heat_capacity_ratio, "heat_capacity_ratio")
-    p0 = require_positive(atmospheric_pressure, "atmospheric_pressure")
+    c0 = fluid.speed_of_sound
+    rho0 = fluid.density
+    eta = fluid.viscosity
+    pr = fluid.prandtl_number
+    gamma = fluid.heat_capacity_ratio
+    p0 = fluid.static_pressure_pa
 
     omega = 2.0 * np.pi * f
     # Effective density, Cox & D'Antonio Eq. (6.19).
@@ -704,8 +697,7 @@ def perforated_plate_impedance(
     hole_radius: float,
     open_area: float,
     end_correction: float | None = None,
-    air_density: float = _AIR_DENSITY,
-    viscosity: float = _AIR_VISCOSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> Complex:
     r"""Transfer impedance of a rigid perforated plate with circular holes.
 
@@ -745,8 +737,8 @@ def perforated_plate_impedance(
     eps = require_positive(open_area, "open_area")
     if eps > 1.0:
         raise ValueError(_OPEN_AREA_MESSAGE)
-    rho0 = require_positive(air_density, "air_density")
-    eta = require_positive(viscosity, "viscosity")
+    rho0 = fluid.density
+    eta = fluid.viscosity
     delta = (
         perforation_end_correction(eps)
         if end_correction is None
@@ -767,8 +759,7 @@ def microperforated_plate_impedance(
     hole_radius: float,
     open_area: float,
     end_correction: float = 0.85,
-    air_density: float = _AIR_DENSITY,
-    viscosity: float = _AIR_VISCOSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> Complex:
     r"""Transfer impedance of a microperforated plate (Maa's exact model).
 
@@ -808,8 +799,8 @@ def microperforated_plate_impedance(
     if eps > 1.0:
         raise ValueError(_OPEN_AREA_MESSAGE)
     delta = require_non_negative(end_correction, "end_correction")
-    rho0 = require_positive(air_density, "air_density")
-    eta = require_positive(viscosity, "viscosity")
+    rho0 = fluid.density
+    eta = fluid.viscosity
     omega = 2.0 * np.pi * f
     arg = a * np.sqrt(rho0 * omega / eta) * np.sqrt(-1j)
     bessel_ratio = special.jv(1, arg) / special.jv(0, arg)
@@ -890,8 +881,7 @@ def membrane_resonance_frequency(
     surface_density: float,
     cavity_depth: float,
     isothermal: bool = False,
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> float:
     r"""Mass-spring resonance of a membrane over a shallow cavity.
 
@@ -910,8 +900,8 @@ def membrane_resonance_frequency(
     """
     m = require_positive(surface_density, "surface_density")
     d = require_positive(cavity_depth, "cavity_depth")
-    c0 = require_positive(speed_of_sound, "speed_of_sound")
-    rho0 = require_positive(air_density, "air_density")
+    c0 = fluid.speed_of_sound
+    rho0 = fluid.density
     stiffness = rho0 * c0**2 / d
     if isothermal:
         stiffness /= _HEAT_CAPACITY_RATIO

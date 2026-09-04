@@ -35,6 +35,7 @@ from reference_data import (
     ISO9053_2_ANNEX_A_WAVELENGTH,
 )
 
+from phonometry.fluids import Fluid
 from phonometry.materials.absorbers.airflow_resistance import (
     AirflowResistanceWarning,
     StaticAirflowResult,
@@ -401,7 +402,7 @@ def test_annex_a_printed_air_reproduces_the_printed_wavelength() -> None:
     reference data rather than the implementation: a typo in the printed speed
     of sound would show up here and nowhere else.
     """
-    c0 = ISO9053_2_ANNEX_A_PRINTED_AIR["speed_of_sound"]
+    c0 = ISO9053_2_ANNEX_A_PRINTED_AIR.speed_of_sound
     wavelength = c0 / ISO9053_2_ANNEX_A_FREQUENCY
     assert round(wavelength, 1) == ISO9053_2_ANNEX_A_WAVELENGTH
 
@@ -417,10 +418,7 @@ def test_thermal_boundary_layer_thickness_annex_a_example() -> None:
     """
     b = thermal_boundary_layer_thickness(
         frequency=ISO9053_2_ANNEX_A_FREQUENCY,
-        speed_of_sound=ISO9053_2_ANNEX_A_PRINTED_AIR["speed_of_sound"],
-        air_density=ISO9053_2_ANNEX_A_PRINTED_AIR["air_density"],
-        specific_heat_cp=ISO9053_2_ANNEX_A_PRINTED_AIR["specific_heat_cp"],
-        thermal_conductivity=ISO9053_2_ANNEX_A_PRINTED_AIR["thermal_conductivity"],
+        fluid=ISO9053_2_ANNEX_A_PRINTED_AIR,
     )
     assert float(f"{b:.3g}") == ISO9053_2_ANNEX_A_BOUNDARY_LAYER
 
@@ -443,7 +441,7 @@ def test_effective_kappa_annex_a_example() -> None:
         cavity_surface=ISO9053_2_ANNEX_A_SURFACE,
         cavity_volume=ISO9053_2_ANNEX_A_VOLUME,
         frequency=ISO9053_2_ANNEX_A_FREQUENCY,
-        **ISO9053_2_ANNEX_A_PRINTED_AIR,
+        fluid=ISO9053_2_ANNEX_A_PRINTED_AIR,
     )
     # Standard prints kappa' = kappa*0.978 = 1.370 (kappa = 1.4008).
     assert kappa_prime == pytest.approx(ISO9053_2_ANNEX_A_KAPPA_PRIME, abs=5e-4)
@@ -478,7 +476,6 @@ def test_effective_kappa_below_adiabatic() -> None:
         ({"cavity_surface": 0.0}, "'cavity_surface' must be positive"),
         ({"cavity_volume": 0.0}, "'cavity_volume' must be positive"),
         ({"frequency": 0.0}, "'frequency' must be positive"),
-        ({"specific_heat_ratio": 0.0}, "'specific_heat_ratio' must be positive"),
     ],
 )
 def test_effective_kappa_invalid_inputs_raise(
@@ -488,6 +485,31 @@ def test_effective_kappa_invalid_inputs_raise(
     base.update(kwargs)
     with pytest.raises(ValueError, match=message):
         effective_kappa(**base)
+
+
+def test_a_fluid_with_no_ratio_of_specific_heats_is_refused_by_the_fluid() -> None:
+    """The guard on the air moved to the type that owns the air.
+
+    ``effective_kappa`` used to check ``specific_heat_ratio`` itself, one of
+    five floats it took. It takes a `Fluid` now, which refuses a non-positive
+    property on construction, so the refusal happens a step earlier and covers
+    every property rather than the one the function remembered to check.
+    """
+    with pytest.raises(ValueError, match=r"'properties\['heat_capacity_ratio'\]'"):
+        Fluid(
+            temperature_c=23.0,
+            static_pressure_pa=101_325.0,
+            composition={},
+            model="an air with no ratio of specific heats",
+            validity="",
+            properties={
+                "speed_of_sound": 345.9,
+                "density": 1.186,
+                "heat_capacity_ratio": 0.0,
+                "specific_heat_capacity": 938.7,
+                "thermal_conductivity": 0.02355,
+            },
+        )
 
 
 def test_public_exports() -> None:

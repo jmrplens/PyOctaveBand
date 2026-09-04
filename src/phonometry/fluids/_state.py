@@ -13,6 +13,7 @@ returning a plausible number nobody printed.
 from __future__ import annotations
 
 import dataclasses
+import math
 import types
 from typing import TYPE_CHECKING
 
@@ -114,7 +115,23 @@ class Fluid:
 
         Copied before wrapping, so a caller who keeps a reference to the dict
         it passed in cannot reach back through it either.
+
+        Every property is required to be a positive finite number here, so that
+        the models reading them do not each have to ask. A density, a speed of
+        sound, a viscosity and every other quantity a fluid fixes is positive by
+        what it is, and a NaN among them would otherwise travel the whole way to
+        a result. A composition fraction may be zero, since dry air has no water
+        vapour, so those are only required to be finite and not negative.
         """
+        for quantity, value in self.properties.items():
+            require_positive(value, f"properties[{quantity!r}]")
+        for constituent, fraction in self.composition.items():
+            if not math.isfinite(fraction) or fraction < 0.0:
+                msg = (
+                    f"'composition[{constituent!r}]' must be a finite fraction "
+                    f"of nought or more."
+                )
+                raise ValueError(msg)
         object.__setattr__(
             self, "composition", types.MappingProxyType(dict(self.composition))
         )

@@ -49,13 +49,10 @@ import numpy as np
 
 from ..._internal.validation import (
     require_non_negative,
-    require_positive,
     require_positive_array,
 )
 from .porous import (
-    _AIR_DENSITY,
-    _AIR_VISCOSITY,
-    _SPEED_OF_SOUND,
+    PUBLISHED_AIR,
     Complex,
     PorousMediumResult,
     membrane_impedance,
@@ -68,6 +65,7 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ..._internal.types import Real
+    from ...fluids import Fluid
 
 #: Discriminator tag of the term tuples built by :func:`_layer_terms`: a
 #: fluid term carries ``(Zx, kx d)`` and takes the fluid-layer branch of the
@@ -324,8 +322,7 @@ def _sheet_impedance(
     layer: Layer,
     f: Real,
     *,
-    air_density: float,
-    viscosity: float,
+    fluid: Fluid,
 ) -> Complex:
     """Series transfer impedance of a sheet layer on the grid *f*."""
     if isinstance(layer, PerforatedPlateLayer):
@@ -335,8 +332,7 @@ def _sheet_impedance(
             hole_radius=layer.hole_radius,
             open_area=layer.open_area,
             end_correction=layer.end_correction,
-            air_density=air_density,
-            viscosity=viscosity,
+            fluid=fluid,
         )
     if isinstance(layer, MicroperforatedPlateLayer):
         return microperforated_plate_impedance(
@@ -345,8 +341,7 @@ def _sheet_impedance(
             hole_radius=layer.hole_radius,
             open_area=layer.open_area,
             end_correction=layer.end_correction,
-            air_density=air_density,
-            viscosity=viscosity,
+            fluid=fluid,
         )
     if isinstance(layer, MembraneLayer):
         return membrane_impedance(
@@ -403,7 +398,7 @@ def _layer_terms(
     k0_sin2: Real,
     rc: float,
     rho0: float,
-    viscosity: float,
+    fluid: Fluid,
 ) -> list[tuple[str, Complex, Complex]]:
     """Evaluate each layer once: fluid layers as ``(Zx, kx d)``, sheets as z.
 
@@ -427,8 +422,7 @@ def _layer_terms(
             z = _sheet_impedance(
                 layer,
                 f,
-                air_density=rho0,
-                viscosity=viscosity,
+                fluid=fluid,
             )
             terms.append(("sheet", z, z))
     return terms
@@ -625,7 +619,7 @@ def _stack_blocks(
     k0_sin2: Real,
     rc: float,
     rho0: float,
-    viscosity: float,
+    fluid: Fluid,
     transverse_wavenumber: Real,
 ) -> list[Any]:
     """Split a stack into fluid blocks and poroelastic blocks.
@@ -652,7 +646,7 @@ def _stack_blocks(
             k0_sin2=k0_sin2,
             rc=rc,
             rho0=rho0,
-            viscosity=viscosity,
+            fluid=fluid,
         )
         groups = _split_fluid_run(terms, biot._BLOCK_NEPERS, biot._MAX_BLOCKS)
         for group in groups:
@@ -692,9 +686,7 @@ def layered_absorber(
     *,
     angle: float = 0.0,
     termination: str | complex | ArrayLike = "rigid",
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
-    viscosity: float = _AIR_VISCOSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> LayeredAbsorberResult:
     r"""Transfer-matrix prediction of a layered absorber at one angle.
 
@@ -745,9 +737,8 @@ def layered_absorber(
     if not 0.0 <= theta < np.pi / 2.0 - 1e-6:
         msg = "'angle' must satisfy 0 <= angle < pi/2 - 1e-6."
         raise ValueError(msg)
-    c0 = require_positive(speed_of_sound, "speed_of_sound")
-    rho0 = require_positive(air_density, "air_density")
-    require_positive(viscosity, "viscosity")
+    c0 = fluid.speed_of_sound
+    rho0 = fluid.density
 
     k0 = 2.0 * np.pi * f / c0
     k0_sin2 = np.asarray((k0 * np.sin(theta)) ** 2, dtype=np.float64)
@@ -764,7 +755,7 @@ def layered_absorber(
             k0_sin2=k0_sin2,
             rc=rc,
             rho0=rho0,
-            viscosity=viscosity,
+            fluid=fluid,
             transverse_wavenumber=np.asarray(k0 * np.sin(theta)),
         )
         if not blocks:
@@ -785,7 +776,7 @@ def layered_absorber(
             k0_sin2=k0_sin2,
             rc=rc,
             rho0=rho0,
-            viscosity=viscosity,
+            fluid=fluid,
         )
         g = _surface_admittance(
             terms, _termination_admittance(termination, f, cos_t=cos_t, rc=rc)
@@ -818,9 +809,7 @@ def diffuse_field_absorption(
     angle_limit: float = np.pi / 2.0,
     quadrature_points: int = 64,
     termination: str | complex | ArrayLike = "rigid",
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
-    viscosity: float = _AIR_VISCOSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> DiffuseFieldAbsorptionResult:
     r"""Random-incidence absorption by the Paris integral (Mechel Sect. D.5).
 
@@ -867,9 +856,7 @@ def diffuse_field_absorption(
             layers,
             angle=float(th),
             termination=termination,
-            speed_of_sound=speed_of_sound,
-            air_density=air_density,
-            viscosity=viscosity,
+            fluid=fluid,
         )
         total += wt * res.absorption * np.cos(th) * np.sin(th)
     alpha_dif = 2.0 * total / np.sin(lim) ** 2

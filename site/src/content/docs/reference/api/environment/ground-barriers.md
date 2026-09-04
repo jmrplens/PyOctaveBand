@@ -120,8 +120,7 @@ barrier_insertion_loss(
     ground_impedance: ArrayLike | PorousMediumResult | None = None,
     ground_flow_resistivity: float | None = None,
     ground_model: Literal['delany_bazley', 'miki'] = 'delany_bazley',
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
+    fluid: Fluid = ...,
 ) -> BarrierInsertionLoss
 ```
 
@@ -346,8 +345,7 @@ ground_effect(
     *,
     impedance: ArrayLike | PorousMediumResult,
     model: Literal['delany_bazley', 'miki'] = ...,
-    speed_of_sound: float = ...,
-    air_density: float = ...,
+    fluid: Fluid = ...,
 ) -> SphericalGroundResult
 
 ground_effect(
@@ -358,8 +356,7 @@ ground_effect(
     *,
     flow_resistivity: float,
     model: Literal['delany_bazley', 'miki'] = ...,
-    speed_of_sound: float = ...,
-    air_density: float = ...,
+    fluid: Fluid = ...,
 ) -> SphericalGroundResult
 ```
 

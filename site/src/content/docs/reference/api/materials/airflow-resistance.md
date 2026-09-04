@@ -143,6 +143,10 @@ Annex A.3 example gives $\kappa' = 1.370$).
 Emits [`AirflowResistanceWarning`](/phonometry/reference/api/materials/airflow-resistance/#airflowresistancewarning) when the piston frequency is outside
 1-4 Hz or when the Formula (3)/(4) validity criteria are not met.
 
+## ANNEX_A_AIR
+
+*Constant* (`phonometry.fluids._state.Fluid`).
+
 ## effective_kappa
 
 ```python
@@ -151,11 +155,7 @@ effective_kappa(
     cavity_volume: float,
     frequency: float,
     *,
-    speed_of_sound: float = 345.86652,
-    air_density: float = 1.1860848,
-    specific_heat_ratio: float = 1.4007573,
-    specific_heat_cp: float = 1013.738121253794,
-    thermal_conductivity: float = 0.0254341377186358,
+    fluid: Fluid = ...,
 ) -> float
 ```
 
@@ -367,10 +367,7 @@ place (mm/s).
 thermal_boundary_layer_thickness(
     frequency: float,
     *,
-    speed_of_sound: float = 345.86652,
-    air_density: float = 1.1860848,
-    specific_heat_cp: float = 1013.738121253794,
-    thermal_conductivity: float = 0.0254341377186358,
+    fluid: Fluid = ...,
 ) -> float
 ```
 

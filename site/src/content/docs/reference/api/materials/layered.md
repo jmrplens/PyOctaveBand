@@ -65,9 +65,7 @@ diffuse_field_absorption(
     angle_limit: float = 1.5707963267948966,
     quadrature_points: int = 64,
     termination: str | complex | ArrayLike = 'rigid',
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
-    viscosity: float = 1.84e-05,
+    fluid: Fluid = ...,
 ) -> DiffuseFieldAbsorptionResult
 ```
 
@@ -142,9 +140,7 @@ layered_absorber(
     *,
     angle: float = 0.0,
     termination: str | complex | ArrayLike = 'rigid',
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
-    viscosity: float = 1.84e-05,
+    fluid: Fluid = ...,
 ) -> LayeredAbsorberResult
 ```
 

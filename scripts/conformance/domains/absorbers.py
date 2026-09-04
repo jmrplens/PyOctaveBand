@@ -50,9 +50,7 @@ _PA_C0 = 343.0
 )
 def _chk_porous_db_real() -> Outcome:
     f = np.array([0.1 * _PA_SIGMA / _PA_RHO0])
-    res = ph.materials.delany_bazley(
-        f, _PA_SIGMA, speed_of_sound=_PA_C0, air_density=_PA_RHO0
-    )
+    res = ph.materials.delany_bazley(f, _PA_SIGMA, fluid=ph.materials.PUBLISHED_AIR)
     return numeric(
         ref.POROUS_DB_ZC_EXPECTED.real,
         float(res.normalized_impedance[0].real),
@@ -67,9 +65,7 @@ def _chk_porous_db_real() -> Outcome:
 )
 def _chk_porous_db_imag() -> Outcome:
     f = np.array([0.1 * _PA_SIGMA / _PA_RHO0])
-    res = ph.materials.delany_bazley(
-        f, _PA_SIGMA, speed_of_sound=_PA_C0, air_density=_PA_RHO0
-    )
+    res = ph.materials.delany_bazley(f, _PA_SIGMA, fluid=ph.materials.PUBLISHED_AIR)
     return numeric(
         ref.POROUS_DB_ZC_EXPECTED.imag,
         float(res.normalized_impedance[0].imag),
@@ -84,7 +80,7 @@ def _chk_porous_db_imag() -> Outcome:
 )
 def _chk_porous_miki() -> Outcome:
     f = np.array([0.1 * _PA_SIGMA])
-    res = ph.materials.miki(f, _PA_SIGMA, speed_of_sound=_PA_C0, air_density=_PA_RHO0)
+    res = ph.materials.miki(f, _PA_SIGMA, fluid=ph.materials.PUBLISHED_AIR)
     return numeric(
         ref.POROUS_MIKI_K_EXPECTED.real,
         float(res.normalized_wavenumber[0].real),
@@ -106,7 +102,7 @@ def _chk_porous_jca_dc() -> Outcome:
         tortuosity=1.3,
         viscous_length=6e-5,
         thermal_length=1.2e-4,
-        air_density=_PA_RHO0,
+        fluid=ph.materials.PUBLISHED_AIR,
     )
     value = float((1j * 2.0 * math.pi * f * res.effective_density)[0].real)
     return numeric(_PA_SIGMA, value, 1e-4, rel=True, unit="Pa s/m2", places=1)
@@ -119,12 +115,11 @@ def _chk_porous_jca_dc() -> Outcome:
 )
 def _chk_porous_rigid_backed() -> Outcome:
     f = np.linspace(200.0, 4000.0, 200)
-    med = ph.materials.delany_bazley(f, _PA_SIGMA, air_density=_PA_RHO0)
+    med = ph.materials.delany_bazley(f, _PA_SIGMA, fluid=ph.materials.PUBLISHED_AIR)
     res = ph.materials.layered_absorber(
         f,
         [ph.materials.PorousLayer(0.05, med)],
-        speed_of_sound=_PA_C0,
-        air_density=_PA_RHO0,
+        fluid=ph.materials.PUBLISHED_AIR,
     )
     zs_ref = -1j * med.characteristic_impedance / np.tan(med.wavenumber * 0.05)
     dev = float(np.max(np.abs(res.surface_impedance - zs_ref) / np.abs(zs_ref)))
@@ -142,8 +137,7 @@ def _chk_porous_air_cavity() -> Outcome:
     res = ph.materials.layered_absorber(
         f,
         [ph.materials.AirLayer(d)],
-        speed_of_sound=_PA_C0,
-        air_density=_PA_RHO0,
+        fluid=ph.materials.PUBLISHED_AIR,
     )
     return numeric(0.0, float(res.absorption[0]), 1e-12, places=4)
 
@@ -168,8 +162,7 @@ def _chk_porous_membrane_resonance() -> Outcome:
     value = ph.materials.membrane_resonance_frequency(
         surface_density=5.0,
         cavity_depth=0.05,
-        speed_of_sound=_PA_C0,
-        air_density=_PA_RHO0,
+        fluid=ph.materials.PUBLISHED_AIR,
     )
     return numeric(
         60.0 / math.sqrt(5.0 * 0.05), value, 0.02, rel=True, unit="Hz", places=2
@@ -192,8 +185,7 @@ def _chk_porous_mpp_peak() -> Outcome:
             ),
             ph.materials.AirLayer(ref.MAA_FIG5_CAVITY),
         ],
-        speed_of_sound=_PA_C0,
-        air_density=_PA_RHO0,
+        fluid=ph.materials.PUBLISHED_AIR,
     )
     return numeric(0.95, float(np.max(res.absorption)), 0.05, places=3)
 
@@ -220,8 +212,7 @@ def _chk_porous_maa_peak_closed_form() -> Outcome:
             ph.materials.MicroperforatedPlateLayer(t, d / 2.0, eps),
             ph.materials.AirLayer(ref.MAA_FIG5_CAVITY),
         ],
-        speed_of_sound=_PA_C0,
-        air_density=_PA_RHO0,
+        fluid=ph.materials.PUBLISHED_AIR,
     )
     i = int(np.argmax(res.absorption))
     omega = 2.0 * math.pi * float(f[i])
@@ -275,9 +266,11 @@ def _chk_limp_low_frequency_limit() -> Outcome:
     rigid = ph.materials.johnson_champoux_allard(
         np.array([1.0e-4]),
         _AA_TABLE_11_2_SIGMA,
-        speed_of_sound=_PA_C0,
-        air_density=_PA_RHO0,
-        **_AA_TABLE_11_2,
+        fluid=ph.materials.PUBLISHED_AIR,
+        porosity=_AA_TABLE_11_2["porosity"],
+        tortuosity=_AA_TABLE_11_2["tortuosity"],
+        viscous_length=_AA_TABLE_11_2["viscous_length"],
+        thermal_length=_AA_TABLE_11_2["thermal_length"],
     )
     limp = ph.materials.limp_frame(
         rigid, _AA_TABLE_11_2_RHO1, porosity=_AA_TABLE_11_2["porosity"]
@@ -303,9 +296,11 @@ def _chk_limp_heavy_frame_limit() -> Outcome:
     rigid = ph.materials.johnson_champoux_allard(
         f,
         _AA_TABLE_11_2_SIGMA,
-        speed_of_sound=_PA_C0,
-        air_density=_PA_RHO0,
-        **_AA_TABLE_11_2,
+        fluid=ph.materials.PUBLISHED_AIR,
+        porosity=_AA_TABLE_11_2["porosity"],
+        tortuosity=_AA_TABLE_11_2["tortuosity"],
+        viscous_length=_AA_TABLE_11_2["viscous_length"],
+        thermal_length=_AA_TABLE_11_2["thermal_length"],
     )
     limp = ph.materials.limp_frame(rigid, 1.0e12, porosity=_AA_TABLE_11_2["porosity"])
     deviation = float(
@@ -352,7 +347,12 @@ _AA_TABLE_6_1_SHEAR = 220.0e4 * (1.0 + 0.1j)
 def _aa_glass_wool_medium(frequency: np.ndarray) -> PorousMediumResult:
     """The rigid-frame JCA equivalent fluid of the Table 6.1 glass wool."""
     return ph.materials.johnson_champoux_allard(
-        frequency, _AA_TABLE_6_1_SIGMA, **_AA_TABLE_6_1
+        frequency,
+        _AA_TABLE_6_1_SIGMA,
+        porosity=_AA_TABLE_6_1["porosity"],
+        tortuosity=_AA_TABLE_6_1["tortuosity"],
+        viscous_length=_AA_TABLE_6_1["viscous_length"],
+        thermal_length=_AA_TABLE_6_1["thermal_length"],
     )
 
 

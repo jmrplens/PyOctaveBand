@@ -35,6 +35,7 @@ import pytest
 
 from phonometry import environment
 from phonometry.environment.propagation import ground_barriers
+from phonometry.fluids import Fluid
 from phonometry.materials import delany_bazley
 
 _BANDS = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
@@ -502,9 +503,16 @@ def test_barrier_rejects_bad_geometry() -> None:
         environment.barrier_insertion_loss(
             _BANDS, 1.0, 50.0, 4.0, 100.0, 1.5, method="exact", thickness=60.0
         )
-    with pytest.raises(ValueError, match=r"'speed_of_sound' must be positive"):
-        environment.barrier_insertion_loss(
-            _BANDS, 1.0, 50.0, 4.0, 100.0, 1.5, speed_of_sound=0.0
+    # The speed of sound is a property of the fluid now, and the fluid refuses a
+    # non-positive one on construction, so the refusal happens before the call.
+    with pytest.raises(ValueError, match=r"'properties\['speed_of_sound'\]'"):
+        Fluid(
+            temperature_c=20.0,
+            static_pressure_pa=101_325.0,
+            composition={},
+            model="an air that does not carry sound",
+            validity="",
+            properties={"speed_of_sound": 0.0, "density": 1.205},
         )
     for bad in (float("nan"), float("inf"), -1.0):
         # thickness NaN/inf/<=0 are all rejected (NaN slips past a bare <= 0).

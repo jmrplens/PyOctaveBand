@@ -116,8 +116,7 @@ delany_bazley(
     flow_resistivity: float,
     *,
     coefficients: str | tuple[float, ...] = 'delany_bazley',
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
+    fluid: Fluid = ...,
 ) -> PorousMediumResult
 ```
 
@@ -204,12 +203,7 @@ johnson_champoux_allard(
     tortuosity: float,
     viscous_length: float,
     thermal_length: float,
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
-    viscosity: float = 1.84e-05,
-    prandtl_number: float = 0.71,
-    heat_capacity_ratio: float = 1.4,
-    atmospheric_pressure: float = 101325.0,
+    fluid: Fluid = ...,
 ) -> PorousMediumResult
 ```
 
@@ -417,8 +411,7 @@ membrane_resonance_frequency(
     surface_density: float,
     cavity_depth: float,
     isothermal: bool = False,
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
+    fluid: Fluid = ...,
 ) -> float
 ```
 
@@ -452,8 +445,7 @@ microperforated_plate_impedance(
     hole_radius: float,
     open_area: float,
     end_correction: float = 0.85,
-    air_density: float = 1.205,
-    viscosity: float = 1.84e-05,
+    fluid: Fluid = ...,
 ) -> Complex
 ```
 
@@ -497,8 +489,7 @@ miki(
     frequency: ArrayLike,
     flow_resistivity: float,
     *,
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
+    fluid: Fluid = ...,
 ) -> PorousMediumResult
 ```
 
@@ -544,8 +535,7 @@ perforated_plate_impedance(
     hole_radius: float,
     open_area: float,
     end_correction: float | None = None,
-    air_density: float = 1.205,
-    viscosity: float = 1.84e-05,
+    fluid: Fluid = ...,
 ) -> Complex
 ```
 

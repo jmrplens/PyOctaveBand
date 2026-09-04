@@ -9,6 +9,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Ten visco-thermal models take a `phonometry.fluids.Fluid` where they took
+  loose air floats. `johnson_champoux_allard` went from six of them to one, and
+  `effective_kappa` from five. The rule is that a function needing **two or
+  more** properties of the medium takes the fluid, and one needing only a speed
+  of sound keeps the scalar, because a wavelength or a delay wants a number
+  rather than a state. Twenty single-property entry points are unchanged.
+
+  `ground_effect`, `barrier_insertion_loss` and the atmospheric parabolic
+  equation follow, since they feed the porous ground models. `environment` had
+  its own copy of the air, `343.0` and `1.205` under a comment reading "matches
+  the materials domain"; it uses the published air now, which is the same two
+  numbers.
+
+  The parabolic equation had conflated two speeds. It passed `c_ref`, the value
+  the sound-speed profile has at the ground, as though it were the air's own.
+  That is right for the ground impedance and wrong as a description, so it now
+  builds the caller's air at that local speed explicitly: a temperature gradient
+  is the whole point of a refracting atmosphere.
+
+  `thermal_boundary_layer_thickness` and `effective_kappa` do not default to the
+  published air. Their air is the ISO 9053-2:2020 Annex A.3 reference state at
+  23 degC, whose constants are transcribed Table F.1 cells; recomputing them from
+  `fluids.air(temperature_c=23.0, ...)` would move them in the eighth figure. It
+  is `materials.ANNEX_A_AIR`, built from those cells rather than recomputed.
+
+  Nothing else moved: the conformance evidence reproduces to the digit, 619 of
+  619 checks across 62 domains.
+
+- A `Fluid` requires every property it carries to be a positive finite number,
+  and every composition fraction to be finite and not negative, since dry air
+  has no water vapour. Ten models used to re-check the same three or four floats
+  each; the invariant belongs to the type that owns them, and the guards the
+  models dropped are now tested where the check actually lives.
+
+### Changed
+
 - `corrugated_plate_stiffness` computes its `Bx` by calling
   `plate_bending_stiffness` instead of spelling out `E h^3 / (12 (1 - nu^2))` a
   second time. `Bx` is that stiffness divided by the profile factor, so the two
