@@ -29,6 +29,9 @@ from scipy.optimize import brentq
 
 from phonometry.building.prediction.panel_transmission import mass_law_transmission_loss
 from phonometry.simulation.elastic_fdtd import (
+    ALUMINIUM,
+    CONCRETE,
+    STEEL,
     ElasticBoundaries,
     ElasticFDTD2D,
     ElasticFDTDResult,
@@ -43,6 +46,40 @@ from phonometry.simulation.fdtd import FDTD2D, GaussianPulse
 CP_AL, CS_AL, RHO_AL = 6320.0, 3130.0, 2700.0
 CP_ST, CS_ST, RHO_ST = 5900.0, 3200.0, 7850.0
 CP_W, RHO_W = 1480.0, 1000.0
+
+
+def test_the_nominal_solids_are_bulk_speeds_not_plate_speeds() -> None:
+    """The three defaults follow the bulk speeds, not the plate ones.
+
+    Their comment says so, and the claim is worth a test because the obvious
+    source for a citation would contradict it: EN 12354-1 Table B.3 tabulates
+    the quasi-longitudinal phase velocity of a plate, which is a different
+    quantity and is roughly a tenth lower. Anyone re-sourcing these constants
+    from that table would change the physics the solver integrates while
+    appearing to add provenance.
+    """
+    import math
+
+    def plate(e: float, nu: float, rho: float) -> float:
+        return math.sqrt(e / (rho * (1.0 - nu**2)))
+
+    def bulk(e: float, nu: float, rho: float) -> float:
+        return math.sqrt(e * (1.0 - nu) / (rho * (1.0 + nu) * (1.0 - 2.0 * nu)))
+
+    def shear(e: float, nu: float, rho: float) -> float:
+        return math.sqrt(e / (2.0 * rho * (1.0 + nu)))
+
+    # Textbook Young's modulus and Poisson's ratio for each material.
+    for material, youngs, poisson in (
+        (STEEL, 200.0e9, 0.30),
+        (ALUMINIUM, 70.0e9, 0.33),
+        (CONCRETE, 30.0e9, 0.20),
+    ):
+        rho = material.rho
+        assert material.c_p == pytest.approx(bulk(youngs, poisson, rho), rel=0.03)
+        assert material.c_s == pytest.approx(shear(youngs, poisson, rho), rel=0.03)
+        # And distinctly not the plate speed: the gap is the point.
+        assert material.c_p > plate(youngs, poisson, rho)
 
 
 def _rayleigh_speed(c_p: float, c_s: float) -> float:

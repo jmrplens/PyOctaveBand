@@ -244,13 +244,28 @@ AIR = Material(c_p=343.0, c_s=0.0, rho=1.2)
 #: Fresh water at room temperature (fluid).
 WATER = Material(c_p=1480.0, c_s=0.0, rho=1000.0)
 
-#: Structural steel (nominal bulk wave speeds).
+# The three solids below carry representative **bulk** wave speeds, the
+# quantities this solver integrates: c_p from (lambda + 2 mu) / rho and c_s from
+# mu / rho, both in an unbounded medium. Each is consistent to a per cent or two
+# with the textbook Young's modulus, Poisson's ratio and density of its material,
+# and none is transcribed from a standard, which is why they are called nominal.
+#
+# They are demonstration defaults, not a sourced table. What a sourced table
+# would have to avoid is worth writing down, because the obvious candidate is
+# the wrong one: EN 12354-1 Table B.3 tabulates the quasi-longitudinal phase
+# velocity of a *plate*, sqrt(E / (rho (1 - nu^2))), which is a different
+# quantity from the bulk c_p, sqrt(E (1 - nu) / (rho (1 + nu) (1 - 2 nu))). For
+# steel the two are 5 291 and 5 856 m/s, an eleven per cent gap that grows to
+# fifteen for aluminium; the table also lists neither steel nor aluminium at
+# all. Reading c_L into c_p would put the wrong physics behind a citation.
+
+#: Structural steel (nominal bulk wave speeds; see the note above).
 STEEL = Material(c_p=5900.0, c_s=3200.0, rho=7850.0)
 
-#: Aluminium (nominal bulk wave speeds).
+#: Aluminium (nominal bulk wave speeds; see the note above).
 ALUMINIUM = Material(c_p=6320.0, c_s=3130.0, rho=2700.0)
 
-#: Dense concrete (nominal bulk wave speeds).
+#: Dense concrete (nominal bulk wave speeds; see the note above).
 CONCRETE = Material(c_p=3800.0, c_s=2250.0, rho=2400.0)
 
 
