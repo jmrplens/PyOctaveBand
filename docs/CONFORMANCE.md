@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**623/623 conformance checks pass** across 63 domains and 385 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**664/664 conformance checks pass** across 64 domains and 387 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -35,6 +35,7 @@
 |:---|:---|:---|:---|:---:|
 | Long 2e Table 14.9 (worked duct-borne sheet, supply path) | Fan to room, 8 octave bands -> 52/42/30/18/9/-2/-2/-1 dB at the receiver | 1 dB | 1 dB | 100 % |
 | IEC 60268-16 Annex M | Step 2 printed intermediates: the measurement condition, row by row | worst row: amf in dB, 0.99 of its last printed place | 0.993 | 99 % |
+| VDI 2081 Blatt 2:2005 Table 1, element 14 | Bend flow noise, worst octave deviation, dB | 0.0496 dB | 0.0496 dB | 99 % |
 | IEC 60268-16 Annex M | Step 3 printed intermediates: the operational condition, row by row | worst row: amf in dB, 0.99 of its last printed place | 0.987 | 99 % |
 | ISO 5136:2003 Table D.1 | C3,4 of the sampling tube for d = 0,5 m at U = +/-5, +/-15, +/-30 m/s, 27 bands | max absolute deviation 0.049 dB | 0.049 dB | 98 % |
 | ISO 9053-2:2020 Annex A.3 | Thermal boundary-layer thickness b | 0.00183 m | 0 m | 97 % |
@@ -42,7 +43,6 @@
 | IEC 61094-2:2009 Table F.1 | Set B (20 C, 80 000 Pa, 65 % RH): rho, c0, kappa, eta and alpha_t, as a fraction of the rounding of the last printed figure | 0.96 | 0.96 | 96 % |
 | ISO 12354-2:2017 Annex C / Annex G Table G.4 | Floating floor: fo = 160 sqrt(s'/m') = 52,8 Hz, DeltaL = 30 lg(f/fo) over 21 bands, DeltaLw = 32,2 dB | 0.048 dB | 0.048 dB | 96 % |
 | ASA WG S3-79 CB_1.TST | Critical band, alternative importance | 0.41 | 0 | 95 % |
-| ASA WG S3-79 ECB_1.TST | Equally contributing, alternative importance | 0.41 | 0 | 95 % |
 
 <details>
 <summary><b>Numerical validation - filters &amp; weightings</b>: class showcase (IEC 61260-1 · IEC 61672-1 · ISO 7196)</summary>
@@ -1178,6 +1178,55 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Norton & Karczub 2e 4.6/4.9 (problem 4.18 answer) | Blower in a plant room to the operator room -> 72.3/60.4/41.4/41.0/33.8/30.7 dB | 0 dB +/-0.1 (max \|diff\| over the 6 bands) | 0.0682 dB | 0.0682 dB | 68 % | ![Pass][cv-pass] Pass |
 | Norton & Karczub 2e Eq. (4.115) (problem 4.16 answer) | Lined compressor enclosure against NC-45 -> required TL 14.4/25.2/28.9/34.4/35.2/34.7/34.7/31.6 dB | 0 dB +/-0.15 (max \|diff\| over the 8 bands) | 0.1099 dB | 0.1099 dB | 73 % | ![Pass][cv-pass] Pass |
 | Norton & Karczub 2e Table 4.5 (constant-volume source power) | Source in the intersection of two flat surfaces (Q = 4) -> +10 lg 4 = 6.02 dB | 6.0206 dB (+/-0 dB) | 6.0206 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+
+</details>
+
+<details>
+<summary><b>HVAC noise (VDI 2081)</b>: 100% (41/41)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
+|:---|:---|:---|:---|:---|:---:|:---:|
+| VDI 2081 Blatt 2:2005 Table 1, element 1 | Supply fan sound power at 63 Hz, dB | 90.4 dB (+/-0.05 dB) | 90.41 dB | 0.006 dB | 12 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 1 | Supply fan sound power at 125 Hz, dB | 88.8 dB (+/-0.05 dB) | 88.82 dB | 0.022 dB | 44 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 1 | Supply fan sound power at 250 Hz, dB | 86.3 dB (+/-0.05 dB) | 86.32 dB | 0.019 dB | 38 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 1 | Supply fan sound power at 500 Hz, dB | 82.9 dB (+/-0.05 dB) | 82.91 dB | 0.01 dB | 20 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 1 | Supply fan sound power at 1000 Hz, dB | 78.6 dB (+/-0.05 dB) | 78.59 dB | -0.006 dB | 12 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 1 | Supply fan sound power at 2000 Hz, dB | 73.4 dB (+/-0.05 dB) | 73.37 dB | -0.027 dB | 54 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 1 | Supply fan sound power at 4000 Hz, dB | 67.2 dB (+/-0.05 dB) | 67.24 dB | 0.045 dB | 90 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 1 | Supply fan sound power at 8000 Hz, dB | 60.2 dB (+/-0.05 dB) | 60.21 dB | 0.011 dB | 22 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1:2001 Eq. (13) | Fan sound power level L_W4 from the duty, dB | 96 dB (+/-0.05 dB) | 96.041 dB | 0.041 dB | 82 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 1 | Supply fan total sound power level, dB | 94.1 dB (+/-0.05 dB) | 94.124 dB | 0.024 dB | 48 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 1 | Supply fan A-weighted sound power level, dB | 84.5 dB (+/-0.05 dB) | 84.511 dB | 0.011 dB | 22 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 5 | Rectangular duct 500 x 400 mm over 4 m, worst octave deviation, dB | 0 dB (+/-0 dB) | 0 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 13 | Round duct 160 mm over 1 m, worst octave deviation, dB | 0 dB (+/-0 dB) | 0 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1:2001 Eq. (34) | Limit frequency of a 160 mm round duct, Hz | 1245 Hz (+/-0.5 Hz) | 1245.2 Hz | 0.25 Hz | 50 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 14 | Round bend 160 mm, Table 7 shifted onto its limit frequency, worst octave deviation, dB | 0 dB (+/-0 dB) | 0 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 3 | Junction into 0.3 m2 of 1.08 m2 total, dB | 5.6 dB (+/-0.05 dB) | 5.563 dB | -0.037 dB | 74 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 7 | Junction into 0.049 m2 of 0.147 m2 total, dB | 4.8 dB (+/-0.05 dB) | 4.771 dB | -0.029 dB | 58 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 16 | Junction into 0.02 m2 of 0.04 m2 total, dB | 3 dB (+/-0.05 dB) | 3.01 dB | 0.01 dB | 20 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1:2001 Eq. (16) | Flow noise of a straight duct, overall sound power level, dB | 38 dB (+/-0.5 dB) | 38.31 dB | 0.306 dB | 61 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1:2001 Eq. (17) | Flow noise of a straight duct, A-weighted sound power level, dB | 22 dB (+/-0.5 dB) | 21.62 dB | -0.376 dB | 75 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 3 | Junction flow noise at 63 Hz, dB | 39.1 dB (+/-0.05 dB) | 39.09 dB | -0.011 dB | 22 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 3 | Junction flow noise at 125 Hz, dB | 33.5 dB (+/-0.05 dB) | 33.53 dB | 0.031 dB | 62 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 3 | Junction flow noise at 250 Hz, dB | 27.4 dB (+/-0.05 dB) | 27.36 dB | -0.039 dB | 78 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 3 | Junction flow noise at 500 Hz, dB | 20.7 dB (+/-0.05 dB) | 20.72 dB | 0.021 dB | 42 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 3 | Junction flow noise at 1000 Hz, dB | 13.7 dB (+/-0.05 dB) | 13.67 dB | -0.034 dB | 68 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 3 | Junction flow noise at 2000 Hz, dB | 6.2 dB (+/-0.05 dB) | 6.24 dB | 0.038 dB | 76 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 3 | Junction flow noise at 4000 Hz, dB | -1.5 dB (+/-0.05 dB) | -1.53 dB | -0.028 dB | 56 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 3 | Junction flow noise at 8000 Hz, dB | -9.6 dB (+/-0.05 dB) | -9.61 dB | -0.006 dB | 12 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 14 | Bend flow noise, worst octave deviation, dB | 0 dB (+/-0.05 dB) | 0.0496 dB | 0.0496 dB | 99 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1:2001 Eq. (49) | Splitter silencer self-noise, A-weighted sound power level, dB | 52 dB (+/-0.5 dB) | 52.099 dB | 0.099 dB | 20 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 2 | Splitter silencer self-noise at 63 Hz, dB | 62.7 dB (+/-0.05 dB) | 62.74 dB | 0.036 dB | 72 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 2 | Splitter silencer self-noise at 125 Hz, dB | 58.3 dB (+/-0.05 dB) | 58.26 dB | -0.038 dB | 76 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 2 | Splitter silencer self-noise at 250 Hz, dB | 53.7 dB (+/-0.05 dB) | 53.72 dB | 0.019 dB | 38 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 2 | Splitter silencer self-noise at 500 Hz, dB | 49.4 dB (+/-0.05 dB) | 49.39 dB | -0.005 dB | 10 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 2 | Splitter silencer self-noise at 1000 Hz, dB | 45.4 dB (+/-0.05 dB) | 45.43 dB | 0.026 dB | 52 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 2 | Splitter silencer self-noise at 2000 Hz, dB | 41.9 dB (+/-0.05 dB) | 41.85 dB | -0.046 dB | 92 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 2 | Splitter silencer self-noise at 4000 Hz, dB | 38.6 dB (+/-0.05 dB) | 38.62 dB | 0.017 dB | 34 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 2 | Splitter silencer self-noise at 8000 Hz, dB | 35.6 dB (+/-0.05 dB) | 35.56 dB | -0.041 dB | 82 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 2, element 18 | End reflection of a 200 mm nozzle in a ceiling, worst octave deviation, dB | 0 dB (+/-0.05 dB) | 0.0449 dB | 0.0449 dB | 90 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Section 1.1 | Spectral assessment correction K_A, worst octave deviation, dB | 0 dB (+/-0 dB) | 0 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, elements 1 to 3 | Chained level after fan, silencer and junction, worst octave deviation, dB | 0 dB (+/-0.1 dB) | 0.0719 dB | 0.0719 dB | 72 % | ![Pass][cv-pass] Pass |
 
 </details>
 

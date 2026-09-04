@@ -28,6 +28,7 @@ from .enclosures import (
     enclosure_required_transmission_loss,
 )
 from .hvac import (
+    VDI2081_SPECTRAL_CORRECTION,
     HvacSpectrumResult,
     HvacWarning,
     air_terminal_damper_correction,
@@ -46,6 +47,7 @@ from .hvac import (
     flow_noise_straight_duct,
     lined_circular_duct_attenuation,
     lined_rectangular_duct_attenuation,
+    octave_band_limits,
     plenum_attenuation,
     room_effect,
     silencer_self_noise,
@@ -78,12 +80,12 @@ from .silencers import (
 )
 
 __all__ = [
-    "ENCLOSURE_MODELS",
     "DesignCriterion",
     "DuctElement",
     "DuctModeResult",
     "DuctPathResult",
     "DuctPathStage",
+    "ENCLOSURE_MODELS",
     "EnclosureResult",
     "HvacSpectrumResult",
     "HvacWarning",
@@ -93,6 +95,7 @@ __all__ = [
     "SilencerChain",
     "SilencerChainElement",
     "SourceRoom",
+    "VDI2081_SPECTRAL_CORRECTION",
     "air_terminal_damper_correction",
     "air_terminal_velocity_limit",
     "blade_passing_frequency",
@@ -121,6 +124,7 @@ __all__ = [
     "insertion_loss",
     "lined_circular_duct_attenuation",
     "lined_rectangular_duct_attenuation",
+    "octave_band_limits",
     "plane_wave_limit",
     "plenum_attenuation",
     "plot_plenum_geometry",

@@ -76,13 +76,14 @@ from __future__ import annotations
 import math
 import warnings
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
 
 from .._internal.validation import (
     check_engine,
     require_choice,
+    require_non_negative,
     require_positive,
     require_ranks,
     require_same_length,
@@ -245,6 +246,119 @@ _EFFICIENCY_CORRECTION: tuple[tuple[float, float], ...] = (
     (50.0, 15.0),
     (0.0, 16.0),
 )
+# ---------------------------------------------------------------------------
+# VDI 2081 Part 1:2001-07, Section 4.3 -- the German fan model, an alternative
+# to the ASHRAE scaling law above. It splits ventilation fans into three
+# assembly types after VDI 3731 Part 2 and gives each one a specific sound
+# power level and a spectral parameter, so a fan is described by its assembly
+# and its duty rather than by a per-type band table.
+# ---------------------------------------------------------------------------
+#: Section 4.3.3 -- per assembly type: the representative specific sound power
+#: level ``L_WSM`` in dB, the spectral parameter ``c3`` of Equation (15), and
+#: the blade-frequency allowance ``dL_Wd`` in dB. The three ``L_WSM`` values
+#: are the printed representative ones, not ``71,6 - 10 lg psi + L_USM``
+#: recomputed: the guideline rounds each within its own stated tolerance.
+_VDI2081_ASSEMBLY: dict[str, tuple[float, float, float]] = {
+    # radial fans with rearwards curved blades, psi = 0,63 to 1,0
+    "rr": (34.0, 0.4, 0.0),
+    # cylindrical rotors with forwards curved blades, psi = 2,4 to 3,0
+    "t": (36.0, 0.15, 0.0),
+    # axial fans with a downstream diffuser, psi = 0,25 to 0,63
+    "am": (42.0, -0.6, 4.0),
+}
+#: Equation (15) -- ``dL_W_Okt = -c1 - c2 (lg St + c3)^2``, both constants 5 dB.
+_VDI2081_SPECTRUM_C1 = 5.0
+_VDI2081_SPECTRUM_C2 = 5.0
+#: Figure 13 -- the level allowance for a duty away from the best efficiency
+#: point, as a cubic in ``V/V_opt``, for assemblies RR and AM. Figure 14 gives
+#: the same for assembly T. Constant first, ascending powers after.
+_VDI2081_OFF_DUTY: dict[str, tuple[float, float, float, float]] = {
+    "rr": (18.9, -46.6, 33.0, -5.2),
+    "am": (18.9, -46.6, 33.0, -5.2),
+    "t": (1.5, -0.453, -7.05, 6.11),
+}
+
+#: VDI 2081 Part 1 Table 5 -- level reduction of a straight duct of 1 mm steel
+#: sheet, dB/m, by size band. The table's columns are 63, 125, 250, 500 and
+#: "> 1000" Hz; the last is held across 1 kHz and above, and a dash (no value
+#: printed) is taken as nought. The size band is keyed on the upper edge, in m.
+_VDI2081_STRAIGHT_DUCT: dict[str, tuple[tuple[float, tuple[float, ...]], ...]] = {
+    "rectangular": (
+        (0.20, (0.6, 0.6, 0.45, 0.3, 0.3, 0.3, 0.3, 0.3)),
+        (0.40, (0.6, 0.6, 0.45, 0.3, 0.2, 0.2, 0.2, 0.2)),
+        (0.80, (0.6, 0.6, 0.3, 0.15, 0.15, 0.15, 0.15, 0.15)),
+        (1.00, (0.45, 0.3, 0.15, 0.1, 0.05, 0.05, 0.05, 0.05)),
+    ),
+    "circular": (
+        (0.20, (0.1, 0.1, 0.15, 0.15, 0.3, 0.3, 0.3, 0.3)),
+        (0.40, (0.05, 0.1, 0.1, 0.15, 0.2, 0.2, 0.2, 0.2)),
+        (0.80, (0.0, 0.05, 0.05, 0.1, 0.15, 0.15, 0.15, 0.15)),
+        (1.00, (0.0, 0.0, 0.0, 0.05, 0.05, 0.05, 0.05, 0.05)),
+    ),
+}
+#: VDI 2081 Part 1 Table 7 -- level reduction of a 90 degree bend, dB, over the
+#: nine octaves 31,5 Hz to 8 kHz, for a side length of 1250 mm and a limit
+#: frequency in the 125 Hz octave. Section 6.2 shifts the whole row so that its
+#: 125 Hz column lands on the octave holding the duct's own limit frequency.
+_VDI2081_BEND: dict[str, tuple[float, ...]] = {
+    "sharp": (0.0, 3.0, 7.0, 6.0, 3.0, 3.0, 3.0, 3.0, 3.0),
+    "sharp_vaned": (0.0, 1.0, 6.0, 6.0, 1.0, 1.0, 1.0, 1.0, 2.0),
+    "sharp_lined_both": (0.0, 3.0, 10.0, 10.0, 14.0, 18.0, 18.0, 18.0, 18.0),
+    "sharp_lined_both_vaned": (0.0, 1.0, 9.0, 10.0, 14.0, 14.0, 14.0, 14.0, 14.0),
+    "sharp_lined_one": (0.0, 2.0, 8.0, 6.0, 8.0, 10.0, 10.0, 10.0, 10.0),
+    "radiused": (0.0, 1.0, 2.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0),
+    "round_radiused": (0.0, 1.0, 2.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0),
+}
+#: The octave the Table 7 rows are tabulated against, Hz: the row's 125 Hz
+#: column is the one that carries the limit frequency.
+_VDI2081_BEND_REFERENCE_BAND = 125.0
+#: The nine octave centres of Table 7, Hz.
+_VDI2081_BEND_BANDS: tuple[float, ...] = (
+    31.5,
+    63.0,
+    125.0,
+    250.0,
+    500.0,
+    1000.0,
+    2000.0,
+    4000.0,
+    8000.0,
+)
+#: VDI 2081 Part 1 Figure 28 -- the solid angle a duct nozzle radiates into,
+#: as a multiple of pi: into the room, into a wall, along an edge, into a
+#: corner. The library's own two terminations are the first two of these.
+_VDI2081_SOLID_ANGLE: dict[str, float] = {
+    "room": 4.0,
+    "wall": 2.0,
+    "edge": 1.0,
+    "corner": 0.5,
+    # the names this function already takes, mapped onto the same geometry
+    "free": 4.0,
+    "flush": 2.0,
+}
+#: Section 6.6 -- the practical ceiling on the reduction, dB. The theoretical
+#: value is not reached because the duct walls radiate what the nozzle
+#: reflects; the guideline's worked example applies it as a flat 15 dB.
+_VDI2081_END_REFLECTION_CAP = 15.0
+
+
+#: VDI 2081 Part 2 Section 1.1 -- the spectral assessment curve ``K_A``, dB,
+#: over the octaves 63 Hz to 8 kHz. It is the inverse A-weighting less the 5 dB
+#: the guideline allows for summing eight octave bands, rounded to whole
+#: decibels as printed.
+VDI2081_SPECTRAL_CORRECTION: NDArray[np.float64] = np.array(
+    [21, 11, 4, -2, -5, -6, -6, -4], dtype=float
+)
+#: The level increase Section 1.1 assumes for the sum of eight octave bands,
+#: dB. A flat spectrum would earn 9 dB; the guideline takes 5, because the
+#: noise of an air-conditioning system does not follow the inverse A curve.
+_VDI2081_BAND_SUM_ALLOWANCE = 5.0
+
+#: Section 6.3 -- VDI 3733's recommendation that no more than 5 dB be taken
+#: from a change of cross-section, since the printed reduction is only reached
+#: when the duct is anechoically terminated at both ends.
+_VDI2081_SECTION_CHANGE_CAP = 5.0
+
 #: Long Table 13.8 -- approximate fan-housing (casing) attenuation, dB, over the
 #: octave bands 63 Hz to 8 kHz (Miller, 1980).
 _FAN_CASING_ATTENUATION: NDArray[np.float64] = np.array(
@@ -579,6 +693,8 @@ def end_reflection_loss(
     termination: str = "flush",
     method: str = "bies",
     speed_of_sound: float = _C_AIR,
+    aspect_ratio: float = 1.0,
+    maximum_reduction_db: float | None = _VDI2081_END_REFLECTION_CAP,
 ) -> HvacSpectrumResult:
     """Duct end reflection loss (Bies Table 8.14, ASHRAE; or Long's closed form).
 
@@ -601,11 +717,44 @@ def end_reflection_loss(
         :func:`equivalent_diameter` for a rectangular duct of area ``S``).
     :param termination: ``"flush"`` (duct flush with a wall/ceiling) or
         ``"free"`` (free space / suspended in the room).
-    :param method: ``"bies"`` (Table 8.14 look-up) or ``"long"`` (closed form).
+    :param method: ``"bies"`` (Table 8.14 look-up), ``"long"`` (closed form)
+        or ``"vdi2081"`` (VDI 2081 Part 1 Figure 28).
+    :param aspect_ratio: **VDI 2081 only.** Nozzle length over height ``m``
+        (default 1, a square opening). Figure 28 is drawn from 1 to 30.
+    :param maximum_reduction_db: **VDI 2081 only.** Ceiling on the reduction,
+        dB (default 15). Section 6.6 says the theoretical value is not reached
+        because the duct walls radiate what the nozzle reflects, and the
+        guideline's own worked example applies exactly this cap. ``None``
+        returns the uncapped closed form.
     :param speed_of_sound: Speed of sound ``c``, m/s (used by the closed form;
         the table is indexed by frequency directly).
     :return: A :class:`HvacSpectrumResult` of the reflection loss, dB.
     """
+    if method == "vdi2081":
+        bands = _frequencies(frequencies)
+        bore = require_positive(diameter, "diameter")
+        angle = _VDI2081_SOLID_ANGLE.get(termination)
+        if angle is None:
+            options = sorted(set(_VDI2081_SOLID_ANGLE))
+            msg = f"'termination' must be one of {options} for method='vdi2081'."
+            raise ValueError(msg)
+        values = _vdi2081_end_reflection(
+            bands,
+            area=math.pi * bore**2 / 4.0,
+            solid_angle_over_pi=angle,
+            aspect_ratio=require_positive(aspect_ratio, "aspect_ratio"),
+            speed_of_sound=require_positive(speed_of_sound, "speed_of_sound"),
+        )
+        if maximum_reduction_db is not None:
+            values = np.minimum(
+                values, require_positive(maximum_reduction_db, "maximum_reduction_db")
+            )
+        return HvacSpectrumResult(
+            frequencies=bands,
+            values=values,
+            quantity="attenuation",
+            label=f"End reflection, VDI 2081 ({termination}, dia {bore * 1000:.0f} mm)",
+        )
     if require_choice(method, "method", ("bies", "long")) == "long":
         return end_reflection_loss_closed_form(
             frequencies,
@@ -639,6 +788,74 @@ def end_reflection_loss(
     )
 
 
+#: The Table 7 row a sharp-edged rectangular bend takes, keyed by whether it
+#: carries turning vanes and by how it is lined ("bare", or which side of the
+#: corner). ``None`` marks the one combination the table does not print.
+_VDI2081_SQUARE_BEND_ROW: dict[tuple[bool, str], str | None] = {
+    (False, "bare"): "sharp",
+    (True, "bare"): "sharp_vaned",
+    (False, "one"): "sharp_lined_one",
+    (True, "one"): None,
+    (False, "both"): "sharp_lined_both",
+    (True, "both"): "sharp_lined_both_vaned",
+}
+
+
+def _vdi2081_bend_row(
+    *, bend_type: str, vanes: bool, lined: bool, lined_side: str
+) -> tuple[str, str]:
+    """The duct shape and the Table 7 row the arguments name.
+
+    :return: The shape ``_vdi2081_bend`` reads the limit frequency with, and
+        the key of the printed row.
+    :raises ValueError: If the bend type is not one of the two, a round bend
+        is given vanes or lining, or the combination has no printed row.
+    """
+    if bend_type == "round":
+        if vanes or lined:
+            msg = "round bends take neither vanes nor lining."
+            raise ValueError(msg)
+        return "circular", "round_radiused"
+    if bend_type != "square":
+        msg = "'bend_type' must be 'square' or 'round'."
+        raise ValueError(msg)
+    key = _VDI2081_SQUARE_BEND_ROW[vanes, lined_side if lined else "bare"]
+    if key is None:
+        msg = (
+            "VDI 2081 Table 7 prints no row for a bend lined on one "
+            "side with a baffle plate; use lined_side='both'."
+        )
+        raise ValueError(msg)
+    return "rectangular", key
+
+
+def _vdi2081_bend_result(
+    bands: NDArray[np.float64],
+    *,
+    width: float,
+    bend_type: str,
+    vanes: bool,
+    lined: bool,
+    lined_side: str,
+    speed_of_sound: float,
+) -> HvacSpectrumResult:
+    """Pick the Table 7 row the arguments describe and shift it into place."""
+    side = require_choice(lined_side, "lined_side", ("both", "one"))
+    size = require_positive(width, "width")
+    c = require_positive(speed_of_sound, "speed_of_sound")
+    shape, key = _vdi2081_bend_row(
+        bend_type=bend_type, vanes=vanes, lined=lined, lined_side=side
+    )
+    return HvacSpectrumResult(
+        frequencies=bands,
+        values=_vdi2081_bend(
+            bands, bend_type=key, shape=shape, size=size, speed_of_sound=c
+        ),
+        quantity="attenuation",
+        label=f"Bend, VDI 2081 ({key.replace('_', ' ')}, {size * 1000:.0f} mm)",
+    )
+
+
 def elbow_insertion_loss(
     frequencies: ArrayLike,
     width: float,
@@ -647,22 +864,56 @@ def elbow_insertion_loss(
     vanes: bool = False,
     lined: bool = False,
     speed_of_sound: float = _C_AIR,
+    model: str = "ashrae",
+    lined_side: str = "both",
 ) -> HvacSpectrumResult:
-    r"""Duct bend/elbow insertion loss per bend (Bies Table 8.11, ASHRAE).
+    r"""Duct bend/elbow insertion loss per bend, by either method.
 
     Indexed by the frequency-to-width ratio :math:`W / \lambda`
     (:math:`\lambda = c / f`).
     Lined bends assume the lining extends at least three duct diameters up- and
     downstream. Round bends are treated as unlined with no vanes.
 
+    ``model="vdi2081"`` reads Table 7 of VDI 2081 Part 1 Section 6.2, which is
+    printed once, for a 1250 mm side, and carried along the frequency axis for
+    every other size. The duct's limit frequency comes from Equation (33),
+    ``c / (2 a)``, or Equation (34), ``0,586 c / d``; the octave holding it
+    takes the place of the table's own 125 Hz column, and the whole row moves
+    with it. Below the shifted row the loss is nought, which is the guideline's
+    statement that a bend reflects nothing while only plane waves run.
+
+    The two methods index the same physics on the same ratio, but they do not
+    tabulate the same bends: Table 7 distinguishes lining before, after, or on
+    both sides of the corner, which the ASHRAE table does not, and ``width`` is
+    read there as the largest side of a rectangular duct or the bore of a round
+    one rather than as the width in the plane of the bend.
+
     :param frequencies: Frequencies ``f``, Hz (1-D array).
-    :param width: Duct width ``W`` in the plane of the bend, m.
-    :param bend_type: ``"square"`` or ``"round"``.
+    :param width: Duct width ``W`` in the plane of the bend, m. For
+        ``model="vdi2081"`` it is the largest side of a rectangular duct, or
+        the internal diameter of a round one.
+    :param bend_type: ``"square"`` or ``"round"``. VDI 2081 reads a square bend
+        as sharp-edged and a round one as radiused with ``r <= 2 D``.
     :param vanes: Turning vanes fitted (square bends only).
     :param lined: Acoustically lined bend (square bends only).
+    :param lined_side: **VDI 2081 only.** ``"both"`` (default) for lining
+        before and after the corner, or ``"one"`` for lining on one side of it,
+        which Table 7 tabulates separately. Ignored unless ``lined``.
     :param speed_of_sound: Speed of sound ``c``, m/s.
+    :param model: ``"ashrae"`` (default) or ``"vdi2081"``.
     :return: A :class:`HvacSpectrumResult` of the insertion loss, dB per bend.
     """
+    scheme = require_choice(model, "model", ("ashrae", "vdi2081"))
+    if scheme == "vdi2081":
+        return _vdi2081_bend_result(
+            _frequencies(frequencies),
+            width=width,
+            bend_type=bend_type,
+            vanes=vanes,
+            lined=lined,
+            lined_side=lined_side,
+            speed_of_sound=speed_of_sound,
+        )
     f = _frequencies(frequencies)
     w = require_positive(width, "width")
     c = require_positive(speed_of_sound, "speed_of_sound")
@@ -794,8 +1045,12 @@ def flow_noise_bend(
     height: float,
     *,
     density: float = 1.206,
+    model: str = "ashrae",
+    branch_diameter: float | None = None,
+    approach_velocity: float | None = None,
+    rounding_ratio: float | None = None,
 ) -> HvacSpectrumResult:
-    r"""Flow-generated octave-band sound power of a mitred bend (Bies Eqs. (8.252), (8.254)).
+    r"""Flow-generated octave-band sound power of a bend or junction, by either method.
 
     .. math::
 
@@ -813,16 +1068,72 @@ def flow_noise_bend(
     quadrupole); equivalently, the *efficiency* referenced to the stream power
     grows as :math:`U^3` and :math:`U^5` respectively.
 
+    ``model="vdi2081"`` is Equation (18) of VDI 2081 Part 1 Section 5.2.2,
+    which covers a junction and a bend with one law:
+
+    .. math::
+
+       L_W = L_W^{*} + 10 \log_{10} \Delta f + 30 \log_{10} d_\mathrm{a}
+       + 50 \log_{10} v_\mathrm{a} + K
+
+    with the normalised level of Figure 17,
+    :math:`L_W^{*} = 12 - 21{,}5 (\lg St)^{1{,}268} + (32 + 13 \lg St)
+    \lg (v_\mathrm{h}/v_\mathrm{a})`, the rounding correction of Figure 18,
+    :math:`K = 13{,}9 (3{,}43 - \lg St)(0{,}15 - r/d_\mathrm{a})`, and
+    :math:`St = f d_\mathrm{a} / v_\mathrm{a}`. A bend is the same law with
+    the two velocities equal, which sends the second term of :math:`L_W^{*}`
+    and the velocity ratio to nought.
+
+    Both figures state that they hold only for :math:`St > 1`, so a band below
+    that returns negative infinity, the level of no contribution at all, rather
+    than an extrapolation: the fit turns over there and its fractional power of
+    :math:`\lg St` is not real below one.
+
     :param frequencies: Octave-band centre frequencies ``f``, Hz (1-D array).
     :param flow_velocity: Mean flow speed ``U``, m/s.
     :param area: Duct cross-sectional area ``S``, m2.
     :param height: Duct height ``H`` in the plane of the bend, m.
     :param density: Air density ``rho``, kg/m3.
+    :param model: ``"ashrae"`` (default, Bies) or ``"vdi2081"``.
+    :param branch_diameter: **VDI 2081 only.** Diameter of the branch duct
+        ``d_a``, m; for a bend, the duct's own diameter.
+    :param approach_velocity: **VDI 2081 only.** Flow speed in the main duct
+        ahead of the junction ``v_h``, m/s. ``None`` (default) takes it equal
+        to ``flow_velocity``, which is the bend case.
+    :param rounding_ratio: **VDI 2081 only.** Rounding radius over branch
+        diameter ``r / d_a``, which applies the correction of Figure 18.
+        ``None`` (default) leaves it out altogether, which is how the
+        guideline's own worked example treats a bend: Figure 18 is drawn for
+        the rounding of a **junction**, and its curves all cross zero at
+        ``r / d_a = 0,15``, so passing 0 asks for a sharp-cornered junction and
+        is worth over 6 dB rather than nothing. Figure 18 is drawn from 0
+        to 0,20.
     :return: A :class:`HvacSpectrumResult` of the band sound power level,
         dB re 1e-12 W.
     """
     f = _frequencies(frequencies)
     u = require_positive(flow_velocity, "flow_velocity")
+    if require_choice(model, "model", ("ashrae", "vdi2081")) == "vdi2081":
+        if branch_diameter is None:
+            msg = (
+                "model='vdi2081' needs 'branch_diameter': Equation (18) is "
+                "written on the diameter of the branch duct, which the Bies "
+                "form does not take."
+            )
+            raise ValueError(msg)
+        approach = u if approach_velocity is None else approach_velocity
+        return HvacSpectrumResult(
+            frequencies=f,
+            values=_vdi2081_branch_flow_noise(
+                f,
+                branch_diameter=require_positive(branch_diameter, "branch_diameter"),
+                branch_velocity=u,
+                approach_velocity=require_positive(approach, "approach_velocity"),
+                rounding_ratio=rounding_ratio,
+            ),
+            quantity="sound_power_level",
+            label=f"Junction flow noise, VDI 2081 (v_a = {u:.1f} m/s)",
+        )
     s = require_positive(area, "area")
     h = require_positive(height, "height")
     rho = require_positive(density, "density")
@@ -879,7 +1190,8 @@ def fan_efficiency_correction(*, relative_efficiency_percent: float) -> float:
     efficiency is unknown Long recommends assuming 80 per cent, which lands in
     the 6 dB step.
 
-    :param relative_efficiency_percent: Static efficiency as a **percentage**
+    :param relative_efficiency_percent: **ASHRAE only.** Static efficiency as
+        a **percentage**
         of the peak, in ``(0, 100]``. A fraction is not accepted in disguise:
         the table is tabulated from 50 % up, so 0,8 would fall to its bottom
         row and return 16 dB where 80 % returns 6, ten decibels with nothing to
@@ -907,16 +1219,120 @@ def fan_efficiency_correction(*, relative_efficiency_percent: float) -> float:
     return _EFFICIENCY_CORRECTION[-1][1]  # pragma: no cover - the last edge is 0
 
 
+def _vdi2081_fan_spectrum(
+    bands: NDArray[np.float64],
+    *,
+    assembly: str,
+    volume_flow: float,
+    fan_total_pressure_pa: float,
+    fan_speed_rpm: float,
+    specific_sound_power_level: float | None,
+    blade_count: int | None,
+    relative_flow: float,
+) -> NDArray[np.float64]:
+    """The VDI 2081 Part 1 Section 4.3 octave spectrum, dB re 1e-12 W.
+
+    Equation (13) sets the level, Equation (15) the shape and Figure 13 or 14
+    the allowance for running away from the best efficiency point.
+    """
+    printed, c3, blade_allowance = _VDI2081_ASSEMBLY[assembly]
+    # Positive rather than merely finite: the guideline publishes 34, 36 and
+    # 42 dB and says each can rise by up to 7 dB at the best duty point, so
+    # nothing near nought is a specific level, and a NaN here would otherwise
+    # travel the whole way to a spectrum.
+    level = (
+        printed
+        if specific_sound_power_level is None
+        else require_positive(specific_sound_power_level, "specific_sound_power_level")
+    )
+    speed = require_positive(fan_speed_rpm, "fan_speed_rpm")
+    ratio = require_positive(relative_flow, "relative_flow")
+
+    # Equation (13): the total-pressure form, with the Mach number exponent
+    # taken as 5 for every ventilation fan (Section 4.3.2), which is what puts
+    # the factor 20 on the pressure rather than the 5 (gamma - 1) of Eq. (11).
+    overall = (
+        level
+        + 10.0 * math.log10(volume_flow)
+        + 20.0 * math.log10(fan_total_pressure_pa)
+    )
+
+    # Equation (15). The Strouhal number carries no diameter: it cancels
+    # between the tip speed and the impeller circumference.
+    strouhal = bands * 60.0 / (math.pi * speed)
+    shape = (
+        -_VDI2081_SPECTRUM_C1 - _VDI2081_SPECTRUM_C2 * (np.log10(strouhal) + c3) ** 2
+    )
+
+    # Figure 13 (RR, AM) or Figure 14 (T), a cubic in the relative flow. It is
+    # nought at the best efficiency point to within a tenth of a decibel, which
+    # is the value the guideline's own worked example prints there.
+    a0, a1, a2, a3 = _VDI2081_OFF_DUTY[assembly]
+    off_duty = a0 + a1 * ratio + a2 * ratio**2 + a3 * ratio**3
+
+    spectrum = overall + shape + off_duty
+    if blade_count is not None:
+        blades = require_positive(blade_count, "blade_count")
+        passing = speed * blades / 60.0
+        nearest = int(np.argmin(np.abs(np.log2(passing / bands))))
+        spectrum[nearest] += blade_allowance
+    return spectrum
+
+
+@overload
 def fan_sound_power(
     volume_flow: float,
     *,
     fan_static_pressure_pa: float,
+    model: Literal["ashrae"] = ...,
+    fan_type: str = ...,
+    relative_efficiency_percent: float = ...,
+    blade_frequency: float | None = ...,
+    frequencies: ArrayLike | None = ...,
+) -> HvacSpectrumResult: ...
+
+
+@overload
+def fan_sound_power(
+    volume_flow: float,
+    *,
+    model: Literal["vdi2081"],
+    fan_total_pressure_pa: float,
+    assembly: str,
+    fan_speed_rpm: float,
+    specific_sound_power_level: float | None = ...,
+    blade_count: int | None = ...,
+    relative_flow: float = ...,
+    frequencies: ArrayLike | None = ...,
+) -> HvacSpectrumResult: ...
+
+
+# Two models with two argument groups, and the overloads above fix which
+# group a given call may use.
+def fan_sound_power(  # noqa: PLR0913
+    volume_flow: float,
+    *,
+    fan_static_pressure_pa: float | None = None,
     fan_type: str = "forward_curved",
     relative_efficiency_percent: float = 80.0,
     blade_frequency: float | None = None,
+    model: str = "ashrae",
+    fan_total_pressure_pa: float | None = None,
+    assembly: str | None = None,
+    fan_speed_rpm: float | None = None,
+    specific_sound_power_level: float | None = None,
+    blade_count: int | None = None,
+    relative_flow: float = 1.0,
     frequencies: ArrayLike | None = None,
 ) -> HvacSpectrumResult:
-    r"""Octave-band fan sound power from the operating point (Long Eq. 13.1).
+    r"""Octave-band fan sound power from the operating point, by either method.
+
+    Two schools of calculation answer the same question and do not agree on
+    how. ``model="ashrae"`` (the default) is the scaling law below;
+    ``model="vdi2081"`` is the German method, described after it. Each takes
+    the arguments its own standard is written on, so neither can be handed the
+    other's: the ASHRAE law scales the **static** pressure, VDI 2081 the
+    **total** pressure rise, and confusing them is worth 20 log of the ratio.
 
     The ASHRAE (1987) scaling law, originally due to Beranek and published by
     Graham (1975):
@@ -945,15 +1361,36 @@ def fan_sound_power(
     prints a forward-curved row that this equation does not reproduce; see the
     module warning.
 
+    **VDI 2081 Part 1:2001-07, Section 4.3.** The German method describes a fan
+    by its assembly type rather than by a per-type band table:
+
+    .. math::
+
+       L_{W4} = L_\mathrm{WSM} + 10 \log_{10} \dot{V} + 20 \log_{10} \Delta p_\mathrm{t}
+
+       \Delta L_{W,\mathrm{oct}} = -5 - 5 \left( \log_{10} St + c_3 \right)^{2},
+       \qquad St = f \, 60 / (\pi n)
+
+    Equation (13) and Equation (15). The factor 20 on the pressure is the
+    general :math:`5(\gamma - 1)` of Equation (11) with the Mach number
+    exponent taken as 5, which Section 4.3.2 does for every ventilation fan.
+    The Strouhal number carries no diameter: it cancels between the tip speed
+    and the impeller circumference, so the impeller size a nomogram gives is
+    not an input here. Section 4.3.3 sets the specific level and the spectral
+    parameter for each of the three assemblies of VDI 3731 Part 2, and
+    Figures 13 and 14 add a cubic allowance for running away from the best
+    duty point, worth 0,1 dB at the optimum itself.
+
     :param volume_flow: Volume flow through the fan ``Q_\mathrm{F}``, m3/s.
-    :param fan_static_pressure_pa: Fan static pressure ``P_\mathrm{F}``, in
+    :param fan_static_pressure_pa: **ASHRAE only.** Fan static pressure
+        ``P_\mathrm{F}``, in
         **pascals gauge**. This is the pressure rise the fan produces across
         itself, not an ambient pressure, and it shares neither the unit nor the
         datum of the ``static_pressure`` the ISO 3740 family takes in
         kilopascals absolute. No plausibility guard can separate the two:
         101,325 Pa is a legitimate duty for a panel or propeller fan, so the
         name is what keeps them apart.
-    :param fan_type: One of ``"airfoil_large"`` / ``"airfoil_small"``
+    :param fan_type: **ASHRAE only.** One of ``"airfoil_large"`` / ``"airfoil_small"``
         (backward-curved or backward-inclined centrifugal wheels above and
         below 36 in diameter), ``"forward_curved"``, ``"radial_low"`` /
         ``"radial_medium"`` / ``"radial_high"`` (radial blades by total
@@ -967,18 +1404,72 @@ def fan_sound_power(
         0,8 falls through to the table's bottom row and returns its worst-case
         16 dB correction instead of the 6 dB that 80 % earns. That is what
         :class:`HvacWarning` says when it fires below the floor.
-    :param blade_frequency: Blade passing frequency ``f_bp``, Hz (from
+    :param blade_frequency: **ASHRAE only.** Blade passing frequency ``f_bp``,
+        Hz (from
         :func:`blade_passing_frequency`). ``None`` (default) places the
         increment in the octave band Table 13.7 tabulates for the fan type.
+    :param model: ``"ashrae"`` (default) or ``"vdi2081"``.
+    :param fan_total_pressure_pa: **VDI 2081 only.** Total pressure rise
+        ``\Delta p_\mathrm{t}`` across the fan, Pa. Not the static pressure
+        of the ASHRAE law: the total pressure carries the dynamic head as
+        well, and Equation (13) scales it by 20 rather than by 10.
+    :param assembly: **VDI 2081 only.** ``"rr"`` (radial, rearwards curved
+        blades), ``"t"`` (cylindrical rotor, forwards curved blades) or
+        ``"am"`` (axial with a downstream diffuser).
+    :param fan_speed_rpm: **VDI 2081 only.** Impeller speed ``n``, min^-1.
+    :param specific_sound_power_level: **VDI 2081 only.** The specific sound
+        power level ``L_\mathrm{WSM}``, dB. ``None`` (default) takes the
+        representative value of the assembly, 34, 36 or 42 dB. Section 4.3.3
+        says a fan can sit up to 7 dB above its assembly average at the
+        optimum duty point, so a manufacturer's own value belongs here.
+    :param blade_count: **VDI 2081 only.** Number of impeller blades ``z``,
+        which places the blade-frequency allowance of Section 4.3.4 in the
+        octave holding ``n z / 60``. ``None`` (default) omits it. The
+        allowance is nought for assemblies RR and T built to the state of the
+        art and 4 dB for AM.
+    :param relative_flow: **VDI 2081 only.** Duty as a fraction of the best
+        efficiency point, ``\dot{V} / \dot{V}_\mathrm{opt}`` (default 1).
     :param frequencies: Octave-band centres, Hz; ``None`` (default) uses the
         63 Hz to 8 kHz bands of :data:`OCTAVE_BANDS`.
     :return: An :class:`HvacSpectrumResult` of the band sound power level,
         dB re 1e-12 W.
     """
-    kind = require_choice(fan_type, "fan_type", tuple(_FAN_LEVEL_CORRECTION))
+    scheme = require_choice(model, "model", ("ashrae", "vdi2081"))
     q = require_positive(volume_flow, "volume_flow")
-    p = require_positive(fan_static_pressure_pa, "fan_static_pressure_pa")
     f, idx = _octave_slots(frequencies)
+
+    if scheme == "vdi2081":
+        if fan_total_pressure_pa is None or assembly is None or fan_speed_rpm is None:
+            msg = (
+                "model='vdi2081' needs 'fan_total_pressure_pa', 'assembly' and "
+                "'fan_speed_rpm'. VDI 2081 Part 1 Equation (13) is written on "
+                "the total pressure rise, which is not the static pressure the "
+                "ASHRAE model takes."
+            )
+            raise ValueError(msg)
+        group = require_choice(assembly, "assembly", tuple(_VDI2081_ASSEMBLY))
+        dpt = require_positive(fan_total_pressure_pa, "fan_total_pressure_pa")
+        return HvacSpectrumResult(
+            frequencies=f,
+            values=_vdi2081_fan_spectrum(
+                f,
+                assembly=group,
+                volume_flow=q,
+                fan_total_pressure_pa=dpt,
+                fan_speed_rpm=fan_speed_rpm,
+                specific_sound_power_level=specific_sound_power_level,
+                blade_count=blade_count,
+                relative_flow=relative_flow,
+            ),
+            quantity="sound_power_level",
+            label=f"Fan (VDI 2081 {group.upper()}, {q * 3600:.0f} m3/h, {dpt:.0f} Pa)",
+        )
+
+    if fan_static_pressure_pa is None:
+        msg = "model='ashrae' needs 'fan_static_pressure_pa'."
+        raise ValueError(msg)
+    kind = require_choice(fan_type, "fan_type", tuple(_FAN_LEVEL_CORRECTION))
+    p = require_positive(fan_static_pressure_pa, "fan_static_pressure_pa")
 
     duty = 10.0 * np.log10(q * 1000.0 / 0.472) + 10.0 * np.log10(p / _PA_PER_IN_WG)
     c_eff = fan_efficiency_correction(
@@ -999,6 +1490,47 @@ def fan_sound_power(
         values=lw,
         quantity="sound_power_level",
         label=f"Fan ({kind.replace('_', ' ')}, {q * 3600:.0f} m3/h, {p:.0f} Pa)",
+    )
+
+
+def octave_band_limits(
+    a_weighted_limit_db: float,
+    frequencies: ArrayLike | None = None,
+) -> HvacSpectrumResult:
+    r"""Octave limits from an A-weighted room requirement (VDI 2081 Part 2 Eq. (1)).
+
+    .. math::
+
+       L_{\mathrm{Okt,max}} = L_A + K_A
+
+    with the correction :data:`VDI2081_SPECTRAL_CORRECTION`, which is the
+    inverse A-weighting less 5 dB. The 5 dB is what Section 1.1 allows for
+    summing eight octave bands: a spectrum flat in A-weighted terms would earn
+    9 dB, and the guideline takes 5 because the noise of an air-conditioning
+    system does not follow the inverse A curve.
+
+    The result is the **unweighted** octave level each band may reach. The same
+    requirement can be read the other way round, which is what the guideline's
+    own worked example does: add the A-weighting to the computed spectrum and
+    compare every band against the flat ``L_A - 5``. The two are the same
+    test, since ``K_A = -A - 5``.
+
+    :param a_weighted_limit_db: The A-weighted level the room is required to
+        meet ``L_A``, dB.
+    :param frequencies: Octave-band centres, Hz; ``None`` (default) uses the
+        63 Hz to 8 kHz bands of :data:`OCTAVE_BANDS`.
+    :return: An :class:`HvacSpectrumResult` of the per-band limit, dB.
+    """
+    f, idx = _octave_slots(frequencies)
+    limit = float(a_weighted_limit_db)
+    if not math.isfinite(limit):
+        msg = "'a_weighted_limit_db' must be finite."
+        raise ValueError(msg)
+    return HvacSpectrumResult(
+        frequencies=f,
+        values=limit + VDI2081_SPECTRAL_CORRECTION[idx],
+        quantity="sound_power_level",
+        label=f"VDI 2081 octave limits for {limit:.0f} dB(A)",
     )
 
 
@@ -1032,6 +1564,198 @@ def fan_casing_attenuation(
 # ---------------------------------------------------------------------------
 # Straight-duct attenuation (Long Chapter 14)
 # ---------------------------------------------------------------------------
+def _vdi2081_silencer_self_noise(
+    bands: NDArray[np.float64],
+    *,
+    airway_velocity: float,
+    pressure_drop_pa: float,
+    approach_area: float,
+    hydraulic_diameter: float,
+) -> NDArray[np.float64]:
+    """Equations (46), (49), (50) and (51) of VDI 2081 Part 1 Section 7.2.4.2.
+
+    The A-weighted level comes from the speed in the clear section, the
+    pressure drop across the silencer and the area it is approached over; the
+    shape is a quartic in ``lg St`` and the offset a term in the same speed.
+    """
+    weighted = (
+        56.6 * math.log10(airway_velocity)
+        - 0.5 * math.log10(pressure_drop_pa)
+        + 10.0 * math.log10(approach_area)
+        - 12.7
+    )
+    offset = -13.0 * math.log10(airway_velocity) + 13.5
+    lg_st = np.log10(bands * hydraulic_diameter / airway_velocity)
+    shape = 11.4 - 14.9 * lg_st - 1.4 * lg_st**2 + 2.2 * lg_st**3 - 0.5 * lg_st**4
+    return np.asarray(weighted + shape + offset, dtype=np.float64)
+
+
+def _vdi2081_end_reflection(
+    bands: NDArray[np.float64],
+    *,
+    area: float,
+    solid_angle_over_pi: float,
+    aspect_ratio: float,
+    speed_of_sound: float,
+) -> NDArray[np.float64]:
+    """Figure 28 of VDI 2081 Part 1 Section 6.6, in its printed closed form.
+
+    The first term is the reflection of a piston small against the wavelength;
+    the second is the correction for a slot-shaped rather than square nozzle,
+    which is why it carries the aspect ratio.
+    """
+    piston = 10.0 * np.log10(
+        1.0
+        + (speed_of_sound / (4.0 * math.pi * bands)) ** 2
+        * (solid_angle_over_pi * math.pi)
+        / area
+    )
+    slot = aspect_ratio * (0.04283 * np.log10(bands * math.sqrt(area)) - 0.0303)
+    return np.asarray(piston + slot, dtype=np.float64)
+
+
+def _vdi2081_octave_bandwidth(bands: NDArray[np.float64]) -> NDArray[np.float64]:
+    """Table 1 of VDI 2081 Part 1: an octave is ``f_m / sqrt(2)`` wide.
+
+    Its edges are ``f_m / sqrt(2)`` and ``f_m sqrt(2)``, so the width is the
+    difference, which reduces to the centre over the root of two: 44,55 Hz at
+    63 Hz, as the guideline's own tables print in their header row.
+    """
+    return np.asarray(bands / math.sqrt(2.0), dtype=np.float64)
+
+
+def _vdi2081_straight_flow_noise(
+    bands: NDArray[np.float64], *, velocity: float, area: float
+) -> NDArray[np.float64]:
+    """Equations (16) and Figure 16 of VDI 2081 Part 1 Section 5.2.1.
+
+    The overall level does not depend on how long the run is, only on how fast
+    the air moves through how large a section; the shape is a single closed
+    curve in ``f / v``.
+    """
+    overall = 7.0 + 50.0 * math.log10(velocity) + 10.0 * math.log10(area)
+    shape = -2.0 - 26.0 * np.log10(1.14 + 0.02 * bands / velocity)
+    return np.asarray(overall + shape, dtype=np.float64)
+
+
+def _vdi2081_branch_flow_noise(
+    bands: NDArray[np.float64],
+    *,
+    branch_diameter: float,
+    branch_velocity: float,
+    approach_velocity: float,
+    rounding_ratio: float | None,
+) -> NDArray[np.float64]:
+    """Equation (18) with Figures 17 and 18, Section 5.2.2.
+
+    Both figures are printed with a closed form beside them and both are
+    stated to hold only above a Strouhal number of one, so a band below that
+    is returned as no contribution rather than extrapolated: the fit turns
+    over there and ``(lg St)^1.268`` is not real for ``St < 1``.
+    """
+    strouhal = bands * branch_diameter / branch_velocity
+    lg_st = np.log10(np.where(strouhal > 1.0, strouhal, 1.0))
+    ratio = math.log10(approach_velocity / branch_velocity)
+    normalised = 12.0 - 21.5 * lg_st**1.268 + (32.0 + 13.0 * lg_st) * ratio
+    correction = (
+        0.0
+        if rounding_ratio is None
+        else 13.9
+        * (3.43 - lg_st)
+        * (0.15 - require_non_negative(rounding_ratio, "rounding_ratio"))
+    )
+    level = (
+        normalised
+        + 10.0 * np.log10(_vdi2081_octave_bandwidth(bands))
+        + 30.0 * math.log10(branch_diameter)
+        + 50.0 * math.log10(branch_velocity)
+        + correction
+    )
+    return np.asarray(np.where(strouhal > 1.0, level, -np.inf), dtype=np.float64)
+
+
+def _vdi2081_limit_frequency(shape: str, size: float, speed_of_sound: float) -> float:
+    """Equation (33) or (34): the frequency below which only plane waves run.
+
+    ``c / (2 a)`` for a rectangular duct of largest side ``a``, and
+    ``0,586 c / d`` for a round one of bore ``d``.
+    """
+    return (
+        speed_of_sound / (2.0 * size)
+        if shape == "rectangular"
+        else 0.586 * speed_of_sound / size
+    )
+
+
+def _vdi2081_bend(
+    bands: NDArray[np.float64],
+    *,
+    bend_type: str,
+    shape: str,
+    size: float,
+    speed_of_sound: float,
+) -> NDArray[np.float64]:
+    """Table 7 of VDI 2081 Part 1, shifted onto the duct's own limit frequency.
+
+    The table is printed for a 1250 mm side, whose limit frequency falls in the
+    125 Hz octave. Section 6.2 carries the whole spectrum along the frequency
+    axis so that its 125 Hz column lands on the octave holding the limit
+    frequency of the duct at hand, which is what makes one printed row serve
+    every duct size.
+    """
+    row = np.array(_VDI2081_BEND[bend_type])
+    table_bands = np.array(_VDI2081_BEND_BANDS)
+    limit = _vdi2081_limit_frequency(shape, size, speed_of_sound)
+    # Step 2: the octave holding the limit frequency, whose edges Section 6.2
+    # defines as f_m / sqrt(2) and f_m * sqrt(2).
+    holder = float(table_bands[int(np.argmin(np.abs(np.log2(limit / table_bands))))])
+    # Step 3: shift, in whole octaves, of the reference column onto it.
+    shift = round(math.log2(holder / _VDI2081_BEND_REFERENCE_BAND))
+
+    values = np.zeros_like(bands)
+    for slot, band in enumerate(bands):
+        source = band / 2.0**shift
+        below = source < table_bands[0] / math.sqrt(2.0)
+        if below:
+            # Off the bottom of the shifted row: below the limit frequency a
+            # bend reflects nothing the table accounts for.
+            continue
+        index = int(np.argmin(np.abs(np.log2(source / table_bands))))
+        values[slot] = row[index]
+    return values
+
+
+def _vdi2081_straight_run(
+    bands: NDArray[np.float64],
+    *,
+    shape: str,
+    size: float,
+    length: float,
+) -> NDArray[np.float64]:
+    """Table 5 of VDI 2081 Part 1, dB, for one straight run.
+
+    ``size`` is the largest clear side length of a rectangular duct or the
+    internal diameter of a round one, which is what selects the table's row.
+    """
+    rows = _VDI2081_STRAIGHT_DUCT[shape]
+    upper = rows[-1][0]
+    if size > upper:
+        msg = (
+            f"'{shape}' duct of {size:g} m is outside VDI 2081 Table 5, which "
+            f"stops at {upper:g} m. Above it Section 6.1 says the attenuation "
+            "of a rigid, massive duct is negligible rather than tabulated."
+        )
+        raise ValueError(msg)
+    per_metre = next(values for edge, values in rows if size <= edge)
+    # The table's five columns run 63, 125, 250, 500 and "> 1000" Hz, so a band
+    # is placed by its own centre rather than by its index.
+    slots = np.array(
+        [min(int(round(math.log2(f / 63.0))), len(per_metre) - 1) for f in bands]
+    )
+    rates = np.take(np.array(per_metre), np.clip(slots, 0, len(per_metre) - 1))
+    return np.asarray(rates * length, dtype=np.float64)
+
+
 def _perimeter_over_area(width: float, height: float) -> float:
     """``P / S`` of a rectangular duct in ft^-1, from SI side lengths in m."""
     w = require_positive(width, "width") / _M_PER_FT
@@ -1046,6 +1770,7 @@ def unlined_rectangular_duct_attenuation(
     length: float,
     *,
     wrapped: bool = False,
+    model: str = "ashrae",
 ) -> HvacSpectrumResult:
     r"""Attenuation of an unlined rectangular sheet-metal duct (Long Eqs. 14.9-14.11).
 
@@ -1059,15 +1784,49 @@ def unlined_rectangular_duct_attenuation(
     fibreglass blanket adds surface mass and doubles the low-frequency loss
     (``wrapped=True``).
 
+    ``model="vdi2081"`` reads Table 5 of VDI 2081 Part 1 Section 6.1 instead: a
+    step table in dB per metre, keyed on the **largest** clear side length and
+    on five frequency columns, 63, 125, 250, 500 and above 1000 Hz. It is a
+    different account of the same loss, not a restatement of this one: Reynolds
+    fits a continuous power law of the perimeter-to-area ratio, VDI 2081
+    tabulates four size bands of 1 mm steel sheet, and where the two overlap
+    they differ by a decibel or two per metre. ``wrapped`` has no meaning there
+    and is refused.
+
     :param frequencies: Octave-band centre frequencies ``f``, Hz (1-D array).
     :param width: Duct width, m.
     :param height: Duct height, m.
     :param length: Duct run length ``l``, m.
     :param wrapped: The duct is externally wrapped with a fibreglass blanket,
         which doubles the 63 Hz to 250 Hz attenuation.
+    :param model: ``"ashrae"`` (default, Reynolds) or ``"vdi2081"``
+        (Table 5, the largest side length selecting the row).
     :return: An :class:`HvacSpectrumResult` of the attenuation, dB.
     """
+    scheme = require_choice(model, "model", ("ashrae", "vdi2081"))
     f = _frequencies(frequencies)
+    if scheme == "vdi2081":
+        if wrapped:
+            msg = (
+                "'wrapped' has no meaning for model='vdi2081': Table 5 is "
+                "tabulated for bare 1 mm steel sheet and prints no lagged row."
+            )
+            raise ValueError(msg)
+        side = max(require_positive(width, "width"), require_positive(height, "height"))
+        return HvacSpectrumResult(
+            frequencies=f,
+            values=_vdi2081_straight_run(
+                f,
+                shape="rectangular",
+                size=side,
+                length=require_positive(length, "length"),
+            ),
+            quantity="attenuation",
+            label=(
+                f"Straight duct, VDI 2081 ({width * 1000:.0f} x "
+                f"{height * 1000:.0f} mm, {length:.2f} m)"
+            ),
+        )
     ps = _perimeter_over_area(width, height)
     ell = require_positive(length, "length") / _M_PER_FT
     low = (
@@ -1093,6 +1852,9 @@ def unlined_rectangular_duct_attenuation(
 def unlined_circular_duct_attenuation(
     frequencies: ArrayLike | None,
     length: float,
+    *,
+    diameter: float | None = None,
+    model: str = "ashrae",
 ) -> HvacSpectrumResult:
     """Attenuation of an unlined circular sheet-metal duct (Long Table 14.1).
 
@@ -1102,11 +1864,43 @@ def unlined_circular_duct_attenuation(
     up to 250 Hz and 0.05 to 0.07 dB/ft above. The published table stops at
     4 kHz; the 4 kHz rate is held for the 8 kHz band.
 
+    ``model="vdi2081"`` reads Table 5 of VDI 2081 Part 1 Section 6.1, which
+    does depend on the diameter: a wide round duct is stiffer still and its
+    tabulated loss falls to nothing at 63 Hz above 400 mm, where the table
+    prints a dash. That is the substantive difference between the two accounts
+    of this element, and it is why ``diameter`` is required there and not here.
+
     :param frequencies: Octave-band centres, Hz; ``None`` uses
         :data:`OCTAVE_BANDS`.
     :param length: Duct run length, m.
+    :param diameter: **VDI 2081 only.** Internal diameter, m, which selects the
+        Table 5 row. The table stops at 1,00 m.
+    :param model: ``"ashrae"`` (default, Long Table 14.1) or ``"vdi2081"``.
     :return: An :class:`HvacSpectrumResult` of the attenuation, dB.
     """
+    scheme = require_choice(model, "model", ("ashrae", "vdi2081"))
+    if scheme == "vdi2081":
+        if diameter is None:
+            msg = (
+                "model='vdi2081' needs 'diameter': Table 5 tabulates a round "
+                "duct by its bore, where Long Table 14.1 does not."
+            )
+            raise ValueError(msg)
+        bands = _frequencies(OCTAVE_BANDS if frequencies is None else frequencies)
+        bore = require_positive(diameter, "diameter")
+        return HvacSpectrumResult(
+            frequencies=bands,
+            values=_vdi2081_straight_run(
+                bands,
+                shape="circular",
+                size=bore,
+                length=require_positive(length, "length"),
+            ),
+            quantity="attenuation",
+            label=(
+                f"Straight duct, VDI 2081 (dia {bore * 1000:.0f} mm, {length:.2f} m)"
+            ),
+        )
     f, idx = _octave_slots(frequencies)
     ell = require_positive(length, "length") / _M_PER_FT
     return HvacSpectrumResult(
@@ -1268,6 +2062,7 @@ def split_loss(
     branch_areas: ArrayLike,
     *,
     branch: int = 0,
+    model: str = "ashrae",
 ) -> float:
     r"""Power split loss into one branch of a duct division (Long Eq. 14.17).
 
@@ -1285,10 +2080,33 @@ def split_loss(
     as -6 dB in his worked sheet); this function returns it as a positive
     attenuation, like every other loss in the module.
 
+    ``model="vdi2081"`` keeps only the second term, which is Equation (35) of
+    VDI 2081 Part 1 Section 6.4:
+
+    .. math::
+
+       \Delta L_W = \left| 10 \log_{10} \frac{S_1}{\sum_i S_i} \right|
+
+    The two standards divide the same physics differently rather than
+    disagreeing about it. Long folds the reflection from a change of total
+    section into the junction; VDI 2081 treats a junction and a change of
+    section as two elements of the chain, the second in Section 6.3, and its
+    junction is the area split alone. Where the branches happen to sum to the
+    feeder area the two agree; where they do not, the difference is exactly
+    the reflection term, half a decibel in the guideline's own Table 1 for the
+    junction whose branch areas sum to twice its feeder.
+
+    The split is the same in every octave. The German text says so
+    ("frequenzunabhängig") and Figure 27 has no frequency axis; the English
+    column of the same page says the opposite, which ``docs/ERRATA.md``
+    records.
+
     :param main_area: Cross-sectional area of the main feeder duct ``S_m``, m2.
     :param branch_areas: Areas ``S_i`` of the branches continuing on from the
         main duct, m2 (1-D array-like).
     :param branch: Index into ``branch_areas`` of the branch being followed.
+    :param model: ``"ashrae"`` (default, Long Eq. 14.17, reflection included)
+        or ``"vdi2081"`` (Equation (35), the area split alone).
     :return: The split loss, dB (positive).
     :raises ValueError: If the areas are not positive or ``branch`` is out of
         range.
@@ -1304,9 +2122,13 @@ def split_loss(
     if not 0 <= branch < areas.size:
         msg = f"'branch' must index 'branch_areas' (0..{areas.size - 1})."
         raise ValueError(msg)
+    scheme = require_choice(model, "model", ("ashrae", "vdi2081"))
     total = float(np.sum(areas))
+    share = -10.0 * np.log10(areas[branch] / total)
+    if scheme == "vdi2081":
+        return float(abs(share))
     reflection = 1.0 - ((total - s_m) / (total + s_m)) ** 2
-    return float(-10.0 * np.log10(reflection) - 10.0 * np.log10(areas[branch] / total))
+    return float(-10.0 * np.log10(reflection) + share)
 
 
 def end_reflection_loss_closed_form(
@@ -1448,6 +2270,11 @@ def silencer_self_noise(
     airway_velocity: float,
     passages: int,
     height: float,
+    *,
+    model: str = "ashrae",
+    pressure_drop_pa: float | None = None,
+    approach_area: float | None = None,
+    airway_width: float | None = None,
 ) -> HvacSpectrumResult:
     r"""Regenerated (self) noise of a splitter silencer (Long Eq. 14.31).
 
@@ -1481,7 +2308,51 @@ def silencer_self_noise(
     :return: An :class:`HvacSpectrumResult` of the band sound power level,
         dB re 1e-12 W.
     :raises ValueError: If ``passages`` is not a positive integer.
+    :param model: ``"ashrae"`` (default, Long Eq. 14.31) or ``"vdi2081"``
+        (Section 7.2.4.2).
+    :param pressure_drop_pa: **VDI 2081 only.** Total pressure drop across the
+        silencer, Pa, which Equation (49) takes.
+    :param approach_area: **VDI 2081 only.** Frontal area the silencer is
+        approached over ``S``, m2. That is the duct's whole section, not the
+        clear area between the splitters.
+    :param airway_width: **VDI 2081 only.** Clear gap between splitters ``s``,
+        m. The Strouhal number is taken on the hydraulic diameter of that gap,
+        which the guideline's own worked example computes as ``2 s``, the
+        parallel-plate limit, rather than as ``4 A / P``; ``docs/ERRATA.md``
+        records the difference.
     """
+    if require_choice(model, "model", ("ashrae", "vdi2081")) == "vdi2081":
+        missing = [
+            name
+            for name, value in (
+                ("pressure_drop_pa", pressure_drop_pa),
+                ("approach_area", approach_area),
+                ("airway_width", airway_width),
+            )
+            if value is None
+        ]
+        if pressure_drop_pa is None or approach_area is None or airway_width is None:
+            msg = (
+                f"model='vdi2081' needs {missing}: Equation (49) is written on "
+                "the pressure drop and the approach area, and its Strouhal "
+                "number on the gap between splitters, none of which the Long "
+                "form takes."
+            )
+            raise ValueError(msg)
+        bands = _frequencies(OCTAVE_BANDS if frequencies is None else frequencies)
+        gap = require_positive(airway_width, "airway_width")
+        return HvacSpectrumResult(
+            frequencies=bands,
+            values=_vdi2081_silencer_self_noise(
+                bands,
+                airway_velocity=require_positive(airway_velocity, "airway_velocity"),
+                pressure_drop_pa=require_positive(pressure_drop_pa, "pressure_drop_pa"),
+                approach_area=require_positive(approach_area, "approach_area"),
+                hydraulic_diameter=2.0 * gap,
+            ),
+            quantity="sound_power_level",
+            label=f"Splitter silencer self-noise, VDI 2081 ({airway_velocity:.1f} m/s)",
+        )
     f, idx = _octave_slots(frequencies)
     v = require_positive(airway_velocity, "airway_velocity")
     if passages <= 0 or not float(passages).is_integer():

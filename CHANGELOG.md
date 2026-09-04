@@ -7,6 +7,136 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- `noise_control.fan_sound_power` takes `model="vdi2081"`, the German method of
+  VDI 2081 Part 1:2001-07 Section 4.3, beside the ASHRAE scaling law it has
+  always had. The two answer the same question and disagree on how: ASHRAE
+  scales the fan's **static** pressure by a table of per-type band constants,
+  VDI 2081 scales the **total** pressure rise by twenty and shapes the spectrum
+  in closed form, `-5 - 5 (lg St + c3)^2`, from the Strouhal number of the
+  impeller speed. Each model takes only the arguments its own standard is
+  written on, declared through `typing.overload`, so the two pressures cannot
+  be swapped: they are different quantities and the mistake would be worth
+  twenty times the logarithm of their ratio.
+
+  A fan is described by one of the three assembly types of VDI 3731 Part 2
+  rather than by a fan-type row: radial with rearwards curved blades, a
+  cylindrical rotor with forwards curved blades, or axial with a downstream
+  diffuser. Each brings its own specific sound power level, its own spectral
+  parameter and its own blade-frequency allowance, and a fan of one's own can
+  replace the representative level, which the guideline says a real fan can
+  exceed by up to 7 dB at the optimum duty point.
+
+- The duct elements of the same chain follow: `unlined_rectangular_duct_attenuation`,
+  `unlined_circular_duct_attenuation`, `elbow_insertion_loss` and `split_loss`
+  all take `model="vdi2081"`.
+
+  Table 5 of Section 6.1 is a step table in dB per metre, keyed on the largest
+  clear side of a rectangular duct or the bore of a round one, where Reynolds
+  fits a continuous power law of the perimeter-to-area ratio. A round duct's
+  loss depends on its diameter there and does not here, which is why the German
+  model asks for one.
+
+  Table 7 of Section 6.2 is printed once, for a 1250 mm side whose limit
+  frequency falls in the 125 Hz octave, and carried along the frequency axis
+  for every other size: the octave holding `c / (2 a)`, or `0,586 c / d` for a
+  round duct, takes the place of the table's own 125 Hz column and the whole
+  row moves with it. It also tabulates lining before, after and on both sides
+  of a corner separately, which the ASHRAE table does not distinguish.
+
+  Equation (35) of Section 6.4 is the area split alone. Long folds a reflection
+  from the change of total section into the same function; VDI 2081 treats a
+  junction and a change of section as two elements of the chain. Where the
+  branches sum to the feeder area the two agree, and where they do not the
+  difference is exactly that reflection, half a decibel in the guideline's own
+  third junction.
+
+  Seven further conformance rows, all of them Table 1 of the worked example:
+  both straight runs, the bend and its 1245 Hz limit frequency, and the three
+  junctions.
+
+- `flow_noise_bend` takes `model="vdi2081"`, which is Equation (18) of
+  Section 5.2.2 with the normalised level of Figure 17 and the rounding
+  correction of Figure 18. One law covers a junction and a bend: a bend is the
+  same expression with the two velocities equal.
+
+  The approach velocity is the one in the duct **ahead** of the junction, so it
+  comes from what the feeder carries rather than from the branch's own duty.
+  In the worked example the two differ by a factor of four and reading the
+  wrong one loses five decibels at 63 Hz.
+
+  `rounding_ratio` defaults to leaving Figure 18 out rather than to nought.
+  Figure 18 is drawn for the rounding of a junction and all its curves cross
+  zero at `r / d_a = 0,15`, so nought asks for a sharp-cornered junction and is
+  worth over 6 dB at 63 Hz. That is how the guideline's own example treats its
+  bend, and passing 0,15 lands back on the uncorrected law.
+
+  Both figures state that they hold only above a Strouhal number of one, so a
+  band below that returns negative infinity, the level of no contribution,
+  rather than an extrapolation: the fit turns over there and its fractional
+  power of `lg St` is not real.
+
+  `flow_noise_straight_duct` needs no second model. Bies Eq. (8.251) already
+  reproduces Section 5.2.1 and says so in its own docstring; what it lacked was
+  an oracle, and it has one now. Eleven further conformance rows, all Table 1
+  of the worked example, take the domain to twenty-nine.
+
+- `silencer_self_noise` and `end_reflection_loss` complete the chain.
+  `model="vdi2081"` on the first is Equations (46), (49), (50) and (51) of
+  Section 7.2.4.2: the A-weighted level from the speed in the clear section,
+  the pressure drop and the approach area, shaped by a quartic in `lg St`.
+  `method="vdi2081"` on the second is Figure 28 of Section 6.6 in the closed
+  form printed beneath it, which knows all four solid angles a nozzle can
+  radiate into, from the middle of a room to a corner, and carries the flat
+  15 dB ceiling the guideline puts on the theoretical value because the duct
+  walls radiate what the nozzle reflects.
+
+  Ten further conformance rows: the silencer's A-weighted level, its
+  regenerated noise octave by octave, and the nozzle's reflection. The domain
+  now stands at thirty-nine.
+
+- `noise_control.octave_band_limits` turns an A-weighted room requirement into
+  a per-octave one by Equation (1) of VDI 2081 Part 2, and
+  `VDI2081_SPECTRAL_CORRECTION` publishes the curve it uses. The curve is the
+  inverse A-weighting less 5 dB: a spectrum flat in A-weighted terms would earn
+  9 dB for the sum of eight octaves, and the guideline takes 5 because the
+  noise of an air-conditioning system does not follow that curve.
+
+  Two further conformance rows, one of which is the point of the whole
+  exercise: the fan, the splitter silencer and the first junction chained in
+  sequence, each attenuating and then adding what it makes, against the running
+  total the worked example prints. Every piece is pinned against its own row
+  elsewhere; this is the row that fails if they do not compose. The domain
+  closes at forty-one.
+
+- Two more entries in `docs/ERRATA.md`, both from Table 1 element 2 of
+  VDI 2081 Part 2. The first is substantive: the table prints a hydraulic
+  diameter of 0,171 m for the gap between splitters and computes its Strouhal
+  row from 0,200 m instead. Both are defensible for that gap, `4 A / P` and the
+  parallel-plate limit `2 s`, but only the second reproduces the eight printed
+  Strouhal numbers, and with it the whole element falls out to the last printed
+  decimal. The second is a cross-reference: the coefficients of the pressure
+  drop are credited to Section 7.3.2, which is the airborne sound insulation of
+  a building component; they are printed in Section 7.2.3.2.
+
+- `docs/ERRATA.md` records that the two columns of VDI 2081 Part 1 Section 6.4
+  contradict each other. The German says the junction's level reduction is
+  independent of frequency and the English, on the same page, says it depends
+  on it. The German is the authoritative version by the cover of every VDI
+  guideline, and it is the one the rest of the document agrees with: Figure 27
+  has no frequency axis, Equation (35) contains no frequency, and the worked
+  example prints a single number for each of its three junctions.
+
+  Eleven conformance rows, and the VDI 2081 domain is the sixty-fourth. They
+  are the guideline's own worked example, VDI 2081 Part 2:2005-05 Table 1: the
+  supply air fan reproduces octave by octave, and so do its unweighted 94,1 dB
+  and its A-weighted 84,5 dB. Both prints are superseded, by Part 1:2022-04
+  and Part 2:2022-10, and neither is held; the pair in hand is what makes the
+  example usable, since Part 2:2005 was written against Part 1:2001 and every
+  cross-reference in its tables resolves there. The two current editions are
+  listed on the support page.
+
 ### Changed
 
 - Ten visco-thermal models take a `phonometry.fluids.Fluid` where they took

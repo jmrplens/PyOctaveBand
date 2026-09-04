@@ -4122,6 +4122,107 @@ in the same order.
   silently swapped.
 - **Status:** unreported.
 
+## VDI 2081 Blatt 1:2001-07, Section 6.4 (the English column says the opposite of the German)
+
+- **Location:** printed folio 40 (PDF page 40), Section 6.4 "Verzweigungen" /
+  "Junctions", the sentence directly under Equation (35).
+- **The print:** the German column reads "Diese in Bild 27 dargestellte Senkung
+  des Schallleistungspegels ist **frequenzunabhängig**." The English column of
+  the same page, translating the same sentence, reads "This sound power level
+  reduction shown in Figure 27 **depends on the frequency**."
+- **The problem:** the two say opposite things, and the German is the
+  authoritative one: the cover of every VDI guideline states that the German
+  version shall be taken as authoritative and that no guarantee is given for
+  the English translation. The German is also the one the rest of the document
+  agrees with. Figure 27 on the same page plots $\Delta L_W$ against the
+  cross-section ratio $S_1 / \sum S_{1,2,3}$ alone and carries no frequency
+  axis; Equation (35) itself, $\Delta L_W = |10 \lg (S_1 / \sum_i S_i)|$,
+  contains no frequency; and the worked example of VDI 2081 Blatt 2:2005-05
+  prints a junction's level reduction as a single number rather than as an
+  octave spectrum, in each of its three junctions (Table 1, elements 3, 7 and
+  16, printed folios 13 and 15: $5{,}6$, $4{,}8$ and $3{,}0$ dB).
+- **The likely mechanism:** the negating prefix of "frequenzunabhängig" is
+  absent from the translation, which turns "independent of the frequency" into
+  its opposite. Nothing else in the sentence differs.
+- **Consequence:** a reader working from the English column alone would look
+  for a frequency dependence that neither the equation nor the figure has, and
+  might conclude that the guideline is incomplete rather than that the sentence
+  is mistranslated.
+- **Evidence:** the two columns of the same printed page read against each
+  other; Figure 27 on that page; Equation (35) above it; and the three junction
+  rows of the worked example in Blatt 2. Verified on PDF page 40 (printed p. 40)
+  of VDI 2081 Blatt 1:2001-07 and PDF pages 13 and 15 (printed pp. 13 and 15) of
+  VDI 2081 Blatt 2:2005-05.
+- **Library behaviour:**
+  [`split_loss`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/noise_control/hvac.py) with
+  `model="vdi2081"` returns one value for the junction, the German reading, and
+  reproduces all three printed junctions of the worked example.
+- **Status:** unreported. Both prints are superseded (Blatt 1:2022-04 and
+  Blatt 2:2022-10) and neither successor is held, so whether the translation was
+  corrected is not known here.
+
+## VDI 2081 Blatt 2:2005-05, Table 1, element 2 (the hydraulic diameter it prints is not the one it computes with)
+
+- **Location:** Table 1, printed folio 12 (PDF page 12), element 2, the splitter
+  silencer: the rows "Hydr. Durchmesser $d_\mathrm{h}$ (m)" and "Strouhalzahl
+  $St$".
+- **The print:** $d_\mathrm{h} = 0{,}171$ m, and the eight Strouhal numbers
+  $0{,}9$, $1{,}7$, $3{,}4$, $6{,}8$, $13{,}5$, $27{,}0$, $54{,}0$ and
+  $108{,}0$ over the octaves 63 Hz to 8 kHz, for a clear gap $s = 0{,}100$ m,
+  a splitter height $H = 0{,}600$ m and a gap speed $v = 14{,}81$ m/s.
+- **The problem:** the two rows disagree. VDI 2081 Blatt 1 Section 7.2.4.2
+  defines $St = f_\mathrm{m} d_\mathrm{h} / v_\mathrm{i}$, so the printed
+  $d_\mathrm{h}$ and the printed $St$ determine each other. With the printed
+  $0{,}171$ m the eight numbers would be $0{,}73$, $1{,}45$, $2{,}89$,
+  $5{,}79$, $11{,}57$, $23{,}15$, $46{,}29$ and $92{,}59$: not one of them
+  rounds onto the printed row. With $d_\mathrm{h} = 2s = 0{,}200$ m they come
+  out as $0{,}851$, $1{,}688$, $3{,}376$, $6{,}752$, $13{,}504$, $27{,}009$,
+  $54{,}018$ and $108{,}035$, which round onto all eight.
+
+  Both values are defensible as a hydraulic diameter, which is why this is an
+  internal inconsistency rather than a wrong number: $4A/P$ for a $0{,}100$ m
+  by $0{,}600$ m gap is $0{,}171$ m, while the parallel-plate limit that a long
+  narrow gap tends to is $2s = 0{,}200$ m. The table prints the first and
+  computes with the second.
+- **Consequence:** following the printed $d_\mathrm{h}$ reproduces neither the
+  Strouhal row nor the flow-noise spectrum beneath it. With $2s$ the whole
+  element falls out to the last printed decimal: $L_\mathrm{WA} = 52$ dB from
+  Equation (49) and the eight octave levels $62{,}7$ down to $35{,}6$ dB from
+  Equations (46), (50) and (51), the worst of them 0,046 dB from its printed
+  cell.
+- **Evidence:** the two rows of the same printed element read against Section
+  7.2.4.2 of Blatt 1 (printed folio 53); both candidate diameters evaluated
+  over the eight octaves; and the flow-noise spectrum recomputed from each.
+  Verified on PDF page 12 (printed p. 12) of VDI 2081 Blatt 2:2005-05 and PDF
+  page 53 (printed p. 53) of VDI 2081 Blatt 1:2001-07.
+- **Library behaviour:**
+  [`silencer_self_noise`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/noise_control/hvac.py) with
+  `model="vdi2081"` takes the clear gap and uses $2s$, so it reproduces the
+  worked example. The docstring says which of the two it takes.
+- **Status:** unreported. Both prints are superseded and neither successor is
+  held.
+
+## VDI 2081 Blatt 2:2005-05, Table 1, element 2 (a cross-reference to the wrong clause)
+
+- **Location:** Table 1, printed folio 12 (PDF page 12), element 2, the box
+  reading "Tabelle aus VDI 2081 Blatt 1/7.3.2" beside the coefficients
+  $a_1$, $a_2$, $b_1$ and $b_2$.
+- **The print:** the coefficients $0{,}255$, $0{,}015$, $-2{,}82$ and $-2{,}91$
+  are credited to Section 7.3.2 of Blatt 1.
+- **The problem:** Section 7.3 of VDI 2081 Blatt 1:2001-07 is "Luftschalldämmung
+  eines Bauteils", the airborne sound insulation of a building component, and
+  has no such table. The coefficients are printed in Section **7.2.3.2**,
+  "Kulissenschalldämpfer", on printed folio 52, whose table gives exactly those
+  four values in its 200 mm row, which is the splitter thickness the element
+  uses.
+- **Consequence:** a reader following the reference lands in the wrong chapter.
+  The values themselves are right.
+- **Evidence:** the cited clause and the actual one, both read from the printed
+  pages. Verified on PDF page 12 (printed p. 12) of VDI 2081 Blatt 2:2005-05
+  and PDF page 52 (printed p. 52) of VDI 2081 Blatt 1:2001-07.
+- **Library behaviour:** none; the library cites Section 7.2.3.2.
+- **Status:** unreported.
+
 ## Related source properties that are not errata
 
 Recorded here to prevent future "fixes" that would break agreement with the
