@@ -4423,6 +4423,46 @@ dos ediciones con las mismas entradas y en el mismo orden.
   las dos lecturas no pueden intercambiarse en silencio.
 - **Estado:** sin notificar.
 
+## VDI 2081 Blatt 1:2001-07, apartado 6.4 (la columna inglesa dice lo contrario que la alemana)
+
+- **Ubicación:** folio impreso 40 (página 40 del PDF), apartado 6.4
+  "Verzweigungen" / "Junctions", la frase inmediatamente posterior a la
+  ecuación (35).
+- **Lo impreso:** la columna alemana dice "Diese in Bild 27 dargestellte Senkung
+  des Schallleistungspegels ist **frequenzunabhängig**". La columna inglesa de
+  la misma página, traduciendo esa misma frase, dice "This sound power level
+  reduction shown in Figure 27 **depends on the frequency**".
+- **El problema:** las dos dicen cosas opuestas, y la que manda es la alemana:
+  la portada de toda directriz VDI declara que la versión alemana es la
+  vinculante y que no se garantiza la traducción inglesa. La alemana es además
+  la que concuerda con el resto del documento. La figura 27 de esa misma página
+  representa $\Delta L_W$ frente al cociente de secciones
+  $S_1 / \sum S_{1,2,3}$ y no tiene eje de frecuencia; la propia ecuación (35),
+  $\Delta L_W = |10 \lg (S_1 / \sum_i S_i)|$, no contiene la frecuencia; y el
+  ejemplo resuelto de VDI 2081 Blatt 2:2005-05 imprime la reducción de nivel de
+  una ramificación como un único número y no como espectro de octava, en las
+  tres que tiene (tabla 1, elementos 3, 7 y 16, folios impresos 13 y 15:
+  $5{,}6$, $4{,}8$ y $3{,}0$ dB).
+- **Mecanismo probable:** el prefijo negativo de "frequenzunabhängig" no está en
+  la traducción, lo que convierte "independiente de la frecuencia" en su
+  contrario. El resto de la frase no difiere.
+- **Consecuencia:** quien trabaje sólo con la columna inglesa buscará una
+  dependencia con la frecuencia que ni la ecuación ni la figura tienen, y puede
+  concluir que la directriz está incompleta en vez de que la frase está mal
+  traducida.
+- **Evidencia:** las dos columnas de la misma página impresa leídas una contra
+  otra; la figura 27 de esa página; la ecuación (35) que la precede; y las tres
+  filas de ramificación del ejemplo resuelto del Blatt 2. Verificado en la
+  página 40 del PDF (p. impresa 40) de VDI 2081 Blatt 1:2001-07 y en las páginas
+  13 y 15 del PDF (pp. impresas 13 y 15) de VDI 2081 Blatt 2:2005-05.
+- **Comportamiento de la biblioteca:**
+  [`split_loss`](../src/phonometry/noise_control/hvac.py) con
+  `model="vdi2081"` devuelve un solo valor para la ramificación, que es la
+  lectura alemana, y reproduce las tres ramificaciones impresas del ejemplo.
+- **Estado:** sin comunicar. Los dos impresos están sustituidos (Blatt 1:2022-04
+  y Blatt 2:2022-10) y no se dispone de ninguno de los sucesores, así que aquí
+  no consta si la traducción se corrigió.
+
 ## Propiedades de las fuentes, relacionadas, que no son erratas
 
 Registradas aquí para prevenir futuros «arreglos» que romperían la

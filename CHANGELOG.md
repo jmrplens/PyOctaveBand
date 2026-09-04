@@ -28,6 +28,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   replace the representative level, which the guideline says a real fan can
   exceed by up to 7 dB at the optimum duty point.
 
+- The duct elements of the same chain follow: `unlined_rectangular_duct_attenuation`,
+  `unlined_circular_duct_attenuation`, `elbow_insertion_loss` and `split_loss`
+  all take `model="vdi2081"`.
+
+  Table 5 of Section 6.1 is a step table in dB per metre, keyed on the largest
+  clear side of a rectangular duct or the bore of a round one, where Reynolds
+  fits a continuous power law of the perimeter-to-area ratio. A round duct's
+  loss depends on its diameter there and does not here, which is why the German
+  model asks for one.
+
+  Table 7 of Section 6.2 is printed once, for a 1250 mm side whose limit
+  frequency falls in the 125 Hz octave, and carried along the frequency axis
+  for every other size: the octave holding `c / (2 a)`, or `0,586 c / d` for a
+  round duct, takes the place of the table's own 125 Hz column and the whole
+  row moves with it. It also tabulates lining before, after and on both sides
+  of a corner separately, which the ASHRAE table does not distinguish.
+
+  Equation (35) of Section 6.4 is the area split alone. Long folds a reflection
+  from the change of total section into the same function; VDI 2081 treats a
+  junction and a change of section as two elements of the chain. Where the
+  branches sum to the feeder area the two agree, and where they do not the
+  difference is exactly that reflection, half a decibel in the guideline's own
+  third junction.
+
+  Seven further conformance rows, all of them Table 1 of the worked example:
+  both straight runs, the bend and its 1245 Hz limit frequency, and the three
+  junctions.
+
+- `docs/ERRATA.md` records that the two columns of VDI 2081 Part 1 Section 6.4
+  contradict each other. The German says the junction's level reduction is
+  independent of frequency and the English, on the same page, says it depends
+  on it. The German is the authoritative version by the cover of every VDI
+  guideline, and it is the one the rest of the document agrees with: Figure 27
+  has no frequency axis, Equation (35) contains no frequency, and the worked
+  example prints a single number for each of its three junctions.
+
   Eleven conformance rows, and the VDI 2081 domain is the sixty-fourth. They
   are the guideline's own worked example, VDI 2081 Part 2:2005-05 Table 1: the
   supply air fan reproduces octave by octave, and so do its unweighted 94,1 dB

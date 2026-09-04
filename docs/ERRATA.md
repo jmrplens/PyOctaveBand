@@ -4096,6 +4096,45 @@ in the same order.
   silently swapped.
 - **Status:** unreported.
 
+## VDI 2081 Blatt 1:2001-07, Section 6.4 (the English column says the opposite of the German)
+
+- **Location:** printed folio 40 (PDF page 40), Section 6.4 "Verzweigungen" /
+  "Junctions", the sentence directly under Equation (35).
+- **The print:** the German column reads "Diese in Bild 27 dargestellte Senkung
+  des Schallleistungspegels ist **frequenzunabhängig**." The English column of
+  the same page, translating the same sentence, reads "This sound power level
+  reduction shown in Figure 27 **depends on the frequency**."
+- **The problem:** the two say opposite things, and the German is the
+  authoritative one: the cover of every VDI guideline states that the German
+  version shall be taken as authoritative and that no guarantee is given for
+  the English translation. The German is also the one the rest of the document
+  agrees with. Figure 27 on the same page plots $\Delta L_W$ against the
+  cross-section ratio $S_1 / \sum S_{1,2,3}$ alone and carries no frequency
+  axis; Equation (35) itself, $\Delta L_W = |10 \lg (S_1 / \sum_i S_i)|$,
+  contains no frequency; and the worked example of VDI 2081 Blatt 2:2005-05
+  prints a junction's level reduction as a single number rather than as an
+  octave spectrum, in each of its three junctions (Table 1, elements 3, 7 and
+  16, printed folios 13 and 15: $5{,}6$, $4{,}8$ and $3{,}0$ dB).
+- **The likely mechanism:** the negating prefix of "frequenzunabhängig" is
+  absent from the translation, which turns "independent of the frequency" into
+  its opposite. Nothing else in the sentence differs.
+- **Consequence:** a reader working from the English column alone would look
+  for a frequency dependence that neither the equation nor the figure has, and
+  might conclude that the guideline is incomplete rather than that the sentence
+  is mistranslated.
+- **Evidence:** the two columns of the same printed page read against each
+  other; Figure 27 on that page; Equation (35) above it; and the three junction
+  rows of the worked example in Blatt 2. Verified on PDF page 40 (printed p. 40)
+  of VDI 2081 Blatt 1:2001-07 and PDF pages 13 and 15 (printed pp. 13 and 15) of
+  VDI 2081 Blatt 2:2005-05.
+- **Library behaviour:**
+  [`split_loss`](../src/phonometry/noise_control/hvac.py) with
+  `model="vdi2081"` returns one value for the junction, the German reading, and
+  reproduces all three printed junctions of the worked example.
+- **Status:** unreported. Both prints are superseded (Blatt 1:2022-04 and
+  Blatt 2:2022-10) and neither successor is held, so whether the translation was
+  corrected is not known here.
+
 ## Related source properties that are not errata
 
 Recorded here to prevent future "fixes" that would break agreement with the

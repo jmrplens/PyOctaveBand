@@ -277,6 +277,57 @@ _VDI2081_OFF_DUTY: dict[str, tuple[float, float, float, float]] = {
     "t": (1.5, -0.453, -7.05, 6.11),
 }
 
+#: VDI 2081 Part 1 Table 5 -- level reduction of a straight duct of 1 mm steel
+#: sheet, dB/m, by size band. The table's columns are 63, 125, 250, 500 and
+#: "> 1000" Hz; the last is held across 1 kHz and above, and a dash (no value
+#: printed) is taken as nought. The size band is keyed on the upper edge, in m.
+_VDI2081_STRAIGHT_DUCT: dict[str, tuple[tuple[float, tuple[float, ...]], ...]] = {
+    "rectangular": (
+        (0.20, (0.6, 0.6, 0.45, 0.3, 0.3, 0.3, 0.3, 0.3)),
+        (0.40, (0.6, 0.6, 0.45, 0.3, 0.2, 0.2, 0.2, 0.2)),
+        (0.80, (0.6, 0.6, 0.3, 0.15, 0.15, 0.15, 0.15, 0.15)),
+        (1.00, (0.45, 0.3, 0.15, 0.1, 0.05, 0.05, 0.05, 0.05)),
+    ),
+    "circular": (
+        (0.20, (0.1, 0.1, 0.15, 0.15, 0.3, 0.3, 0.3, 0.3)),
+        (0.40, (0.05, 0.1, 0.1, 0.15, 0.2, 0.2, 0.2, 0.2)),
+        (0.80, (0.0, 0.05, 0.05, 0.1, 0.15, 0.15, 0.15, 0.15)),
+        (1.00, (0.0, 0.0, 0.0, 0.05, 0.05, 0.05, 0.05, 0.05)),
+    ),
+}
+#: VDI 2081 Part 1 Table 7 -- level reduction of a 90 degree bend, dB, over the
+#: nine octaves 31,5 Hz to 8 kHz, for a side length of 1250 mm and a limit
+#: frequency in the 125 Hz octave. Section 6.2 shifts the whole row so that its
+#: 125 Hz column lands on the octave holding the duct's own limit frequency.
+_VDI2081_BEND: dict[str, tuple[float, ...]] = {
+    "sharp": (0.0, 3.0, 7.0, 6.0, 3.0, 3.0, 3.0, 3.0, 3.0),
+    "sharp_vaned": (0.0, 1.0, 6.0, 6.0, 1.0, 1.0, 1.0, 1.0, 2.0),
+    "sharp_lined_both": (0.0, 3.0, 10.0, 10.0, 14.0, 18.0, 18.0, 18.0, 18.0),
+    "sharp_lined_both_vaned": (0.0, 1.0, 9.0, 10.0, 14.0, 14.0, 14.0, 14.0, 14.0),
+    "sharp_lined_one": (0.0, 2.0, 8.0, 6.0, 8.0, 10.0, 10.0, 10.0, 10.0),
+    "radiused": (0.0, 1.0, 2.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0),
+    "round_radiused": (0.0, 1.0, 2.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0),
+}
+#: The octave the Table 7 rows are tabulated against, Hz: the row's 125 Hz
+#: column is the one that carries the limit frequency.
+_VDI2081_BEND_REFERENCE_BAND = 125.0
+#: The nine octave centres of Table 7, Hz.
+_VDI2081_BEND_BANDS: tuple[float, ...] = (
+    31.5,
+    63.0,
+    125.0,
+    250.0,
+    500.0,
+    1000.0,
+    2000.0,
+    4000.0,
+    8000.0,
+)
+#: Section 6.3 -- VDI 3733's recommendation that no more than 5 dB be taken
+#: from a change of cross-section, since the printed reduction is only reached
+#: when the duct is anechoically terminated at both ends.
+_VDI2081_SECTION_CHANGE_CAP = 5.0
+
 #: Long Table 13.8 -- approximate fan-housing (casing) attenuation, dB, over the
 #: octave bands 63 Hz to 8 kHz (Miller, 1980).
 _FAN_CASING_ATTENUATION: NDArray[np.float64] = np.array(
@@ -671,6 +722,52 @@ def end_reflection_loss(
     )
 
 
+def _vdi2081_bend_result(
+    bands: NDArray[np.float64],
+    *,
+    width: float,
+    bend_type: str,
+    vanes: bool,
+    lined: bool,
+    lined_side: str,
+    speed_of_sound: float,
+) -> HvacSpectrumResult:
+    """Pick the Table 7 row the arguments describe and shift it into place."""
+    side = require_choice(lined_side, "lined_side", ("both", "one"))
+    size = require_positive(width, "width")
+    c = require_positive(speed_of_sound, "speed_of_sound")
+    if bend_type == "round":
+        if vanes or lined:
+            msg = "round bends take neither vanes nor lining."
+            raise ValueError(msg)
+        shape, key = "circular", "round_radiused"
+    elif bend_type == "square":
+        shape = "rectangular"
+        if not lined:
+            key = "sharp_vaned" if vanes else "sharp"
+        elif side == "one":
+            if vanes:
+                msg = (
+                    "VDI 2081 Table 7 prints no row for a bend lined on one "
+                    "side with a baffle plate; use lined_side='both'."
+                )
+                raise ValueError(msg)
+            key = "sharp_lined_one"
+        else:
+            key = "sharp_lined_both_vaned" if vanes else "sharp_lined_both"
+    else:
+        msg = "'bend_type' must be 'square' or 'round'."
+        raise ValueError(msg)
+    return HvacSpectrumResult(
+        frequencies=bands,
+        values=_vdi2081_bend(
+            bands, bend_type=key, shape=shape, size=size, speed_of_sound=c
+        ),
+        quantity="attenuation",
+        label=f"Bend, VDI 2081 ({key.replace('_', ' ')}, {size * 1000:.0f} mm)",
+    )
+
+
 def elbow_insertion_loss(
     frequencies: ArrayLike,
     width: float,
@@ -679,22 +776,56 @@ def elbow_insertion_loss(
     vanes: bool = False,
     lined: bool = False,
     speed_of_sound: float = _C_AIR,
+    model: str = "ashrae",
+    lined_side: str = "both",
 ) -> HvacSpectrumResult:
-    r"""Duct bend/elbow insertion loss per bend (Bies Table 8.11, ASHRAE).
+    r"""Duct bend/elbow insertion loss per bend, by either method.
 
     Indexed by the frequency-to-width ratio :math:`W / \lambda`
     (:math:`\lambda = c / f`).
     Lined bends assume the lining extends at least three duct diameters up- and
     downstream. Round bends are treated as unlined with no vanes.
 
+    ``model="vdi2081"`` reads Table 7 of VDI 2081 Part 1 Section 6.2, which is
+    printed once, for a 1250 mm side, and carried along the frequency axis for
+    every other size. The duct's limit frequency comes from Equation (33),
+    ``c / (2 a)``, or Equation (34), ``0,586 c / d``; the octave holding it
+    takes the place of the table's own 125 Hz column, and the whole row moves
+    with it. Below the shifted row the loss is nought, which is the guideline's
+    statement that a bend reflects nothing while only plane waves run.
+
+    The two methods index the same physics on the same ratio, but they do not
+    tabulate the same bends: Table 7 distinguishes lining before, after, or on
+    both sides of the corner, which the ASHRAE table does not, and ``width`` is
+    read there as the largest side of a rectangular duct or the bore of a round
+    one rather than as the width in the plane of the bend.
+
     :param frequencies: Frequencies ``f``, Hz (1-D array).
-    :param width: Duct width ``W`` in the plane of the bend, m.
-    :param bend_type: ``"square"`` or ``"round"``.
+    :param width: Duct width ``W`` in the plane of the bend, m. For
+        ``model="vdi2081"`` it is the largest side of a rectangular duct, or
+        the internal diameter of a round one.
+    :param bend_type: ``"square"`` or ``"round"``. VDI 2081 reads a square bend
+        as sharp-edged and a round one as radiused with ``r <= 2 D``.
     :param vanes: Turning vanes fitted (square bends only).
     :param lined: Acoustically lined bend (square bends only).
+    :param lined_side: **VDI 2081 only.** ``"both"`` (default) for lining
+        before and after the corner, or ``"one"`` for lining on one side of it,
+        which Table 7 tabulates separately. Ignored unless ``lined``.
     :param speed_of_sound: Speed of sound ``c``, m/s.
+    :param model: ``"ashrae"`` (default) or ``"vdi2081"``.
     :return: A :class:`HvacSpectrumResult` of the insertion loss, dB per bend.
     """
+    scheme = require_choice(model, "model", ("ashrae", "vdi2081"))
+    if scheme == "vdi2081":
+        return _vdi2081_bend_result(
+            _frequencies(frequencies),
+            width=width,
+            bend_type=bend_type,
+            vanes=vanes,
+            lined=lined,
+            lined_side=lined_side,
+            speed_of_sound=speed_of_sound,
+        )
     f = _frequencies(frequencies)
     w = require_positive(width, "width")
     c = require_positive(speed_of_sound, "speed_of_sound")
@@ -1242,6 +1373,88 @@ def fan_casing_attenuation(
 # ---------------------------------------------------------------------------
 # Straight-duct attenuation (Long Chapter 14)
 # ---------------------------------------------------------------------------
+def _vdi2081_limit_frequency(shape: str, size: float, speed_of_sound: float) -> float:
+    """Equation (33) or (34): the frequency below which only plane waves run.
+
+    ``c / (2 a)`` for a rectangular duct of largest side ``a``, and
+    ``0,586 c / d`` for a round one of bore ``d``.
+    """
+    return (
+        speed_of_sound / (2.0 * size)
+        if shape == "rectangular"
+        else 0.586 * speed_of_sound / size
+    )
+
+
+def _vdi2081_bend(
+    bands: NDArray[np.float64],
+    *,
+    bend_type: str,
+    shape: str,
+    size: float,
+    speed_of_sound: float,
+) -> NDArray[np.float64]:
+    """Table 7 of VDI 2081 Part 1, shifted onto the duct's own limit frequency.
+
+    The table is printed for a 1250 mm side, whose limit frequency falls in the
+    125 Hz octave. Section 6.2 carries the whole spectrum along the frequency
+    axis so that its 125 Hz column lands on the octave holding the limit
+    frequency of the duct at hand, which is what makes one printed row serve
+    every duct size.
+    """
+    row = np.array(_VDI2081_BEND[bend_type])
+    table_bands = np.array(_VDI2081_BEND_BANDS)
+    limit = _vdi2081_limit_frequency(shape, size, speed_of_sound)
+    # Step 2: the octave holding the limit frequency, whose edges Section 6.2
+    # defines as f_m / sqrt(2) and f_m * sqrt(2).
+    holder = float(table_bands[int(np.argmin(np.abs(np.log2(limit / table_bands))))])
+    # Step 3: shift, in whole octaves, of the reference column onto it.
+    shift = round(math.log2(holder / _VDI2081_BEND_REFERENCE_BAND))
+
+    values = np.zeros_like(bands)
+    for slot, band in enumerate(bands):
+        source = band / 2.0**shift
+        below = source < table_bands[0] / math.sqrt(2.0)
+        if below:
+            # Off the bottom of the shifted row: below the limit frequency a
+            # bend reflects nothing the table accounts for.
+            continue
+        index = int(np.argmin(np.abs(np.log2(source / table_bands))))
+        values[slot] = row[index]
+    return values
+
+
+def _vdi2081_straight_run(
+    bands: NDArray[np.float64],
+    *,
+    shape: str,
+    size: float,
+    length: float,
+) -> NDArray[np.float64]:
+    """Table 5 of VDI 2081 Part 1, dB, for one straight run.
+
+    ``size`` is the largest clear side length of a rectangular duct or the
+    internal diameter of a round one, which is what selects the table's row.
+    """
+    rows = _VDI2081_STRAIGHT_DUCT[shape]
+    upper = rows[-1][0]
+    if size > upper:
+        msg = (
+            f"'{shape}' duct of {size:g} m is outside VDI 2081 Table 5, which "
+            f"stops at {upper:g} m. Above it Section 6.1 says the attenuation "
+            "of a rigid, massive duct is negligible rather than tabulated."
+        )
+        raise ValueError(msg)
+    per_metre = next(values for edge, values in rows if size <= edge)
+    # The table's five columns run 63, 125, 250, 500 and "> 1000" Hz, so a band
+    # is placed by its own centre rather than by its index.
+    slots = np.array(
+        [min(int(round(math.log2(f / 63.0))), len(per_metre) - 1) for f in bands]
+    )
+    rates = np.take(np.array(per_metre), np.clip(slots, 0, len(per_metre) - 1))
+    return np.asarray(rates * length, dtype=np.float64)
+
+
 def _perimeter_over_area(width: float, height: float) -> float:
     """``P / S`` of a rectangular duct in ft^-1, from SI side lengths in m."""
     w = require_positive(width, "width") / _M_PER_FT
@@ -1256,6 +1469,7 @@ def unlined_rectangular_duct_attenuation(
     length: float,
     *,
     wrapped: bool = False,
+    model: str = "ashrae",
 ) -> HvacSpectrumResult:
     r"""Attenuation of an unlined rectangular sheet-metal duct (Long Eqs. 14.9-14.11).
 
@@ -1273,11 +1487,43 @@ def unlined_rectangular_duct_attenuation(
     :param width: Duct width, m.
     :param height: Duct height, m.
     :param length: Duct run length ``l``, m.
+    ``model="vdi2081"`` reads Table 5 of VDI 2081 Part 1 Section 6.1 instead: a
+    step table in dB per metre, keyed on the **largest** clear side length and
+    on five frequency columns, 63, 125, 250, 500 and above 1000 Hz. It is a
+    different account of the same loss, not a restatement of this one: Reynolds
+    fits a continuous power law of the perimeter-to-area ratio, VDI 2081
+    tabulates four size bands of 1 mm steel sheet, and where the two overlap
+    they differ by a decibel or two per metre. ``wrapped`` has no meaning there
+    and is refused.
+
     :param wrapped: The duct is externally wrapped with a fibreglass blanket,
         which doubles the 63 Hz to 250 Hz attenuation.
     :return: An :class:`HvacSpectrumResult` of the attenuation, dB.
     """
+    scheme = require_choice(model, "model", ("ashrae", "vdi2081"))
     f = _frequencies(frequencies)
+    if scheme == "vdi2081":
+        if wrapped:
+            msg = (
+                "'wrapped' has no meaning for model='vdi2081': Table 5 is "
+                "tabulated for bare 1 mm steel sheet and prints no lagged row."
+            )
+            raise ValueError(msg)
+        side = max(require_positive(width, "width"), require_positive(height, "height"))
+        return HvacSpectrumResult(
+            frequencies=f,
+            values=_vdi2081_straight_run(
+                f,
+                shape="rectangular",
+                size=side,
+                length=require_positive(length, "length"),
+            ),
+            quantity="attenuation",
+            label=(
+                f"Straight duct, VDI 2081 ({width * 1000:.0f} x "
+                f"{height * 1000:.0f} mm, {length:.2f} m)"
+            ),
+        )
     ps = _perimeter_over_area(width, height)
     ell = require_positive(length, "length") / _M_PER_FT
     low = (
@@ -1303,6 +1549,9 @@ def unlined_rectangular_duct_attenuation(
 def unlined_circular_duct_attenuation(
     frequencies: ArrayLike | None,
     length: float,
+    *,
+    diameter: float | None = None,
+    model: str = "ashrae",
 ) -> HvacSpectrumResult:
     """Attenuation of an unlined circular sheet-metal duct (Long Table 14.1).
 
@@ -1312,11 +1561,43 @@ def unlined_circular_duct_attenuation(
     up to 250 Hz and 0.05 to 0.07 dB/ft above. The published table stops at
     4 kHz; the 4 kHz rate is held for the 8 kHz band.
 
+    ``model="vdi2081"`` reads Table 5 of VDI 2081 Part 1 Section 6.1, which
+    does depend on the diameter: a wide round duct is stiffer still and its
+    tabulated loss falls to nothing at 63 Hz above 400 mm, where the table
+    prints a dash. That is the substantive difference between the two accounts
+    of this element, and it is why ``diameter`` is required there and not here.
+
     :param frequencies: Octave-band centres, Hz; ``None`` uses
         :data:`OCTAVE_BANDS`.
     :param length: Duct run length, m.
+    :param diameter: **VDI 2081 only.** Internal diameter, m, which selects the
+        Table 5 row. The table stops at 1,00 m.
+    :param model: ``"ashrae"`` (default, Long Table 14.1) or ``"vdi2081"``.
     :return: An :class:`HvacSpectrumResult` of the attenuation, dB.
     """
+    scheme = require_choice(model, "model", ("ashrae", "vdi2081"))
+    if scheme == "vdi2081":
+        if diameter is None:
+            msg = (
+                "model='vdi2081' needs 'diameter': Table 5 tabulates a round "
+                "duct by its bore, where Long Table 14.1 does not."
+            )
+            raise ValueError(msg)
+        bands = _frequencies(OCTAVE_BANDS if frequencies is None else frequencies)
+        bore = require_positive(diameter, "diameter")
+        return HvacSpectrumResult(
+            frequencies=bands,
+            values=_vdi2081_straight_run(
+                bands,
+                shape="circular",
+                size=bore,
+                length=require_positive(length, "length"),
+            ),
+            quantity="attenuation",
+            label=(
+                f"Straight duct, VDI 2081 (dia {bore * 1000:.0f} mm, {length:.2f} m)"
+            ),
+        )
     f, idx = _octave_slots(frequencies)
     ell = require_positive(length, "length") / _M_PER_FT
     return HvacSpectrumResult(
@@ -1478,6 +1759,7 @@ def split_loss(
     branch_areas: ArrayLike,
     *,
     branch: int = 0,
+    model: str = "ashrae",
 ) -> float:
     r"""Power split loss into one branch of a duct division (Long Eq. 14.17).
 
@@ -1495,10 +1777,33 @@ def split_loss(
     as -6 dB in his worked sheet); this function returns it as a positive
     attenuation, like every other loss in the module.
 
+    ``model="vdi2081"`` keeps only the second term, which is Equation (35) of
+    VDI 2081 Part 1 Section 6.4:
+
+    .. math::
+
+       \Delta L_W = \left| 10 \log_{10} \frac{S_1}{\sum_i S_i} \right|
+
+    The two standards divide the same physics differently rather than
+    disagreeing about it. Long folds the reflection from a change of total
+    section into the junction; VDI 2081 treats a junction and a change of
+    section as two elements of the chain, the second in Section 6.3, and its
+    junction is the area split alone. Where the branches happen to sum to the
+    feeder area the two agree; where they do not, the difference is exactly
+    the reflection term, half a decibel in the guideline's own Table 1 for the
+    junction whose branch areas sum to twice its feeder.
+
+    The split is the same in every octave. The German text says so
+    ("frequenzunabhängig") and Figure 27 has no frequency axis; the English
+    column of the same page says the opposite, which ``docs/ERRATA.md``
+    records.
+
     :param main_area: Cross-sectional area of the main feeder duct ``S_m``, m2.
     :param branch_areas: Areas ``S_i`` of the branches continuing on from the
         main duct, m2 (1-D array-like).
     :param branch: Index into ``branch_areas`` of the branch being followed.
+    :param model: ``"ashrae"`` (default, Long Eq. 14.17, reflection included)
+        or ``"vdi2081"`` (Equation (35), the area split alone).
     :return: The split loss, dB (positive).
     :raises ValueError: If the areas are not positive or ``branch`` is out of
         range.
@@ -1514,9 +1819,13 @@ def split_loss(
     if not 0 <= branch < areas.size:
         msg = f"'branch' must index 'branch_areas' (0..{areas.size - 1})."
         raise ValueError(msg)
+    scheme = require_choice(model, "model", ("ashrae", "vdi2081"))
     total = float(np.sum(areas))
+    share = -10.0 * np.log10(areas[branch] / total)
+    if scheme == "vdi2081":
+        return float(abs(share))
     reflection = 1.0 - ((total - s_m) / (total + s_m)) ** 2
-    return float(-10.0 * np.log10(reflection) - 10.0 * np.log10(areas[branch] / total))
+    return float(-10.0 * np.log10(reflection) + share)
 
 
 def end_reflection_loss_closed_form(

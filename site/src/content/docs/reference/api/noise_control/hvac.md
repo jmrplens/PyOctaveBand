@@ -266,26 +266,44 @@ elbow_insertion_loss(
     vanes: bool = False,
     lined: bool = False,
     speed_of_sound: float = 343.0,
+    model: str = 'ashrae',
+    lined_side: str = 'both',
 ) -> HvacSpectrumResult
 ```
 
-Duct bend/elbow insertion loss per bend (Bies Table 8.11, ASHRAE).
+Duct bend/elbow insertion loss per bend, by either method.
 
 Indexed by the frequency-to-width ratio $W / \lambda$
 ($\lambda = c / f$).
 Lined bends assume the lining extends at least three duct diameters up- and
 downstream. Round bends are treated as unlined with no vanes.
 
+`model="vdi2081"` reads Table 7 of VDI 2081 Part 1 Section 6.2, which is
+printed once, for a 1250 mm side, and carried along the frequency axis for
+every other size. The duct's limit frequency comes from Equation (33),
+`c / (2 a)`, or Equation (34), `0,586 c / d`; the octave holding it
+takes the place of the table's own 125 Hz column, and the whole row moves
+with it. Below the shifted row the loss is nought, which is the guideline's
+statement that a bend reflects nothing while only plane waves run.
+
+The two methods index the same physics on the same ratio, but they do not
+tabulate the same bends: Table 7 distinguishes lining before, after, or on
+both sides of the corner, which the ASHRAE table does not, and `width` is
+read there as the largest side of a rectangular duct or the bore of a round
+one rather than as the width in the plane of the bend.
+
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Frequencies `f`, Hz (1-D array). |
-| `width` | Duct width `W` in the plane of the bend, m. |
-| `bend_type` | `"square"` or `"round"`. |
+| `width` | Duct width `W` in the plane of the bend, m. For `model="vdi2081"` it is the largest side of a rectangular duct, or the internal diameter of a round one. |
+| `bend_type` | `"square"` or `"round"`. VDI 2081 reads a square bend as sharp-edged and a round one as radiused with `r <= 2 D`. |
 | `vanes` | Turning vanes fitted (square bends only). |
 | `lined` | Acoustically lined bend (square bends only). |
+| `lined_side` | **VDI 2081 only.** `"both"` (default) for lining before and after the corner, or `"one"` for lining on one side of it, which Table 7 tabulates separately. Ignored unless `lined`. |
 | `speed_of_sound` | Speed of sound `c`, m/s. |
+| `model` | `"ashrae"` (default) or `"vdi2081"`. |
 
 **Returns:** A [`HvacSpectrumResult`](/phonometry/reference/api/noise_control/hvac/#hvacspectrumresult) of the insertion loss, dB per bend.
 
@@ -989,6 +1007,7 @@ split_loss(
     branch_areas: ArrayLike,
     *,
     branch: int = 0,
+    model: str = 'ashrae',
 ) -> float
 ```
 
@@ -1006,6 +1025,27 @@ Long prints this as a negative level change (a 25 per cent area split shows
 as -6 dB in his worked sheet); this function returns it as a positive
 attenuation, like every other loss in the module.
 
+`model="vdi2081"` keeps only the second term, which is Equation (35) of
+VDI 2081 Part 1 Section 6.4:
+
+$$
+\Delta L_W = \left| 10 \log_{10} \frac{S_1}{\sum_i S_i} \right|
+$$
+
+The two standards divide the same physics differently rather than
+disagreeing about it. Long folds the reflection from a change of total
+section into the junction; VDI 2081 treats a junction and a change of
+section as two elements of the chain, the second in Section 6.3, and its
+junction is the area split alone. Where the branches happen to sum to the
+feeder area the two agree; where they do not, the difference is exactly
+the reflection term, half a decibel in the guideline's own Table 1 for the
+junction whose branch areas sum to twice its feeder.
+
+The split is the same in every octave. The German text says so
+("frequenzunabhängig") and Figure 27 has no frequency axis; the English
+column of the same page says the opposite, which `docs/ERRATA.md`
+records.
+
 **Parameters**
 
 | Name | Description |
@@ -1013,6 +1053,7 @@ attenuation, like every other loss in the module.
 | `main_area` | Cross-sectional area of the main feeder duct `S_m`, m2. |
 | `branch_areas` | Areas `S_i` of the branches continuing on from the main duct, m2 (1-D array-like). |
 | `branch` | Index into `branch_areas` of the branch being followed. |
+| `model` | `"ashrae"` (default, Long Eq. 14.17, reflection included) or `"vdi2081"` (Equation (35), the area split alone). |
 
 **Returns:** The split loss, dB (positive).
 
@@ -1084,6 +1125,9 @@ noise is a separate quantity, [`silencer_self_noise`](/phonometry/reference/api/
 unlined_circular_duct_attenuation(
     frequencies: ArrayLike | None,
     length: float,
+    *,
+    diameter: float | None = None,
+    model: str = 'ashrae',
 ) -> HvacSpectrumResult
 ```
 
@@ -1095,12 +1139,20 @@ the rectangular value and is tabulated as a length rate alone, 0.03 dB/ft
 up to 250 Hz and 0.05 to 0.07 dB/ft above. The published table stops at
 4 kHz; the 4 kHz rate is held for the 8 kHz band.
 
+`model="vdi2081"` reads Table 5 of VDI 2081 Part 1 Section 6.1, which
+does depend on the diameter: a wide round duct is stiffer still and its
+tabulated loss falls to nothing at 63 Hz above 400 mm, where the table
+prints a dash. That is the substantive difference between the two accounts
+of this element, and it is why `diameter` is required there and not here.
+
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Octave-band centres, Hz; `None` uses [`OCTAVE_BANDS`](/phonometry/reference/api/materials/rating/#octave_bands). |
 | `length` | Duct run length, m. |
+| `diameter` | **VDI 2081 only.** Internal diameter, m, which selects the Table 5 row. The table stops at 1,00 m. |
+| `model` | `"ashrae"` (default, Long Table 14.1) or `"vdi2081"`. |
 
 **Returns:** An [`HvacSpectrumResult`](/phonometry/reference/api/noise_control/hvac/#hvacspectrumresult) of the attenuation, dB.
 
@@ -1114,6 +1166,7 @@ unlined_rectangular_duct_attenuation(
     length: float,
     *,
     wrapped: bool = False,
+    model: str = 'ashrae',
 ) -> HvacSpectrumResult
 ```
 
@@ -1140,3 +1193,12 @@ fibreglass blanket adds surface mass and doubles the low-frequency loss
 | `wrapped` | The duct is externally wrapped with a fibreglass blanket, which doubles the 63 Hz to 250 Hz attenuation. |
 
 **Returns:** An [`HvacSpectrumResult`](/phonometry/reference/api/noise_control/hvac/#hvacspectrumresult) of the attenuation, dB.
+
+`model="vdi2081"` reads Table 5 of VDI 2081 Part 1 Section 6.1 instead: a
+step table in dB per metre, keyed on the **largest** clear side length and
+on five frequency columns, 63, 125, 250, 500 and above 1000 Hz. It is a
+different account of the same loss, not a restatement of this one: Reynolds
+fits a continuous power law of the perimeter-to-area ratio, VDI 2081
+tabulates four size bands of 1 mm steel sheet, and where the two overlap
+they differ by a decibel or two per metre. `wrapped` has no meaning there
+and is refused.

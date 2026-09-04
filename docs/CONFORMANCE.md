@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**634/634 conformance checks pass** across 64 domains and 387 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**641/641 conformance checks pass** across 64 domains and 394 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -1182,7 +1182,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>HVAC noise (VDI 2081)</b>: 100% (11/11)</summary>
+<summary><b>HVAC noise (VDI 2081)</b>: 100% (18/18)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -1197,6 +1197,13 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | VDI 2081 Blatt 1 Eq. (13) | Fan sound power level L_W4 from the duty, dB | 96 dB (+/-0.05 dB) | 96.041 dB | 0.041 dB | 82 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2 Table 1, element 1 | Supply fan total sound power level, dB | 94.1 dB (+/-0.05 dB) | 94.124 dB | 0.024 dB | 48 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2 Table 1, element 1 | Supply fan A-weighted sound power level, dB | 84.5 dB (+/-0.05 dB) | 84.511 dB | 0.011 dB | 22 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 5 | Rectangular duct 500 x 400 mm over 4 m, level reduction per octave, dB | 9 dB (+/-0 dB) | 9 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 13 | Round duct 160 mm over 1 m, level reduction per octave, dB | 1.7 dB (+/-0 dB) | 1.7 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1 Eq. (34) | Limit frequency of a 160 mm round duct, Hz | 1245 Hz (+/-0.5 Hz) | 1245.2 Hz | 0.25 Hz | 50 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 14 | Round bend 160 mm, Table 7 shifted onto its limit frequency, dB | 12 dB (+/-0 dB) | 12 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 3 | Junction into 0.3 m2 of 1.08 m2 total, dB | 5.6 dB (+/-0.05 dB) | 5.563 dB | -0.037 dB | 74 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 7 | Junction into 0.049 m2 of 0.147 m2 total, dB | 4.8 dB (+/-0.05 dB) | 4.771 dB | -0.029 dB | 58 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2 Table 1, element 16 | Junction into 0.02 m2 of 0.04 m2 total, dB | 3 dB (+/-0.05 dB) | 3.01 dB | 0.01 dB | 20 % | ![Pass][cv-pass] Pass |
 
 </details>
 

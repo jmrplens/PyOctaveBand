@@ -3,12 +3,12 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 634,
-    "passing": 634,
+    "checks": 641,
+    "passing": 641,
     "failing": 0,
     "domains": 64,
-    "standards": 387,
-    "citations": 559,
+    "standards": 394,
+    "citations": 566,
     "designations": 121,
     "sources": 84
   },
@@ -447,8 +447,8 @@
     {
       "id": "hvac-noise-vdi-2081",
       "title": "HVAC noise (VDI 2081)",
-      "checks": 11,
-      "passing": 11
+      "checks": 18,
+      "passing": 18
     },
     {
       "id": "cnossos-eu-railway-source-directive-2002-49-ec-annex-ii",
@@ -18014,6 +18014,202 @@
       },
       "deviation": {
         "value": 0.011
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-5/rectangular-duct-500-x-400-mm-over-4-m-level-reduction-per-octave-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 5",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 5"
+      },
+      "quantity": "Rectangular duct 500 x 400 mm over 4 m, level reduction per octave, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 9.0
+      },
+      "computed": {
+        "value": 9.0
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-06
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-13/round-duct-160-mm-over-1-m-level-reduction-per-octave-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 13",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 13"
+      },
+      "quantity": "Round duct 160 mm over 1 m, level reduction per octave, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 1.7
+      },
+      "computed": {
+        "value": 1.7
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-06
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-1-eq-34/limit-frequency-of-a-160-mm-round-duct-hz",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 1 Eq. (34)",
+        "cite": "VDI 2081 Blatt 1 Eq. (34)"
+      },
+      "quantity": "Limit frequency of a 160 mm round duct, Hz",
+      "kind": "scalar",
+      "expected": {
+        "value": 1245.0
+      },
+      "computed": {
+        "value": 1245.2
+      },
+      "unit": "Hz",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.5
+      },
+      "deviation": {
+        "value": 0.25
+      },
+      "precision": 1,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-14/round-bend-160-mm-table-7-shifted-onto-its-limit-frequency-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 14",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 14"
+      },
+      "quantity": "Round bend 160 mm, Table 7 shifted onto its limit frequency, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 12.0
+      },
+      "computed": {
+        "value": 12.0
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-06
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-3/junction-into-0-3-m2-of-1-08-m2-total-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 3",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 3"
+      },
+      "quantity": "Junction into 0.3 m2 of 1.08 m2 total, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 5.6
+      },
+      "computed": {
+        "value": 5.563
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.037
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-7/junction-into-0-049-m2-of-0-147-m2-total-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 7",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 7"
+      },
+      "quantity": "Junction into 0.049 m2 of 0.147 m2 total, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 4.8
+      },
+      "computed": {
+        "value": 4.771
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.029
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-16/junction-into-0-02-m2-of-0-04-m2-total-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 16",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 16"
+      },
+      "quantity": "Junction into 0.02 m2 of 0.04 m2 total, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 3.0
+      },
+      "computed": {
+        "value": 3.01
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.01
       },
       "precision": 3,
       "verdict": "pass"

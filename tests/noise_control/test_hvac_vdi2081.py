@@ -274,3 +274,163 @@ def test_the_vdi_model_refuses_what_is_not_a_fan(
     base.update(kwargs)
     with pytest.raises(ValueError, match=match):
         hvac.fan_sound_power(FAN_VOLUME_FLOW_M3_S, **base)  # type: ignore[arg-type]
+
+
+# ---------------------------------------------------------------------------
+# Duct elements: Table 1 again, this time its attenuation rows
+# ---------------------------------------------------------------------------
+#: Table 1, element 5: a 500 x 400 mm rectangular duct, 4 m long, and the
+#: "delta L_W (dB/Okt)" row it prints for that run.
+RECTANGULAR_RUN = (0.500, 0.400, 4.000)
+PRINTED_RECTANGULAR_DB = (2.4, 2.4, 1.2, 0.6, 0.6, 0.6, 0.6, 0.6)
+#: Table 1, elements 13 and 17: a 160 mm round duct, 1 m and 2 m long.
+PRINTED_ROUND_1M_DB = (0.1, 0.1, 0.15, 0.15, 0.3, 0.3, 0.3, 0.3)
+PRINTED_ROUND_2M_DB = (0.2, 0.2, 0.3, 0.3, 0.6, 0.6, 0.6, 0.6)
+#: Table 1, element 14: a 160 mm round bend, and the limit frequency and
+#: spectrum the table prints beside it. The example works in air at 340 m/s.
+BEND_DIAMETER_M = 0.160
+EXAMPLE_SPEED_OF_SOUND = 340.0
+PRINTED_LIMIT_FREQUENCY_HZ = 1245.0
+PRINTED_BEND_DB = (0.0, 0.0, 0.0, 1.0, 2.0, 3.0, 3.0, 3.0)
+#: Table 1, elements 3, 7 and 16: the three junctions, as (fed branch area,
+#: all branch areas, printed reduction in dB).
+PRINTED_JUNCTIONS = (
+    (0.30, (0.30, 0.36, 0.42), 5.6),
+    (0.049, (0.049, 0.049, 0.049), 4.8),
+    (0.020, (0.020, 0.020), 3.0),
+)
+
+
+def test_the_straight_runs_reproduce_table_5() -> None:
+    """Elements 5, 13 and 17, which between them cover both duct shapes.
+
+    The rectangular row is selected by the **largest** side: 500 mm puts the
+    duct in the 0,40 to 0,80 m band, and reading it by the 400 mm side instead
+    would give 0,45 dB/m at 250 Hz where the table gives 0,3.
+    """
+    width, height, length = RECTANGULAR_RUN
+    rect = hvac.unlined_rectangular_duct_attenuation(
+        hvac.OCTAVE_BANDS, width, height, length, model="vdi2081"
+    )
+    assert rect.values == pytest.approx(PRINTED_RECTANGULAR_DB, abs=1e-9)
+
+    for run_length, printed in (
+        (1.000, PRINTED_ROUND_1M_DB),
+        (2.000, PRINTED_ROUND_2M_DB),
+    ):
+        round_duct = hvac.unlined_circular_duct_attenuation(
+            hvac.OCTAVE_BANDS, run_length, diameter=0.160, model="vdi2081"
+        )
+        assert round_duct.values == pytest.approx(printed, abs=1e-9)
+
+
+def test_the_bend_shifts_table_7_onto_its_own_limit_frequency() -> None:
+    """Element 14: a 160 mm round bend, whose limit frequency is 1245 Hz.
+
+    Equation (34) puts ``f_G = 0,586 c / d`` in the 1 kHz octave, three octaves
+    above the 125 Hz the table is printed for, so the whole row moves three
+    octaves up. That is what turns the printed 0, 1, 2, 3, 3, ... into the
+    0, 0, 0, 1, 2, 3, 3, 3 of the example.
+    """
+    limit = 0.586 * EXAMPLE_SPEED_OF_SOUND / BEND_DIAMETER_M
+    assert limit == pytest.approx(PRINTED_LIMIT_FREQUENCY_HZ, abs=0.5)
+
+    bend = hvac.elbow_insertion_loss(
+        hvac.OCTAVE_BANDS,
+        BEND_DIAMETER_M,
+        bend_type="round",
+        speed_of_sound=EXAMPLE_SPEED_OF_SOUND,
+        model="vdi2081",
+    )
+    assert bend.values == pytest.approx(PRINTED_BEND_DB, abs=1e-9)
+
+
+def test_a_wider_bend_moves_the_same_row_further_down() -> None:
+    """The shift is the whole point of Table 7 being printed only once.
+
+    A 1250 mm rectangular duct is the size the table is tabulated for, so its
+    row comes back unshifted; a duct eight times narrower has a limit frequency
+    three octaves higher and takes the row three octaves up with it.
+    """
+    tabulated = hvac.elbow_insertion_loss(
+        hvac.OCTAVE_BANDS, 1.250, speed_of_sound=340.0, model="vdi2081"
+    )
+    # c / (2 a) = 136 Hz, inside the 125 Hz octave, so nothing moves: the row's
+    # 63 Hz, 125 Hz and 250 Hz columns arrive where they are printed.
+    assert tabulated.values[:3] == pytest.approx((3.0, 7.0, 6.0), abs=1e-9)
+
+    narrow = hvac.elbow_insertion_loss(
+        hvac.OCTAVE_BANDS, 1.250 / 8.0, speed_of_sound=340.0, model="vdi2081"
+    )
+    assert narrow.values[3:6] == pytest.approx((3.0, 7.0, 6.0), abs=1e-9)
+    assert narrow.values[:3] == pytest.approx((0.0, 0.0, 0.0), abs=1e-9)
+
+
+def test_the_junction_is_the_area_split_alone() -> None:
+    """Elements 3, 7 and 16, and the term VDI 2081 does not put here.
+
+    Equation (35) is the share of the total branch area and nothing else. Long
+    folds a reflection from the change of total section into the same function,
+    which is why the third junction, whose branches sum to twice its feeder,
+    differs by half a decibel between the two.
+    """
+    for fed, branches, printed in PRINTED_JUNCTIONS:
+        areas = list(branches)
+        index = areas.index(fed)
+        vdi = hvac.split_loss(sum(areas), areas, branch=index, model="vdi2081")
+        assert vdi == pytest.approx(printed, abs=0.05)
+
+    _, mismatched, _ = PRINTED_JUNCTIONS[2]
+    feeder = 0.020
+    areas = list(mismatched)
+    reflection = hvac.split_loss(feeder, areas) - hvac.split_loss(
+        feeder, areas, model="vdi2081"
+    )
+    assert reflection == pytest.approx(0.512, abs=1e-3)
+
+
+def test_the_vdi_duct_models_refuse_what_they_cannot_answer() -> None:
+    """Each one asks for exactly what its own table needs."""
+    with pytest.raises(ValueError, match=r"model='vdi2081' needs 'diameter'"):
+        hvac.unlined_circular_duct_attenuation(None, 1.0, model="vdi2081")
+
+    with pytest.raises(ValueError, match=r"'wrapped' has no meaning"):
+        hvac.unlined_rectangular_duct_attenuation(
+            hvac.OCTAVE_BANDS, 0.5, 0.4, 1.0, wrapped=True, model="vdi2081"
+        )
+
+    with pytest.raises(ValueError, match=r"outside VDI 2081 Table 5"):
+        hvac.unlined_circular_duct_attenuation(None, 1.0, diameter=1.5, model="vdi2081")
+
+    with pytest.raises(ValueError, match=r"prints no row for a bend lined on one"):
+        hvac.elbow_insertion_loss(
+            hvac.OCTAVE_BANDS,
+            0.5,
+            vanes=True,
+            lined=True,
+            lined_side="one",
+            model="vdi2081",
+        )
+
+
+def test_lining_one_side_of_a_corner_is_its_own_row() -> None:
+    """Table 7 tabulates lining before, after and on both sides separately.
+
+    The ASHRAE table does not make that distinction, so it is a place where the
+    German method answers a question the other cannot.
+    """
+    common = {
+        "bend_type": "square",
+        "lined": True,
+        "speed_of_sound": 340.0,
+        "model": "vdi2081",
+    }
+    both = hvac.elbow_insertion_loss(hvac.OCTAVE_BANDS, 1.250, **common)  # type: ignore[arg-type]
+    one = hvac.elbow_insertion_loss(
+        hvac.OCTAVE_BANDS,
+        1.250,
+        lined_side="one",
+        **common,  # type: ignore[arg-type]
+    )
+    assert np.all(one.values <= both.values)
+    assert not np.allclose(one.values, both.values)

@@ -123,3 +123,122 @@ def _chk_total_a_weighted() -> Outcome:
     weighted = _fan() + np.array(_PRINTED_A_WEIGHTING)
     total = 10.0 * math.log10(float(np.sum(10.0 ** (weighted / 10.0))))
     return numeric(84.5, total, _PRINTED_TOLERANCE, unit="dB", places=3)
+
+
+# ---------------------------------------------------------------------------
+# Table 1 again: the duct elements the same chain runs through
+# ---------------------------------------------------------------------------
+#: Table 1, element 5: a 500 x 400 mm rectangular duct 4 m long, and the level
+#: reduction the table prints for it in every octave.
+_RECT_RUN = (0.500, 0.400, 4.000)
+_PRINTED_RECT = (2.4, 2.4, 1.2, 0.6, 0.6, 0.6, 0.6, 0.6)
+#: Table 1, element 13: a 160 mm round duct, 1 m long.
+_PRINTED_ROUND = (0.1, 0.1, 0.15, 0.15, 0.3, 0.3, 0.3, 0.3)
+#: Table 1, element 14: a 160 mm round bend in air at 340 m/s, whose limit
+#: frequency the table prints as 1245 Hz.
+_BEND_DIAMETER = 0.160
+_EXAMPLE_SPEED = 340.0
+_PRINTED_BEND = (0.0, 0.0, 0.0, 1.0, 2.0, 3.0, 3.0, 3.0)
+
+
+@register(
+    _VDI2081,
+    "VDI 2081 Blatt 2 Table 1, element 5",
+    "Rectangular duct 500 x 400 mm over 4 m, level reduction per octave, dB",
+)
+def _chk_rectangular_run() -> Outcome:
+    """Table 5 read by the largest side, which is what puts 250 Hz at 0,3 dB/m."""
+    width, height, length = _RECT_RUN
+    values = ph.noise_control.unlined_rectangular_duct_attenuation(
+        np.array(_PRINTED_BANDS), width, height, length, model="vdi2081"
+    ).values
+    return numeric(
+        float(np.sum(_PRINTED_RECT)),
+        float(np.sum(values)),
+        1e-6,
+        unit="dB",
+        places=3,
+    )
+
+
+@register(
+    _VDI2081,
+    "VDI 2081 Blatt 2 Table 1, element 13",
+    "Round duct 160 mm over 1 m, level reduction per octave, dB",
+)
+def _chk_round_run() -> Outcome:
+    """The round rows of Table 5, which do depend on the bore."""
+    values = ph.noise_control.unlined_circular_duct_attenuation(
+        np.array(_PRINTED_BANDS), 1.000, diameter=0.160, model="vdi2081"
+    ).values
+    return numeric(
+        float(np.sum(_PRINTED_ROUND)),
+        float(np.sum(values)),
+        1e-6,
+        unit="dB",
+        places=3,
+    )
+
+
+@register(
+    _VDI2081,
+    "VDI 2081 Blatt 1 Eq. (34)",
+    "Limit frequency of a 160 mm round duct, Hz",
+)
+def _chk_limit_frequency() -> Outcome:
+    """``f_G = 0,586 c / d``, printed beside element 14 as 1245 Hz."""
+    return numeric(
+        1245.0, 0.586 * _EXAMPLE_SPEED / _BEND_DIAMETER, 0.5, unit="Hz", places=1
+    )
+
+
+@register(
+    _VDI2081,
+    "VDI 2081 Blatt 2 Table 1, element 14",
+    "Round bend 160 mm, Table 7 shifted onto its limit frequency, dB",
+)
+def _chk_bend() -> Outcome:
+    """Table 7 carried three octaves up, since f_G lands in the 1 kHz octave."""
+    values = ph.noise_control.elbow_insertion_loss(
+        np.array(_PRINTED_BANDS),
+        _BEND_DIAMETER,
+        bend_type="round",
+        speed_of_sound=_EXAMPLE_SPEED,
+        model="vdi2081",
+    ).values
+    return numeric(
+        float(np.sum(_PRINTED_BEND)),
+        float(np.sum(values)),
+        1e-6,
+        unit="dB",
+        places=3,
+    )
+
+
+def _junction_outcome(
+    fed: float, branches: tuple[float, ...], printed: float
+) -> Outcome:
+    """One junction of Table 1, by Equation (35)."""
+    areas = list(branches)
+    computed = ph.noise_control.split_loss(
+        sum(areas), areas, branch=areas.index(fed), model="vdi2081"
+    )
+    return numeric(printed, computed, 0.05, unit="dB", places=3)
+
+
+def _register_junctions() -> None:
+    """Register the three Table 1 junctions, one row each."""
+    junctions = (
+        (3, 0.30, (0.30, 0.36, 0.42), 5.6),
+        (7, 0.049, (0.049, 0.049, 0.049), 4.8),
+        (16, 0.020, (0.020, 0.020), 3.0),
+    )
+    for element, fed, branches, printed in junctions:
+        register(
+            _VDI2081,
+            f"VDI 2081 Blatt 2 Table 1, element {element}",
+            f"Junction into {fed:g} m2 of {sum(branches):g} m2 total, dB",
+        )(functools.partial(_junction_outcome, fed, branches, printed))
+
+
+_register_junctions()
