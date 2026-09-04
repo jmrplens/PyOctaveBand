@@ -3,13 +3,13 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 623,
-    "passing": 623,
+    "checks": 634,
+    "passing": 634,
     "failing": 0,
-    "domains": 63,
-    "standards": 385,
-    "citations": 557,
-    "designations": 120,
+    "domains": 64,
+    "standards": 387,
+    "citations": 559,
+    "designations": 121,
     "sources": 84
   },
   "units": [
@@ -443,6 +443,12 @@
       "title": "Industrial noise control",
       "checks": 22,
       "passing": 22
+    },
+    {
+      "id": "hvac-noise-vdi-2081",
+      "title": "HVAC noise (VDI 2081)",
+      "checks": 11,
+      "passing": 11
     },
     {
       "id": "cnossos-eu-railway-source-directive-2002-49-ec-annex-ii",
@@ -17702,6 +17708,314 @@
         "value": 8.88e-16
       },
       "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-sound-power-at-63-hz-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+      },
+      "quantity": "Supply fan sound power at 63 Hz, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 90.4
+      },
+      "computed": {
+        "value": 90.41
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.006
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-sound-power-at-125-hz-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+      },
+      "quantity": "Supply fan sound power at 125 Hz, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 88.8
+      },
+      "computed": {
+        "value": 88.82
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.022
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-sound-power-at-250-hz-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+      },
+      "quantity": "Supply fan sound power at 250 Hz, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 86.3
+      },
+      "computed": {
+        "value": 86.32
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.019
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-sound-power-at-500-hz-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+      },
+      "quantity": "Supply fan sound power at 500 Hz, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 82.9
+      },
+      "computed": {
+        "value": 82.91
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.01
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-sound-power-at-1000-hz-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+      },
+      "quantity": "Supply fan sound power at 1000 Hz, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 78.6
+      },
+      "computed": {
+        "value": 78.59
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.006
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-sound-power-at-2000-hz-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+      },
+      "quantity": "Supply fan sound power at 2000 Hz, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 73.4
+      },
+      "computed": {
+        "value": 73.37
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.027
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-sound-power-at-4000-hz-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+      },
+      "quantity": "Supply fan sound power at 4000 Hz, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 67.2
+      },
+      "computed": {
+        "value": 67.24
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.045
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-sound-power-at-8000-hz-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+      },
+      "quantity": "Supply fan sound power at 8000 Hz, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 60.2
+      },
+      "computed": {
+        "value": 60.21
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.011
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-1-eq-13/fan-sound-power-level-l-w4-from-the-duty-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 1 Eq. (13)",
+        "cite": "VDI 2081 Blatt 1 Eq. (13)"
+      },
+      "quantity": "Fan sound power level L_W4 from the duty, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 96.0
+      },
+      "computed": {
+        "value": 96.041
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.041
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-total-sound-power-level-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+      },
+      "quantity": "Supply fan total sound power level, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 94.1
+      },
+      "computed": {
+        "value": 94.124
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.024
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-a-weighted-sound-power-level-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+      },
+      "quantity": "Supply fan A-weighted sound power level, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 84.5
+      },
+      "computed": {
+        "value": 84.511
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.011
+      },
+      "precision": 3,
       "verdict": "pass"
     },
     {

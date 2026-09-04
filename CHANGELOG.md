@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- `noise_control.fan_sound_power` takes `model="vdi2081"`, the German method of
+  VDI 2081 Part 1:2001-07 Section 4.3, beside the ASHRAE scaling law it has
+  always had. The two answer the same question and disagree on how: ASHRAE
+  scales the fan's **static** pressure by a table of per-type band constants,
+  VDI 2081 scales the **total** pressure rise by twenty and shapes the spectrum
+  in closed form, `-5 - 5 (lg St + c3)^2`, from the Strouhal number of the
+  impeller speed. Each model takes only the arguments its own standard is
+  written on, declared through `typing.overload`, so the two pressures cannot
+  be swapped: they are different quantities and the mistake would be worth
+  twenty times the logarithm of their ratio.
+
+  A fan is described by one of the three assembly types of VDI 3731 Part 2
+  rather than by a fan-type row: radial with rearwards curved blades, a
+  cylindrical rotor with forwards curved blades, or axial with a downstream
+  diffuser. Each brings its own specific sound power level, its own spectral
+  parameter and its own blade-frequency allowance, and a fan of one's own can
+  replace the representative level, which the guideline says a real fan can
+  exceed by up to 7 dB at the optimum duty point.
+
+  Eleven conformance rows, and the VDI 2081 domain is the sixty-fourth. They
+  are the guideline's own worked example, VDI 2081 Part 2:2005-05 Table 1: the
+  supply air fan reproduces octave by octave, and so do its unweighted 94,1 dB
+  and its A-weighted 84,5 dB. Both prints are superseded, by Part 1:2022-04
+  and Part 2:2022-10, and neither is held; the pair in hand is what makes the
+  example usable, since Part 2:2005 was written against Part 1:2001 and every
+  cross-reference in its tables resolves there. The two current editions are
+  listed on the support page.
+
 ### Changed
 
 - Ten visco-thermal models take a `phonometry.fluids.Fluid` where they took

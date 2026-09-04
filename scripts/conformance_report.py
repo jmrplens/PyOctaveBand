@@ -78,6 +78,7 @@ from conformance.domains import (
     atmospheric_refraction,
     electroacoustics,
     noise_control,
+    vdi2081,
     cnossos_rail,
 )
 
@@ -164,6 +165,7 @@ __all__ = [
     "document_problems",
     "dumps",
     "load",
+    "vdi2081",
     "write",
     "_cell",
     "_domains",

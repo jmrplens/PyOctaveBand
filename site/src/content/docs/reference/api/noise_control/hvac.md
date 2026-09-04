@@ -431,7 +431,7 @@ the 6 dB step.
 
 | Name | Description |
 | :--- | :--- |
-| `relative_efficiency_percent` | Static efficiency as a **percentage** of the peak, in `(0, 100]`. A fraction is not accepted in disguise: the table is tabulated from 50 % up, so 0,8 would fall to its bottom row and return 16 dB where 80 % returns 6, ten decibels with nothing to say it happened. Below 50 % the caller is warned that the value is outside the span Table 13.6 tabulates. |
+| `relative_efficiency_percent` | **ASHRAE only.** Static efficiency as a **percentage** of the peak, in `(0, 100]`. A fraction is not accepted in disguise: the table is tabulated from 50 % up, so 0,8 would fall to its bottom row and return 16 dB where 80 % returns 6, ten decibels with nothing to say it happened. Below 50 % the caller is warned that the value is outside the span Table 13.6 tabulates. |
 
 **Returns:** The correction `C_EFF`, dB.
 
@@ -448,14 +448,35 @@ fan_sound_power(
     volume_flow: float,
     *,
     fan_static_pressure_pa: float,
-    fan_type: str = 'forward_curved',
-    relative_efficiency_percent: float = 80.0,
-    blade_frequency: float | None = None,
-    frequencies: ArrayLike | None = None,
+    model: Literal['ashrae'] = ...,
+    fan_type: str = ...,
+    relative_efficiency_percent: float = ...,
+    blade_frequency: float | None = ...,
+    frequencies: ArrayLike | None = ...,
+) -> HvacSpectrumResult
+
+fan_sound_power(
+    volume_flow: float,
+    *,
+    model: Literal['vdi2081'],
+    fan_total_pressure_pa: float,
+    assembly: str,
+    fan_speed_rpm: float,
+    specific_sound_power_level: float | None = ...,
+    blade_count: int | None = ...,
+    relative_flow: float = ...,
+    frequencies: ArrayLike | None = ...,
 ) -> HvacSpectrumResult
 ```
 
-Octave-band fan sound power from the operating point (Long Eq. 13.1).
+Octave-band fan sound power from the operating point, by either method.
+
+Two schools of calculation answer the same question and do not agree on
+how. `model="ashrae"` (the default) is the scaling law below;
+`model="vdi2081"` is the German method, described after it. Each takes
+the arguments its own standard is written on, so neither can be handed the
+other's: the ASHRAE law scales the **static** pressure, VDI 2081 the
+**total** pressure rise, and confusing them is worth 20 log of the ratio.
 
 The ASHRAE (1987) scaling law, originally due to Beranek and published by
 Graham (1975):
@@ -483,15 +504,43 @@ to AMCA Standard 300 or ASHRAE Standard 68. Long's worked sheet (Table 14.9)
 prints a forward-curved row that this equation does not reproduce; see the
 module warning.
 
+**VDI 2081 Part 1:2001-07, Section 4.3.** The German method describes a fan
+by its assembly type rather than by a per-type band table:
+
+$$
+L_{W4} = L_\mathrm{WSM} + 10 \log_{10} \dot{V} + 20 \log_{10} \Delta p_\mathrm{t}
+$$
+
+$$
+\Delta L_{W,\mathrm{oct}} = -5 - 5 \left( \log_{10} St + c_3 \right)^{2}, \qquad St = f \, 60 / (\pi n)
+$$
+
+Equation (13) and Equation (15). The factor 20 on the pressure is the
+general $5(\gamma - 1)$ of Equation (11) with the Mach number
+exponent taken as 5, which Section 4.3.2 does for every ventilation fan.
+The Strouhal number carries no diameter: it cancels between the tip speed
+and the impeller circumference, so the impeller size a nomogram gives is
+not an input here. Section 4.3.3 sets the specific level and the spectral
+parameter for each of the three assemblies of VDI 3731 Part 2, and
+Figures 13 and 14 add a cubic allowance for running away from the best
+duty point, worth 0,1 dB at the optimum itself.
+
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `volume_flow` | Volume flow through the fan `Q_\mathrm{F}`, m3/s. |
-| `fan_static_pressure_pa` | Fan static pressure `P_\mathrm{F}`, in **pascals gauge**. This is the pressure rise the fan produces across itself, not an ambient pressure, and it shares neither the unit nor the datum of the `static_pressure` the ISO 3740 family takes in kilopascals absolute. No plausibility guard can separate the two: 101,325 Pa is a legitimate duty for a panel or propeller fan, so the name is what keeps them apart. |
-| `fan_type` | One of `"airfoil_large"` / `"airfoil_small"` (backward-curved or backward-inclined centrifugal wheels above and below 36 in diameter), `"forward_curved"`, `"radial_low"` / `"radial_medium"` / `"radial_high"` (radial blades by total pressure), `"vaneaxial_hub_low"` / `"vaneaxial_hub_medium"` / `"vaneaxial_hub_high"` (hub ratios 0.3-0.4, 0.4-0.6 and 0.6-0.8), `"tubeaxial_large"` / `"tubeaxial_small"` (above and below 40 in wheel diameter) or `"propeller"`. |
+| `fan_static_pressure_pa` | **ASHRAE only.** Fan static pressure `P_\mathrm{F}`, in **pascals gauge**. This is the pressure rise the fan produces across itself, not an ambient pressure, and it shares neither the unit nor the datum of the `static_pressure` the ISO 3740 family takes in kilopascals absolute. No plausibility guard can separate the two: 101,325 Pa is a legitimate duty for a panel or propeller fan, so the name is what keeps them apart. |
+| `fan_type` | **ASHRAE only.** One of `"airfoil_large"` / `"airfoil_small"` (backward-curved or backward-inclined centrifugal wheels above and below 36 in diameter), `"forward_curved"`, `"radial_low"` / `"radial_medium"` / `"radial_high"` (radial blades by total pressure), `"vaneaxial_hub_low"` / `"vaneaxial_hub_medium"` / `"vaneaxial_hub_high"` (hub ratios 0.3-0.4, 0.4-0.6 and 0.6-0.8), `"tubeaxial_large"` / `"tubeaxial_small"` (above and below 40 in wheel diameter) or `"propeller"`. |
 | `relative_efficiency_percent` | Static efficiency as a **percentage** of the peak (default 80, Long's recommendation when the peak is unknown). Table 13.6 is tabulated from 50 % up, so a fraction such as 0,8 falls through to the table's bottom row and returns its worst-case 16 dB correction instead of the 6 dB that 80 % earns. That is what [`HvacWarning`](/phonometry/reference/api/noise_control/hvac/#hvacwarning) says when it fires below the floor. |
-| `blade_frequency` | Blade passing frequency `f_bp`, Hz (from [`blade_passing_frequency`](/phonometry/reference/api/noise_control/hvac/#blade_passing_frequency)). `None` (default) places the increment in the octave band Table 13.7 tabulates for the fan type. |
+| `blade_frequency` | **ASHRAE only.** Blade passing frequency `f_bp`, Hz (from [`blade_passing_frequency`](/phonometry/reference/api/noise_control/hvac/#blade_passing_frequency)). `None` (default) places the increment in the octave band Table 13.7 tabulates for the fan type. |
+| `model` | `"ashrae"` (default) or `"vdi2081"`. |
+| `fan_total_pressure_pa` | **VDI 2081 only.** Total pressure rise `\Delta p_\mathrm{t}` across the fan, Pa. Not the static pressure of the ASHRAE law: the total pressure carries the dynamic head as well, and Equation (13) scales it by 20 rather than by 10. |
+| `assembly` | **VDI 2081 only.** `"rr"` (radial, rearwards curved blades), `"t"` (cylindrical rotor, forwards curved blades) or `"am"` (axial with a downstream diffuser). |
+| `fan_speed_rpm` | **VDI 2081 only.** Impeller speed `n`, min^-1. |
+| `specific_sound_power_level` | **VDI 2081 only.** The specific sound power level `L_\mathrm{WSM}`, dB. `None` (default) takes the representative value of the assembly, 34, 36 or 42 dB. Section 4.3.3 says a fan can sit up to 7 dB above its assembly average at the optimum duty point, so a manufacturer's own value belongs here. |
+| `blade_count` | **VDI 2081 only.** Number of impeller blades `z`, which places the blade-frequency allowance of Section 4.3.4 in the octave holding `n z / 60`. `None` (default) omits it. The allowance is nought for assemblies RR and T built to the state of the art and 4 dB for AM. |
+| `relative_flow` | **VDI 2081 only.** Duty as a fraction of the best efficiency point, `\dot{V} / \dot{V}_\mathrm{opt}` (default 1). |
 | `frequencies` | Octave-band centres, Hz; `None` (default) uses the 63 Hz to 8 kHz bands of [`OCTAVE_BANDS`](/phonometry/reference/api/materials/rating/#octave_bands). |
 
 **Returns:** An [`HvacSpectrumResult`](/phonometry/reference/api/noise_control/hvac/#hvacspectrumresult) of the band sound power level, dB re 1e-12 W.

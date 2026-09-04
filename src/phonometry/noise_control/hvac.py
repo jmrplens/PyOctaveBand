@@ -76,7 +76,7 @@ from __future__ import annotations
 import math
 import warnings
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
 
@@ -245,6 +245,38 @@ _EFFICIENCY_CORRECTION: tuple[tuple[float, float], ...] = (
     (50.0, 15.0),
     (0.0, 16.0),
 )
+# ---------------------------------------------------------------------------
+# VDI 2081 Part 1:2001-07, Section 4.3 -- the German fan model, an alternative
+# to the ASHRAE scaling law above. It splits ventilation fans into three
+# assembly types after VDI 3731 Part 2 and gives each one a specific sound
+# power level and a spectral parameter, so a fan is described by its assembly
+# and its duty rather than by a per-type band table.
+# ---------------------------------------------------------------------------
+#: Section 4.3.3 -- per assembly type: the representative specific sound power
+#: level ``L_WSM`` in dB, the spectral parameter ``c3`` of Equation (15), and
+#: the blade-frequency allowance ``dL_Wd`` in dB. The three ``L_WSM`` values
+#: are the printed representative ones, not ``71,6 - 10 lg psi + L_USM``
+#: recomputed: the guideline rounds each within its own stated tolerance.
+_VDI2081_ASSEMBLY: dict[str, tuple[float, float, float]] = {
+    # radial fans with rearwards curved blades, psi = 0,63 to 1,0
+    "rr": (34.0, 0.4, 0.0),
+    # cylindrical rotors with forwards curved blades, psi = 2,4 to 3,0
+    "t": (36.0, 0.15, 0.0),
+    # axial fans with a downstream diffuser, psi = 0,25 to 0,63
+    "am": (42.0, -0.6, 4.0),
+}
+#: Equation (15) -- ``dL_W_Okt = -c1 - c2 (lg St + c3)^2``, both constants 5 dB.
+_VDI2081_SPECTRUM_C1 = 5.0
+_VDI2081_SPECTRUM_C2 = 5.0
+#: Figure 13 -- the level allowance for a duty away from the best efficiency
+#: point, as a cubic in ``V/V_opt``, for assemblies RR and AM. Figure 14 gives
+#: the same for assembly T. Constant first, ascending powers after.
+_VDI2081_OFF_DUTY: dict[str, tuple[float, float, float, float]] = {
+    "rr": (18.9, -46.6, 33.0, -5.2),
+    "am": (18.9, -46.6, 33.0, -5.2),
+    "t": (1.5, -0.453, -7.05, 6.11),
+}
+
 #: Long Table 13.8 -- approximate fan-housing (casing) attenuation, dB, over the
 #: octave bands 63 Hz to 8 kHz (Miller, 1980).
 _FAN_CASING_ATTENUATION: NDArray[np.float64] = np.array(
@@ -879,7 +911,8 @@ def fan_efficiency_correction(*, relative_efficiency_percent: float) -> float:
     efficiency is unknown Long recommends assuming 80 per cent, which lands in
     the 6 dB step.
 
-    :param relative_efficiency_percent: Static efficiency as a **percentage**
+    :param relative_efficiency_percent: **ASHRAE only.** Static efficiency as
+        a **percentage**
         of the peak, in ``(0, 100]``. A fraction is not accepted in disguise:
         the table is tabulated from 50 % up, so 0,8 would fall to its bottom
         row and return 16 dB where 80 % returns 6, ten decibels with nothing to
@@ -907,16 +940,118 @@ def fan_efficiency_correction(*, relative_efficiency_percent: float) -> float:
     return _EFFICIENCY_CORRECTION[-1][1]  # pragma: no cover - the last edge is 0
 
 
+def _vdi2081_fan_spectrum(
+    bands: NDArray[np.float64],
+    *,
+    assembly: str,
+    volume_flow: float,
+    fan_total_pressure_pa: float,
+    fan_speed_rpm: float,
+    specific_sound_power_level: float | None,
+    blade_count: int | None,
+    relative_flow: float,
+) -> NDArray[np.float64]:
+    """The VDI 2081 Part 1 Section 4.3 octave spectrum, dB re 1e-12 W.
+
+    Equation (13) sets the level, Equation (15) the shape and Figure 13 or 14
+    the allowance for running away from the best efficiency point.
+    """
+    printed, c3, blade_allowance = _VDI2081_ASSEMBLY[assembly]
+    # Positive rather than merely finite: the guideline publishes 34, 36 and
+    # 42 dB and says each can rise by up to 7 dB at the best duty point, so
+    # nothing near nought is a specific level, and a NaN here would otherwise
+    # travel the whole way to a spectrum.
+    level = (
+        printed
+        if specific_sound_power_level is None
+        else require_positive(specific_sound_power_level, "specific_sound_power_level")
+    )
+    speed = require_positive(fan_speed_rpm, "fan_speed_rpm")
+    ratio = require_positive(relative_flow, "relative_flow")
+
+    # Equation (13): the total-pressure form, with the Mach number exponent
+    # taken as 5 for every ventilation fan (Section 4.3.2), which is what puts
+    # the factor 20 on the pressure rather than the 5 (gamma - 1) of Eq. (11).
+    overall = (
+        level
+        + 10.0 * math.log10(volume_flow)
+        + 20.0 * math.log10(fan_total_pressure_pa)
+    )
+
+    # Equation (15). The Strouhal number carries no diameter: it cancels
+    # between the tip speed and the impeller circumference.
+    strouhal = bands * 60.0 / (math.pi * speed)
+    shape = (
+        -_VDI2081_SPECTRUM_C1 - _VDI2081_SPECTRUM_C2 * (np.log10(strouhal) + c3) ** 2
+    )
+
+    # Figure 13 (RR, AM) or Figure 14 (T), a cubic in the relative flow. It is
+    # nought at the best efficiency point to within a tenth of a decibel, which
+    # is the value the guideline's own worked example prints there.
+    a0, a1, a2, a3 = _VDI2081_OFF_DUTY[assembly]
+    off_duty = a0 + a1 * ratio + a2 * ratio**2 + a3 * ratio**3
+
+    spectrum = overall + shape + off_duty
+    if blade_count is not None:
+        blades = require_positive(blade_count, "blade_count")
+        passing = speed * blades / 60.0
+        nearest = int(np.argmin(np.abs(np.log2(passing / bands))))
+        spectrum[nearest] += blade_allowance
+    return spectrum
+
+
+@overload
 def fan_sound_power(
     volume_flow: float,
     *,
     fan_static_pressure_pa: float,
+    model: Literal["ashrae"] = ...,
+    fan_type: str = ...,
+    relative_efficiency_percent: float = ...,
+    blade_frequency: float | None = ...,
+    frequencies: ArrayLike | None = ...,
+) -> HvacSpectrumResult: ...
+
+
+@overload
+def fan_sound_power(
+    volume_flow: float,
+    *,
+    model: Literal["vdi2081"],
+    fan_total_pressure_pa: float,
+    assembly: str,
+    fan_speed_rpm: float,
+    specific_sound_power_level: float | None = ...,
+    blade_count: int | None = ...,
+    relative_flow: float = ...,
+    frequencies: ArrayLike | None = ...,
+) -> HvacSpectrumResult: ...
+
+
+def fan_sound_power(  # noqa: PLR0913 - two models, each with its own arguments
+    volume_flow: float,
+    *,
+    fan_static_pressure_pa: float | None = None,
     fan_type: str = "forward_curved",
     relative_efficiency_percent: float = 80.0,
     blade_frequency: float | None = None,
+    model: str = "ashrae",
+    fan_total_pressure_pa: float | None = None,
+    assembly: str | None = None,
+    fan_speed_rpm: float | None = None,
+    specific_sound_power_level: float | None = None,
+    blade_count: int | None = None,
+    relative_flow: float = 1.0,
     frequencies: ArrayLike | None = None,
 ) -> HvacSpectrumResult:
-    r"""Octave-band fan sound power from the operating point (Long Eq. 13.1).
+    r"""Octave-band fan sound power from the operating point, by either method.
+
+    Two schools of calculation answer the same question and do not agree on
+    how. ``model="ashrae"`` (the default) is the scaling law below;
+    ``model="vdi2081"`` is the German method, described after it. Each takes
+    the arguments its own standard is written on, so neither can be handed the
+    other's: the ASHRAE law scales the **static** pressure, VDI 2081 the
+    **total** pressure rise, and confusing them is worth 20 log of the ratio.
 
     The ASHRAE (1987) scaling law, originally due to Beranek and published by
     Graham (1975):
@@ -945,15 +1080,36 @@ def fan_sound_power(
     prints a forward-curved row that this equation does not reproduce; see the
     module warning.
 
+    **VDI 2081 Part 1:2001-07, Section 4.3.** The German method describes a fan
+    by its assembly type rather than by a per-type band table:
+
+    .. math::
+
+       L_{W4} = L_\mathrm{WSM} + 10 \log_{10} \dot{V} + 20 \log_{10} \Delta p_\mathrm{t}
+
+       \Delta L_{W,\mathrm{oct}} = -5 - 5 \left( \log_{10} St + c_3 \right)^{2},
+       \qquad St = f \, 60 / (\pi n)
+
+    Equation (13) and Equation (15). The factor 20 on the pressure is the
+    general :math:`5(\gamma - 1)` of Equation (11) with the Mach number
+    exponent taken as 5, which Section 4.3.2 does for every ventilation fan.
+    The Strouhal number carries no diameter: it cancels between the tip speed
+    and the impeller circumference, so the impeller size a nomogram gives is
+    not an input here. Section 4.3.3 sets the specific level and the spectral
+    parameter for each of the three assemblies of VDI 3731 Part 2, and
+    Figures 13 and 14 add a cubic allowance for running away from the best
+    duty point, worth 0,1 dB at the optimum itself.
+
     :param volume_flow: Volume flow through the fan ``Q_\mathrm{F}``, m3/s.
-    :param fan_static_pressure_pa: Fan static pressure ``P_\mathrm{F}``, in
+    :param fan_static_pressure_pa: **ASHRAE only.** Fan static pressure
+        ``P_\mathrm{F}``, in
         **pascals gauge**. This is the pressure rise the fan produces across
         itself, not an ambient pressure, and it shares neither the unit nor the
         datum of the ``static_pressure`` the ISO 3740 family takes in
         kilopascals absolute. No plausibility guard can separate the two:
         101,325 Pa is a legitimate duty for a panel or propeller fan, so the
         name is what keeps them apart.
-    :param fan_type: One of ``"airfoil_large"`` / ``"airfoil_small"``
+    :param fan_type: **ASHRAE only.** One of ``"airfoil_large"`` / ``"airfoil_small"``
         (backward-curved or backward-inclined centrifugal wheels above and
         below 36 in diameter), ``"forward_curved"``, ``"radial_low"`` /
         ``"radial_medium"`` / ``"radial_high"`` (radial blades by total
@@ -967,18 +1123,72 @@ def fan_sound_power(
         0,8 falls through to the table's bottom row and returns its worst-case
         16 dB correction instead of the 6 dB that 80 % earns. That is what
         :class:`HvacWarning` says when it fires below the floor.
-    :param blade_frequency: Blade passing frequency ``f_bp``, Hz (from
+    :param blade_frequency: **ASHRAE only.** Blade passing frequency ``f_bp``,
+        Hz (from
         :func:`blade_passing_frequency`). ``None`` (default) places the
         increment in the octave band Table 13.7 tabulates for the fan type.
+    :param model: ``"ashrae"`` (default) or ``"vdi2081"``.
+    :param fan_total_pressure_pa: **VDI 2081 only.** Total pressure rise
+        ``\Delta p_\mathrm{t}`` across the fan, Pa. Not the static pressure
+        of the ASHRAE law: the total pressure carries the dynamic head as
+        well, and Equation (13) scales it by 20 rather than by 10.
+    :param assembly: **VDI 2081 only.** ``"rr"`` (radial, rearwards curved
+        blades), ``"t"`` (cylindrical rotor, forwards curved blades) or
+        ``"am"`` (axial with a downstream diffuser).
+    :param fan_speed_rpm: **VDI 2081 only.** Impeller speed ``n``, min^-1.
+    :param specific_sound_power_level: **VDI 2081 only.** The specific sound
+        power level ``L_\mathrm{WSM}``, dB. ``None`` (default) takes the
+        representative value of the assembly, 34, 36 or 42 dB. Section 4.3.3
+        says a fan can sit up to 7 dB above its assembly average at the
+        optimum duty point, so a manufacturer's own value belongs here.
+    :param blade_count: **VDI 2081 only.** Number of impeller blades ``z``,
+        which places the blade-frequency allowance of Section 4.3.4 in the
+        octave holding ``n z / 60``. ``None`` (default) omits it. The
+        allowance is nought for assemblies RR and T built to the state of the
+        art and 4 dB for AM.
+    :param relative_flow: **VDI 2081 only.** Duty as a fraction of the best
+        efficiency point, ``\dot{V} / \dot{V}_\mathrm{opt}`` (default 1).
     :param frequencies: Octave-band centres, Hz; ``None`` (default) uses the
         63 Hz to 8 kHz bands of :data:`OCTAVE_BANDS`.
     :return: An :class:`HvacSpectrumResult` of the band sound power level,
         dB re 1e-12 W.
     """
-    kind = require_choice(fan_type, "fan_type", tuple(_FAN_LEVEL_CORRECTION))
+    scheme = require_choice(model, "model", ("ashrae", "vdi2081"))
     q = require_positive(volume_flow, "volume_flow")
-    p = require_positive(fan_static_pressure_pa, "fan_static_pressure_pa")
     f, idx = _octave_slots(frequencies)
+
+    if scheme == "vdi2081":
+        if fan_total_pressure_pa is None or assembly is None or fan_speed_rpm is None:
+            msg = (
+                "model='vdi2081' needs 'fan_total_pressure_pa', 'assembly' and "
+                "'fan_speed_rpm'. VDI 2081 Part 1 Equation (13) is written on "
+                "the total pressure rise, which is not the static pressure the "
+                "ASHRAE model takes."
+            )
+            raise ValueError(msg)
+        group = require_choice(assembly, "assembly", tuple(_VDI2081_ASSEMBLY))
+        dpt = require_positive(fan_total_pressure_pa, "fan_total_pressure_pa")
+        return HvacSpectrumResult(
+            frequencies=f,
+            values=_vdi2081_fan_spectrum(
+                f,
+                assembly=group,
+                volume_flow=q,
+                fan_total_pressure_pa=dpt,
+                fan_speed_rpm=fan_speed_rpm,
+                specific_sound_power_level=specific_sound_power_level,
+                blade_count=blade_count,
+                relative_flow=relative_flow,
+            ),
+            quantity="sound_power_level",
+            label=f"Fan (VDI 2081 {group.upper()}, {q * 3600:.0f} m3/h, {dpt:.0f} Pa)",
+        )
+
+    if fan_static_pressure_pa is None:
+        msg = "model='ashrae' needs 'fan_static_pressure_pa'."
+        raise ValueError(msg)
+    kind = require_choice(fan_type, "fan_type", tuple(_FAN_LEVEL_CORRECTION))
+    p = require_positive(fan_static_pressure_pa, "fan_static_pressure_pa")
 
     duty = 10.0 * np.log10(q * 1000.0 / 0.472) + 10.0 * np.log10(p / _PA_PER_IN_WG)
     c_eff = fan_efficiency_correction(
