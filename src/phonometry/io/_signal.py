@@ -150,7 +150,8 @@ class Signal:
     def __len__(self) -> int:
         return int(self._view.shape[0])
 
-    def __getitem__(self, key: Any) -> Any:  # noqa: ANN401  # mirrors ndarray indexing, whose key union numpy does not export
+    # Mirrors ndarray indexing, whose key union numpy does not export.
+    def __getitem__(self, key: Any) -> Any:  # noqa: ANN401
         return self._view[key]
 
     @property

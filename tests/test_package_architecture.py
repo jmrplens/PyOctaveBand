@@ -725,6 +725,38 @@ def test_no_source_compares_a_float_for_equality() -> None:
     )
 
 
+def test_no_suppression_comment_hides_its_reason_from_the_parser() -> None:
+    """A `# noqa` directive ends at its codes, and the reason goes above it.
+
+    Ruff documents the directive as ``# noqa: CODE``, and reads codes until it
+    meets something that is not one. Prose after a code is undefined ground:
+    ruff has tolerated it, the static analyser reports it as a malformed
+    suppression, and a directive that silently stops applying is worse than
+    the lint it was hiding. Thirteen of these had accumulated in three shapes,
+    a dash, a double dash and a second hash, and SonarCloud only saw the
+    fourteenth because it was new code in a pull request. The reason belongs on
+    the line above, where nothing has to parse it.
+    """
+    import pathlib
+    import re
+
+    directive = re.compile(r"#\s*noqa:\s*(?P<tail>.*)$")
+    codes = re.compile(r"^[A-Z]+[0-9]+(?:\s*,\s*[A-Z]+[0-9]+)*\s*$")
+    trailing: list[str] = []
+    for path in sorted(pathlib.Path("src/phonometry").rglob("*.py")):
+        for number, line in enumerate(
+            path.read_text(encoding="utf-8").splitlines(), start=1
+        ):
+            match = directive.search(line)
+            if match and not codes.match(match.group("tail")):
+                trailing.append(f"{path.relative_to('src')}:{number} {line.strip()}")
+
+    assert not trailing, (
+        "suppression comments carrying prose after their codes:\n  "
+        + "\n  ".join(trailing)
+    )
+
+
 def test_no_error_message_carries_a_comma_decimal() -> None:
     """Error messages are English prose, and English prose takes a point.
 

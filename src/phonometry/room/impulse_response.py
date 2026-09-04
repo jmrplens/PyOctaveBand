@@ -178,7 +178,8 @@ class ImpulseResponseResult:
         """Number of impulse-response samples (the length of ``ir``'s last axis)."""
         return int(self.ir.shape[-1])
 
-    def __getitem__(self, key: Any) -> Any:  # noqa: ANN401  # mirrors ndarray indexing, whose key union numpy does not export
+    # Mirrors ndarray indexing, whose key union numpy does not export.
+    def __getitem__(self, key: Any) -> Any:  # noqa: ANN401
         """Forward indexing to ``ir``: ``result[key]`` yields ``ir[key]``."""
         return self.ir[key]
 
@@ -909,7 +910,8 @@ class ShapedSweepResult:
         """Number of sweep samples (the length of ``signal``'s last axis)."""
         return int(self.signal.shape[-1])
 
-    def __getitem__(self, key: Any) -> Any:  # noqa: ANN401  # mirrors ndarray indexing, whose key union numpy does not export
+    # Mirrors ndarray indexing, whose key union numpy does not export.
+    def __getitem__(self, key: Any) -> Any:  # noqa: ANN401
         """Forward indexing to ``signal``: ``result[key]`` yields ``signal[key]``."""
         return self.signal[key]
 

@@ -343,7 +343,8 @@ def _normalise(value: str, aliases: Mapping[str, str], name: str) -> str:
     """Lower-case ``value``, normalise separators and resolve aliases."""
     if not isinstance(value, str):
         msg = f"'{name}' must be a string; got {value!r}."
-        raise ValueError(msg)  # noqa: TRY004 - ValueError keeps the module validation errors uniform
+        # ValueError keeps the module validation errors uniform.
+        raise ValueError(msg)  # noqa: TRY004
     key = value.strip().lower().replace(" ", "_").replace("-", "_")
     return aliases.get(key, key)
 
