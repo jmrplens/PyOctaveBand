@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**619/619 conformance checks pass** across 62 domains and 382 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**623/623 conformance checks pass** across 63 domains and 385 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -858,6 +858,18 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Ray tracing vs linear gradient | Turning depth of a 10° ray, c = 1500 + 0.05z (circular arc), m | 462.8 m (+/-1 m) | 462.8 m | 0 m | 0 % | ![Pass][cv-pass] Pass |
 | Ray travel time vs iso-gradient closed form | Travel time of a 10° ray at 10 km, c = 1500 + 0.05z (Medwin & Clay Eq. 3.3.20), s | 6.625942 s (+/-0.000001 s) | 6.625942 s | 0 s | 0 % | ![Pass][cv-pass] Pass |
 | Parabolic equation vs free field | PE propagation loss at 2 km, homogeneous medium (spherical spreading), dB | 66.021 dB (+/-0.1 dB) | 66.021 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+
+</details>
+
+<details>
+<summary><b>Sonar processing gain and detection (Ainslie 2010)</b>: 100% (4/4)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
+|:---|:---|:---|:---|:---|:---:|:---:|
+| Ainslie (2010) Sect. 6.1.2.1, printed folio 267 | Line-array DI at broadside, high-frequency limit 10 log10(2L/lambda), dB | 23.01 dB (+/-0.01 dB) | 23.015 dB | 0.004 dB | 40 % | ![Pass][cv-pass] Pass |
+| Ainslie (2010) Sect. 6.1.2.1, printed folio 267 | Line-array DI at endfire, where the footprint halves: 10 log10(4L/lambda), dB | 26.021 dB (+/-0.01 dB) | 26.023 dB | 0.002 dB | 20 % | ![Pass][cv-pass] Pass |
+| Ainslie (2010) Eq. (11.20), Fig. 11.1 | Unsteered DI vs the book's own approximation 1 + G0 tanh(pi^2 G0/36) at 2L/lambda = 20 | 13.22 dB (+/-0.5 dB) | 13.05 dB | -0.168 dB | 34 % | ![Pass][cv-pass] Pass |
+| Ainslie (2010) Eq. (11.22), printed folio 581 | Detection threshold at 50 % detection probability, p_fa = 1e-4, dB | 10.0947 dB (+/-0 dB) | 10.0947 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 
 </details>
 

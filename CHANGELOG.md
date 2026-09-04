@@ -160,6 +160,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `underwater.array_directivity_index` and `underwater.detection_threshold`,
+  the two terms of the sonar equation that had to be supplied from outside.
+  `passive_sonar_equation` and `active_sonar_equation` accepted `DI` and `DT`
+  as numbers and had no way to produce either, so the equation stopped one step
+  short of an answer.
+
+  The directivity index of an unshaded line array comes from Ainslie,
+  *Principles of Sonar Performance Modelling* (Springer 2010), Equations (6.49)
+  to (6.57) on printed folio 267: the beam's solid-angle footprint in closed
+  form, through the sine integral. It is also the **array gain** whenever the
+  noise is isotropic and the signal a plane wave, which is the case the sonar
+  equation is written for, so the one function answers both terms.
+
+  Checked against the three limits Section 6.1.2.1 states, which are exact
+  rather than fitted: 10 log10(2L/lambda) at high frequency away from endfire,
+  10 log10(4L/lambda) near endfire where the footprint halves, and 0 dB once
+  the array is much shorter than a wavelength. And cross-checked against the
+  book's own closed-form approximation, Equation (11.20), which Figure 11.1
+  plots against the same integral: the two agree within half a decibel across
+  the range that figure covers, which is an independent check rather than a
+  restatement, since the approximation is fitted and the implementation
+  derived.
+
+  The detection threshold at 50 % detection probability comes from
+  Equation (11.22) on printed folio 581. The logarithm inside it is base two,
+  not a square: the two are typeset alike, they differ by half a decibel at
+  p_fa = 1e-4, and the distinction has a test of its own. A false-alarm
+  probability of one half is refused rather than returned, since the threshold
+  diverges there: half the empty beams are already being declared detections.
+
+  Four conformance rows, and the sonar domain is the sixty-third.
+
 - `fluids.sea_water()` and `fluids.sea_water_density()` give the library a
   density of sea water, which it had nowhere. The density implements Ainslie,
   *Principles of Sonar Performance Modelling* (Springer 2010), Equation (4.6)

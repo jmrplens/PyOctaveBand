@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 619 numerical conformance checks against 382 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 623 numerical conformance checks against 385 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 619 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 62 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 623 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 63 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -37025,6 +37025,8 @@ documents, one page per module.
 | `seawater_absorption` | `function` | **Volume absorption α, dB/km.**<br>• `frequency_hz` [Hz] (scalar/array)<br>• `temperature` [°C] / `salinity` [ppt] / `depth` [m] / `ph`<br>• `model`: `"francois-garrison"` (default) / `"ainslie-mccolm"` / `"thorp"` | `seawater_absorption(10e3)` |
 | `propagation_loss` | `function` | **Propagation loss PL = spreading + α·R, α in dB/km and R in km.**<br>• `range_m` [m] / `frequency_hz` [Hz]<br>• `law` / `temperature` / `salinity` / `depth` / `ph` / `model` / `transition_range` | `propagation_loss(r, 10e3)`<br><br>• `PropagationLossResult` |
 | `PropagationLossResult` | `dataclass` | **Propagation-loss result.**<br>• `range_m` [m] / `pl` / `spreading` / `absorption` [dB]<br>• `frequency` [Hz] / `absorption_coefficient` [dB/km]<br>• `law` / `model`<br>• `.plot()`: PL vs range | `res.pl, res.absorption_coefficient` |
+| `array_directivity_index` | `function` | **Directivity index of an unshaded line array (Ainslie 2010 Eqs. 6.49–6.57).**<br>• `array_length_m` L, `wavelength_m` λ<br>• `steer_angle_rad` ψ from broadside (Default: 0)<br>• DI = 10 log₁₀(4π/δΩ); also the **array gain** in isotropic noise, which is the case the sonar equation assumes<br>• 10 log₁₀(2L/λ) at broadside, 3 dB more at endfire, → 0 dB as L/λ → 0 | `underwater.array_directivity_index(50.0, 1.5)  # 18.3` |
+| `detection_threshold` | `function` | **Detection threshold at 50 % detection probability (Ainslie 2010 Eq. 11.22).**<br>• `false_alarm_probability` p_fa, in (0, ½)<br>• DT = 10 log₁₀(log₂[1/(2 p_fa)]) − 0,8 dB, base two<br>• ±0,1 dB for p_fa < 10⁻² with one-dominant-plus-Rayleigh statistics; diverges at ½ | `underwater.detection_threshold(1e-4)  # 10.09` |
 | `passive_sonar_equation` | `function` | **Passive sonar equation.**<br>• `source_level` / `propagation_loss` / `noise_level` [dB]<br>• `directivity_index` / `detection_threshold` (Default: 0)<br>SE = SL − PL − (NL − DI) − DT | `passive_sonar_equation(140, 80, 60)`<br><br>• `SonarEquationResult` |
 | `active_sonar_equation` | `function` | **Active (monostatic) sonar equation.**<br>• `source_level` / `propagation_loss` / `target_strength` / `noise_level` [dB]<br>• `directivity_index` / `detection_threshold` / `reverberation_level`<br>noise-limited SE = SL − 2·PL + TS − (NL − DI) − DT; with `reverberation_level` → SE = SL − 2·PL + TS − RL − DT | `active_sonar_equation(220, 70, 15, 60)`<br><br>• `SonarEquationResult` |
 | `SonarEquationResult` | `dataclass` | **Sonar-equation result.**<br>• `mode` / `signal_excess` / `snr` [dB] / `figure_of_merit` [dB]<br>• `propagation_loss` / `source_level` / `noise_level` / `directivity_index` / `detection_threshold` [dB]<br>• `target_strength` [dB or None] / `reverberation_limited`<br>• `.plot()`: signal excess vs PL | `res.signal_excess, res.figure_of_merit` |
@@ -51925,7 +51927,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 619 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 623 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -52292,7 +52294,7 @@ sample from the metrology core:
 | IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()`; IEC 61252:2025 has since superseded this print, and the transcription still targets the 1993+A2 text | `tests/signals/test_levels.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-619 numerical conformance checks across 62 domains and 382 standards, covering
+623 numerical conformance checks across 63 domains and 385 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise
@@ -53377,7 +53379,62 @@ underwater.active_sonar_equation(220.0, 70.0, target_strength=15.0, noise_level=
                          directivity_index=20.0, detection_threshold=10.0)
 ```
 
-### 3.1 Detection range
+### 3.1 Where $DI$ and $DT$ come from
+
+The two terms above were typed in. Both have a model, so neither has to be.
+
+The **directivity index** of an unshaded line array follows from its length,
+the wavelength and the direction it is steered in (Ainslie, *Principles of
+Sonar Performance Modelling*, Equations (6.49) to (6.57), printed folio 267). It is also the **array gain**
+whenever the noise is isotropic and the signal a plane wave, which is the case
+the sonar equation is written for, so one number answers both:
+
+```python
+from phonometry import underwater
+
+di = underwater.array_directivity_index(array_length_m=50.0, wavelength_m=1.5)
+print(f"{di:.1f} dB")                                        # 18.3 dB
+```
+
+The array buys 3 dB more at endfire than at broadside, because the beam
+footprint halves there, and nothing at all once it is much shorter than a
+wavelength:
+
+```python
+import math
+
+from phonometry import underwater
+
+broadside = underwater.array_directivity_index(100.0, 1.0)
+endfire = underwater.array_directivity_index(100.0, 1.0,
+                                             steer_angle_rad=math.pi / 2)
+print(f"{broadside:.1f} dB, {endfire:.1f} dB")               # 23.0 dB, 26.0 dB
+print(f"{underwater.array_directivity_index(0.01, 1.0):.3f} dB")  # 0.000 dB
+```
+
+The **detection threshold** at 50 % detection probability follows from the
+false-alarm probability alone (Equation (11.22), printed folio 581), for the
+one-dominant-plus-Rayleigh statistics the book recommends when the target
+statistics are unknown:
+
+```python
+from phonometry import underwater
+
+for p_fa in (1e-2, 1e-4, 1e-6):
+    print(f"{p_fa:.0e} -> {underwater.detection_threshold(p_fa):.1f} dB")
+# 1e-02 -> 6.7 dB
+# 1e-04 -> 10.1 dB
+# 1e-06 -> 12.0 dB
+```
+
+Demanding fewer false alarms costs signal-to-noise ratio, and the price falls
+away as it is paid: the logarithm inside Equation (11.22) is itself logarithmic
+in $p_\mathrm{fa}$, so the decade below $10^{-2}$ buys 2.0 dB and the decade
+below $10^{-5}$ only 0.8. At $p_\mathrm{fa} = 1/2$ the threshold diverges and
+the call is refused: half the empty beams are already being
+declared detections, and no threshold rescues that.
+
+### 3.2 Detection range
 
 Since the figure of merit *is* the maximum allowable propagation loss,
 inverting a loss law at $PL = FOM$ gives the **detection range**, the range at

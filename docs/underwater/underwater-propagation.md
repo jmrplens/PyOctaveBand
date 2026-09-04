@@ -285,7 +285,62 @@ underwater.active_sonar_equation(220.0, 70.0, target_strength=15.0, noise_level=
                          directivity_index=20.0, detection_threshold=10.0)
 ```
 
-### 3.1 Detection range
+### 3.1 Where $DI$ and $DT$ come from
+
+The two terms above were typed in. Both have a model, so neither has to be.
+
+The **directivity index** of an unshaded line array follows from its length,
+the wavelength and the direction it is steered in (Ainslie, *Principles of
+Sonar Performance Modelling*, Equations (6.49) to (6.57), printed folio 267). It is also the **array gain**
+whenever the noise is isotropic and the signal a plane wave, which is the case
+the sonar equation is written for, so one number answers both:
+
+```python
+from phonometry import underwater
+
+di = underwater.array_directivity_index(array_length_m=50.0, wavelength_m=1.5)
+print(f"{di:.1f} dB")                                        # 18.3 dB
+```
+
+The array buys 3 dB more at endfire than at broadside, because the beam
+footprint halves there, and nothing at all once it is much shorter than a
+wavelength:
+
+```python
+import math
+
+from phonometry import underwater
+
+broadside = underwater.array_directivity_index(100.0, 1.0)
+endfire = underwater.array_directivity_index(100.0, 1.0,
+                                             steer_angle_rad=math.pi / 2)
+print(f"{broadside:.1f} dB, {endfire:.1f} dB")               # 23.0 dB, 26.0 dB
+print(f"{underwater.array_directivity_index(0.01, 1.0):.3f} dB")  # 0.000 dB
+```
+
+The **detection threshold** at 50 % detection probability follows from the
+false-alarm probability alone (Equation (11.22), printed folio 581), for the
+one-dominant-plus-Rayleigh statistics the book recommends when the target
+statistics are unknown:
+
+```python
+from phonometry import underwater
+
+for p_fa in (1e-2, 1e-4, 1e-6):
+    print(f"{p_fa:.0e} -> {underwater.detection_threshold(p_fa):.1f} dB")
+# 1e-02 -> 6.7 dB
+# 1e-04 -> 10.1 dB
+# 1e-06 -> 12.0 dB
+```
+
+Demanding fewer false alarms costs signal-to-noise ratio, and the price falls
+away as it is paid: the logarithm inside Equation (11.22) is itself logarithmic
+in $p_\mathrm{fa}$, so the decade below $10^{-2}$ buys 2.0 dB and the decade
+below $10^{-5}$ only 0.8. At $p_\mathrm{fa} = 1/2$ the threshold diverges and
+the call is refused: half the empty beams are already being
+declared detections, and no threshold rescues that.
+
+### 3.2 Detection range
 
 Since the figure of merit *is* the maximum allowable propagation loss,
 inverting a loss law at $PL = FOM$ gives the **detection range**, the range at

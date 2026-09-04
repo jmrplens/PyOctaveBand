@@ -20,6 +20,12 @@ propagation loss at the detection limit $\mathrm{SE} = 0$):
   is given, reverberation-limited
   $\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{PL} + \mathrm{TS} - \mathrm{RL} - \mathrm{DT}$.
 
+Two of those terms have their own model here rather than having to be supplied
+from outside: [`array_directivity_index`](/phonometry/reference/api/underwater/sonar-equation/#array_directivity_index) gives `DI` from the length of a
+line array and the wavelength, which is also its array gain when the noise is
+isotropic, and [`detection_threshold`](/phonometry/reference/api/underwater/sonar-equation/#detection_threshold) gives `DT` from the false-alarm
+probability alone. Both are Ainslie (2010).
+
 All quantities are in dB (levels re a plane wave of 1 µPa rms; the terms are
 spectrum levels, i.e. referred to a 1 Hz band). Source: Urick, *Principles of
 Underwater Sound*, via Etter (2003), Table 10.2. The loss term is the
@@ -83,6 +89,62 @@ $\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{PL} + \mathrm{TS} - \mathrm{RL} - \mathr
 | Exception | When |
 | :--- | :--- |
 | ValueError | If an input is not finite. |
+
+## array_directivity_index
+
+```python
+array_directivity_index(
+    array_length_m: float,
+    wavelength_m: float,
+    *,
+    steer_angle_rad: float = 0.0,
+) -> float
+```
+
+Directivity index of an unshaded line array (Ainslie 2010, Eq. (6.49)).
+
+$\mathrm{DI} = 10 \log_{10} G_\mathrm{D}$ with the directivity factor
+$G_\mathrm{D} = 4\pi / \delta\Omega$ the reciprocal of the solid-angle
+footprint of the beam. For a steered unshaded line array, Equation (6.56)
+on printed folio 267 gives that footprint in closed form:
+
+$$
+\delta\Omega = \frac{4}{G_0} \left\{ \sigma\!\left[\frac{\pi G_0}{2}(1 - \sin\psi)\right] + \sigma\!\left[\frac{\pi G_0}{2}(1 + \sin\psi)\right] \right\}
+$$
+
+with $\sigma(x) = \int_0^x \mathrm{d}u \sin^2 u / u^2 = \mathrm{Si}(2x) - \sin^2 x / x$ (Eq. (6.54)) and
+$G_0 = 2L/\lambda$ (Eq. (6.57)), the high-frequency limit of the
+broadside directivity factor.
+
+This is the **array gain** whenever the noise is isotropic and the signal a
+plane wave, which is the case the sonar equation is written for
+(Section 6.1.3.1): the two coincide in that limit, so this is what
+[`passive_sonar_equation`](/phonometry/reference/api/underwater/sonar-equation/#passive_sonar_equation) wants for its `directivity_index`.
+
+The book states three limits, and they are what the implementation is
+checked against: $10 \log_{10}(2L/\lambda)$ at high frequency for
+every steer direction but endfire, $10 \log_{10}(4L/\lambda)$ near
+endfire, where the footprint halves, and 0 dB as $L/\lambda \to 0$,
+where the array stops resolving anything. That last one is a limit and not
+a cutoff: a finite array a wavelength long still returns 3.45 dB, and half
+a wavelength 1.11 dB. It is reached exactly only where the ratio itself
+underflows, and the value there is 0 dB rather than an error.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `array_length_m` | Array length `L`, in metres (> 0). |
+| `wavelength_m` | Acoustic wavelength `lambda`, in metres (> 0). |
+| `steer_angle_rad` | Steer angle `psi` from broadside, in radians (Default: 0, broadside). Only its sine enters, so the two sides of broadside give the same index. |
+
+**Returns:** The directivity index `DI`, in dB (>= 0).
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a non-positive or non-finite length or wavelength, or a non-finite steer angle. |
 
 ## detection_range
 
@@ -170,6 +232,44 @@ linearly between the two bracketing samples. Real waveguides oscillate, so
 | Exception | When |
 | :--- | :--- |
 | ValueError | If the inputs are invalid. |
+
+## detection_threshold
+
+```python
+detection_threshold(false_alarm_probability: float) -> float
+```
+
+Detection threshold at 50 % detection probability (Ainslie Eq. (11.22)).
+
+$$
+\mathrm{DT}_{50}(p_\mathrm{fa}) \approx 10 \log_{10}\left(\log_2 \frac{1}{2 p_\mathrm{fa}}\right) - 0.8 \ \mathrm{dB}
+$$
+
+printed on folio 581. `DT` is $10 \log_{10} R_{50}$, the
+signal-to-noise ratio after all processing that a 50 % detection
+probability needs (Eq. (3.31)); this closed form estimates it from the
+false-alarm probability alone.
+
+The logarithm inside is **base two**, not a square. The book states the
+approximation is accurate to +/- 0.1 dB for $p_\mathrm{fa} < 10^{-2}$
+with one-dominant-plus-Rayleigh signal statistics, which is the
+intermediate choice to make when the target statistics are unknown, and
+that assuming those statistics anyway costs no more than 0.8 dB even for a
+stable signal or a fully Rayleigh one.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `false_alarm_probability` | `p_fa`, the probability of declaring a detection with no target present, in (0, 1/2). |
+
+**Returns:** The detection threshold `DT`, in dB.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a non-finite `p_fa`, or one outside (0, 1/2). At $p_\mathrm{fa} = 1/2$ the inner logarithm is zero and the threshold diverges: half the empty beams are already called detections. |
 
 ## DetectionRangeResult
 

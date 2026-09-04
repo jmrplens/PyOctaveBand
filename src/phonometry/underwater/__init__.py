@@ -84,8 +84,10 @@ from .sonar_equation import (
     DetectionRangeResult,
     SonarEquationResult,
     active_sonar_equation,
+    array_directivity_index,
     detection_range,
     detection_range_from_curve,
+    detection_threshold,
     passive_sonar_equation,
 )
 from .sources import (
@@ -149,6 +151,8 @@ __all__ = [
     "WestonRegimeBoundaries",
     "WestonSeabed",
     "active_sonar_equation",
+    "array_directivity_index",
+    "detection_threshold",
     "audiogram_parameters",
     "auditory_weighting",
     "bottom_reflection_loss",

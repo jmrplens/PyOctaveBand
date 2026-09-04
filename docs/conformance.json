@@ -3,12 +3,12 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 619,
-    "passing": 619,
+    "checks": 623,
+    "passing": 623,
     "failing": 0,
-    "domains": 62,
-    "standards": 382,
-    "citations": 554,
+    "domains": 63,
+    "standards": 385,
+    "citations": 557,
     "designations": 120,
     "sources": 84
   },
@@ -335,6 +335,12 @@
       "title": "Underwater numerical propagation (modes / rays / PE)",
       "checks": 5,
       "passing": 5
+    },
+    {
+      "id": "sonar-processing-gain-and-detection-ainslie-2010",
+      "title": "Sonar processing gain and detection (Ainslie 2010)",
+      "checks": 4,
+      "passing": 4
     },
     {
       "id": "aircraft-noise-icao-annex-16-iec-61265",
@@ -12820,6 +12826,122 @@
         "value": 1.4e-05
       },
       "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "sonar-processing-gain-and-detection-ainslie-2010/ainslie-2010-sect-6-1-2-1-printed-folio-267/line-array-di-at-broadside-high-frequency-limit-10-log10-2l-lambda-db",
+      "domain": "sonar-processing-gain-and-detection-ainslie-2010",
+      "reference": {
+        "kind": "article",
+        "designation": "Ainslie",
+        "edition": "(2010)",
+        "clause": "Sect. 6.1.2.1, printed folio 267",
+        "cite": "Ainslie (2010) Sect. 6.1.2.1, printed folio 267"
+      },
+      "quantity": "Line-array DI at broadside, high-frequency limit 10 log10(2L/lambda), dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 23.010299956639813
+      },
+      "computed": {
+        "value": 23.015
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.01
+      },
+      "deviation": {
+        "value": 0.004
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "sonar-processing-gain-and-detection-ainslie-2010/ainslie-2010-sect-6-1-2-1-printed-folio-267/line-array-di-at-endfire-where-the-footprint-halves-10-log10-4l-lambda-db",
+      "domain": "sonar-processing-gain-and-detection-ainslie-2010",
+      "reference": {
+        "kind": "article",
+        "designation": "Ainslie",
+        "edition": "(2010)",
+        "clause": "Sect. 6.1.2.1, printed folio 267",
+        "cite": "Ainslie (2010) Sect. 6.1.2.1, printed folio 267"
+      },
+      "quantity": "Line-array DI at endfire, where the footprint halves: 10 log10(4L/lambda), dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 26.020599913279625
+      },
+      "computed": {
+        "value": 26.023
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.01
+      },
+      "deviation": {
+        "value": 0.002
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "sonar-processing-gain-and-detection-ainslie-2010/ainslie-2010-eq-11-20-fig-11-1/unsteered-di-vs-the-book-s-own-approximation-1-g0-tanh-pi-2-g0-36-at-2l-lambda-20",
+      "domain": "sonar-processing-gain-and-detection-ainslie-2010",
+      "reference": {
+        "kind": "article",
+        "designation": "Ainslie",
+        "edition": "(2010)",
+        "clause": "Eq. (11.20), Fig. 11.1",
+        "cite": "Ainslie (2010) Eq. (11.20), Fig. 11.1"
+      },
+      "quantity": "Unsteered DI vs the book's own approximation 1 + G0 tanh(pi^2 G0/36) at 2L/lambda = 20",
+      "kind": "scalar",
+      "expected": {
+        "value": 13.222050040593825
+      },
+      "computed": {
+        "value": 13.05
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.5
+      },
+      "deviation": {
+        "value": -0.168
+      },
+      "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "sonar-processing-gain-and-detection-ainslie-2010/ainslie-2010-eq-11-22-printed-folio-581/detection-threshold-at-50-detection-probability-p-fa-1e-4-db",
+      "domain": "sonar-processing-gain-and-detection-ainslie-2010",
+      "reference": {
+        "kind": "article",
+        "designation": "Ainslie",
+        "edition": "(2010)",
+        "clause": "Eq. (11.22), printed folio 581",
+        "cite": "Ainslie (2010) Eq. (11.22), printed folio 581"
+      },
+      "quantity": "Detection threshold at 50 % detection probability, p_fa = 1e-4, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 10.094710372059536
+      },
+      "computed": {
+        "value": 10.0947
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
       "verdict": "pass"
     },
     {

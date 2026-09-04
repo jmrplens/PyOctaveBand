@@ -657,6 +657,64 @@ propagación tiene unidades de m², así que el mismo número que se lee como
 pérdida de propagación máxima admisible en decibelios se lee como figura de
 mérito re 1 m².
 
+### De dónde salen $DI$ y $DT$
+
+Los dos términos de arriba se escribieron a mano. Los dos tienen modelo, así
+que ninguno tiene por qué escribirse.
+
+El **índice de directividad** de un array lineal sin ponderar sale de su
+longitud, de la longitud de onda y de la dirección a la que apunta (Ainslie,
+*Principles of Sonar Performance Modelling*, Ecs. (6.49) a (6.57), folio
+impreso 267). Es además la
+**ganancia de array** cuando el ruido es isótropo y la señal una onda plana,
+que es el caso para el que está escrita la ecuación del sónar, así que un solo
+número responde a los dos:
+
+```python
+from phonometry import underwater
+
+di = underwater.array_directivity_index(array_length_m=50.0, wavelength_m=1.5)
+print(f"{di:.1f} dB")                                        # 18.3 dB
+```
+
+El array gana 3 dB más en proa que en través, porque allí la huella del haz se
+reduce a la mitad, y no gana nada en cuanto es mucho más corto que una longitud
+de onda:
+
+```python
+import math
+
+from phonometry import underwater
+
+traves = underwater.array_directivity_index(100.0, 1.0)
+proa = underwater.array_directivity_index(100.0, 1.0,
+                                          steer_angle_rad=math.pi / 2)
+print(f"{traves:.1f} dB, {proa:.1f} dB")                     # 23.0 dB, 26.0 dB
+print(f"{underwater.array_directivity_index(0.01, 1.0):.3f} dB")  # 0.000 dB
+```
+
+El **umbral de detección** con 50 % de probabilidad de detección sale sólo de
+la probabilidad de falsa alarma (Ec. (11.22), folio impreso 581), para la
+estadística de una dominante más Rayleigh que el libro recomienda cuando no se
+conoce la del blanco:
+
+```python
+from phonometry import underwater
+
+for p_fa in (1e-2, 1e-4, 1e-6):
+    print(f"{p_fa:.0e} -> {underwater.detection_threshold(p_fa):.1f} dB")
+# 1e-02 -> 6.7 dB
+# 1e-04 -> 10.1 dB
+# 1e-06 -> 12.0 dB
+```
+
+Exigir menos falsas alarmas cuesta relación señal a ruido, y el precio se
+abarata según se paga: el logaritmo interior de la Ec. (11.22) es a su vez
+logarítmico en $p_\mathrm{fa}$, así que la década por debajo de $10^{-2}$ cuesta
+2,0 dB y la que hay por debajo de $10^{-5}$ solo 0,8. En $p_\mathrm{fa} = 1/2$
+el umbral diverge y la llamada se rechaza: la mitad de los haces vacíos ya se están
+declarando detecciones, y ahí no hay umbral que valga.
+
 ### Alcance de detección
 
 Como la figura de mérito *es* la pérdida de propagación máxima admisible,
