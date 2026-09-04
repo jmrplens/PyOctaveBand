@@ -89,10 +89,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- `fluids.sea_water()`, and with it a density of sea water, which this library
-  had nowhere. `fluids.sea_water_density()` implements Ainslie, *Principles of
-  Sonar Performance Modelling* (Springer 2010), Equation (4.6) on printed folio
-  127, which that book attributes to Pierce (1989, p. 34). Three conformance
+- `fluids.sea_water()` and `fluids.sea_water_density()` give the library a
+  density of sea water, which it had nowhere. The density implements Ainslie,
+  *Principles of Sonar Performance Modelling* (Springer 2010), Equation (4.6)
+  on printed folio 127, which that book attributes to Pierce (1989, p. 34). Three conformance
   rows pin it: the 1027 kg/m3 the book gives for the standard ocean, the
   atmosphere its Equation (4.11) puts at the surface, and the 0,043 855 kg/m3
   the pressure term is worth.
