@@ -193,15 +193,24 @@ def test_only_the_impossible_is_refused() -> None:
     Air at 60 degC in a duct and air at -60 degC in a cold chamber are both
     outside Annex F's stated domain and both real; they warn. Absolute zero is
     not a state, and neither is a negative pressure.
+
+    200 degC used to be in this list at 50 % relative humidity, which is not a
+    state either: saturation there is 1 592 kPa, so at one atmosphere the most
+    the air can hold is 6,4 %, and 50 % asks for more water vapour than total
+    pressure. It stays, at a humidity it can actually have.
     """
-    for temperature_c in (-60.0, 60.0, 200.0):
+    for temperature_c, relative_humidity_percent in (
+        (-60.0, 50.0),
+        (60.0, 50.0),
+        (200.0, 6.0),
+    ):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", FluidWarning)
             assert math.isfinite(
                 air(
                     temperature_c=temperature_c,
                     static_pressure_pa=101_325.0,
-                    relative_humidity_percent=50.0,
+                    relative_humidity_percent=relative_humidity_percent,
                 ).density
             )
     with pytest.raises(ValueError, match="'temperature_c' must be"):
@@ -225,6 +234,68 @@ def test_impossible_conditions_are_refused(
         warnings.simplefilter("ignore")
         with pytest.raises(ValueError, match=match):
             air(temperature_c=20.0, **kwargs)
+
+
+def test_conditions_that_cannot_hold_together_are_refused() -> None:
+    """Each argument can be a state and the combination still not be one.
+
+    At 20 degC and 1 kPa, 50 % relative humidity asks for a water vapour mole
+    fraction of 1,17, and a mole fraction cannot reach 1: there is more water
+    vapour than total pressure. Every argument passes its own guard, so nothing
+    but a guard on the fraction catches it, and without one the CIPM equations
+    carry on and return a density and a speed of sound that look like
+    measurements.
+    """
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        with pytest.raises(ValueError, match="cannot hold together"):
+            air(
+                temperature_c=20.0,
+                static_pressure_pa=1_000.0,
+                relative_humidity_percent=50.0,
+            )
+
+
+@pytest.mark.parametrize(
+    ("temperature_c", "static_pressure_pa", "relative_humidity_percent"),
+    [
+        (27.0, 60_000.0, 90.0),  # the corner of the printed domain
+        (20.0, 101_325.0, 100.0),  # saturated at one atmosphere
+        (60.0, 101_325.0, 100.0),  # saturated and hot: x = 0,198
+        (50.0, 60_000.0, 100.0),  # saturated and thin: x = 0,207
+    ],
+)
+def test_air_that_can_exist_is_not_refused_by_that_guard(
+    temperature_c: float, static_pressure_pa: float, relative_humidity_percent: float
+) -> None:
+    """The guard has to let saturated, hot and thin air through.
+
+    Saturation carries a fifth of the mole fraction at 60 degC, so a guard set
+    anywhere below 1 would start refusing air that exists.
+    """
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        fluid = air(
+            temperature_c=temperature_c,
+            static_pressure_pa=static_pressure_pa,
+            relative_humidity_percent=relative_humidity_percent,
+        )
+    assert 0.0 < fluid.composition["water_vapour_mole_fraction"] < 1.0
+    assert fluid.density > 0.0
+
+
+def test_the_refusal_comes_before_the_assumption_warning() -> None:
+    """A caller who promotes the warning must still learn which argument failed.
+
+    The assumption warning used to be raised before the optional values were
+    validated, so `simplefilter("error", FluidAssumptionWarning)` turned it into
+    the exception a bad humidity raised, and the ValueError naming the argument
+    never arrived.
+    """
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", FluidAssumptionWarning)
+        with pytest.raises(ValueError, match="'relative_humidity_percent' must be"):
+            air(temperature_c=20.0, relative_humidity_percent=101.0)
 
 
 def test_air_refuses_a_positional_argument() -> None:

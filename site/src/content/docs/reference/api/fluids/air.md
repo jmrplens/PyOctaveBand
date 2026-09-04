@@ -57,7 +57,7 @@ specific heat capacity Clause F.6 gives expressions for.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if the temperature is at or below -273,15 degC, the pressure is not positive, the humidity is outside 0 % to 100 %, or the carbon dioxide mole fraction is outside 0 to 1. |
+| ValueError | if the temperature is at or below -273,15 degC, the pressure is not positive, the humidity is outside 0 % to 100 %, the carbon dioxide mole fraction is outside 0 to 1, any of the four is not finite, or the pressure and humidity cannot hold together at that temperature. That last one is a combination rather than an argument: at 20 degC and 1 kPa, 50 % relative humidity asks for a water vapour mole fraction of 1,17, and a mole fraction cannot reach 1. |
 
 Nothing else is refused. Annex F states a domain for its equations and this
 warns outside it, because a fit past its range is still arithmetic; what it

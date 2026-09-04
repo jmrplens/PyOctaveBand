@@ -106,6 +106,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   would have recorded nothing. That is the fourth transverse package, and the
   first added since 4.0 split the original one in three.
 
+  Three conditions that each exist can still describe air that does not, so
+  `air()` refuses the combination as well as the arguments. At 20 degC and
+  1 kPa, 50 % relative humidity asks for a water vapour mole fraction of 1,17,
+  which is more water vapour than total pressure; every argument passes its own
+  guard, and without one on the fraction the CIPM equations carry on and return
+  a density and a speed of sound that look like measurements. Saturated air at
+  60 degC reaches 0,198 and passes, so the bound is the only one that can be
+  set: a mole fraction cannot reach 1.
+
+  The assumption warning is now raised after the refusals rather than before
+  them. A caller who promotes it with `simplefilter("error", ...)` used to
+  receive it in place of the `ValueError` an invalid humidity earns, and never
+  learn which argument was wrong.
+
   It is frozen through, not only at the surface. `frozen=True` stops the
   attribute from being rebound and says nothing about what it points at, so the
   two mappings are copied and wrapped on construction. Without that, one

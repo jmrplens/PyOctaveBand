@@ -236,8 +236,12 @@ def air(
         of the density at most.
     :return: The :class:`~phonometry.fluids.Fluid` at that state.
     :raises ValueError: if the temperature is at or below -273,15 degC, the
-        pressure is not positive, the humidity is outside 0 % to 100 %, or the
-        carbon dioxide mole fraction is outside 0 to 1.
+        pressure is not positive, the humidity is outside 0 % to 100 %, the
+        carbon dioxide mole fraction is outside 0 to 1, any of the four is not
+        finite, or the pressure and humidity cannot hold together at that
+        temperature. That last one is a combination rather than an argument: at
+        20 degC and 1 kPa, 50 % relative humidity asks for a water vapour mole
+        fraction of 1,17, and a mole fraction cannot reach 1.
 
     Nothing else is refused. Annex F states a domain for its equations and this
     warns outside it, because a fit past its range is still arithmetic; what it
@@ -248,7 +252,6 @@ def air(
         msg = "'temperature_c' must be a finite temperature above -273.15 degC."
         raise ValueError(msg)
 
-    _warn_assumptions(static_pressure_pa, relative_humidity_percent)
     pressure = (
         DEFAULT_STATIC_PRESSURE_PA
         if static_pressure_pa is None
@@ -274,12 +277,31 @@ def air(
         msg = "'co2_mole_fraction' must be a mole fraction between 0 and 1."
         raise ValueError(msg)
 
+    # After the refusals, not before them: a caller who promotes this warning to
+    # an error would otherwise receive it in place of the ValueError the invalid
+    # argument earns, and never learn which argument was wrong.
+    _warn_assumptions(static_pressure_pa, relative_humidity_percent)
     _warn_outside_domain(float(temperature_c), pressure, humidity)
 
     t = float(temperature_c)
     saturation = _saturation_vapour_pressure(kelvin)
     enhancement = _enhancement_factor(pressure, t)
     water = (humidity / 100.0) * (saturation / pressure) * enhancement
+    # Each of the three is a state that exists; the combination need not be. At
+    # 20 degC and 1 kPa, 50 % relative humidity asks for more water vapour than
+    # the total pressure can hold, and the mole fraction comes out at 1,17. The
+    # equations below carry on regardless and return a density and a speed of
+    # sound that look like measurements, so the guard has to be on the fraction
+    # rather than on any argument alone.
+    if not math.isfinite(water) or water >= 1.0:
+        msg = (
+            f"'static_pressure_pa' {pressure:g} Pa and "
+            f"'relative_humidity_percent' {humidity:g} % cannot hold together at "
+            f"{t:g} degC: they ask for a water vapour mole fraction of "
+            f"{water:.3f}, and a mole fraction cannot reach 1. Saturation at "
+            f"this temperature needs at least {saturation * enhancement:.0f} Pa."
+        )
+        raise ValueError(msg)
     compressibility = _compressibility(pressure, t, water)
 
     density = (
