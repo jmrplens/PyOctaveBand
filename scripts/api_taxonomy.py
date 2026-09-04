@@ -413,6 +413,7 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     # the Johnson-Champoux-Allard model is credited to fluids unless said
     # otherwise. It belongs to the model that publishes those constants.
     "PUBLISHED_AIR": "phonometry.materials.absorbers.porous",
+    "ANNEX_A_AIR": "phonometry.materials.absorbers.airflow_resistance",
     # The three assumed conditions are owned by the air model and re-exported
     # by the package, so a plain scan sees them in both.
     "DEFAULT_CO2_MOLE_FRACTION": "phonometry.fluids.air",

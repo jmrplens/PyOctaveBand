@@ -16,6 +16,8 @@ D'Antonio work through in Appendix B of the third edition.
 
 from __future__ import annotations
 
+from phonometry.fluids import Fluid
+
 # ---------------------------------------------------------------------------
 # ISO 11654:1997 rating of sound absorption — the two normative worked examples
 # of Annex A. Both use the same practical-coefficient spectrum except at 500 Hz;
@@ -52,14 +54,23 @@ ISO9053_2_ANNEX_A_WAVELENGTH = 172.9  # lambda = c0/f (m)
 ISO9053_2_ANNEX_A_BOUNDARY_LAYER = 1.83e-3  # b (m)
 ISO9053_2_ANNEX_A_KAPPA_PRIME = 1.370  # kappa' = kappa*0,978
 
-#: The air properties as printed in Annex A.3, folios 13 and 14.
-ISO9053_2_ANNEX_A_PRINTED_AIR: dict[str, float] = {
-    "speed_of_sound": 345.9,  # c0 (m/s)
-    "air_density": 1.186,  # rho0 (kg/m3)
-    "specific_heat_ratio": 1.4008,  # kappa, adiabatic
-    "specific_heat_cp": 938.7,  # C_P (J/(kg*K))
-    "thermal_conductivity": 0.02355,  # k_a (J/(s*m*K))
-}
+#: The air properties as printed in Annex A.3, folios 13 and 14, as the `Fluid`
+#: the two helpers now take. Transcribed here rather than imported from the
+#: library, so that the rows built on it stay an independent oracle.
+ISO9053_2_ANNEX_A_PRINTED_AIR = Fluid(
+    temperature_c=23.0,
+    static_pressure_pa=101_325.0,
+    composition={"relative_humidity_percent": 50.0},
+    model="ISO 9053-2:2020 Annex A.3 as printed, folios 13 and 14",
+    validity="",
+    properties={
+        "speed_of_sound": 345.9,  # c0 (m/s)
+        "density": 1.186,  # rho0 (kg/m3)
+        "heat_capacity_ratio": 1.4008,  # kappa, adiabatic
+        "specific_heat_capacity": 938.7,  # C_P (J/(kg*K))
+        "thermal_conductivity": 0.02355,  # k_a (J/(s*m*K))
+    },
+)
 
 # ---------------------------------------------------------------------------
 # ISO 10534-1:1996 standing-wave-ratio method — closed-form physics oracle from

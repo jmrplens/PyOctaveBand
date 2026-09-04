@@ -303,8 +303,7 @@ def delany_bazley(
     flow_resistivity: float,
     *,
     coefficients: str | tuple[float, ...] = "delany_bazley",
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> PorousMediumResult:
     r"""Delany-Bazley one-parameter porous model (power laws in ``X``).
 
@@ -323,14 +322,16 @@ def delany_bazley(
         (``"delany_bazley"`` rockwool/fibreglass default, ``"garai_pompoli"``
         polyester, ``"dunn_davern"`` / ``"wu"`` foams) or an explicit
         ``(C1..C8)`` tuple.
-    :param speed_of_sound: Speed of sound ``c`` in fluid, in m/s.
-    :param air_density: Air density ``rho``, in kg/m3.
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid`
+        (Default: :data:`PUBLISHED_AIR`, the air this model was published
+        with). Pass a computed one, such as ``fluids.air(temperature_c=30.0,
+        relative_humidity_percent=70.0)``, to work in the air of the room.
     :return: A :class:`PorousMediumResult`.
     """
     f = require_positive_array(frequency, "frequency")
     sigma = require_positive(flow_resistivity, "flow_resistivity")
-    c0 = require_positive(speed_of_sound, "speed_of_sound")
-    rho0 = require_positive(air_density, "air_density")
+    c0 = fluid.speed_of_sound
+    rho0 = fluid.density
     if isinstance(coefficients, str):
         try:
             coeffs = DELANY_BAZLEY_COEFFICIENTS[coefficients]
@@ -365,8 +366,7 @@ def miki(
     frequency: ArrayLike,
     flow_resistivity: float,
     *,
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> PorousMediumResult:
     r"""Miki (1990) positive-real modification of the Delany-Bazley model.
 
@@ -383,14 +383,16 @@ def miki(
 
     :param frequency: Frequency vector ``f``, in hertz.
     :param flow_resistivity: Airflow resistivity ``sigma``, in Pa s/m2.
-    :param speed_of_sound: Speed of sound ``c`` in fluid, in m/s.
-    :param air_density: Air density ``rho``, in kg/m3.
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid`
+        (Default: :data:`PUBLISHED_AIR`, the air this model was published
+        with). Pass a computed one, such as ``fluids.air(temperature_c=30.0,
+        relative_humidity_percent=70.0)``, to work in the air of the room.
     :return: A :class:`PorousMediumResult`.
     """
     f = require_positive_array(frequency, "frequency")
     sigma = require_positive(flow_resistivity, "flow_resistivity")
-    c0 = require_positive(speed_of_sound, "speed_of_sound")
-    rho0 = require_positive(air_density, "air_density")
+    c0 = fluid.speed_of_sound
+    rho0 = fluid.density
     y = np.asarray(f / sigma, dtype=np.float64)
     _warn_fit_range(y, MIKI_VALIDITY, "f / sigma", "Miki")
     zc = rho0 * c0 * (1.0 + 0.070 * y**-0.632 - 1j * 0.107 * y**-0.632)
@@ -414,12 +416,7 @@ def johnson_champoux_allard(
     tortuosity: float,
     viscous_length: float,
     thermal_length: float,
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
-    viscosity: float = _AIR_VISCOSITY,
-    prandtl_number: float = _PRANDTL_NUMBER,
-    heat_capacity_ratio: float = _HEAT_CAPACITY_RATIO,
-    atmospheric_pressure: float = _ATMOSPHERIC_PRESSURE,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> PorousMediumResult:
     r"""Johnson-Champoux-Allard five-parameter rigid-frame model.
 
@@ -458,12 +455,10 @@ def johnson_champoux_allard(
     :param viscous_length: Viscous characteristic length ``L``, in metres.
     :param thermal_length: Thermal characteristic length ``L'``, in metres
         (physically :math:`L' \ge L`).
-    :param speed_of_sound: Speed of sound ``c`` in fluid, in m/s.
-    :param air_density: Air density ``rho``, in kg/m3.
-    :param viscosity: Dynamic viscosity ``eta`` of fluid, in Pa s.
-    :param prandtl_number: Prandtl number ``Pr`` of fluid.
-    :param heat_capacity_ratio: Ratio of specific heats ``gamma``.
-    :param atmospheric_pressure: Static pressure ``P0``, in Pa.
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid`
+        (Default: :data:`PUBLISHED_AIR`, the air this model was published
+        with). Pass a computed one, such as ``fluids.air(temperature_c=30.0,
+        relative_humidity_percent=70.0)``, to work in the air of the room.
     :return: A :class:`PorousMediumResult`.
     """
     f = require_positive_array(frequency, "frequency")
@@ -477,12 +472,12 @@ def johnson_champoux_allard(
         raise ValueError(msg)
     lam_v = require_positive(viscous_length, "viscous_length")
     lam_t = require_positive(thermal_length, "thermal_length")
-    c0 = require_positive(speed_of_sound, "speed_of_sound")
-    rho0 = require_positive(air_density, "air_density")
-    eta = require_positive(viscosity, "viscosity")
-    pr = require_positive(prandtl_number, "prandtl_number")
-    gamma = require_positive(heat_capacity_ratio, "heat_capacity_ratio")
-    p0 = require_positive(atmospheric_pressure, "atmospheric_pressure")
+    c0 = fluid.speed_of_sound
+    rho0 = fluid.density
+    eta = fluid.viscosity
+    pr = fluid.prandtl_number
+    gamma = fluid.heat_capacity_ratio
+    p0 = fluid.static_pressure_pa
 
     omega = 2.0 * np.pi * f
     # Effective density, Cox & D'Antonio Eq. (6.19).
@@ -704,8 +699,7 @@ def perforated_plate_impedance(
     hole_radius: float,
     open_area: float,
     end_correction: float | None = None,
-    air_density: float = _AIR_DENSITY,
-    viscosity: float = _AIR_VISCOSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> Complex:
     r"""Transfer impedance of a rigid perforated plate with circular holes.
 
@@ -735,8 +729,10 @@ def perforated_plate_impedance(
     :param open_area: Fractional open area ``eps`` (0..1).
     :param end_correction: End-correction factor ``delta`` per end; default
         :func:`perforation_end_correction` of ``eps``.
-    :param air_density: Air density ``rho``, in kg/m3.
-    :param viscosity: Dynamic viscosity ``eta`` of fluid, in Pa s.
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid`
+        (Default: :data:`PUBLISHED_AIR`, the air this model was published
+        with). Pass a computed one, such as ``fluids.air(temperature_c=30.0,
+        relative_humidity_percent=70.0)``, to work in the air of the room.
     :return: Complex transfer impedance ``z``, in Pa s/m.
     """
     f = require_positive_array(frequency, "frequency")
@@ -745,8 +741,8 @@ def perforated_plate_impedance(
     eps = require_positive(open_area, "open_area")
     if eps > 1.0:
         raise ValueError(_OPEN_AREA_MESSAGE)
-    rho0 = require_positive(air_density, "air_density")
-    eta = require_positive(viscosity, "viscosity")
+    rho0 = fluid.density
+    eta = fluid.viscosity
     delta = (
         perforation_end_correction(eps)
         if end_correction is None
@@ -767,8 +763,7 @@ def microperforated_plate_impedance(
     hole_radius: float,
     open_area: float,
     end_correction: float = 0.85,
-    air_density: float = _AIR_DENSITY,
-    viscosity: float = _AIR_VISCOSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> Complex:
     r"""Transfer impedance of a microperforated plate (Maa's exact model).
 
@@ -797,8 +792,10 @@ def microperforated_plate_impedance(
     :param open_area: Fractional open area ``eps`` (0..1).
     :param end_correction: End-correction factor ``delta`` per end
         (default 0.85, the isolated-orifice value used by Maa).
-    :param air_density: Air density ``rho``, in kg/m3.
-    :param viscosity: Dynamic viscosity ``eta`` of fluid, in Pa s.
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid`
+        (Default: :data:`PUBLISHED_AIR`, the air this model was published
+        with). Pass a computed one, such as ``fluids.air(temperature_c=30.0,
+        relative_humidity_percent=70.0)``, to work in the air of the room.
     :return: Complex transfer impedance ``z``, in Pa s/m.
     """
     f = require_positive_array(frequency, "frequency")
@@ -808,8 +805,8 @@ def microperforated_plate_impedance(
     if eps > 1.0:
         raise ValueError(_OPEN_AREA_MESSAGE)
     delta = require_non_negative(end_correction, "end_correction")
-    rho0 = require_positive(air_density, "air_density")
-    eta = require_positive(viscosity, "viscosity")
+    rho0 = fluid.density
+    eta = fluid.viscosity
     omega = 2.0 * np.pi * f
     arg = a * np.sqrt(rho0 * omega / eta) * np.sqrt(-1j)
     bessel_ratio = special.jv(1, arg) / special.jv(0, arg)
@@ -890,8 +887,7 @@ def membrane_resonance_frequency(
     surface_density: float,
     cavity_depth: float,
     isothermal: bool = False,
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> float:
     r"""Mass-spring resonance of a membrane over a shallow cavity.
 
@@ -904,15 +900,21 @@ def membrane_resonance_frequency(
     :param surface_density: Membrane mass per unit area ``m``, in kg/m2.
     :param cavity_depth: Cavity depth ``d``, in metres.
     :param isothermal: Use the isothermal air-spring stiffness.
-    :param speed_of_sound: Speed of sound ``c`` in fluid, in m/s.
-    :param air_density: Air density ``rho``, in kg/m3.
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid`
+        (Default: :data:`PUBLISHED_AIR`, the air this model was published
+        with). Pass a computed one, such as ``fluids.air(temperature_c=30.0,
+        relative_humidity_percent=70.0)``, to work in the air of the room.
     :return: Resonance frequency ``f0``, in hertz.
     """
     m = require_positive(surface_density, "surface_density")
     d = require_positive(cavity_depth, "cavity_depth")
-    c0 = require_positive(speed_of_sound, "speed_of_sound")
-    rho0 = require_positive(air_density, "air_density")
+    c0 = fluid.speed_of_sound
+    rho0 = fluid.density
     stiffness = rho0 * c0**2 / d
     if isothermal:
-        stiffness /= _HEAT_CAPACITY_RATIO
+        # The fluid's own ratio, not the published constant: an air the caller
+        # computed carries its own gamma, and dividing by 1.4 regardless would
+        # return the published air's resonance under the caller's density and
+        # speed of sound, which is neither air.
+        stiffness /= fluid.heat_capacity_ratio
     return float(np.sqrt(stiffness / m) / (2.0 * np.pi))

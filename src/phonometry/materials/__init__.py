@@ -28,6 +28,7 @@ from .._plot.geometry import (
     plot_transmission_tube_geometry,
 )
 from .absorbers import (
+    ANNEX_A_AIR,
     DELANY_BAZLEY_COEFFICIENTS,
     DELANY_BAZLEY_VALIDITY,
     LIMP_FRAME_CRITERIA,
@@ -389,6 +390,7 @@ __all__ = [
     "static_airflow_resistance",
     "statistical_absorption",
     "surface_impedance",
+    "ANNEX_A_AIR",
     "thermal_boundary_layer_thickness",
     "transfer_matrix_one_load",
     "transfer_matrix_two_load",

@@ -59,6 +59,7 @@ from phonometry.materials.absorbers.layered import (
 from phonometry.materials.absorbers.porous import (
     DELANY_BAZLEY_COEFFICIENTS,
     DELANY_BAZLEY_VALIDITY,
+    PUBLISHED_AIR,
     PorousAbsorberWarning,
     PorousMediumResult,
     delany_bazley,
@@ -89,7 +90,7 @@ class TestDelanyBazley:
         """Bies Table D.1 / Mechel G.11 Eq. (2), X = 0.1, digit-exact."""
         sigma = 20000.0
         f = np.array([ref.POROUS_DB_X_POINT * sigma / RHO0])
-        res = delany_bazley(f, sigma, speed_of_sound=C0, air_density=RHO0)
+        res = delany_bazley(f, sigma, fluid=PUBLISHED_AIR)
         np.testing.assert_allclose(
             res.normalized_impedance, [ref.POROUS_DB_ZC_EXPECTED], rtol=1e-12
         )
@@ -101,7 +102,7 @@ class TestDelanyBazley:
         """X -> upper fit edge: Zc -> rho c and k -> k0 monotonically."""
         sigma = 5000.0
         f = np.array([0.02, 0.2, 1.0]) * sigma / RHO0
-        res = delany_bazley(f, sigma, air_density=RHO0)
+        res = delany_bazley(f, sigma, fluid=PUBLISHED_AIR)
         dev = np.abs(res.normalized_impedance - 1.0)
         assert dev[0] > dev[1] > dev[2]
         assert dev[2] < 0.15
@@ -110,7 +111,7 @@ class TestDelanyBazley:
         """Re(Zc) > 0 and Im(k) < 0 (decaying wave) inside 0.01 < X < 1."""
         sigma = 20000.0
         x = np.linspace(*DELANY_BAZLEY_VALIDITY, 200)
-        res = delany_bazley(x * sigma / RHO0, sigma, air_density=RHO0)
+        res = delany_bazley(x * sigma / RHO0, sigma, fluid=PUBLISHED_AIR)
         assert np.all(res.characteristic_impedance.real > 0.0)
         assert np.all(res.wavenumber.imag < 0.0)
 
@@ -120,7 +121,7 @@ class TestDelanyBazley:
         sigma = 100000.0
         f = np.linspace(5.0, 200.0, 100)
         with pytest.warns(PorousAbsorberWarning):
-            med = delany_bazley(f, sigma, air_density=RHO0)
+            med = delany_bazley(f, sigma, fluid=PUBLISHED_AIR)
         zs = layered_absorber(f, [PorousLayer(0.01, med)]).surface_impedance
         assert np.min(zs.real) < 0.0
 
@@ -169,7 +170,7 @@ class TestMiki:
         """Miki 1990 Eqs. (30)-(34), f/sigma = 0.1, digit-exact."""
         sigma = 20000.0
         f = np.array([ref.POROUS_MIKI_Y_POINT * sigma])
-        res = miki(f, sigma, speed_of_sound=C0, air_density=RHO0)
+        res = miki(f, sigma, fluid=PUBLISHED_AIR)
         np.testing.assert_allclose(
             res.normalized_impedance, [ref.POROUS_MIKI_ZC_EXPECTED], rtol=1e-12
         )
@@ -189,7 +190,7 @@ class TestMiki:
         sigma = 100000.0
         f = np.linspace(50.0, 5000.0, 200)
         with pytest.warns(PorousAbsorberWarning):
-            med = miki(f, sigma, air_density=RHO0)
+            med = miki(f, sigma, fluid=PUBLISHED_AIR)
         assert np.all(med.characteristic_impedance.real > 0.0)
         zs = layered_absorber(f, [PorousLayer(0.01, med)]).surface_impedance
         assert np.all(zs.real > -1e-9)
@@ -198,8 +199,8 @@ class TestMiki:
         """Both regressions describe the same data set (within ~15 %)."""
         sigma = 20000.0
         y = np.linspace(0.05, 0.8, 60)
-        m = miki(y * sigma, sigma, air_density=RHO0)
-        d = delany_bazley(y * sigma, sigma, air_density=RHO0)
+        m = miki(y * sigma, sigma, fluid=PUBLISHED_AIR)
+        d = delany_bazley(y * sigma, sigma, fluid=PUBLISHED_AIR)
         rel = np.abs(m.characteristic_impedance - d.characteristic_impedance)
         assert np.max(rel / np.abs(d.characteristic_impedance)) < 0.15
 
@@ -221,8 +222,7 @@ class TestJohnsonChampouxAllard:
             tortuosity=tort,
             viscous_length=lam,
             thermal_length=2.0 * lam,
-            air_density=RHO0,
-            viscosity=self.ETA,
+            fluid=PUBLISHED_AIR,
         )
 
     def test_viscous_dc_limit(self) -> None:
@@ -263,10 +263,9 @@ class TestJohnsonChampouxAllard:
             tortuosity=1.0,
             viscous_length=lam,
             thermal_length=lam,
-            air_density=RHO0,
-            viscosity=self.ETA,
+            fluid=PUBLISHED_AIR,
         )
-        db = delany_bazley(f, self.SIGMA, air_density=RHO0)
+        db = delany_bazley(f, self.SIGMA, fluid=PUBLISHED_AIR)
         rel_z = np.abs(jca.characteristic_impedance - db.characteristic_impedance)
         rel_k = np.abs(jca.wavenumber - db.wavenumber)
         assert np.max(rel_z / np.abs(db.characteristic_impedance)) < 0.15
@@ -320,20 +319,18 @@ class TestLayeredAbsorber:
     def test_hard_backed_layer_closed_form(self) -> None:
         """Zs = -j Zc cot(k d) (Mechel D.3 Eq. (1); Bies Eq. (D.94))."""
         f = _grid(200.0, 4000.0)
-        med = delany_bazley(f, 20000.0, air_density=RHO0)
-        res = layered_absorber(
-            f, [PorousLayer(0.05, med)], speed_of_sound=C0, air_density=RHO0
-        )
+        med = delany_bazley(f, 20000.0, fluid=PUBLISHED_AIR)
+        res = layered_absorber(f, [PorousLayer(0.05, med)], fluid=PUBLISHED_AIR)
         zs_ref = -1j * med.characteristic_impedance / np.tan(med.wavenumber * 0.05)
         np.testing.assert_allclose(res.surface_impedance, zs_ref, rtol=1e-12)
 
     def test_matches_bies_impedance_recursion(self) -> None:
         """Independent Bies Eq. (D.95) recursion reproduces the TMM stack."""
         f = _grid(300.0, 3000.0, 200)
-        med1 = delany_bazley(f, 30000.0, air_density=RHO0)
-        med2 = miki(f, 8000.0, air_density=RHO0)
+        med1 = delany_bazley(f, 30000.0, fluid=PUBLISHED_AIR)
+        med2 = miki(f, 8000.0, fluid=PUBLISHED_AIR)
         layers = [PorousLayer(0.02, med1), AirLayer(0.03), PorousLayer(0.04, med2)]
-        res = layered_absorber(f, layers, speed_of_sound=C0, air_density=RHO0)
+        res = layered_absorber(f, layers, fluid=PUBLISHED_AIR)
         # Bies (D.95): Z_i = Zm (Z_{i-1} + j Zm tan(km l)) / (Zm + j Z_{i-1} tan)
         k0 = 2.0 * np.pi * f / C0
         z_l = np.full(f.shape, np.inf + 0j)
@@ -358,13 +355,13 @@ class TestLayeredAbsorber:
         f_quarter = C0 / (4.0 * d)
         f = np.linspace(20.0, 4000.0, 500)
         f = np.sort(np.append(f, f_quarter))
-        res = layered_absorber(f, [AirLayer(d)], speed_of_sound=C0)
+        res = layered_absorber(f, [AirLayer(d)], fluid=PUBLISHED_AIR)
         np.testing.assert_allclose(np.abs(res.reflection), 1.0, atol=1e-12)
         np.testing.assert_allclose(res.absorption, 0.0, atol=1e-12)
 
     def test_zero_thickness_layers_are_transparent(self) -> None:
         f = _grid(200.0, 1000.0, 50)
-        med = delany_bazley(f, 20000.0, air_density=RHO0)
+        med = delany_bazley(f, 20000.0, fluid=PUBLISHED_AIR)
         with_zero = layered_absorber(
             f, [AirLayer(0.0), PorousLayer(0.0, med), PorousLayer(0.05, med)]
         )
@@ -375,7 +372,7 @@ class TestLayeredAbsorber:
     def test_very_high_resistivity_approaches_rigid_wall(self) -> None:
         f = _grid(100.0, 1000.0, 50)
         with pytest.warns(PorousAbsorberWarning):
-            med = miki(f, 1e9, air_density=RHO0)
+            med = miki(f, 1e9, fluid=PUBLISHED_AIR)
         res = layered_absorber(f, [PorousLayer(0.05, med)])
         assert np.max(res.absorption) < 0.01
 
@@ -410,7 +407,7 @@ class TestLayeredAbsorber:
 
     def test_impedance_termination_matches_rigid_limit(self) -> None:
         f = _grid(200.0, 1000.0, 50)
-        med = delany_bazley(f, 20000.0, air_density=RHO0)
+        med = delany_bazley(f, 20000.0, fluid=PUBLISHED_AIR)
         rigid = layered_absorber(f, [PorousLayer(0.05, med)])
         huge = layered_absorber(f, [PorousLayer(0.05, med)], termination=1e12 + 0j)
         np.testing.assert_allclose(huge.reflection, rigid.reflection, atol=1e-6)
@@ -418,11 +415,9 @@ class TestLayeredAbsorber:
     def test_cross_check_with_impedance_tube_machinery(self) -> None:
         """ASTM E2611 recovery returns the model Zc/k from the layer matrix."""
         f = _grid(200.0, 800.0, 60)  # keep Re(k d) < pi for arccos branch
-        med = delany_bazley(f, 20000.0, air_density=RHO0)
+        med = delany_bazley(f, 20000.0, fluid=PUBLISHED_AIR)
         d = 0.05
-        res = layered_absorber(
-            f, [PorousLayer(d, med)], speed_of_sound=C0, air_density=RHO0
-        )
+        res = layered_absorber(f, [PorousLayer(d, med)], fluid=PUBLISHED_AIR)
         tm = res.transfer_matrix
         t = TransferMatrix(t11=tm[0, 0], t12=tm[0, 1], t21=tm[1, 0], t22=tm[1, 1])
         np.testing.assert_allclose(
@@ -441,7 +436,7 @@ class TestLayeredAbsorber:
         rng = np.random.default_rng(20260717)
         f = _grid(50.0, 8000.0, 400)
         for _ in range(12):
-            med = miki(f, float(rng.uniform(3000, 80000)), air_density=RHO0)
+            med = miki(f, float(rng.uniform(3000, 80000)), fluid=PUBLISHED_AIR)
             layers = [
                 MicroperforatedPlateLayer(
                     float(rng.uniform(2e-4, 1e-3)),
@@ -473,7 +468,7 @@ class TestLayeredAbsorber:
         recursion's ``reflection`` to machine precision at every angle.
         """
         f = _grid(250.0, 4000.0, 300)
-        med = miki(f, 20000.0, air_density=RHO0)
+        med = miki(f, 20000.0, fluid=PUBLISHED_AIR)
         layers = [
             MicroperforatedPlateLayer(3e-4, 1e-4, 0.01),
             AirLayer(0.02),
@@ -609,8 +604,7 @@ class TestResonantSheets:
                 hole_radius=a,
                 open_area=1.0,
                 end_correction=0.0,
-                air_density=rho0,
-                viscosity=eta,
+                fluid=PUBLISHED_AIR,
             )
             - np.sqrt(2.0 * omega * rho0 * eta) / 2.0
         )
@@ -639,7 +633,7 @@ class TestResonantSheets:
                 thickness=mpp.thickness,
                 hole_radius=mpp.hole_radius,
                 open_area=mpp.open_area,
-                air_density=RHO0,
+                fluid=PUBLISHED_AIR,
             )
             / RC
         )
@@ -669,7 +663,7 @@ class TestResonantSheets:
                 thickness=mpp.thickness,
                 hole_radius=mpp.hole_radius,
                 open_area=mpp.open_area,
-                air_density=RHO0,
+                fluid=PUBLISHED_AIR,
             ).imag
             / RC
         )
@@ -710,12 +704,53 @@ class TestResonantSheets:
         assert f_ad == pytest.approx(60.0 / np.sqrt(m * d), rel=0.02)
         assert f_iso == pytest.approx(50.0 / np.sqrt(m * d), rel=0.02)
 
+    def test_isothermal_stiffness_uses_the_fluids_own_gamma(self) -> None:
+        """The ratio of specific heats comes from the fluid, not the constant.
+
+        The isothermal branch divides the air-spring stiffness by ``gamma``.
+        Reading the published 1,4 there instead of the fluid's own would return
+        the published air's resonance under the caller's density and speed of
+        sound, which is neither air: warm humid air carries 1,3806, and the
+        0,7 % it moves the frequency by is invisible in the result.
+        """
+        import warnings
+
+        from phonometry import fluids
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            humid = fluids.air(
+                temperature_c=60.0,
+                static_pressure_pa=101_325.0,
+                relative_humidity_percent=90.0,
+            )
+        assert humid.heat_capacity_ratio != PUBLISHED_AIR.heat_capacity_ratio
+
+        m, d = 2.0, 0.05
+        got = membrane_resonance_frequency(
+            surface_density=m, cavity_depth=d, isothermal=True, fluid=humid
+        )
+        expected = np.sqrt(
+            humid.density * humid.speed_of_sound**2 / d / humid.heat_capacity_ratio / m
+        ) / (2.0 * np.pi)
+        assert got == pytest.approx(float(expected), rel=1e-12)
+
+        # And it is not the published-gamma answer, which is what the bug gave.
+        with_published_gamma = np.sqrt(
+            humid.density
+            * humid.speed_of_sound**2
+            / d
+            / PUBLISHED_AIR.heat_capacity_ratio
+            / m
+        ) / (2.0 * np.pi)
+        assert got != pytest.approx(float(with_published_gamma), rel=1e-4)
+
     @pytest.mark.filterwarnings("ignore::phonometry.PhonometryWarning")
     def test_membrane_over_cavity_peaks_at_resonance(self) -> None:
         m, d = 5.0, 0.05
         f0 = membrane_resonance_frequency(surface_density=m, cavity_depth=d)
         f = np.linspace(20.0, 500.0, 3000)
-        med = delany_bazley(f, 10000.0, air_density=RHO0)
+        med = delany_bazley(f, 10000.0, fluid=PUBLISHED_AIR)
         res = layered_absorber(
             f, [MembraneLayer(m), AirLayer(0.02), PorousLayer(0.03, med)]
         )
@@ -820,7 +855,7 @@ class TestRandomIncidence:
 
     def test_diffuse_field_bounds_and_value(self) -> None:
         f = np.array([250.0, 500.0, 1000.0, 2000.0])
-        med = delany_bazley(f, 20000.0, air_density=RHO0)
+        med = delany_bazley(f, 20000.0, fluid=PUBLISHED_AIR)
         res = diffuse_field_absorption(f, [PorousLayer(0.05, med)])
         assert np.all(res.absorption >= 0.0)
         assert np.all(res.absorption <= 1.0)

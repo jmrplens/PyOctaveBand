@@ -120,8 +120,7 @@ barrier_insertion_loss(
     ground_impedance: ArrayLike | PorousMediumResult | None = None,
     ground_flow_resistivity: float | None = None,
     ground_model: Literal['delany_bazley', 'miki'] = 'delany_bazley',
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
+    fluid: Fluid = ...,
 ) -> BarrierInsertionLoss
 ```
 
@@ -166,8 +165,7 @@ at `(receiver_distance, receiver_height)`. Three models are available:
 | `ground_impedance` | Normalized ground impedance for the coherent ground model (`"exact"` only), in the $e^{-i \omega t}$ convention ($\operatorname{Im}(Z) > 0$ for a passive ground); a `PorousMediumResult` is conjugated internally from the materials' $e^{+j \omega t}$ convention. |
 | `ground_flow_resistivity` | Effective flow resistivity `sigma` (Pa s/m2) for the ground model, as an alternative to `ground_impedance`. |
 | `ground_model` | Porous model for `ground_flow_resistivity`. |
-| `speed_of_sound` | Speed of sound `c`, in m/s. |
-| `air_density` | Air density `rho`, in kg/m3. |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`PUBLISHED_AIR`](/phonometry/reference/api/materials/porous/#published_air), the air this model was published with). Pass a computed one, such as `fluids.air(temperature_c=30.0, relative_humidity_percent=70.0)`, to work in the air of the room. |
 
 **Returns:** A [`BarrierInsertionLoss`](/phonometry/reference/api/environment/ground-barriers/#barrierinsertionloss).
 
@@ -346,8 +344,7 @@ ground_effect(
     *,
     impedance: ArrayLike | PorousMediumResult,
     model: Literal['delany_bazley', 'miki'] = ...,
-    speed_of_sound: float = ...,
-    air_density: float = ...,
+    fluid: Fluid = ...,
 ) -> SphericalGroundResult
 
 ground_effect(
@@ -358,8 +355,7 @@ ground_effect(
     *,
     flow_resistivity: float,
     model: Literal['delany_bazley', 'miki'] = ...,
-    speed_of_sound: float = ...,
-    air_density: float = ...,
+    fluid: Fluid = ...,
 ) -> SphericalGroundResult
 ```
 
@@ -390,8 +386,7 @@ of the materials domain. Exactly one of the two must be given.
 | `impedance` | Normalized ground impedance ($e^{-i \omega t}$ convention, $\operatorname{Im}(Z) > 0$ for a passive ground), or a `PorousMediumResult` (which is conjugated internally from the materials' $e^{+j \omega t}$ convention). |
 | `flow_resistivity` | Effective flow resistivity `sigma` (Pa s/m2); grassland is about `2e5` (Salomons Sec. 3.1). The porous model raises a [`PorousAbsorberWarning`](/phonometry/reference/api/materials/porous/#porousabsorberwarning) when the lowest bands fall below its published fit range $0.01 < \rho f / \sigma < 1$ (it still extrapolates a value there). |
 | `model` | Porous model for `flow_resistivity` (`"delany_bazley"` or `"miki"`). |
-| `speed_of_sound` | Speed of sound `c`, in m/s. |
-| `air_density` | Air density `rho`, in kg/m3. |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`PUBLISHED_AIR`](/phonometry/reference/api/materials/porous/#published_air), the air this model was published with). Pass a computed one, such as `fluids.air(temperature_c=30.0, relative_humidity_percent=70.0)`, to work in the air of the room. |
 
 **Returns:** A [`SphericalGroundResult`](/phonometry/reference/api/environment/ground-barriers/#sphericalgroundresult).
 

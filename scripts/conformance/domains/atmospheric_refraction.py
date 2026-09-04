@@ -68,7 +68,7 @@ def _chk_atm_pe_ground_effect() -> Outcome:
             zr,
             float(pe.ranges[i]),
             impedance=z,
-            speed_of_sound=343.0,
+            fluid=ph.materials.PUBLISHED_AIR,
         ).excess_attenuation[0]
     )
     return numeric(oracle, got, 0.5, unit="dB", places=3)

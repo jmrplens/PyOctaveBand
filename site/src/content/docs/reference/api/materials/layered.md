@@ -65,9 +65,7 @@ diffuse_field_absorption(
     angle_limit: float = 1.5707963267948966,
     quadrature_points: int = 64,
     termination: str | complex | ArrayLike = 'rigid',
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
-    viscosity: float = 1.84e-05,
+    fluid: Fluid = ...,
 ) -> DiffuseFieldAbsorptionResult
 ```
 
@@ -93,9 +91,7 @@ truncate the integral at 75-87 degrees instead of 90 (Sect. D.5); set
 | `angle_limit` | Upper integration angle `theta_lim`, in radians (0 \< theta_lim \<= pi/2; default pi/2). |
 | `quadrature_points` | Gauss-Legendre order (default 64). |
 | `termination` | As in [`layered_absorber`](/phonometry/reference/api/materials/layered/#layered_absorber). |
-| `speed_of_sound` | Speed of sound `c` in air, in m/s. |
-| `air_density` | Air density `rho`, in kg/m3. |
-| `viscosity` | Dynamic viscosity of air, in Pa s. |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`PUBLISHED_AIR`](/phonometry/reference/api/materials/porous/#published_air), the air this model was published with). Pass a computed one, such as `fluids.air(temperature_c=30.0, relative_humidity_percent=70.0)`, to work in the air of the room. |
 
 **Returns:** A [`DiffuseFieldAbsorptionResult`](/phonometry/reference/api/materials/layered/#diffusefieldabsorptionresult).
 
@@ -142,9 +138,7 @@ layered_absorber(
     *,
     angle: float = 0.0,
     termination: str | complex | ArrayLike = 'rigid',
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
-    viscosity: float = 1.84e-05,
+    fluid: Fluid = ...,
 ) -> LayeredAbsorberResult
 ```
 
@@ -182,9 +176,7 @@ extremely attenuating layers); the raw chain matrix is still returned in
 | `layers` | Layer stack from the incidence side to the termination. |
 | `angle` | Polar angle of incidence `theta`, in radians ($0 \le \theta < \pi/2 - 10^{-6}$; grazing incidence is excluded). |
 | `termination` | `"rigid"` (default), `"free"`, or a non-zero complex impedance (scalar or per-frequency array), in Pa s/m. |
-| `speed_of_sound` | Speed of sound `c` in air, in m/s. |
-| `air_density` | Air density `rho`, in kg/m3. |
-| `viscosity` | Dynamic viscosity of air, in Pa s (sheet layers). |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`PUBLISHED_AIR`](/phonometry/reference/api/materials/porous/#published_air), the air this model was published with). Pass a computed one, such as `fluids.air(temperature_c=30.0, relative_humidity_percent=70.0)`, to work in the air of the room. |
 
 **Returns:** A [`LayeredAbsorberResult`](/phonometry/reference/api/materials/layered/#layeredabsorberresult).
 

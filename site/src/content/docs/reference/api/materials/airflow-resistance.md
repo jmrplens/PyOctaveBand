@@ -143,6 +143,10 @@ Annex A.3 example gives $\kappa' = 1.370$).
 Emits [`AirflowResistanceWarning`](/phonometry/reference/api/materials/airflow-resistance/#airflowresistancewarning) when the piston frequency is outside
 1-4 Hz or when the Formula (3)/(4) validity criteria are not met.
 
+## ANNEX_A_AIR
+
+*Constant* (`phonometry.fluids.Fluid`).
+
 ## effective_kappa
 
 ```python
@@ -151,11 +155,7 @@ effective_kappa(
     cavity_volume: float,
     frequency: float,
     *,
-    speed_of_sound: float = 345.86652,
-    air_density: float = 1.1860848,
-    specific_heat_ratio: float = 1.4007573,
-    specific_heat_cp: float = 1013.738121253794,
-    thermal_conductivity: float = 0.0254341377186358,
+    fluid: Fluid = ...,
 ) -> float
 ```
 
@@ -173,9 +173,9 @@ with `b` the thermal boundary-layer thickness (Formulae (A.4)/(A.5),
 of the air cavity (m2) and `V` its volume (m3).
 
 `cavity_surface` is `S` (m2), `cavity_volume` `V` (m3) and `frequency`
-the piston frequency `f` (Hz); `specific_heat_ratio` `kappa` (adiabatic) and
-the remaining air properties default to air at the Annex A.3 reference state,
-computed from IEC 61094-2:2009 Annex F (see
+the piston frequency `f` (Hz). The adiabatic `kappa` and every other air
+property come from `fluid`, which defaults to [`ANNEX_A_AIR`](/phonometry/reference/api/materials/airflow-resistance/#annex_a_air), the
+Annex A.3 reference state computed from IEC 61094-2:2009 Annex F (see
 [`thermal_boundary_layer_thickness`](/phonometry/reference/api/materials/airflow-resistance/#thermal_boundary_layer_thickness) on why those differ from the pair
 Annex A.3 prints). Returns the dimensionless `kappa'` for use in
 [`alternating_airflow_resistance`](/phonometry/reference/api/materials/airflow-resistance/#alternating_airflow_resistance); the Annex A.3 worked example
@@ -367,10 +367,7 @@ place (mm/s).
 thermal_boundary_layer_thickness(
     frequency: float,
     *,
-    speed_of_sound: float = 345.86652,
-    air_density: float = 1.1860848,
-    specific_heat_cp: float = 1013.738121253794,
-    thermal_conductivity: float = 0.0254341377186358,
+    fluid: Fluid = ...,
 ) -> float
 ```
 
@@ -384,11 +381,10 @@ $$
 b = \sqrt{\frac{2 c_0 l_\mathrm{h}}{\omega}}, \qquad \omega = 2\pi f \tag{A.4}
 $$
 
-`frequency` is the piston frequency `f` (Hz); `speed_of_sound` `c0` (m/s),
-`air_density` `rho0` (kg/m3), `specific_heat_cp` `C_P` (J/(kg\*K)) and
-`thermal_conductivity` `k_a` (J/(s\*m\*K)) are air properties, defaulting to air
-at 23 degC, 101,325 kPa and 50 % relative humidity computed from IEC 61094-2:2009
-Annex F. Note that `c0` cancels: `b` is
+`frequency` is the piston frequency `f` (Hz). The air properties `c0`,
+`rho0`, `C_P` and `k_a` come from `fluid`, which defaults to
+[`ANNEX_A_AIR`](/phonometry/reference/api/materials/airflow-resistance/#annex_a_air): air at 23 degC, 101 325 Pa and 50 % relative humidity
+computed from IEC 61094-2:2009 Annex F. Note that `c0` cancels: `b` is
 $\sqrt{2 k_\mathrm{a} / (\rho_0 C_\mathrm{P} \omega)}$, so only the pair
 `k_a`/`C_P` and the density move it.
 

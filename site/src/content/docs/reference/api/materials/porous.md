@@ -116,8 +116,7 @@ delany_bazley(
     flow_resistivity: float,
     *,
     coefficients: str | tuple[float, ...] = 'delany_bazley',
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
+    fluid: Fluid = ...,
 ) -> PorousMediumResult
 ```
 
@@ -139,8 +138,7 @@ are still returned.
 | `frequency` | Frequency vector `f`, in hertz. |
 | `flow_resistivity` | Airflow resistivity `sigma`, in Pa s/m2. |
 | `coefficients` | Preset name from [`DELANY_BAZLEY_COEFFICIENTS`](/phonometry/reference/api/materials/porous/#delany_bazley_coefficients) (`"delany_bazley"` rockwool/fibreglass default, `"garai_pompoli"` polyester, `"dunn_davern"` / `"wu"` foams) or an explicit `(C1..C8)` tuple. |
-| `speed_of_sound` | Speed of sound `c` in fluid, in m/s. |
-| `air_density` | Air density `rho`, in kg/m3. |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`PUBLISHED_AIR`](/phonometry/reference/api/materials/porous/#published_air), the air this model was published with). Pass a computed one, such as `fluids.air(temperature_c=30.0, relative_humidity_percent=70.0)`, to work in the air of the room. |
 
 **Returns:** A [`PorousMediumResult`](/phonometry/reference/api/materials/porous/#porousmediumresult).
 
@@ -204,12 +202,7 @@ johnson_champoux_allard(
     tortuosity: float,
     viscous_length: float,
     thermal_length: float,
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
-    viscosity: float = 1.84e-05,
-    prandtl_number: float = 0.71,
-    heat_capacity_ratio: float = 1.4,
-    atmospheric_pressure: float = 101325.0,
+    fluid: Fluid = ...,
 ) -> PorousMediumResult
 ```
 
@@ -246,12 +239,7 @@ $\omega \to \infty$ (Johnson et al. 1987), pinned in the tests.
 | `tortuosity` | High-frequency tortuosity $T = \alpha_\infty$ (>= 1). |
 | `viscous_length` | Viscous characteristic length `L`, in metres. |
 | `thermal_length` | Thermal characteristic length `L'`, in metres (physically $L' \ge L$). |
-| `speed_of_sound` | Speed of sound `c` in fluid, in m/s. |
-| `air_density` | Air density `rho`, in kg/m3. |
-| `viscosity` | Dynamic viscosity `eta` of fluid, in Pa s. |
-| `prandtl_number` | Prandtl number `Pr` of fluid. |
-| `heat_capacity_ratio` | Ratio of specific heats `gamma`. |
-| `atmospheric_pressure` | Static pressure `P0`, in Pa. |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`PUBLISHED_AIR`](/phonometry/reference/api/materials/porous/#published_air), the air this model was published with). Pass a computed one, such as `fluids.air(temperature_c=30.0, relative_humidity_percent=70.0)`, to work in the air of the room. |
 
 **Returns:** A [`PorousMediumResult`](/phonometry/reference/api/materials/porous/#porousmediumresult).
 
@@ -417,8 +405,7 @@ membrane_resonance_frequency(
     surface_density: float,
     cavity_depth: float,
     isothermal: bool = False,
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
+    fluid: Fluid = ...,
 ) -> float
 ```
 
@@ -437,8 +424,7 @@ the porous-filled cavity case below about 500 Hz.
 | `surface_density` | Membrane mass per unit area `m`, in kg/m2. |
 | `cavity_depth` | Cavity depth `d`, in metres. |
 | `isothermal` | Use the isothermal air-spring stiffness. |
-| `speed_of_sound` | Speed of sound `c` in fluid, in m/s. |
-| `air_density` | Air density `rho`, in kg/m3. |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`PUBLISHED_AIR`](/phonometry/reference/api/materials/porous/#published_air), the air this model was published with). Pass a computed one, such as `fluids.air(temperature_c=30.0, relative_humidity_percent=70.0)`, to work in the air of the room. |
 
 **Returns:** Resonance frequency `f0`, in hertz.
 
@@ -452,8 +438,7 @@ microperforated_plate_impedance(
     hole_radius: float,
     open_area: float,
     end_correction: float = 0.85,
-    air_density: float = 1.205,
-    viscosity: float = 1.84e-05,
+    fluid: Fluid = ...,
 ) -> Complex
 ```
 
@@ -485,8 +470,7 @@ transfer impedance (Cox & D'Antonio Eq. (7.35)).
 | `hole_radius` | Hole radius `a`, in metres (submillimetre for a genuine microperforated design). |
 | `open_area` | Fractional open area `eps` (0..1). |
 | `end_correction` | End-correction factor `delta` per end (default 0.85, the isolated-orifice value used by Maa). |
-| `air_density` | Air density `rho`, in kg/m3. |
-| `viscosity` | Dynamic viscosity `eta` of fluid, in Pa s. |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`PUBLISHED_AIR`](/phonometry/reference/api/materials/porous/#published_air), the air this model was published with). Pass a computed one, such as `fluids.air(temperature_c=30.0, relative_humidity_percent=70.0)`, to work in the air of the room. |
 
 **Returns:** Complex transfer impedance `z`, in Pa s/m.
 
@@ -497,8 +481,7 @@ miki(
     frequency: ArrayLike,
     flow_resistivity: float,
     *,
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
+    fluid: Fluid = ...,
 ) -> PorousMediumResult
 ```
 
@@ -521,8 +504,7 @@ Sect. 4.1).
 | :--- | :--- |
 | `frequency` | Frequency vector `f`, in hertz. |
 | `flow_resistivity` | Airflow resistivity `sigma`, in Pa s/m2. |
-| `speed_of_sound` | Speed of sound `c` in fluid, in m/s. |
-| `air_density` | Air density `rho`, in kg/m3. |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`PUBLISHED_AIR`](/phonometry/reference/api/materials/porous/#published_air), the air this model was published with). Pass a computed one, such as `fluids.air(temperature_c=30.0, relative_humidity_percent=70.0)`, to work in the air of the room. |
 
 **Returns:** A [`PorousMediumResult`](/phonometry/reference/api/materials/porous/#porousmediumresult).
 
@@ -544,8 +526,7 @@ perforated_plate_impedance(
     hole_radius: float,
     open_area: float,
     end_correction: float | None = None,
-    air_density: float = 1.205,
-    viscosity: float = 1.84e-05,
+    fluid: Fluid = ...,
 ) -> Complex
 ```
 
@@ -578,8 +559,7 @@ holes.
 | `hole_radius` | Hole radius `a`, in metres. |
 | `open_area` | Fractional open area `eps` (0..1). |
 | `end_correction` | End-correction factor `delta` per end; default [`perforation_end_correction`](/phonometry/reference/api/materials/porous/#perforation_end_correction) of `eps`. |
-| `air_density` | Air density `rho`, in kg/m3. |
-| `viscosity` | Dynamic viscosity `eta` of fluid, in Pa s. |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`PUBLISHED_AIR`](/phonometry/reference/api/materials/porous/#published_air), the air this model was published with). Pass a computed one, such as `fluids.air(temperature_c=30.0, relative_humidity_percent=70.0)`, to work in the air of the room. |
 
 **Returns:** Complex transfer impedance `z`, in Pa s/m.
 
@@ -701,4 +681,4 @@ Requires matplotlib (`pip install phonometry[plot]`); returns the
 
 ## PUBLISHED_AIR
 
-*Constant* (`phonometry.fluids._state.Fluid`).
+*Constant* (`phonometry.fluids.Fluid`).

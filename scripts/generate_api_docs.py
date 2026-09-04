@@ -762,7 +762,29 @@ def _type_name(obj: object) -> str:
     # names something they must not import.
     if cls.__module__ == "typing":
         return str(obj).replace("typing.", "")
-    return f"{cls.__module__}.{cls.__qualname__}"
+    # A class defined in a private module is published by its package, and that
+    # is the path a reader may import. `Fluid` lives in `phonometry.fluids._state`
+    # and is `phonometry.fluids.Fluid`; printing the private path would offer an
+    # import that works today and is not supported.
+    return f"{_published_module(cls)}.{cls.__qualname__}"
+
+
+def _published_module(cls: type) -> str:
+    """The public module that exports *cls*, or its own if none does."""
+    parts = cls.__module__.split(".")
+    for cut in range(len(parts) - 1, 0, -1):
+        if not parts[cut].startswith("_"):
+            continue
+        candidate = ".".join(parts[:cut])
+        if any(segment.startswith("_") for segment in parts[:cut]):
+            # A package nested under a private one is private too: publishing
+            # `phonometry.x._private` would swap one unsupported import for
+            # another.
+            continue
+        module = sys.modules.get(candidate)
+        if module is not None and getattr(module, cls.__qualname__, None) is cls:
+            return candidate
+    return cls.__module__
 
 
 def build_model() -> tuple[list[ModuleDoc], dict[str, str], list[str]]:

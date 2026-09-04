@@ -398,6 +398,138 @@ def test_every_public_name_is_reachable_from_its_domain() -> None:
     )
 
 
+def test_no_docstring_documents_a_parameter_that_is_gone() -> None:
+    """A `:param` for an argument the signature no longer has is a lie.
+
+    Converting the visco-thermal models to take a `Fluid` left twenty-five of
+    these behind: `johnson_champoux_allard` alone still documented six floats
+    it no longer accepts, so a reader following its own docstring got a
+    `TypeError`. Nothing caught it, because a docstring is prose to every gate
+    the repository has, and the generated reference tables are built from the
+    signature rather than from the text beside it, so the two drifted apart
+    without either looking wrong on its own.
+    """
+    import ast
+    import pathlib
+
+    stale: list[str] = []
+    for path in sorted(pathlib.Path("src/phonometry").rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.FunctionDef):
+                continue
+            doc = ast.get_docstring(node) or ""
+            if not doc:
+                continue
+            named = {
+                a.arg
+                for a in node.args.posonlyargs + node.args.args + node.args.kwonlyargs
+            }
+            if node.args.vararg is not None:
+                named.add(node.args.vararg.arg)
+            if node.args.kwarg is not None:
+                named.add(node.args.kwarg.arg)
+            for line in doc.split("\n"):
+                text = line.strip()
+                if not text.startswith(":param "):
+                    continue
+                name = text[len(":param ") :].split(":")[0].strip()
+                if name in named:
+                    continue
+                # A varargs docstring names the collection it documents rather
+                # than the parameter: `:param fields:` for `*field`. Only that
+                # one name is excused, not every name in a variadic function.
+                if node.args.vararg is not None and name.rstrip("s") == (
+                    node.args.vararg.arg.rstrip("s")
+                ):
+                    continue
+                stale.append(
+                    f"{path.relative_to('src')}:{node.lineno} {node.name} "
+                    f"documents ':param {name}:', which it does not take"
+                )
+
+    assert not stale, (
+        "docstrings naming parameters the signature does not have:\n  "
+        + "\n  ".join(stale)
+    )
+
+
+#: The floats a `Fluid` withdrew from the signatures that used to take them
+#: one by one. A curated row still naming one of these describes an API that
+#: is gone; every other word in a row is prose and stays out of the check.
+WITHDRAWN_FLUID_FLOATS = frozenset(
+    {
+        "air",
+        "air_density",
+        "atmospheric_pressure",
+        "density",
+        "heat_capacity_ratio",
+        "prandtl_number",
+        "specific_heat_capacity",
+        "specific_heat_ratio",
+        "speed_of_sound",
+        "static_pressure_pa",
+        "temperature_c",
+        "thermal_conductivity",
+        "viscosity",
+    }
+)
+
+
+def test_no_curated_row_offers_a_fluid_float_that_is_gone() -> None:
+    """The other half of the gate on the curated table.
+
+    ``check_api_reference.py`` asks that every public name have a row. It does
+    not ask that a row describe the signature it names, so the ten rows the
+    fluid conversion left behind kept offering `speed_of_sound` and
+    `air_density` to functions that take a `Fluid`, and the table read as
+    current while documenting an API that raises `TypeError`. The vocabulary
+    is closed to the floats a `Fluid` replaced, so a name is flagged only where
+    the signature really has no such argument.
+    """
+    import inspect
+    import pathlib
+    import re
+
+    import phonometry
+
+    published: dict[str, object] = {}
+    for domain in sorted(dir(phonometry)):
+        if domain.startswith("_"):
+            continue
+        package = getattr(phonometry, domain)
+        if not inspect.ismodule(package):
+            continue
+        for name in getattr(package, "__all__", ()):
+            published.setdefault(name, getattr(package, name, None))
+
+    row = re.compile(r"^\|\s*`([A-Za-z_][\w.]*)`\s*\|\s*`function`\s*\|(.*)\|\s*$")
+    index = pathlib.Path("docs/reference/api/index.md")
+    stale: list[str] = []
+    for number, line in enumerate(index.read_text(encoding="utf-8").splitlines(), 1):
+        match = row.match(line)
+        if match is None:
+            continue
+        name, body = match.group(1), match.group(2)
+        function = published.get(name)
+        if not callable(function):
+            continue
+        try:
+            accepted = set(inspect.signature(function).parameters)
+        except (TypeError, ValueError):  # pragma: no cover - builtins only
+            continue
+        cited = set(re.findall(r"`([a-z_]\w*)`", body.split("|")[0]))
+        stale.extend(
+            f"{index}:{number} {name} offers '{gone}'"
+            for gone in sorted(cited & WITHDRAWN_FLUID_FLOATS - accepted)
+        )
+
+    assert not stale, (
+        "curated rows offering an argument the signature does not take:\n  "
+        + "\n  ".join(stale)
+    )
+
+
 def test_every_warning_a_package_can_raise_is_published() -> None:
     """A warning you cannot name is a warning you cannot filter.
 
