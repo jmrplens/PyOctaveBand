@@ -26,6 +26,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
+from phonometry.fluids import FluidPropertyUnavailable
 from phonometry.materials.absorbers.porous import PUBLISHED_AIR
 from phonometry.materials.absorbers.slow_sound import (
     CriticalCouplingResult,
@@ -44,6 +45,7 @@ _RHO0 = 1.205
 _C0 = 343.0
 _GAMMA = 1.4
 _P0 = 101325.0
+_PR = 0.71
 # The five constants above are the paper's, read off its text; the model's
 # published air is meant to be the same air. Pinning them here and asserting
 # the identity below keeps the oracle independent while making any drift
@@ -58,6 +60,12 @@ def test_published_air_is_the_papers_air() -> None:
     assert PUBLISHED_AIR.viscosity == pytest.approx(_ETA, abs=0.0)
     assert PUBLISHED_AIR.heat_capacity_ratio == pytest.approx(_GAMMA, abs=0.0)
     assert PUBLISHED_AIR.static_pressure_pa == pytest.approx(_P0, abs=0.0)
+    # The one the models read that is not closed from the others: this air
+    # determines no thermal diffusivity, so eta / (rho alpha_t) has nothing to
+    # close from, and the fitted 0,71 has to be carried rather than derived.
+    assert PUBLISHED_AIR.prandtl_number == pytest.approx(_PR, abs=0.0)
+    with pytest.raises(FluidPropertyUnavailable):
+        _ = PUBLISHED_AIR.thermal_diffusivity
 
 
 def _base_resonator() -> HelmholtzResonator:
