@@ -855,3 +855,17 @@ def test_window_size_and_assessment_validation() -> None:
     impact_requirement = hr.db_hr_impact_requirement("protected", "other_unit")
     with pytest.raises(ValueError, match=r"'value' must be finite"):
         hr.check_db_hr_requirement(math.nan, impact_requirement)
+
+
+def test_a_table_key_that_is_not_a_string_is_refused_by_name() -> None:
+    """The tables are keyed on words, and a number reaches no row at all.
+
+    Passing something other than a string used to die inside ``str.strip``
+    with an anonymous ``AttributeError``; the refusal names the argument, and
+    it is a ``ValueError`` like every other refusal in this module rather than
+    the ``TypeError`` the isinstance check suggests.
+    """
+    with pytest.raises(ValueError, match=r"'building_use' must be a string"):
+        hr.db_hr_facade_requirement(60.0, 5, "protected")  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match=r"'room_type' must be a string"):
+        hr.db_hr_facade_requirement(60.0, "residential", None)  # type: ignore[arg-type]

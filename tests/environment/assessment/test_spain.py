@@ -753,3 +753,14 @@ def test_a_tonal_correction_refuses_per_band_columns_that_disagree() -> None:
     result = rd.tonal_correction(np.array([50.0, 62.0, 51.0, 50.0, 49.0]), frequencies)
     with pytest.raises(ValueError, match=r"'levels' \(4\)"):
         dataclasses.replace(result, levels=result.levels[:-1])
+
+
+def test_an_area_type_that_is_not_a_string_is_refused_by_name() -> None:
+    """The area tables are keyed on a letter, and a number reaches no row.
+
+    Passing something other than a string used to die inside ``str.strip``
+    with an anonymous ``AttributeError``; the refusal names the argument, and
+    it is a ``ValueError`` like every other refusal in this module.
+    """
+    with pytest.raises(ValueError, match=r"'area_type' must be a string"):
+        rd.infrastructure_limits(5)  # type: ignore[arg-type]
