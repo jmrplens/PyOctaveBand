@@ -58,6 +58,15 @@ Every other section consumes it.
 - [Measurement uncertainty](signals/metrology/gum-uncertainty.md): the GUM law of propagation of uncertainty and the Monte Carlo method (ISO/IEC Guide 98-3:2008 and Supplement 1): combined and expanded uncertainty, Welch–Satterthwaite effective degrees of freedom, and probabilistically symmetric coverage intervals
 - [Data qualification](signals/metrology/data-qualification.md): the Bendat & Piersol stationarity tests (reverse arrangements with the Table A.6 acceptance regions, runs about the median with the exact Wald-Wolfowitz distribution) on segment mean squares, and the Rice statistics of level crossings, apparent frequency, peak rates and the irregularity factor that places the peak-height distribution between Rayleigh and Gaussian
 
+### [The medium](fluids/index.md)
+
+The fluid the sound travels through, computed from the conditions that were
+measured rather than assumed. A density and a speed of sound stand behind
+every level in the library; this is where they come from instead of being
+typed once.
+
+- [Humid air](fluids/humid-air.md): the density, speed of sound, ratio of specific heats, viscosity and thermal diffusivity of air from the measured temperature, pressure and humidity (IEC 61094-2:2009 Annex F, CIPM-2007), what each condition is worth, the domain the annex states for itself, and what the model refuses to guess
+
 ### [Audio files](io/index.md)
 
 Measurement audio in and out: every linear WAV a meter writes read into a

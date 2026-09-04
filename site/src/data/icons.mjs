@@ -55,6 +55,15 @@ export const topicIcons = {
   // A waveform on the sheet it is stored on: samples on a page, which is what
   // the topic reads and writes. Bars rather than a trace, because the signals
   // icon is already a trace and at 16 px two traces read as one topic.
+  // A thermometer and a droplet: the two conditions the medium is measured by,
+  // and the two the API asks about. A wave would have said sound rather than
+  // the substance it travels through, and every other topic already uses arcs.
+  fluids: `
+    <path d="M6.9 13.6V5.4a2.6 2.6 0 0 1 5.2 0v8.2" />
+    <circle cx="9.5" cy="16.6" r="3.9" />
+    <path d="M17.6 8.4c1.9 2.5 3 3.9 3 5.2a3 3 0 0 1-6 0c0-1.3 1.1-2.7 3-5.2z" />
+  `,
+
   io: `
     <path d="M13.4 2.8H6.8a1.5 1.5 0 0 0-1.5 1.5v15.4a1.5 1.5 0 0 0 1.5 1.5h10.4a1.5 1.5 0 0 0 1.5-1.5V8.2z" />
     <path d="M13.4 2.8v5.4h5.3" />
