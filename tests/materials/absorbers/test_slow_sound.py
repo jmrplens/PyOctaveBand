@@ -26,7 +26,8 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from phonometry.materials.absorbers.porous import AirProperties
+from phonometry.fluids import FluidPropertyUnavailable
+from phonometry.materials.absorbers.porous import PUBLISHED_AIR
 from phonometry.materials.absorbers.slow_sound import (
     CriticalCouplingResult,
     HelmholtzResonator,
@@ -44,13 +45,27 @@ _RHO0 = 1.205
 _C0 = 343.0
 _GAMMA = 1.4
 _P0 = 101325.0
-_AIR = AirProperties(
-    speed_of_sound=_C0,
-    density=_RHO0,
-    viscosity=_ETA,
-    heat_capacity_ratio=_GAMMA,
-    atmospheric_pressure=_P0,
-)
+_PR = 0.71
+# The five constants above are the paper's, read off its text; the model's
+# published air is meant to be the same air. Pinning them here and asserting
+# the identity below keeps the oracle independent while making any drift
+# between the two a test failure rather than a silent change of oracle.
+_AIR = PUBLISHED_AIR
+
+
+def test_published_air_is_the_papers_air() -> None:
+    """The model's published air carries the constants the paper prints."""
+    assert PUBLISHED_AIR.speed_of_sound == pytest.approx(_C0, abs=0.0)
+    assert PUBLISHED_AIR.density == pytest.approx(_RHO0, abs=0.0)
+    assert PUBLISHED_AIR.viscosity == pytest.approx(_ETA, abs=0.0)
+    assert PUBLISHED_AIR.heat_capacity_ratio == pytest.approx(_GAMMA, abs=0.0)
+    assert PUBLISHED_AIR.static_pressure_pa == pytest.approx(_P0, abs=0.0)
+    # The one the models read that is not closed from the others: this air
+    # determines no thermal diffusivity, so eta / (rho alpha_t) has nothing to
+    # close from, and the fitted 0,71 has to be carried rather than derived.
+    assert PUBLISHED_AIR.prandtl_number == pytest.approx(_PR, abs=0.0)
+    with pytest.raises(FluidPropertyUnavailable):
+        _ = PUBLISHED_AIR.thermal_diffusivity
 
 
 def _base_resonator() -> HelmholtzResonator:
@@ -69,7 +84,7 @@ def test_slit_dc_flow_resistivity() -> None:
     """j w rho_s -> 12 eta / h^2 (parallel-plate Poiseuille) as w -> 0."""
     h = 1.2e-3
     f = np.array([1.0e-2])
-    rho_s, _ = slit_effective_properties(f, slit_height=h, air=_AIR)
+    rho_s, _ = slit_effective_properties(f, slit_height=h, fluid=_AIR)
     sigma = float((1j * 2.0 * np.pi * f * rho_s)[0].real)
     assert sigma == pytest.approx(12.0 * _ETA / h**2, rel=1e-4)
 
@@ -77,7 +92,7 @@ def test_slit_dc_flow_resistivity() -> None:
 def test_slit_high_frequency_limits() -> None:
     """rho_s -> rho0 and kappa_s -> kappa0 as the boundary layers vanish."""
     f = np.array([2.0e4])
-    rho_s, kap_s = slit_effective_properties(f, slit_height=5.0e-2, air=_AIR)
+    rho_s, kap_s = slit_effective_properties(f, slit_height=5.0e-2, fluid=_AIR)
     assert rho_s[0].real == pytest.approx(_RHO0, rel=2e-2)
     assert kap_s[0].real == pytest.approx(_GAMMA * _P0, rel=2e-2)
 
@@ -86,7 +101,7 @@ def test_square_duct_dc_flow_resistivity() -> None:
     """j w rho -> 28.454 eta / side^2 (square-duct Poiseuille) as w -> 0."""
     side = 3.0e-3
     f = np.array([1.0e-2])
-    rho, _ = rectangular_duct_properties(f, side=side, air=_AIR)
+    rho, _ = rectangular_duct_properties(f, side=side, fluid=_AIR)
     sigma = float((1j * 2.0 * np.pi * f * rho)[0].real)
     assert sigma == pytest.approx(28.454 * _ETA / side**2, rel=1e-3)
 
@@ -97,7 +112,7 @@ def test_square_duct_high_frequency_limits() -> None:
     rho, kap = rectangular_duct_properties(
         f,
         side=5.0e-2,
-        air=_AIR,
+        fluid=_AIR,
         sum_terms=120,
     )
     assert rho[0].real == pytest.approx(_RHO0, rel=1e-2)
@@ -127,7 +142,7 @@ def test_duct_reduces_to_slit_in_wide_limit() -> None:
     rho_s, kap_s = slit_effective_properties(f, slit_height=h)
     # Rebuild the rectangular series directly with a != b (b wide), on the
     # same air the model defaults to.
-    air = AirProperties()
+    air = PUBLISHED_AIR
     idx = np.arange(400)
     a2 = ((2 * idx + 1) * np.pi / h) ** 2
     b2 = ((2 * idx + 1) * np.pi / 0.08) ** 2
@@ -142,7 +157,7 @@ def test_duct_reduces_to_slit_in_wide_limit() -> None:
     rho_d = np.conj(-_RHO0 * h**2 * 0.08**2 / (64.0 * g2r * sr))
     kap_d = np.conj(
         air.heat_capacity_ratio
-        * air.atmospheric_pressure
+        * air.static_pressure_pa
         / (
             air.heat_capacity_ratio
             + (64.0 * (air.heat_capacity_ratio - 1.0) * g2k / (h**2 * 0.08**2)) * sk
@@ -172,7 +187,7 @@ def test_resonator_impedance_lumped_helmholtz_limit() -> None:
     z = helmholtz_resonator_impedance(
         f,
         res,
-        air=AirProperties(density=_RHO0, viscosity=_ETA),
+        fluid=PUBLISHED_AIR,
     )
     # resonance = reactance sign change
     react = z.imag

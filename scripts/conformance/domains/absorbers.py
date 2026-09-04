@@ -487,13 +487,13 @@ def _chk_slow_sound_perfect_absorption() -> Outcome:
         cavity_length=30.0e-3,
         cavity_side=27.0e-3,
     )
-    air = ph.materials.AirProperties(density=_PA_RHO0, speed_of_sound=_PA_C0)
+    air = ph.materials.PUBLISHED_AIR
     design = ph.materials.critical_coupling_design(
         300.0,
         res,
         lattice_step=3.0e-2,
         period=5.0e-2,
-        air=air,
+        fluid=air,
     )
     out = ph.materials.slit_helmholtz_absorber(
         np.array([300.0]),
@@ -501,7 +501,7 @@ def _chk_slow_sound_perfect_absorption() -> Outcome:
         slit_height=design.slit_height,
         lattice_step=3.0e-2,
         period=5.0e-2,
-        air=air,
+        fluid=air,
     )
     # The check requires the solver to have converged: a non-converged design
     # fails the check outright rather than silently reporting its (imperfect)
@@ -516,13 +516,14 @@ def _chk_slow_sound_perfect_absorption() -> Outcome:
     "Slit: j w rho_s -> 12 eta / h^2 as w -> 0 (h = 1.2 mm)",
 )
 def _chk_slow_sound_slit_resistivity() -> Outcome:
-    eta = 1.84e-5
+    air = ph.materials.PUBLISHED_AIR
+    eta = air.viscosity
     h = 1.2e-3
     f = np.array([1.0e-2])
     rho_s, _ = ph.materials.slit_effective_properties(
         f,
         slit_height=h,
-        air=ph.materials.AirProperties(density=_PA_RHO0, viscosity=eta),
+        fluid=air,
     )
     sigma = float((1j * 2.0 * math.pi * f * rho_s)[0].real)
     return numeric(12.0 * eta / h**2, sigma, 1e-3, rel=True, unit="Pa s/m2", places=1)
@@ -534,13 +535,14 @@ def _chk_slow_sound_slit_resistivity() -> Outcome:
     "Square duct: j w rho -> 28.454 eta / w^2 as w -> 0 (w = 3 mm)",
 )
 def _chk_slow_sound_duct_resistivity() -> Outcome:
-    eta = 1.84e-5
+    air = ph.materials.PUBLISHED_AIR
+    eta = air.viscosity
     side = 3.0e-3
     f = np.array([1.0e-2])
     rho, _ = ph.materials.rectangular_duct_properties(
         f,
         side=side,
-        air=ph.materials.AirProperties(density=_PA_RHO0, viscosity=eta),
+        fluid=air,
     )
     sigma = float((1j * 2.0 * math.pi * f * rho)[0].real)
     return numeric(

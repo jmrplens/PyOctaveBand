@@ -50,7 +50,7 @@ passive medium has :math:`\operatorname{Im}(k) < 0`):
   around, :func:`helmholtz_resonance_frequency` for a perforate and
   :func:`membrane_resonance_frequency` for a membrane.
 
-The air all of them propagate through is described by :class:`AirProperties`,
+The air all of them propagate through is described by :class:`Fluid`,
 which carries the six quantities a visco-thermal model can need (speed of
 sound, density, viscosity, Prandtl number, ratio of specific heats and static
 pressure) with the values these models were published with. The narrow-channel
@@ -80,6 +80,7 @@ from ..._internal.validation import (
     require_positive_array,
 )
 from ..._internal.warnings import PhonometryWarning
+from ...fluids import Fluid
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -90,15 +91,15 @@ if TYPE_CHECKING:
 
 Complex = NDArray[np.complex128]
 
-#: Default speed of sound in air, in m/s (20 degC).
+#: Default speed of sound in fluid, in m/s (20 degC).
 _SPEED_OF_SOUND = 343.0
 #: Default air density, in kg/m3 (Bies 5e Appendix D: 1,205 at 20 degC).
 _AIR_DENSITY = 1.205
-#: Default dynamic viscosity of air, in Pa s (Cox & D'Antonio Eq. (7.13)).
+#: Default dynamic viscosity of fluid, in Pa s (Cox & D'Antonio Eq. (7.13)).
 _AIR_VISCOSITY = 1.84e-5
 #: Default Prandtl number of air at 20 degC (``eta c_p / kappa``).
 _PRANDTL_NUMBER = 0.71
-#: Default ratio of specific heats of air.
+#: Default ratio of specific heats of fluid.
 _HEAT_CAPACITY_RATIO = 1.4
 #: Default atmospheric pressure, in Pa.
 _ATMOSPHERIC_PRESSURE = 101325.0
@@ -143,12 +144,11 @@ MIKI_VALIDITY = (0.01, 1.0)
 LIMP_FRAME_CRITERIA: Mapping[str, float] = {"beranek": 0.05, "doutres": 0.2}
 
 __all__ = [
-    "DEFAULT_AIR",
     "DELANY_BAZLEY_COEFFICIENTS",
     "DELANY_BAZLEY_VALIDITY",
     "LIMP_FRAME_CRITERIA",
     "MIKI_VALIDITY",
-    "AirProperties",
+    "PUBLISHED_AIR",
     "PorousAbsorberWarning",
     "PorousMediumResult",
     "decoupling_frequency",
@@ -173,49 +173,33 @@ class PorousAbsorberWarning(PhonometryWarning):
 # ---------------------------------------------------------------------------
 # The air the models propagate through
 # ---------------------------------------------------------------------------
-@dataclass(frozen=True)
-class AirProperties:
-    r"""State of the air the visco-thermal models propagate through.
-
-    The six quantities a narrow-channel model needs: the speed of sound
-    ``c0`` in m/s, the density :math:`\rho_0` in kg/m3, the dynamic viscosity
-    :math:`\eta` in Pa s, the Prandtl number ``Pr``, the ratio of specific
-    heats :math:`\gamma` and the static pressure :math:`P_0` in Pa (the
-    adiabatic bulk modulus is :math:`\kappa_0 = \gamma P_0`). The defaults are
-    dry air at 20 degC, the values the models were published with.
-
-    Every field is validated on construction, so an impossible air state is
-    rejected once, where it is written, rather than at each model that reads
-    it.
-
-    :raises ValueError: If any quantity is not positive and finite.
-    """
-
-    speed_of_sound: float = _SPEED_OF_SOUND
-    density: float = _AIR_DENSITY
-    viscosity: float = _AIR_VISCOSITY
-    prandtl_number: float = _PRANDTL_NUMBER
-    heat_capacity_ratio: float = _HEAT_CAPACITY_RATIO
-    atmospheric_pressure: float = _ATMOSPHERIC_PRESSURE
-
-    def __post_init__(self) -> None:
-        """Validate the six quantities.
-
-        :raises ValueError: If any of them is not positive and finite.
-        """
-        require_positive(self.speed_of_sound, "speed_of_sound")
-        # The message keeps the historical parameter name of the models this
-        # field replaces.
-        require_positive(self.density, "air_density")
-        require_positive(self.viscosity, "viscosity")
-        require_positive(self.prandtl_number, "prandtl_number")
-        require_positive(self.heat_capacity_ratio, "heat_capacity_ratio")
-        require_positive(self.atmospheric_pressure, "atmospheric_pressure")
-
-
-#: Dry air at 20 degC, the air every model defaults to. The instance is
-#: immutable, so the models share this one rather than build their own.
-DEFAULT_AIR = AirProperties()
+#: The air the visco-thermal models were **published** with, not a measurement
+#: of anyone's fluid. Johnson, Champoux and Allard fitted their closed forms
+#: against these six values, so they are constants of the model in the same way
+#: its exponents are: substituting better physics does not correct an error, it
+#: changes the model. Most visibly, the Prandtl number here is 0,71 while air at
+#: this state has 0,728, and that alone moves the characteristic impedance and
+#: the wavenumber by 1,5 parts in a thousand.
+#:
+#: Frozen, shared by every model rather than rebuilt, and it stays in this
+#: module because it belongs to these models and to nothing else.
+PUBLISHED_AIR = Fluid(
+    temperature_c=20.0,
+    static_pressure_pa=_ATMOSPHERIC_PRESSURE,
+    composition={},
+    model="Johnson-Champoux-Allard published constants (dry air at 20 degC)",
+    validity="",
+    properties={
+        "speed_of_sound": _SPEED_OF_SOUND,
+        "density": _AIR_DENSITY,
+        "viscosity": _AIR_VISCOSITY,
+        "heat_capacity_ratio": _HEAT_CAPACITY_RATIO,
+        # Carried rather than derived: this is the model's fitted constant, and
+        # Fluid.prandtl_number would close eta/(rho alpha_t) from an air that
+        # does not have it.
+        "prandtl_number": _PRANDTL_NUMBER,
+    },
+)
 
 
 # ---------------------------------------------------------------------------
@@ -248,7 +232,7 @@ class PorousMediumResult:
 
     @property
     def normalized_impedance(self) -> Complex:
-        r"""Characteristic impedance normalised by :math:`\rho c` of air."""
+        r"""Characteristic impedance normalised by :math:`\rho c` of fluid."""
         rc = self.air_density * self.speed_of_sound
         return np.asarray(self.characteristic_impedance / rc, dtype=np.complex128)
 
@@ -339,7 +323,7 @@ def delany_bazley(
         (``"delany_bazley"`` rockwool/fibreglass default, ``"garai_pompoli"``
         polyester, ``"dunn_davern"`` / ``"wu"`` foams) or an explicit
         ``(C1..C8)`` tuple.
-    :param speed_of_sound: Speed of sound ``c`` in air, in m/s.
+    :param speed_of_sound: Speed of sound ``c`` in fluid, in m/s.
     :param air_density: Air density ``rho``, in kg/m3.
     :return: A :class:`PorousMediumResult`.
     """
@@ -399,7 +383,7 @@ def miki(
 
     :param frequency: Frequency vector ``f``, in hertz.
     :param flow_resistivity: Airflow resistivity ``sigma``, in Pa s/m2.
-    :param speed_of_sound: Speed of sound ``c`` in air, in m/s.
+    :param speed_of_sound: Speed of sound ``c`` in fluid, in m/s.
     :param air_density: Air density ``rho``, in kg/m3.
     :return: A :class:`PorousMediumResult`.
     """
@@ -474,10 +458,10 @@ def johnson_champoux_allard(
     :param viscous_length: Viscous characteristic length ``L``, in metres.
     :param thermal_length: Thermal characteristic length ``L'``, in metres
         (physically :math:`L' \ge L`).
-    :param speed_of_sound: Speed of sound ``c`` in air, in m/s.
+    :param speed_of_sound: Speed of sound ``c`` in fluid, in m/s.
     :param air_density: Air density ``rho``, in kg/m3.
-    :param viscosity: Dynamic viscosity ``eta`` of air, in Pa s.
-    :param prandtl_number: Prandtl number ``Pr`` of air.
+    :param viscosity: Dynamic viscosity ``eta`` of fluid, in Pa s.
+    :param prandtl_number: Prandtl number ``Pr`` of fluid.
     :param heat_capacity_ratio: Ratio of specific heats ``gamma``.
     :param atmospheric_pressure: Static pressure ``P0``, in Pa.
     :return: A :class:`PorousMediumResult`.
@@ -572,7 +556,7 @@ def limp_frame_applicable(
     :math:`\lvert K_c/K_\mathrm{f} \rvert < 0.05`, and the frame structural
     interaction study of Doutres et al. (2007) relaxes it to
     :math:`\lvert K_c/K_\mathrm{f} \rvert < 0.2`. With ``K_f`` taken as the
-    isothermal bulk modulus of air, :math:`P_0 = 101.3` kPa, the relaxed
+    isothermal bulk modulus of fluid, :math:`P_0 = 101.3` kPa, the relaxed
     criterion is the book's statement that
     "the limp model is applicable for materials having a bulk modulus lower
     than 20 kPa". Neither criterion accounts for boundary or mounting
@@ -584,7 +568,7 @@ def limp_frame_applicable(
     :param criterion: Key into :data:`LIMP_FRAME_CRITERIA`, ``"doutres"``
         (Default, 0,2) or ``"beranek"`` (0,05).
     :param fluid_bulk_modulus: Bulk modulus of the pore fluid ``K_f``, in Pa
-        (Default: 101 325, the isothermal value for air).
+        (Default: 101 325, the isothermal value for fluid).
     :return: ``True`` when :math:`\lvert K_c/K_\mathrm{f} \rvert` does not exceed
         the threshold.
     :raises ValueError: for a negative modulus or an unknown criterion.
@@ -752,7 +736,7 @@ def perforated_plate_impedance(
     :param end_correction: End-correction factor ``delta`` per end; default
         :func:`perforation_end_correction` of ``eps``.
     :param air_density: Air density ``rho``, in kg/m3.
-    :param viscosity: Dynamic viscosity ``eta`` of air, in Pa s.
+    :param viscosity: Dynamic viscosity ``eta`` of fluid, in Pa s.
     :return: Complex transfer impedance ``z``, in Pa s/m.
     """
     f = require_positive_array(frequency, "frequency")
@@ -814,7 +798,7 @@ def microperforated_plate_impedance(
     :param end_correction: End-correction factor ``delta`` per end
         (default 0.85, the isolated-orifice value used by Maa).
     :param air_density: Air density ``rho``, in kg/m3.
-    :param viscosity: Dynamic viscosity ``eta`` of air, in Pa s.
+    :param viscosity: Dynamic viscosity ``eta`` of fluid, in Pa s.
     :return: Complex transfer impedance ``z``, in Pa s/m.
     """
     f = require_positive_array(frequency, "frequency")
@@ -882,7 +866,7 @@ def helmholtz_resonance_frequency(
     :param open_area: Fractional open area ``eps`` (0..1).
     :param end_correction: End-correction factor ``delta`` per end; default
         :func:`perforation_end_correction` of ``eps``.
-    :param speed_of_sound: Speed of sound ``c`` in air, in m/s.
+    :param speed_of_sound: Speed of sound ``c`` in fluid, in m/s.
     :return: Resonance frequency ``f0``, in hertz.
     """
     d = require_positive(cavity_depth, "cavity_depth")
@@ -920,7 +904,7 @@ def membrane_resonance_frequency(
     :param surface_density: Membrane mass per unit area ``m``, in kg/m2.
     :param cavity_depth: Cavity depth ``d``, in metres.
     :param isothermal: Use the isothermal air-spring stiffness.
-    :param speed_of_sound: Speed of sound ``c`` in air, in m/s.
+    :param speed_of_sound: Speed of sound ``c`` in fluid, in m/s.
     :param air_density: Air density ``rho``, in kg/m3.
     :return: Resonance frequency ``f0``, in hertz.
     """

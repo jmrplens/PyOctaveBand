@@ -56,7 +56,7 @@ passive medium has $\operatorname{Im}(k) < 0$):
   around, [`helmholtz_resonance_frequency`](/phonometry/reference/api/materials/porous/#helmholtz_resonance_frequency) for a perforate and
   [`membrane_resonance_frequency`](/phonometry/reference/api/materials/porous/#membrane_resonance_frequency) for a membrane.
 
-The air all of them propagate through is described by [`AirProperties`](/phonometry/reference/api/materials/porous/#airproperties),
+The air all of them propagate through is described by [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid),
 which carries the six quantities a visco-thermal model can need (speed of
 sound, density, viscosity, Prandtl number, ratio of specific heats and static
 pressure) with the values these models were published with. The narrow-channel
@@ -69,38 +69,6 @@ stack of them and solving it with the transfer matrix is the subject of
 [`layered`](/phonometry/reference/api/materials/layered/).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
-## AirProperties
-
-```python
-AirProperties(
-    speed_of_sound: float = 343.0,
-    density: float = 1.205,
-    viscosity: float = 1.84e-05,
-    prandtl_number: float = 0.71,
-    heat_capacity_ratio: float = 1.4,
-    atmospheric_pressure: float = 101325.0,
-)
-```
-
-State of the air the visco-thermal models propagate through.
-
-The six quantities a narrow-channel model needs: the speed of sound
-`c0` in m/s, the density $\rho_0$ in kg/m3, the dynamic viscosity
-$\eta$ in Pa s, the Prandtl number `Pr`, the ratio of specific
-heats $\gamma$ and the static pressure $P_0$ in Pa (the
-adiabatic bulk modulus is $\kappa_0 = \gamma P_0$). The defaults are
-dry air at 20 degC, the values the models were published with.
-
-Every field is validated on construction, so an impossible air state is
-rejected once, where it is written, rather than at each model that reads
-it.
-
-**Raises**
-
-| Exception | When |
-| :--- | :--- |
-| ValueError | If any quantity is not positive and finite. |
 
 ## decoupling_frequency
 
@@ -140,10 +108,6 @@ matters.
 | :--- | :--- |
 | ValueError | for a non-positive input or a porosity above 1. |
 
-## DEFAULT_AIR
-
-*Constant* (`phonometry.materials.absorbers.porous.AirProperties`).
-
 ## delany_bazley
 
 ```python
@@ -175,7 +139,7 @@ are still returned.
 | `frequency` | Frequency vector `f`, in hertz. |
 | `flow_resistivity` | Airflow resistivity `sigma`, in Pa s/m2. |
 | `coefficients` | Preset name from [`DELANY_BAZLEY_COEFFICIENTS`](/phonometry/reference/api/materials/porous/#delany_bazley_coefficients) (`"delany_bazley"` rockwool/fibreglass default, `"garai_pompoli"` polyester, `"dunn_davern"` / `"wu"` foams) or an explicit `(C1..C8)` tuple. |
-| `speed_of_sound` | Speed of sound `c` in air, in m/s. |
+| `speed_of_sound` | Speed of sound `c` in fluid, in m/s. |
 | `air_density` | Air density `rho`, in kg/m3. |
 
 **Returns:** A [`PorousMediumResult`](/phonometry/reference/api/materials/porous/#porousmediumresult).
@@ -225,7 +189,7 @@ end-corrected plug length $t' = t + 2 \delta a$ (Cox & D'Antonio
 | `hole_radius` | Hole radius `a`, in metres. |
 | `open_area` | Fractional open area `eps` (0..1). |
 | `end_correction` | End-correction factor `delta` per end; default [`perforation_end_correction`](/phonometry/reference/api/materials/porous/#perforation_end_correction) of `eps`. |
-| `speed_of_sound` | Speed of sound `c` in air, in m/s. |
+| `speed_of_sound` | Speed of sound `c` in fluid, in m/s. |
 
 **Returns:** Resonance frequency `f0`, in hertz.
 
@@ -282,10 +246,10 @@ $\omega \to \infty$ (Johnson et al. 1987), pinned in the tests.
 | `tortuosity` | High-frequency tortuosity $T = \alpha_\infty$ (>= 1). |
 | `viscous_length` | Viscous characteristic length `L`, in metres. |
 | `thermal_length` | Thermal characteristic length `L'`, in metres (physically $L' \ge L$). |
-| `speed_of_sound` | Speed of sound `c` in air, in m/s. |
+| `speed_of_sound` | Speed of sound `c` in fluid, in m/s. |
 | `air_density` | Air density `rho`, in kg/m3. |
-| `viscosity` | Dynamic viscosity `eta` of air, in Pa s. |
-| `prandtl_number` | Prandtl number `Pr` of air. |
+| `viscosity` | Dynamic viscosity `eta` of fluid, in Pa s. |
+| `prandtl_number` | Prandtl number `Pr` of fluid. |
 | `heat_capacity_ratio` | Ratio of specific heats `gamma`. |
 | `atmospheric_pressure` | Static pressure `P0`, in Pa. |
 
@@ -387,7 +351,7 @@ printed pp. 253-254): Beranek (1947) requires
 $\lvert K_c/K_\mathrm{f} \rvert < 0.05$, and the frame structural
 interaction study of Doutres et al. (2007) relaxes it to
 $\lvert K_c/K_\mathrm{f} \rvert < 0.2$. With `K_f` taken as the
-isothermal bulk modulus of air, $P_0 = 101.3$ kPa, the relaxed
+isothermal bulk modulus of fluid, $P_0 = 101.3$ kPa, the relaxed
 criterion is the book's statement that
 "the limp model is applicable for materials having a bulk modulus lower
 than 20 kPa". Neither criterion accounts for boundary or mounting
@@ -400,7 +364,7 @@ vibrating structure by an air gap behaves limply well above the limit.
 | :--- | :--- |
 | `frame_bulk_modulus` | Bulk modulus of the frame in vacuum `K_c`, in Pa (>= 0; pass `abs(K_c)` for a complex modulus). |
 | `criterion` | Key into [`LIMP_FRAME_CRITERIA`](/phonometry/reference/api/materials/porous/#limp_frame_criteria), `"doutres"` (Default, 0,2) or `"beranek"` (0,05). |
-| `fluid_bulk_modulus` | Bulk modulus of the pore fluid `K_f`, in Pa (Default: 101 325, the isothermal value for air). |
+| `fluid_bulk_modulus` | Bulk modulus of the pore fluid `K_f`, in Pa (Default: 101 325, the isothermal value for fluid). |
 
 **Returns:** `True` when $\lvert K_c/K_\mathrm{f} \rvert$ does not exceed the threshold.
 
@@ -473,7 +437,7 @@ the porous-filled cavity case below about 500 Hz.
 | `surface_density` | Membrane mass per unit area `m`, in kg/m2. |
 | `cavity_depth` | Cavity depth `d`, in metres. |
 | `isothermal` | Use the isothermal air-spring stiffness. |
-| `speed_of_sound` | Speed of sound `c` in air, in m/s. |
+| `speed_of_sound` | Speed of sound `c` in fluid, in m/s. |
 | `air_density` | Air density `rho`, in kg/m3. |
 
 **Returns:** Resonance frequency `f0`, in hertz.
@@ -522,7 +486,7 @@ transfer impedance (Cox & D'Antonio Eq. (7.35)).
 | `open_area` | Fractional open area `eps` (0..1). |
 | `end_correction` | End-correction factor `delta` per end (default 0.85, the isolated-orifice value used by Maa). |
 | `air_density` | Air density `rho`, in kg/m3. |
-| `viscosity` | Dynamic viscosity `eta` of air, in Pa s. |
+| `viscosity` | Dynamic viscosity `eta` of fluid, in Pa s. |
 
 **Returns:** Complex transfer impedance `z`, in Pa s/m.
 
@@ -557,7 +521,7 @@ Sect. 4.1).
 | :--- | :--- |
 | `frequency` | Frequency vector `f`, in hertz. |
 | `flow_resistivity` | Airflow resistivity `sigma`, in Pa s/m2. |
-| `speed_of_sound` | Speed of sound `c` in air, in m/s. |
+| `speed_of_sound` | Speed of sound `c` in fluid, in m/s. |
 | `air_density` | Air density `rho`, in kg/m3. |
 
 **Returns:** A [`PorousMediumResult`](/phonometry/reference/api/materials/porous/#porousmediumresult).
@@ -615,7 +579,7 @@ holes.
 | `open_area` | Fractional open area `eps` (0..1). |
 | `end_correction` | End-correction factor `delta` per end; default [`perforation_end_correction`](/phonometry/reference/api/materials/porous/#perforation_end_correction) of `eps`. |
 | `air_density` | Air density `rho`, in kg/m3. |
-| `viscosity` | Dynamic viscosity `eta` of air, in Pa s. |
+| `viscosity` | Dynamic viscosity `eta` of fluid, in Pa s. |
 
 **Returns:** Complex transfer impedance `z`, in Pa s/m.
 
@@ -710,7 +674,7 @@ $k = \omega \sqrt{\rho_\mathrm{e} / K_\mathrm{e}}$ for every model.
 
 *property*
 
-Characteristic impedance normalised by $\rho c$ of air.
+Characteristic impedance normalised by $\rho c$ of fluid.
 
 ### PorousMediumResult.normalized_wavenumber
 
@@ -734,3 +698,7 @@ Plot the normalised `Zc` and `k` components against frequency.
 
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.
+
+## PUBLISHED_AIR
+
+*Constant* (`phonometry.fluids._state.Fluid`).

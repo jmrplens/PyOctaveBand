@@ -79,13 +79,14 @@ from ..._internal.validation import (
     require_positive_array,
 )
 from ..._internal.warnings import PhonometryWarning
-from .porous import DEFAULT_AIR, AirProperties, Complex
+from .porous import PUBLISHED_AIR, Complex
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import ArrayLike
 
     from ..._internal.types import Real
+    from ...fluids import Fluid
 
 #: Default number of transverse modes kept per axis in the duct series.
 _DUCT_TERMS = 40
@@ -164,7 +165,7 @@ def slit_effective_properties(
     frequency: ArrayLike,
     *,
     slit_height: float,
-    air: AirProperties = DEFAULT_AIR,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> tuple[Complex, Complex]:
     r"""Effective density and bulk modulus of a narrow slit of height ``h``.
 
@@ -182,19 +183,19 @@ def slit_effective_properties(
 
     :param frequency: Frequency vector ``f``, in hertz.
     :param slit_height: Slit height ``h``, in metres.
-    :param air: State of the air in the slit
-        (:class:`~phonometry.materials.absorbers.porous.AirProperties`); the
+    :param fluid: State of the air in the slit
+        (:class:`~phonometry.fluids.Fluid`); the
         density ``rho0``, viscosity ``eta``, Prandtl number ``Pr``, ratio of
         specific heats ``gamma`` and static pressure ``P0`` are read from it.
     :return: ``(rho_s, kappa_s)`` complex arrays shaped like ``frequency``.
     """
     f = require_positive_array(frequency, "frequency")
     h = require_positive(slit_height, "slit_height")
-    rho0 = air.density
-    eta = air.viscosity
-    pr = air.prandtl_number
-    gamma = air.heat_capacity_ratio
-    p0 = air.atmospheric_pressure
+    rho0 = fluid.density
+    eta = fluid.viscosity
+    pr = fluid.prandtl_number
+    gamma = fluid.heat_capacity_ratio
+    p0 = fluid.static_pressure_pa
     omega = 2.0 * np.pi * f
     x_rho = (h / 2.0) * np.sqrt(1j * omega * rho0 / eta)
     x_kap = (h / 2.0) * np.sqrt(1j * omega * pr * rho0 / eta)
@@ -210,7 +211,7 @@ def rectangular_duct_properties(
     frequency: ArrayLike,
     *,
     side: float,
-    air: AirProperties = DEFAULT_AIR,
+    fluid: Fluid = PUBLISHED_AIR,
     sum_terms: int = _DUCT_TERMS,
 ) -> tuple[Complex, Complex]:
     r"""Effective density and bulk modulus of a square duct of the given side.
@@ -240,8 +241,8 @@ def rectangular_duct_properties(
 
     :param frequency: Frequency vector ``f``, in hertz.
     :param side: Square-duct side length, in metres.
-    :param air: State of the air in the duct
-        (:class:`~phonometry.materials.absorbers.porous.AirProperties`); the
+    :param fluid: State of the air in the duct
+        (:class:`~phonometry.fluids.Fluid`); the
         density ``rho0``, viscosity ``eta``, Prandtl number ``Pr``, ratio of
         specific heats ``gamma`` and static pressure ``P0`` are read from it.
     :param sum_terms: Transverse modes kept per axis (default 40).
@@ -249,11 +250,11 @@ def rectangular_duct_properties(
     """
     f = require_positive_array(frequency, "frequency")
     a = require_positive(side, "side")
-    rho0 = air.density
-    eta = air.viscosity
-    pr = air.prandtl_number
-    gamma = air.heat_capacity_ratio
-    p0 = air.atmospheric_pressure
+    rho0 = fluid.density
+    eta = fluid.viscosity
+    pr = fluid.prandtl_number
+    gamma = fluid.heat_capacity_ratio
+    p0 = fluid.static_pressure_pa
     n = int(sum_terms)
     if n < 1:
         msg = "'sum_terms' must be at least 1."
@@ -332,7 +333,7 @@ def _slit_resonator_ducts(
     slit_height: float | None,
     lattice_step: float | None,
     end_correction: bool,
-    air: AirProperties,
+    fluid: Fluid,
 ) -> tuple[Complex, Complex, Complex, Complex, Complex, Complex, float]:
     """Duct parameters of the 2-D resonator (Sci. Rep. Eqs. (8)-(12))."""
     if slit_height is None or lattice_step is None:
@@ -340,8 +341,8 @@ def _slit_resonator_ducts(
         raise ValueError(msg)
     h = require_positive(slit_height, "slit_height")
     a = require_positive(lattice_step, "lattice_step")
-    rho_n, kap_n = slit_effective_properties(f, slit_height=wn, air=air)
-    rho_c, kap_c = slit_effective_properties(f, slit_height=wc, air=air)
+    rho_n, kap_n = slit_effective_properties(f, slit_height=wn, fluid=fluid)
+    rho_c, kap_c = slit_effective_properties(f, slit_height=wc, fluid=fluid)
     z_n = np.asarray(np.sqrt(kap_n * rho_n) / (wn * a), dtype=np.complex128)
     z_c = np.asarray(np.sqrt(kap_c * rho_c) / (wc * a), dtype=np.complex128)
     dl = 0.0
@@ -367,12 +368,16 @@ def _square_resonator_ducts(
     slit_height: float | None,
     lattice_step: float | None,
     end_correction: bool,
-    air: AirProperties,
+    fluid: Fluid,
     sum_terms: int,
 ) -> tuple[Complex, Complex, Complex, Complex, Complex, Complex, float]:
     """Duct parameters of the square resonator (APL Eqs. (A23)-(A26))."""
-    rho_n, kap_n = rectangular_duct_properties(f, side=wn, air=air, sum_terms=sum_terms)
-    rho_c, kap_c = rectangular_duct_properties(f, side=wc, air=air, sum_terms=sum_terms)
+    rho_n, kap_n = rectangular_duct_properties(
+        f, side=wn, fluid=fluid, sum_terms=sum_terms
+    )
+    rho_c, kap_c = rectangular_duct_properties(
+        f, side=wc, fluid=fluid, sum_terms=sum_terms
+    )
     z_n = np.asarray(np.sqrt(kap_n * rho_n) / wn**2, dtype=np.complex128)
     z_c = np.asarray(np.sqrt(kap_c * rho_c) / wc**2, dtype=np.complex128)
     dl = 0.0
@@ -395,7 +400,7 @@ def helmholtz_resonator_impedance(
     lattice_step: float | None = None,
     end_correction: bool = True,
     geometry: str = "square",
-    air: AirProperties = DEFAULT_AIR,
+    fluid: Fluid = PUBLISHED_AIR,
     sum_terms: int = _DUCT_TERMS,
 ) -> Complex:
     r"""Acoustic impedance of a Helmholtz resonator with visco-thermal losses.
@@ -435,8 +440,8 @@ def helmholtz_resonator_impedance(
     :param end_correction: Include the radiation end corrections (default True).
     :param geometry: ``"square"`` (default) for square-duct necks and
         cavities, ``"slit"`` for the two-dimensional resonator model.
-    :param air: State of the air in the neck and cavity
-        (:class:`~phonometry.materials.absorbers.porous.AirProperties`); the
+    :param fluid: State of the air in the neck and cavity
+        (:class:`~phonometry.fluids.Fluid`); the
         density ``rho0``, viscosity ``eta``, Prandtl number ``Pr``, ratio of
         specific heats ``gamma`` and static pressure ``P0`` are read from it.
     :param sum_terms: Transverse modes kept per axis in the duct series.
@@ -460,7 +465,7 @@ def helmholtz_resonator_impedance(
             slit_height,
             lattice_step,
             end_correction,
-            air,
+            fluid,
         )
     else:
         rho_n, kap_n, rho_c, kap_c, z_n, z_c, dl = _square_resonator_ducts(
@@ -470,7 +475,7 @@ def helmholtz_resonator_impedance(
             slit_height,
             lattice_step,
             end_correction,
-            air,
+            fluid,
             sum_terms,
         )
     k_n = omega * np.sqrt(rho_n / kap_n)
@@ -577,14 +582,14 @@ def _panel_transfer_matrix(
     slit_radiation: bool,
     end_correction: bool,
     resonator_geometry: str,
-    air: AirProperties,
+    fluid: Fluid,
 ) -> Complex:
     """Total chain matrix ``M_dl (M_s M_HR M_s)...`` shaped ``(2, 2, nf)``."""
     f = omega / (2.0 * np.pi)
     area_slit = slit_height * lattice_step
     area_cell = period * lattice_step
     phit = slit_height / period
-    rho_s, kap_s = slit_effective_properties(f, slit_height=slit_height, air=air)
+    rho_s, kap_s = slit_effective_properties(f, slit_height=slit_height, fluid=fluid)
     k_s = omega * np.sqrt(rho_s / kap_s)
     z_s = np.sqrt(kap_s * rho_s) / area_slit
     nf = omega.size
@@ -599,7 +604,7 @@ def _panel_transfer_matrix(
     # conjugated here to the e^{+j w t} convention, where a radiation mass is
     # +j w rho0 dl / (phi S0) and must lower the slit-panel resonance.
     dl_slit = _slit_radiation_length(slit_height, period) if slit_radiation else 0.0
-    z_dl = 1j * omega * dl_slit * air.density / (phit * area_cell)
+    z_dl = 1j * omega * dl_slit * fluid.density / (phit * area_cell)
     total = np.array([[ones, z_dl], [zeros, ones]])
     for res in resonators:
         z_hr = helmholtz_resonator_impedance(
@@ -609,7 +614,7 @@ def _panel_transfer_matrix(
             lattice_step=lattice_step,
             end_correction=end_correction,
             geometry=resonator_geometry,
-            air=air,
+            fluid=fluid,
         )
         m_hr = np.array([[ones, zeros], [ones / z_hr, ones]])
         cell = _matmul(_matmul(ms, m_hr), ms)
@@ -647,7 +652,7 @@ def slit_helmholtz_absorber(
     end_correction: bool = True,
     slit_radiation: bool = True,
     resonator_geometry: str = "square",
-    air: AirProperties = DEFAULT_AIR,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> SlitResonatorAbsorberResult:
     r"""Transfer-matrix prediction of a slit panel loaded with resonators.
 
@@ -677,9 +682,9 @@ def slit_helmholtz_absorber(
         (:math:`0 \le \theta < \pi/2 - 10^{-6}`).
     :param end_correction: Include the resonator radiation end corrections.
     :param slit_radiation: Include the slit-to-free-air radiation correction.
-    :param air: State of the air the panel radiates into and the slit and
+    :param fluid: State of the air the panel radiates into and the slit and
         resonators are filled with
-        (:class:`~phonometry.materials.absorbers.porous.AirProperties`): its
+        (:class:`~phonometry.fluids.Fluid`): its
         speed of sound ``c0``, density ``rho0``, viscosity ``eta``, Prandtl
         number ``Pr``, ratio of specific heats ``gamma`` and static pressure
         ``P0``.
@@ -698,8 +703,8 @@ def slit_helmholtz_absorber(
     if h > d:
         msg = "'slit_height' must not exceed 'period'."
         raise ValueError(msg)
-    c0 = air.speed_of_sound
-    rho0 = air.density
+    c0 = fluid.speed_of_sound
+    rho0 = fluid.density
     theta = float(angle)
     if not 0.0 <= theta < np.pi / 2.0 - 1e-6:
         msg = "'angle' must satisfy 0 <= angle < pi/2 - 1e-6."
@@ -721,7 +726,7 @@ def slit_helmholtz_absorber(
         slit_radiation=slit_radiation,
         end_correction=end_correction,
         resonator_geometry=resonator_geometry,
-        air=air,
+        fluid=fluid,
     )
     t11, t12, t21, t22 = tm[0, 0], tm[0, 1], tm[1, 0], tm[1, 1]
     area_cell = d * a
@@ -782,7 +787,7 @@ def _acoustic_surface_impedance(
     period: float,
     end_correction: bool,
     slit_radiation: bool,
-    air: AirProperties,
+    fluid: Fluid,
 ) -> complex:
     r"""Acoustic surface impedance :math:`Z = T_{11} / T_{21}` at ``f0``."""
     omega = np.array([2.0 * np.pi * f0], dtype=np.float64)
@@ -795,7 +800,7 @@ def _acoustic_surface_impedance(
         slit_radiation=slit_radiation,
         end_correction=end_correction,
         resonator_geometry="square",
-        air=air,
+        fluid=fluid,
     )
     return complex(tm[0, 0][0] / tm[1, 0][0])
 
@@ -811,7 +816,7 @@ def critical_coupling_design(
     cavity_length_bounds: tuple[float, float] = (2.0e-3, 200.0e-3),
     end_correction: bool = True,
     slit_radiation: bool = True,
-    air: AirProperties = DEFAULT_AIR,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> CriticalCouplingResult:
     r"""Solve resonator/slit geometry for perfect absorption at a frequency.
 
@@ -836,8 +841,8 @@ def critical_coupling_design(
     :param cavity_length_bounds: Search bounds for the cavity length, in metres.
     :param end_correction: Include the resonator radiation end corrections.
     :param slit_radiation: Include the slit-to-free-air radiation correction.
-    :param air: State of the air the panel is designed for
-        (:class:`~phonometry.materials.absorbers.porous.AirProperties`): its
+    :param fluid: State of the air the panel is designed for
+        (:class:`~phonometry.fluids.Fluid`): its
         speed of sound ``c0``, density ``rho0``, viscosity ``eta``, Prandtl
         number ``Pr``, ratio of specific heats ``gamma`` and static pressure
         ``P0``.
@@ -848,8 +853,8 @@ def critical_coupling_design(
     f0 = require_positive(target_frequency, "target_frequency")
     a = require_positive(lattice_step, "lattice_step")
     d = require_positive(period, "period")
-    c0 = air.speed_of_sound
-    rho0 = air.density
+    c0 = fluid.speed_of_sound
+    rho0 = fluid.density
     theta = float(angle)
     if not 0.0 <= theta < np.pi / 2.0 - 1e-6:
         msg = "'angle' must satisfy 0 <= angle < pi/2 - 1e-6."
@@ -874,7 +879,7 @@ def critical_coupling_design(
             period=d,
             end_correction=end_correction,
             slit_radiation=slit_radiation,
-            air=air,
+            fluid=fluid,
         )
         diff = z * cos_t - z0
         return [diff.real / z0, diff.imag / z0]
@@ -895,7 +900,7 @@ def critical_coupling_design(
         period=d,
         end_correction=end_correction,
         slit_radiation=slit_radiation,
-        air=air,
+        fluid=fluid,
     )
     r = (z_final * cos_t - z0) / (z_final * cos_t + z0)
     alpha = float(1.0 - abs(r) ** 2)

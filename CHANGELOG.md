@@ -783,6 +783,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   reached it, and that one silences twenty-six others too. An architecture test
   now fails on any warning class a package can raise and does not publish.
 
+- The visco-thermal absorber models take a `phonometry.fluids.Fluid` where they
+  used to take an `AirProperties` of their own. `AirProperties` and
+  `DEFAULT_AIR` are withdrawn; the air the Johnson-Champoux-Allard model was
+  published with is `PUBLISHED_AIR`, and the keyword is `fluid=` rather than
+  `air=`. Nothing about the numbers changed: `PUBLISHED_AIR` carries the same
+  343,0 m/s, 1,205 kg/m3, 1,84 x 10^-5 Pa s, Pr = 0,71, gamma = 1,4 and
+  101 325 Pa those models always defaulted to.
+
+  What changes is what a caller can pass instead. `AirProperties` held six
+  numbers and no account of where they came from, so an air measured at 30 degC
+  and one recited from a textbook were the same object. A `Fluid` carries the
+  model that determined it and the conditions it was computed under, which is
+  what makes `fluids.air(temperature_c=30.0, static_pressure_pa=90000.0,
+  relative_humidity_percent=70.0)` usable here: the absorber is then predicted
+  in the air of the room rather than in the air of the paper.
+
+  `PUBLISHED_AIR` keeps its own Prandtl number rather than closing it from
+  eta / (rho alpha_t). A published fit carries the value it was fitted with, and
+  deriving it from a better air would silently change the model instead of
+  correcting it.
+
 - The fan's pressure rise says what it is: `fan_sound_power`'s second argument
   is `fan_static_pressure_pa`, keyword-only. It is a **gauge** pressure rise in
   **pascals**, and it shared its name with the `static_pressure` the ISO 3740
