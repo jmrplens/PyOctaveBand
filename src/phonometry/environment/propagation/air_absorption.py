@@ -72,7 +72,10 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ..._internal.validation import require_same_shape
+from ..._internal.validation import (
+    require_above_absolute_zero,
+    require_same_shape,
+)
 from ..._internal.warnings import PhonometryWarning
 from ...materials.absorbers.sound_absorption import attenuation_from_alpha
 
@@ -142,9 +145,7 @@ def _validate(
     if np.any(freqs <= 0.0):
         msg = "'frequencies' must be positive."
         raise ValueError(msg)
-    if temperature <= -_KELVIN:
-        msg = "'temperature' must be above absolute zero (-273.15 degC)."
-        raise ValueError(msg)
+    require_above_absolute_zero(float(temperature), "temperature")
     if not 0.0 <= relative_humidity <= _MAX_RELATIVE_HUMIDITY_PERCENT:
         msg = "'relative_humidity' must be within [0, 100] %."
         raise ValueError(msg)

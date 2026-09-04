@@ -34,6 +34,7 @@ if TYPE_CHECKING:
 from phonometry._internal.validation import (
     check_engine,
     require_1d_signal,
+    require_above_absolute_zero_array,
     require_equal_shapes,
     require_finite_array,
     require_finite_fields,
@@ -267,6 +268,38 @@ def test_garbage_input_is_refused_naming_the_parameter(
     for garbage in (("bad",), object(), {"a": 1}):
         with pytest.raises(ValueError, match="'x' must be numeric"):
             validator(garbage, "x", *args)
+
+
+@pytest.mark.parametrize(
+    ("validator", "args"),
+    [
+        (require_positive_array, ()),
+        (require_finite_array, ()),
+        (require_per_band, (np.array([100.0, 200.0]),)),
+        (require_1d_signal, ()),
+        (require_above_absolute_zero_array, ()),
+    ],
+)
+@pytest.mark.parametrize(
+    "complex_input",
+    [[1 + 2j], np.array([1 + 2j]), np.complex128(1 + 2j)],
+)
+def test_a_complex_input_is_refused_rather_than_flattened(
+    validator: Callable[..., object],
+    args: tuple[object, ...],
+    complex_input: object,
+) -> None:
+    """A complex array must not arrive as its real part.
+
+    ``np.asarray(z, dtype=float64)`` does not fail on a complex array: it
+    drops the imaginary part and emits a ``ComplexWarning``, which is a
+    warning and not an error, so ``np.array([1 + 2j])`` used to reach the
+    guards as ``[1.0]`` and satisfy every one of them. A *list* of complex
+    numbers raised, because that path fails the conversion outright, so the
+    two spellings of the same input disagreed with each other.
+    """
+    with pytest.raises(ValueError, match="'x' must be real, not complex"):
+        validator(complex_input, "x", *args)
 
 
 # ---------------------------------------------------------------------------

@@ -33,6 +33,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ..._internal.validation import (
+    require_above_absolute_zero,
     require_equal_shapes,
     require_finite_array,
     require_non_negative,
@@ -113,10 +114,7 @@ def thermal_noise_spectrum(
     :raises ValueError: If the inputs are invalid.
     """
     f = require_positive_array(frequency_hz, "frequency_hz")
-    t_kelvin = float(temperature) + 273.15
-    if not np.isfinite(t_kelvin) or t_kelvin <= 0.0:
-        msg = "'temperature' must be above absolute zero."
-        raise ValueError(msg)
+    t_kelvin = require_above_absolute_zero(float(temperature), "temperature") + 273.15
     rho = require_positive(density, "density")
     c = require_positive(sound_speed, "sound_speed")
     p2 = 4.0 * np.pi * _BOLTZMANN * t_kelvin * rho * f**2 / c

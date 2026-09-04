@@ -38,6 +38,7 @@ from typing import TYPE_CHECKING, Any, Literal, NamedTuple, cast
 import numpy as np
 
 from .._internal.validation import (
+    require_above_absolute_zero,
     require_choice,
     require_equal_counts,
     require_ranks,
@@ -195,16 +196,15 @@ def impedance_adjustment(
     :param temperature: Aerodrome air temperature ``T``, in °C (default 15 °C).
     :param pressure: Aerodrome air pressure ``p``, in kPa (default 101.325 kPa).
     :return: The impedance adjustment, in dB (added to the NPD level).
-    :raises ValueError: If the pressure is not positive or inputs are non-finite.
+    :raises ValueError: If the pressure is not positive, the temperature is at
+        or below -273,15 degC, or either input is non-finite.
     """
     t = float(temperature)
     p = float(pressure)
     if not (np.isfinite(t) and np.isfinite(p) and p > 0.0):
         msg = "'pressure' must be positive and inputs finite."
         raise ValueError(msg)
-    if t <= _ABS_ZERO_C:
-        msg = "'temperature' must be above absolute zero (−273.15 °C)."
-        raise ValueError(msg)
+    require_above_absolute_zero(t, "temperature")
     delta = p / _P0_KPA
     theta = (t + 273.15) / (_T0_C + 273.15)
     zc = _ZC_STD * delta / np.sqrt(theta)

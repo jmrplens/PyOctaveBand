@@ -482,6 +482,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- A temperature at or below absolute zero is refused rather than computed
+  with.
+  `sea_water_sound_speed(-273.15, 35.0, 0.0)` returned -31 457 m/s, a negative
+  speed of sound; `sound_speed_profile` checked only that its temperatures were
+  finite, so -300 degC went straight through to [-44 562, -45 333] m/s; and
+  `seawater_absorption(1e3, temperature=-300.0)` returned 0,495 dB/km, which is
+  the dangerous one, because nothing about that number says where it came from
+  next to the 0,0185 dB/km of real cold water.
+
+  `require_above_absolute_zero` in the internal validation now says it once,
+  with an array companion for the profiles, and every site that had written it
+  by hand uses one of the two: the air absorption of ISO 9613-1, the ASTM C423
+  absorption, the intensity sound power, the airport impedance adjustment, the
+  ocean ambient noise, the two ocean sound-speed entry points and the five air
+  helpers of `materials`. One of those was spelling
+  its message with a Unicode minus and a degree sign where the rest of the tree
+  uses ASCII.
+
+  Three guards deliberately do **not** migrate, and a test pins them by name.
+  They protect the pole of the formula their own clause prints, `sqrt(273 + θ)`
+  in ISO 3741 and ISO 3745 and `1245/(273 + t)` in Francois-Garrison, with the
+  273 the standard prints rather than the physical 273,15. Their pole sits
+  0,15 degC higher, so migrating them would leave a band of a sixth of a degree
+  that clears the check and then overflows.
+
+  Francois-Garrison needs both: the physical bound in front, and its own pole
+  behind it. The band (-273,15, -273,0] used to raise `OverflowError` or
+  `ZeroDivisionError`, neither of which names the argument that caused it.
+
+
 - The weighting filter design gave different coefficients on different CPUs.
   The fit that removes the bilinear warp reaches its answer through a sequence
   of small dense solves, and the reductions inside them, the normal equations,

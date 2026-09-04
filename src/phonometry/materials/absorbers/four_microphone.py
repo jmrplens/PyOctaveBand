@@ -34,7 +34,10 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from ..._internal.validation import require_positive
+from ..._internal.validation import (
+    require_above_absolute_zero_array,
+    require_positive,
+)
 from .impedance_tube import (
     _DIAMETER_POSITIVE,
     ImpedanceTubeWarning,
@@ -101,10 +104,7 @@ def speed_of_sound_astm(*, temperature_c: ArrayLike) -> Real:
     :return: Speed of sound ``c``, in metres per second.
     :raises ValueError: if any temperature is at or below -273.15 degC.
     """
-    t = np.asarray(temperature_c, dtype=np.float64)
-    if np.any(t <= -_ASTM_T0):
-        msg = "'temperature_c' must exceed -273.15 degC."
-        raise ValueError(msg)
+    t = require_above_absolute_zero_array(temperature_c, "temperature_c")
     return np.asarray(_ASTM_C_CONST * np.sqrt(_ASTM_T0 + t), dtype=np.float64)
 
 
@@ -124,11 +124,8 @@ def air_density_astm(
     :raises ValueError: if any temperature is at or below -273.15 degC, or any
         pressure is not positive.
     """
-    t = np.asarray(temperature_c, dtype=np.float64)
+    t = require_above_absolute_zero_array(temperature_c, "temperature_c")
     p = np.asarray(atmospheric_pressure_kpa, dtype=np.float64)
-    if np.any(t <= -_ASTM_T0):
-        msg = "'temperature_c' must exceed -273.15 degC."
-        raise ValueError(msg)
     if np.any(p <= 0.0):
         msg = "'atmospheric_pressure_kpa' must be positive (kPa)."
         raise ValueError(msg)

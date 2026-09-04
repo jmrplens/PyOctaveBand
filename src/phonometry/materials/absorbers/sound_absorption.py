@@ -61,6 +61,7 @@ import numpy as np
 
 from ..._internal.validation import (
     check_engine,
+    require_above_absolute_zero,
     require_equal_shapes,
     require_ranks,
     require_same_length,
@@ -149,8 +150,8 @@ def _resolve_speed(temperature: float, speed_of_sound: float | None) -> float:
 
     Warns when the speed is derived from a temperature outside the 15..30 degC
     validity range of Eq. (6). An explicit ``speed_of_sound`` bypasses the check.
-    Rejects a physically impossible ``temperature`` outright: Eq. (6) applied
-    below absolute zero would hand back a zero or negative speed of sound.
+    Rejects a physically impossible ``temperature`` outright: Eq. (6) applied at
+    or below absolute zero would hand back a zero or negative speed of sound.
     """
     if speed_of_sound is not None:
         # NaN passes a bare <= comparison and propagates into every derived
@@ -161,9 +162,7 @@ def _resolve_speed(temperature: float, speed_of_sound: float | None) -> float:
         return float(speed_of_sound)
     # NaN is named alongside the bound: a NaN temperature would otherwise
     # propagate through Eq. (6) into every derived quantity.
-    if math.isnan(temperature) or temperature <= -_KELVIN:
-        msg = "'temperature' must be above absolute zero (-273.15 degC)."
-        raise ValueError(msg)
+    require_above_absolute_zero(float(temperature), "temperature")
     lo, hi = _EQ6_TEMPERATURE_RANGE
     if not lo <= temperature <= hi:
         warnings.warn(

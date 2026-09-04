@@ -705,7 +705,9 @@ def test_event_level_invalid_inputs() -> None:
 def test_impedance_adjustment_rejects_absolute_zero() -> None:
     from phonometry.aircraft.airport_noise import impedance_adjustment
 
-    with pytest.raises(ValueError, match=r"'temperature' must be above absolute zero"):
+    with pytest.raises(
+        ValueError, match=r"'temperature' must be a finite temperature above"
+    ):
         impedance_adjustment(-300.0, 101.325)
 
 

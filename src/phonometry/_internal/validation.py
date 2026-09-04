@@ -33,6 +33,58 @@ def require_positive(value: float, name: str) -> float:
     return float(value)
 
 
+#: Absolute zero, in degrees Celsius. The bound on a temperature that has to be
+#: a temperature. It is not the same number as the ``-273`` that several ISO 3740
+#: clauses print inside their own ``sqrt(273 + theta)``: those guards protect the
+#: pole of the formula the clause states, which sits 0,15 degC higher, and they
+#: stay where they are.
+ABSOLUTE_ZERO_C = -273.15
+
+
+def require_above_absolute_zero(value: float, name: str) -> float:
+    """Require a finite temperature in degrees Celsius above absolute zero.
+
+    The one bound a temperature always has. A model may state a narrower domain
+    for itself, and that is a warning rather than a refusal, because a fit past
+    its validated range is still arithmetic; a temperature at or below absolute
+    zero is not a state at all, and the arithmetic below one is not wrong so much as
+    meaningless. Left unguarded it does not raise, it returns: a sea-water sound
+    speed comes back at -31 457 m/s, and an absorption at -300 degC comes back
+    at a plausible-looking 0,495 dB/km.
+
+    :param value: The temperature to validate, in degrees Celsius.
+    :param name: Parameter name used in the error message.
+    :return: The validated temperature as a ``float``.
+    :raises ValueError: for a non-finite temperature, or one at or below
+        -273,15 degC.
+    """
+    if not math.isfinite(value) or value <= ABSOLUTE_ZERO_C:
+        msg = f"'{name}' must be a finite temperature above -273.15 degC."
+        raise ValueError(msg)
+    return float(value)
+
+
+def require_above_absolute_zero_array(x: ArrayLike, name: str) -> np.ndarray:
+    """Require every temperature in ``x`` to be finite and above absolute zero.
+
+    The array companion of :func:`require_above_absolute_zero`. A profile is
+    where this bites hardest: one element at or below absolute zero among a
+    hundred good ones still poisons the whole returned array, and the caller has no
+    reason to look at any single element of it.
+
+    :param x: Temperatures, in degrees Celsius.
+    :param name: Parameter name used in the error message.
+    :return: The temperatures as a ``float64`` array.
+    :raises ValueError: if any element is non-finite or at or below
+        -273,15 degC.
+    """
+    values = _as_float64(x, name)
+    if not np.all(np.isfinite(values)) or np.any(values <= ABSOLUTE_ZERO_C):
+        msg = f"'{name}' must be finite temperatures above -273.15 degC."
+        raise ValueError(msg)
+    return values
+
+
 def require_non_negative(value: float, name: str) -> float:
     """Require a non-negative finite number (rejects NaN and infinities).
 
@@ -101,7 +153,25 @@ def _as_float64(x: ArrayLike, name: str) -> np.ndarray:
     A string element raises numpy's anonymous "could not convert string to
     float", and an unconvertible object a bare ``TypeError``; both would
     escape the array guards below without saying which parameter refused.
+
+    A complex array is refused rather than converted. ``np.asarray(z,
+    dtype=float64)`` does not fail on one: it drops the imaginary part and
+    emits a ``ComplexWarning``, which is a warning and not an error, so
+    ``np.array([1 + 2j])`` would arrive at the guards below as ``[1.0]`` and
+    pass every one of them. A list of complex numbers already raised here, so
+    the two spellings of the same input disagreed.
     """
+    try:
+        complex_input = np.iscomplexobj(x)
+    except (TypeError, ValueError) as exc:
+        # `iscomplexobj` builds the array to read its dtype, so a ragged list
+        # fails here rather than below and would escape without naming the
+        # parameter. Its refusal is the same refusal, in the same words.
+        msg = f"'{name}' must be numeric."
+        raise ValueError(msg) from exc
+    if complex_input:
+        msg = f"'{name}' must be real, not complex."
+        raise ValueError(msg)
     try:
         return np.asarray(x, dtype=np.float64)
     except (TypeError, ValueError) as exc:

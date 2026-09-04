@@ -34,6 +34,7 @@ import numpy as np
 
 from ..._internal.validation import (
     check_engine,
+    require_above_absolute_zero_array,
     require_equal_shapes,
     require_ranks,
     require_same_length,
@@ -194,11 +195,7 @@ def speed_of_sound_iso17497(*, temperature_c: ArrayLike) -> Real:
     :return: Speed of sound ``c``, in metres per second.
     :raises ValueError: if any temperature is at or below -273.15 degC.
     """
-    t = np.asarray(temperature_c, dtype=np.float64)
-    kelvin = _T0 + t
-    if np.any(kelvin <= 0.0):
-        msg = "'temperature_c' must exceed -273.15 degC."
-        raise ValueError(msg)
+    kelvin = _T0 + require_above_absolute_zero_array(temperature_c, "temperature_c")
     return np.asarray(_C_REF * np.sqrt(kelvin / _T_REF_K), dtype=np.float64)
 
 

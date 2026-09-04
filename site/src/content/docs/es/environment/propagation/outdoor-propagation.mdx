@@ -160,7 +160,7 @@ $\pm 10$ % (apartado 7.1). Las entradas fuera de los rangos tabulados
 (−20…+50 °C, 10…100 % HR, 50…10 000 Hz, o por encima de la envolvente de validez
 de 200 kPa) siguen calculándose pero emiten una `AtmosphericAbsorptionWarning`;
 las entradas no físicas (frecuencia no positiva, humedad fuera de 0…100 %,
-temperatura bajo el cero absoluto) lanzan `ValueError`. `air_attenuation_m`
+temperatura igual o inferior al cero absoluto) lanzan `ValueError`. `air_attenuation_m`
 compone $\alpha$ con la conversión de la ISO 354 $m = \alpha/(10 \log_{10} e)$, de modo
 que quien use la ISO 354 puede alimentar condiciones atmosféricas reales
 directamente a `absorption_area` / `absorption_coefficient` en vez de introducir
