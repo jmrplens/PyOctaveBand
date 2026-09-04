@@ -337,6 +337,50 @@ print(round(environment.directivity_omega(1.5, 1.5, 200.0), 2))                 
 print(round(environment.meteorological_correction(200.0, 1.5, 1.5, 2.0), 2))     # 1.7 dB
 ```
 
+### Ground of more than one kind, and the mean path height
+
+Both ground methods want a small number of inputs that a real site does not
+hand over directly. The general method wants one $G$ per region, and a path
+usually crosses several kinds of ground; the alternative method wants
+$h_\mathrm{m}$, and a terrain model holds heights, not areas. ISO 9613-2 leaves
+both reductions open, and two implementations that read them differently
+disagree on the same site. ISO/TR 17534-3 settles them for quality-assured
+software, and both rules are exposed here.
+
+`region_ground_factors` takes the ground projection of the path cut into
+segments, one per patch of ground it crosses and in order from the source, and
+returns the `GroundFactors` of the three regions: each is the mean of $G$
+weighted by the length of projection it covers. `mean_path_height` takes the
+ground profile as a polyline and returns $h_\mathrm{m} = F/d$ directly, by
+integrating the area between the straight ray and the ground beneath it.
+
+```python
+from phonometry import environment
+
+# One path crossing three grounds; source 1 m up, receiver 4 m up. The three
+# stretches are the guideline's own printed lengths, each rounded to the
+# centimetre, so they sum to 194.17 m where the path itself is 194.16 m.
+g = environment.region_ground_factors(
+    [40.88, 102.19, 51.10], [0.9, 0.5, 0.2], 1.0, 4.0)
+print(round(g.source, 2), round(g.middle, 2), round(g.receiver, 2))  # 0.9 0.6 0.37
+
+# The same path over ground that climbs 10 m under the receiver
+hm = environment.mean_path_height(
+    [0.0, 112.41, 178.83, 194.16], [0.0, 0.0, 10.0, 10.0],
+    1.0, 4.0, distance=194.60)
+print(round(hm, 2))                                                  # 4.99
+```
+
+Both figures are cells of the guideline's own worked cases. ISO/TR 17534-3
+prints nineteen of them, each a complete chain with every intermediate
+quantity, so that two implementations can be compared where a single formula
+would not separate them; it also fixes the envelope a result has to stay
+inside, $\pm 0{,}05$ dB per band and on the total. The seven that ISO 9613-2
+answers on its own (T01 to T07) are checked band by band in the
+[conformance report](https://jmrplens.github.io/phonometry/reference/conformance/).
+The other twelve build their ray paths by the additional recommendations of
+its Clause 5, over barriers and around buildings, and are not implemented.
+
 ### The image source behind the ground effect
 
 Every entry of Table 3 is an engineering fit to one physical picture: the
@@ -639,6 +683,14 @@ against the exact half-plane and coherent-ground models.
   this module implements the 1996 method).
   [iso.org catalogue](https://www.iso.org/standard/20649.html).
   The implemented attenuation chain of section 2.
+- International Organization for Standardization. (2015). *Acoustics —
+  Software for the calculation of sound outdoors — Part 3: Recommendations for
+  quality assured implementation of ISO 9613-2 in software according to
+  ISO 17534-1* (ISO/TR 17534-3:2015).
+  [iso.org catalogue](https://www.iso.org/standard/63697.html).
+  The nineteen worked test cases, the +/-0,05 dB envelope they are judged by,
+  and the two reductions of section 2: the region ground factors and the mean
+  path height.
 
 ## Standards
 
@@ -652,7 +704,12 @@ method of calculation*: the downwind receiver level (Eq. (3)/(4)) assembled
 from geometrical divergence (Eq. (7)), atmospheric absorption (Eq. (8)), the
 ground effect (Eq. (9), Table 3) with its A-weighted alternative
 (Eq. (10)/(11)), barrier screening (Eqs. (12)–(17)) and the meteorological
-correction (Eq. (21)/(22)). ISO 354:2003, *Acoustics — Measurement of sound
+correction (Eq. (21)/(22)). ISO/TR 17534-3:2015, *Acoustics — Software for the
+calculation of sound outdoors — Part 3: Recommendations for quality assured
+implementation of ISO 9613-2 in software according to ISO 17534-1*: the
+length-weighted region ground factors of 6.2.5 behind `region_ground_factors`,
+and test cases T01 to T07, the ones it marks as answerable by ISO 9613-2 alone.
+ISO 354:2003, *Acoustics — Measurement of sound
 absorption in a reverberation room*: only the clause 8.1.2.1 conversion
 $m = \alpha/(10 \log_{10} e)$ behind `air_attenuation_m`; the reverberation-room
 method itself is covered in the [Room Acoustics guide](../../buildings/rooms/room-acoustics.md).

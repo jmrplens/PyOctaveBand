@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**664/664 conformance checks pass** across 64 domains and 387 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**698/698 conformance checks pass** across 65 domains and 388 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -33,6 +33,7 @@
 
 | Standard | Quantity | Computed | &#916; | Used |
 |:---|:---|:---|:---|:---:|
+| ISO/TR 17534-3:2015 Table 3 | Ground-projected path length dp, m | 194.165 m | 0.005 m | 100 % |
 | Long 2e Table 14.9 (worked duct-borne sheet, supply path) | Fan to room, 8 octave bands -> 52/42/30/18/9/-2/-2/-1 dB at the receiver | 1 dB | 1 dB | 100 % |
 | IEC 60268-16 Annex M | Step 2 printed intermediates: the measurement condition, row by row | worst row: amf in dB, 0.99 of its last printed place | 0.993 | 99 % |
 | VDI 2081 Blatt 2:2005 Table 1, element 14 | Bend flow noise, worst octave deviation, dB | 0.0496 dB | 0.0496 dB | 99 % |
@@ -42,7 +43,6 @@
 | Long, Architectural Acoustics 2e, Table 8.1 | Room modes of a 7 x 5 x 3 m room: the six printed frequencies, Hz | 42.27 Hz | -0.126 Hz | 97 % |
 | IEC 61094-2:2009 Table F.1 | Set B (20 C, 80 000 Pa, 65 % RH): rho, c0, kappa, eta and alpha_t, as a fraction of the rounding of the last printed figure | 0.96 | 0.96 | 96 % |
 | ISO 12354-2:2017 Annex C / Annex G Table G.4 | Floating floor: fo = 160 sqrt(s'/m') = 52,8 Hz, DeltaL = 30 lg(f/fo) over 21 bands, DeltaLw = 32,2 dB | 0.048 dB | 0.048 dB | 96 % |
-| ASA WG S3-79 CB_1.TST | Critical band, alternative importance | 0.41 | 0 | 95 % |
 
 <details>
 <summary><b>Numerical validation - filters &amp; weightings</b>: class showcase (IEC 61260-1 · IEC 61672-1 · ISO 7196)</summary>
@@ -444,6 +444,48 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 3745:2012 Eq (11) | K1 background floor (6 dB edge band) | 1.2563 dB (+/-0.0001 dB) | 1.2563 dB | 0 dB | 4 % | ![Pass][cv-pass] Pass |
 | ISO 3745:2012 Eq (16) | Meteorological C1 at 23 C reference | -0.1282 dB (+/-0.0001 dB) | -0.1282 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 9614-3:2002 Eqs (5)/(8)/(9) | Uniform-intensity LW recovery | 80 dB (+/-0 dB) | 80 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+
+</details>
+
+<details>
+<summary><b>Outdoor propagation quality assurance (ISO/TR 17534-3)</b>: 100% (34/34)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
+|:---|:---|:---|:---|:---|:---:|:---:|
+| ISO/TR 17534-3:2015 T01 | Receiver band levels over ground G = 0, dB | 0 dB (+/-0.05 dB) | 0.008 dB | 0.008 dB | 16 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T01 | Receiver total level over ground G = 0, dB | 47.46 dB (+/-0.05 dB) | 47.457 dB | -0.003 dB | 6 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T01 | Receiver A-weighted level over ground G = 0, dB | 44.29 dB (+/-0.05 dB) | 44.293 dB | 0.003 dB | 6 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T02 | Receiver band levels over ground G = 0.5, dB | 0 dB (+/-0.05 dB) | 0.01 dB | 0.01 dB | 20 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T02 | Receiver total level over ground G = 0.5, dB | 44.61 dB (+/-0.05 dB) | 44.608 dB | -0.002 dB | 4 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T02 | Receiver A-weighted level over ground G = 0.5, dB | 41.53 dB (+/-0.05 dB) | 41.526 dB | -0.004 dB | 8 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T03 | Receiver band levels over ground G = 1, dB | 0 dB (+/-0.05 dB) | 0.008 dB | 0.008 dB | 16 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T03 | Receiver total level over ground G = 1, dB | 42.8 dB (+/-0.05 dB) | 42.8 dB | 0 dB | 1 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T03 | Receiver A-weighted level over ground G = 1, dB | 39.14 dB (+/-0.05 dB) | 39.139 dB | -0.001 dB | 2 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 Table 3 | Ground-projected path length dp, m | 194.16 m (+/-0.005 m) | 194.165 m | 0.005 m | 100 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 Table 3 | Straight-line path length d3, m | 194.19 m (+/-0.005 m) | 194.188 m | -0.002 m | 40 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 Table 3 | Geometrical divergence Adiv, dB | 56.76 dB (+/-0.05 dB) | 56.764 dB | 0.004 dB | 8 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 Table 3 | Middle-region overlap factor q (ISO 9613-2 Table 3, note 2) | 0.23 (+/-0.005) | 0.2275 | -0.0025 | 50 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T04 | Receiver band levels, flat ground of three kinds, general method, dB | 0 dB (+/-0.05 dB) | 0.0124 dB | 0.0124 dB | 25 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T04 | Receiver total level, flat ground of three kinds, general method, dB | 45.25 dB (+/-0.05 dB) | 45.248 dB | -0.002 dB | 4 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T04 | Receiver A-weighted level, flat ground of three kinds, general method, dB | 42.23 dB (+/-0.05 dB) | 42.227 dB | -0.003 dB | 6 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T06 | Receiver band levels, ground rising under the receiver, general method, dB | 0 dB (+/-0.05 dB) | 0.0111 dB | 0.0111 dB | 22 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T06 | Receiver total level, ground rising under the receiver, general method, dB | 43.85 dB (+/-0.05 dB) | 43.85 dB | 0 dB | 1 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T06 | Receiver A-weighted level, ground rising under the receiver, general method, dB | 40.59 dB (+/-0.05 dB) | 40.589 dB | -0.001 dB | 2 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T05 | Receiver band levels, flat ground of three kinds, alternative method, dB | 0 dB (+/-0.05 dB) | 0.0075 dB | 0.0075 dB | 15 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T05 | Receiver total level, flat ground of three kinds, alternative method, dB | 42.46 dB (+/-0.05 dB) | 42.461 dB | 0.001 dB | 2 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T05 | Receiver A-weighted level, flat ground of three kinds, alternative method, dB | 39.3 dB (+/-0.05 dB) | 39.298 dB | -0.002 dB | 4 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T07 | Receiver band levels, ground rising under the receiver, alternative method, dB | 0 dB (+/-0.05 dB) | 0.0088 dB | 0.0088 dB | 18 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T07 | Receiver total level, ground rising under the receiver, alternative method, dB | 42.91 dB (+/-0.05 dB) | 42.914 dB | 0.004 dB | 8 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 T07 | Receiver A-weighted level, ground rising under the receiver, alternative method, dB | 39.75 dB (+/-0.05 dB) | 39.749 dB | -0.001 dB | 2 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 Table 8 (T04) | Region ground factor Gs (source region) over three areas | 0.2 (+/-0.005) | 0.2 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 Table 8 (T04) | Region ground factor Gm (middle region) over three areas | 0.43 (+/-0.005) | 0.4261 | -0.0039 | 78 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 Table 8 (T04) | Region ground factor Gr (receiver region) over three areas | 0.67 (+/-0.005) | 0.6703 | 0.0003 | 6 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 Table 14 (T06) | Region ground factor Gs (source region) over three areas | 0.9 (+/-0.005) | 0.9 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 Table 14 (T06) | Region ground factor Gm (middle region) over three areas | 0.6 (+/-0.005) | 0.5985 | -0.0015 | 30 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 Table 14 (T06) | Region ground factor Gr (receiver region) over three areas | 0.37 (+/-0.005) | 0.3723 | 0.0023 | 46 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 Table 14 (T06) | Straight-line path length d3, m | 194.6 m (+/-0.005 m) | 194.6 m | 0 m | 8 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 Table 17 (T05) | Mean path height hm over flat ground, m | 2.5 m (+/-0.005 m) | 2.4997 m | -0.0003 m | 6 % | ![Pass][cv-pass] Pass |
+| ISO/TR 17534-3:2015 Table 17 (T07) | Mean path height hm over a slope, m | 4.99 m (+/-0.005 m) | 4.9888 m | -0.0012 m | 24 % | ![Pass][cv-pass] Pass |
 
 </details>
 

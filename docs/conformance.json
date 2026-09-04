@@ -3,13 +3,13 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 664,
-    "passing": 664,
+    "checks": 698,
+    "passing": 698,
     "failing": 0,
-    "domains": 64,
-    "standards": 387,
-    "citations": 573,
-    "designations": 121,
+    "domains": 65,
+    "standards": 388,
+    "citations": 585,
+    "designations": 122,
     "sources": 84
   },
   "units": [
@@ -167,6 +167,12 @@
       "title": "Precision sound power (ISO 3745 / 9614-3)",
       "checks": 4,
       "passing": 4
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "title": "Outdoor propagation quality assurance (ISO/TR 17534-3)",
+      "checks": 34,
+      "passing": 34
     },
     {
       "id": "human-vibration-iso-8041-2631-5349",
@@ -7558,6 +7564,985 @@
       },
       "deviation": {
         "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t01/receiver-band-levels-over-ground-g-0-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T01",
+        "cite": "ISO/TR 17534-3:2015 T01"
+      },
+      "quantity": "Receiver band levels over ground G = 0, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.008
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.008
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t01/receiver-total-level-over-ground-g-0-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T01",
+        "cite": "ISO/TR 17534-3:2015 T01"
+      },
+      "quantity": "Receiver total level over ground G = 0, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 47.46
+      },
+      "computed": {
+        "value": 47.457
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.003
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t01/receiver-a-weighted-level-over-ground-g-0-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T01",
+        "cite": "ISO/TR 17534-3:2015 T01"
+      },
+      "quantity": "Receiver A-weighted level over ground G = 0, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 44.29
+      },
+      "computed": {
+        "value": 44.293
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.003
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t02/receiver-band-levels-over-ground-g-0-5-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T02",
+        "cite": "ISO/TR 17534-3:2015 T02"
+      },
+      "quantity": "Receiver band levels over ground G = 0.5, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.01
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.01
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t02/receiver-total-level-over-ground-g-0-5-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T02",
+        "cite": "ISO/TR 17534-3:2015 T02"
+      },
+      "quantity": "Receiver total level over ground G = 0.5, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 44.61
+      },
+      "computed": {
+        "value": 44.608
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.002
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t02/receiver-a-weighted-level-over-ground-g-0-5-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T02",
+        "cite": "ISO/TR 17534-3:2015 T02"
+      },
+      "quantity": "Receiver A-weighted level over ground G = 0.5, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 41.53
+      },
+      "computed": {
+        "value": 41.526
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.004
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t03/receiver-band-levels-over-ground-g-1-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T03",
+        "cite": "ISO/TR 17534-3:2015 T03"
+      },
+      "quantity": "Receiver band levels over ground G = 1, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.008
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.008
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t03/receiver-total-level-over-ground-g-1-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T03",
+        "cite": "ISO/TR 17534-3:2015 T03"
+      },
+      "quantity": "Receiver total level over ground G = 1, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 42.8
+      },
+      "computed": {
+        "value": 42.8
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.000337
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t03/receiver-a-weighted-level-over-ground-g-1-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T03",
+        "cite": "ISO/TR 17534-3:2015 T03"
+      },
+      "quantity": "Receiver A-weighted level over ground G = 1, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 39.14
+      },
+      "computed": {
+        "value": 39.139
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.001
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-table-3/ground-projected-path-length-dp-m",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "Table 3",
+        "cite": "ISO/TR 17534-3:2015 Table 3"
+      },
+      "quantity": "Ground-projected path length dp, m",
+      "kind": "scalar",
+      "expected": {
+        "value": 194.16
+      },
+      "computed": {
+        "value": 194.165
+      },
+      "unit": "m",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.005
+      },
+      "deviation": {
+        "value": 0.005
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-table-3/straight-line-path-length-d3-m",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "Table 3",
+        "cite": "ISO/TR 17534-3:2015 Table 3"
+      },
+      "quantity": "Straight-line path length d3, m",
+      "kind": "scalar",
+      "expected": {
+        "value": 194.19
+      },
+      "computed": {
+        "value": 194.188
+      },
+      "unit": "m",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.005
+      },
+      "deviation": {
+        "value": -0.002
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-table-3/geometrical-divergence-adiv-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "Table 3",
+        "cite": "ISO/TR 17534-3:2015 Table 3"
+      },
+      "quantity": "Geometrical divergence Adiv, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 56.76
+      },
+      "computed": {
+        "value": 56.764
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.004
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-table-3/middle-region-overlap-factor-q-iso-9613-2-table-3-note-2",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "Table 3",
+        "cite": "ISO/TR 17534-3:2015 Table 3"
+      },
+      "quantity": "Middle-region overlap factor q (ISO 9613-2 Table 3, note 2)",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.23
+      },
+      "computed": {
+        "value": 0.2275
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.005
+      },
+      "deviation": {
+        "value": -0.0025
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t04/receiver-band-levels-flat-ground-of-three-kinds-general-method-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T04",
+        "cite": "ISO/TR 17534-3:2015 T04"
+      },
+      "quantity": "Receiver band levels, flat ground of three kinds, general method, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0124
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.0124
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t04/receiver-total-level-flat-ground-of-three-kinds-general-method-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T04",
+        "cite": "ISO/TR 17534-3:2015 T04"
+      },
+      "quantity": "Receiver total level, flat ground of three kinds, general method, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 45.25
+      },
+      "computed": {
+        "value": 45.248
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.002
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t04/receiver-a-weighted-level-flat-ground-of-three-kinds-general-method-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T04",
+        "cite": "ISO/TR 17534-3:2015 T04"
+      },
+      "quantity": "Receiver A-weighted level, flat ground of three kinds, general method, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 42.23
+      },
+      "computed": {
+        "value": 42.227
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.003
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t06/receiver-band-levels-ground-rising-under-the-receiver-general-method-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T06",
+        "cite": "ISO/TR 17534-3:2015 T06"
+      },
+      "quantity": "Receiver band levels, ground rising under the receiver, general method, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0111
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.0111
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t06/receiver-total-level-ground-rising-under-the-receiver-general-method-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T06",
+        "cite": "ISO/TR 17534-3:2015 T06"
+      },
+      "quantity": "Receiver total level, ground rising under the receiver, general method, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 43.85
+      },
+      "computed": {
+        "value": 43.85
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.000251
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t06/receiver-a-weighted-level-ground-rising-under-the-receiver-general-method-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T06",
+        "cite": "ISO/TR 17534-3:2015 T06"
+      },
+      "quantity": "Receiver A-weighted level, ground rising under the receiver, general method, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 40.59
+      },
+      "computed": {
+        "value": 40.589
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.001
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t05/receiver-band-levels-flat-ground-of-three-kinds-alternative-method-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T05",
+        "cite": "ISO/TR 17534-3:2015 T05"
+      },
+      "quantity": "Receiver band levels, flat ground of three kinds, alternative method, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0075
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.0075
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t05/receiver-total-level-flat-ground-of-three-kinds-alternative-method-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T05",
+        "cite": "ISO/TR 17534-3:2015 T05"
+      },
+      "quantity": "Receiver total level, flat ground of three kinds, alternative method, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 42.46
+      },
+      "computed": {
+        "value": 42.461
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.001
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t05/receiver-a-weighted-level-flat-ground-of-three-kinds-alternative-method-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T05",
+        "cite": "ISO/TR 17534-3:2015 T05"
+      },
+      "quantity": "Receiver A-weighted level, flat ground of three kinds, alternative method, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 39.3
+      },
+      "computed": {
+        "value": 39.298
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.002
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t07/receiver-band-levels-ground-rising-under-the-receiver-alternative-method-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T07",
+        "cite": "ISO/TR 17534-3:2015 T07"
+      },
+      "quantity": "Receiver band levels, ground rising under the receiver, alternative method, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0088
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.0088
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t07/receiver-total-level-ground-rising-under-the-receiver-alternative-method-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T07",
+        "cite": "ISO/TR 17534-3:2015 T07"
+      },
+      "quantity": "Receiver total level, ground rising under the receiver, alternative method, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 42.91
+      },
+      "computed": {
+        "value": 42.914
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.004
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-t07/receiver-a-weighted-level-ground-rising-under-the-receiver-alternative-method-db",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "T07",
+        "cite": "ISO/TR 17534-3:2015 T07"
+      },
+      "quantity": "Receiver A-weighted level, ground rising under the receiver, alternative method, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 39.75
+      },
+      "computed": {
+        "value": 39.749
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.001
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-table-8-t04/region-ground-factor-gs-source-region-over-three-areas",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "Table 8 (T04)",
+        "cite": "ISO/TR 17534-3:2015 Table 8 (T04)"
+      },
+      "quantity": "Region ground factor Gs (source region) over three areas",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.2
+      },
+      "computed": {
+        "value": 0.2
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-table-8-t04/region-ground-factor-gm-middle-region-over-three-areas",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "Table 8 (T04)",
+        "cite": "ISO/TR 17534-3:2015 Table 8 (T04)"
+      },
+      "quantity": "Region ground factor Gm (middle region) over three areas",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.43
+      },
+      "computed": {
+        "value": 0.4261
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.005
+      },
+      "deviation": {
+        "value": -0.0039
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-table-8-t04/region-ground-factor-gr-receiver-region-over-three-areas",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "Table 8 (T04)",
+        "cite": "ISO/TR 17534-3:2015 Table 8 (T04)"
+      },
+      "quantity": "Region ground factor Gr (receiver region) over three areas",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.67
+      },
+      "computed": {
+        "value": 0.6703
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.005
+      },
+      "deviation": {
+        "value": 0.0003
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-table-14-t06/region-ground-factor-gs-source-region-over-three-areas",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "Table 14 (T06)",
+        "cite": "ISO/TR 17534-3:2015 Table 14 (T06)"
+      },
+      "quantity": "Region ground factor Gs (source region) over three areas",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.9
+      },
+      "computed": {
+        "value": 0.9
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-table-14-t06/region-ground-factor-gm-middle-region-over-three-areas",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "Table 14 (T06)",
+        "cite": "ISO/TR 17534-3:2015 Table 14 (T06)"
+      },
+      "quantity": "Region ground factor Gm (middle region) over three areas",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.6
+      },
+      "computed": {
+        "value": 0.5985
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.005
+      },
+      "deviation": {
+        "value": -0.0015
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-table-14-t06/region-ground-factor-gr-receiver-region-over-three-areas",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "Table 14 (T06)",
+        "cite": "ISO/TR 17534-3:2015 Table 14 (T06)"
+      },
+      "quantity": "Region ground factor Gr (receiver region) over three areas",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.37
+      },
+      "computed": {
+        "value": 0.3723
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.005
+      },
+      "deviation": {
+        "value": 0.0023
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-table-14-t06/straight-line-path-length-d3-m",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "Table 14 (T06)",
+        "cite": "ISO/TR 17534-3:2015 Table 14 (T06)"
+      },
+      "quantity": "Straight-line path length d3, m",
+      "kind": "scalar",
+      "expected": {
+        "value": 194.6
+      },
+      "computed": {
+        "value": 194.6
+      },
+      "unit": "m",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.005
+      },
+      "deviation": {
+        "value": -0.000411
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-table-17-t05/mean-path-height-hm-over-flat-ground-m",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "Table 17 (T05)",
+        "cite": "ISO/TR 17534-3:2015 Table 17 (T05)"
+      },
+      "quantity": "Mean path height hm over flat ground, m",
+      "kind": "scalar",
+      "expected": {
+        "value": 2.5
+      },
+      "computed": {
+        "value": 2.4997
+      },
+      "unit": "m",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.005
+      },
+      "deviation": {
+        "value": -0.0003
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "outdoor-propagation-quality-assurance-iso-tr-17534-3/iso-tr-17534-3-2015-table-17-t07/mean-path-height-hm-over-a-slope-m",
+      "domain": "outdoor-propagation-quality-assurance-iso-tr-17534-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO/TR 17534-3",
+        "edition": "2015",
+        "clause": "Table 17 (T07)",
+        "cite": "ISO/TR 17534-3:2015 Table 17 (T07)"
+      },
+      "quantity": "Mean path height hm over a slope, m",
+      "kind": "scalar",
+      "expected": {
+        "value": 4.99
+      },
+      "computed": {
+        "value": 4.9888
+      },
+      "unit": "m",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.005
+      },
+      "deviation": {
+        "value": -0.0012
       },
       "precision": 4,
       "verdict": "pass"

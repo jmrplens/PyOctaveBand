@@ -34,9 +34,11 @@ from .outdoor_propagation import (
     geometric_divergence,
     ground_attenuation,
     ground_attenuation_alternative,
+    mean_path_height,
     meteorological_correction,
     outdoor_propagation_attenuation,
     predicted_receiver_level,
+    region_ground_factors,
 )
 from .refraction import (
     AtmosphericPEResult,
@@ -79,6 +81,7 @@ __all__ = [
     "geometric_divergence",
     "ground_attenuation",
     "ground_attenuation_alternative",
+    "mean_path_height",
     "ground_effect",
     "kurze_anderson_attenuation",
     "linear_sound_speed_profile",
@@ -86,6 +89,7 @@ __all__ = [
     "meteorological_correction",
     "outdoor_propagation_attenuation",
     "predicted_receiver_level",
+    "region_ground_factors",
     "ray_curvature_radius",
     "shadow_zone_distance",
     "spherical_reflection_coefficient",

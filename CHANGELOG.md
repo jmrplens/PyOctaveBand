@@ -310,6 +310,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `environment.region_ground_factors` and `environment.mean_path_height`, the
+  two reductions ISO 9613-2 leaves to the caller. The general ground method
+  wants one factor `G` per region and a real path crosses several kinds of
+  ground; the alternative method wants the mean path height `hm`, and a terrain
+  model holds heights rather than areas. Neither reduction is written down in
+  ISO 9613-2, so two implementations that read it differently disagree on the
+  same site, which is exactly what ISO/TR 17534-3:2015 exists to stop.
+
+  `region_ground_factors` takes the ground projection cut into segments and
+  averages `G` over each of the three regions weighted by length, as 6.2.5 of
+  that Technical Report settles it. `mean_path_height` takes the ground profile
+  as a polyline and integrates the area between the straight ray and the ground
+  under it, which is what Figure 3 of ISO 9613-2 draws and never writes.
+
+  With the two in place the seven quality-assurance test cases the Technical
+  Report marks as answerable by ISO 9613-2 alone (T01 to T07) come out of the
+  library end to end, band by band and on both totals, inside the +/-0,05 dB
+  envelope it declares. They are a kind of oracle the report did not have: a
+  whole chain with every intermediate quantity printed, built to expose the
+  disagreements between implementations that a single formula never does.
+  Thirty-four rows, its own domain, and the run goes from 664 to 698 checks.
+
+  T08 to T19 are not attempted. They build their ray paths by the additional
+  recommendations of Clause 5, over barriers and around buildings, which is
+  geometry rather than acoustics and would be public surface with no oracle
+  behind it.
+
 - `underwater.array_directivity_index` and `underwater.detection_threshold`,
   the two terms of the sonar equation that had to be supplied from outside.
   `passive_sonar_equation` and `active_sonar_equation` accepted `DI` and `DT`
