@@ -399,6 +399,57 @@ trees, farmland). The default is hard ground throughout.
 | `middle` | Ground factor `Gm` of the middle region ([0, 1]). |
 | `receiver` | Ground factor `Gr` of the receiver region ([0, 1]). |
 
+## mean_path_height
+
+```python
+mean_path_height(
+    profile_distances: ArrayLike,
+    profile_heights: ArrayLike,
+    source_height: float,
+    receiver_height: float,
+    distance: float | None = None,
+) -> float
+```
+
+Mean height `hm` of the propagation path above the ground (Figure 3).
+
+The alternative ground method of ISO 9613-2:1996, 7.3.2 is written in one
+quantity the standard defines by a drawing: $h_\mathrm{m} = F/d$,
+with `F` the area between the straight source-to-receiver ray and the
+ground beneath it (Figure 3). This computes that area for a ground given as
+a polyline, which is the shape a terrain model reduces to once it is cut
+along the vertical plane through source and receiver.
+
+Source and receiver stand on the two ends of the profile, so the ray runs
+from $g(0) + h_\mathrm{s}$ to $g(d_\mathrm{p}) + h_\mathrm{r}$
+and the profile fixes both the ground-projected length and the height
+difference the slant distance is built from.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `profile_distances` | Ground-projected distance of each profile point from the source, in metres, strictly increasing. |
+| `profile_heights` | Ground height at each profile point, in metres, on any one datum (only differences are used). |
+| `source_height` | Source height `hs` above the ground at the first profile point, in metres. |
+| `receiver_height` | Receiver height `hr` above the ground at the last profile point, in metres. |
+| `distance` | Source-to-receiver distance `d` to divide the area by, in metres; `None` takes the slant distance the profile implies. |
+
+**Returns:** `hm`, in metres.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the two sequences disagree in length, describe fewer than two points, the distances are not strictly increasing, a height is negative, or `distance` is not positive. |
+
+:::note
+Ground rising above the ray subtracts from `F`, exactly as the area of
+Figure 3 is drawn. A path the ground screens outright is no longer a
+7.3.2 path at all: its obstacle belongs in the screening term
+$A_\mathrm{bar}$ of 7.4.
+:::
+
 ## meteorological_correction
 
 ```python
@@ -663,6 +714,57 @@ meteorological correction of clause 8 are written in.
 | `source_height` | Source height `hs` above ground, in metres. |
 | `receiver_height` | Receiver height `hr` above ground, in metres. |
 | `projected_distance` | Ground-plane projected distance `dp`, in metres; `None` defaults to $\sqrt{d^2 - (h_\mathrm{s} - h_\mathrm{r})^2}$. |
+
+## region_ground_factors
+
+```python
+region_ground_factors(
+    segment_lengths: ArrayLike,
+    segment_ground_factors: ArrayLike,
+    source_height: float,
+    receiver_height: float,
+) -> GroundFactors
+```
+
+Ground factors of the three regions from a path crossing several grounds.
+
+ISO 9613-2:1996, 7.3.1 splits the ground projection of the path into a
+source region 30 $h_\mathrm{s}$ long, a receiver region 30
+$h_\mathrm{r}$ long and whatever middle region is left between them,
+and asks for one ground factor per region. Where the path runs over ground
+of more than one kind, the standard does not say how to reduce the several
+factors to the three the method wants. ISO/TR 17534-3:2015, 6.2.5 settles
+it for quality-assured software: each region takes the mean of `G`
+weighted by the length of the ground projection it covers.
+
+The ground projection of the path is the concatenation of the segments, so
+$d_\mathrm{p}$ is their total length; give the segments in order from
+the source.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `segment_lengths` | Length of each segment of the ground projection, in metres, ordered from the source; each must be positive. |
+| `segment_ground_factors` | Ground factor `G` of each segment ([0, 1]), aligned with `segment_lengths`. |
+| `source_height` | Source height `hs` above ground, in metres. |
+| `receiver_height` | Receiver height `hr` above ground, in metres. |
+
+**Returns:** The [`GroundFactors`](/phonometry/reference/api/environment/outdoor-propagation/#groundfactors) of the source, middle and receiver regions.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the two sequences disagree in length or are empty, a length is not positive, a factor is outside `[0, 1]`, or a height is negative. |
+
+:::note
+Where the two outer regions meet or overlap there is no middle region,
+and the returned [`GroundFactors.middle`](/phonometry/reference/api/environment/outdoor-propagation/#groundfactors) is the mean over the whole
+projection. It does not reach the result: the overlap factor `q` of
+Table 3, note 2 is nought over exactly that range, which drops the
+middle-region term altogether.
+:::
 
 ## SourceEmission
 

@@ -52,6 +52,13 @@ references:
     note: "La cadena de atenuación implementada en la sección 2: el nivel en el receptor a favor del viento (Ec. (3)/(4)) compuesto por la divergencia geométrica (Ec. (7)), la absorción atmosférica (Ec. (8)), el efecto del suelo (Ec. (9), Tabla 3) con su alternativa ponderada A (Ec. (10)/(11)), el apantallamiento por barreras (Ecs. (12)-(17)) y la corrección meteorológica (Ec. (21)/(22)). En 2024 se publicó una edición revisada; este módulo implementa el método de 1996."
   - type: standard
     organization: "International Organization for Standardization"
+    year: 2015
+    title: "Acoustics — Software for the calculation of sound outdoors — Part 3: Recommendations for quality assured implementation of ISO 9613-2 in software according to ISO 17534-1"
+    designation: "ISO/TR 17534-3:2015"
+    url: "https://www.iso.org/standard/63697.html"
+    note: "Los diecinueve casos de prueba resueltos y el margen de ±0,05 dB con el que se juzgan; los factores de suelo por regiones ponderados por longitud del 6.2.5 que hay detrás de region_ground_factors; y los casos T01 a T07, los que la propia guía marca como resolubles solo con la ISO 9613-2."
+  - type: standard
+    organization: "International Organization for Standardization"
     year: 2003
     title: "Acoustics — Measurement of sound absorption in a reverberation room"
     designation: "ISO 354:2003"
@@ -554,6 +561,51 @@ print(round(environment.directivity_omega(1.5, 1.5, 200.0), 2))                 
 # Corrección meteorológica a largo plazo (C0 = 2 dB) a restar de LAT(DW)
 print(round(environment.meteorological_correction(200.0, 1.5, 1.5, 2.0), 2))     # 1.7 dB
 ```
+
+### Suelo de más de una clase, y la altura media del camino
+
+Los dos métodos de suelo piden unos pocos datos que un emplazamiento real no
+entrega directamente. El método general pide una $G$ por región, y un camino
+suele cruzar varias clases de suelo; el alternativo pide $h_\mathrm{m}$, y un
+modelo del terreno guarda alturas, no áreas. La ISO 9613-2 deja abiertas las
+dos reducciones, y dos implementaciones que las lean distinto discrepan sobre
+el mismo emplazamiento. La ISO/TR 17534-3 las cierra para software con calidad
+asegurada, y aquí se exponen las dos reglas.
+
+`region_ground_factors` toma la proyección del camino sobre el suelo partida en
+tramos, uno por cada porción de suelo que cruza y en orden desde la fuente, y
+devuelve los `GroundFactors` de las tres regiones: cada uno es la media de $G$
+ponderada por la longitud de proyección que cubre. `mean_path_height` toma el
+perfil del terreno como una polilínea y devuelve $h_\mathrm{m} = F/d$
+directamente, integrando el área entre la recta del rayo y el suelo que tiene
+debajo.
+
+```python
+from phonometry import environment
+
+# Un camino de 194,16 m que cruza tres suelos; fuente a 1 m, receptor a 4 m
+g = environment.region_ground_factors(
+    [40.88, 102.19, 51.10], [0.9, 0.5, 0.2], 1.0, 4.0)
+print(round(g.source, 2), round(g.middle, 2), round(g.receiver, 2))  # 0.9 0.6 0.37
+
+# El mismo camino sobre un suelo que sube 10 m bajo el receptor
+hm = environment.mean_path_height(
+    [0.0, 112.41, 178.83, 194.16], [0.0, 0.0, 10.0, 10.0],
+    1.0, 4.0, distance=194.60)
+print(round(hm, 2))                                                  # 4.99
+```
+
+Las dos cifras son celdas de los casos resueltos de la propia guía. La
+ISO/TR 17534-3 imprime diecinueve, cada uno una cadena completa con todas sus
+magnitudes intermedias, para poder comparar dos implementaciones donde una
+fórmula suelta no las separaría; también fija el margen dentro del que un
+resultado tiene que quedarse, $\pm 0{,}05$ dB por banda y en el total. Los
+siete que la ISO 9613-2 responde por sí sola (T01 a T07) se comprueban banda a
+banda en el
+[informe de conformidad](https://jmrplens.github.io/phonometry/es/reference/conformance/).
+Los otros doce construyen sus caminos de rayo con las recomendaciones
+adicionales de su capítulo 5, sobre barreras y alrededor de edificios, y no
+están implementados.
 
 ### La fuente imagen que explica el efecto del suelo
 

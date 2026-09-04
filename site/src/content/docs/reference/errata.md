@@ -2123,6 +2123,30 @@ in the same order.
   so it yields $4{,}15\ \text{dB/km}$ for this condition.
 - **Status:** unreported.
 
+## ISO/TR 17534-3:2015, Table 20 (q credited to the wrong footnote of ISO 9613-2 Table 3)
+
+- **Location:** Table 20, "Single number step by step results" of test case
+  T08, the row naming the middle-region overlap factor $q$.
+- **The print:** `q (ISO 9613-2:1996, Table 3, footnote 1)`.
+- **The problem:** footnote 1 of ISO 9613-2:1996, Table 3 is about which ground
+  factor and which height each outer region takes ("For calculating $A_s$, take
+  $G = G_s$ and $h = h_s$..."). It says nothing about $q$. The factor $q$ is
+  defined by footnote 2 of the same table, which is where the guideline itself
+  sends the reader in the four other places it prints the row: Table 3 (T01),
+  Table 8 (T04), Table 14 (T06) and Table 22 (T09) all read "Table 3
+  footnote 2". Table 20 is the single occurrence that reads footnote 1, and the
+  value it carries, $q = 0{,}23$, is the one footnote 2 produces.
+- **Evidence:** the row was read on PDF page 23 (printed p. 17) of
+  ISO/TR 17534-3:2015, and the four consistent occurrences of the same row on
+  PDF pages 13, 16, 20 and 41 (printed pp. 7, 10, 14 and 35) of the same
+  edition; the two footnotes it points at were read on PDF page 10 (printed
+  p. 8) of ISO 9613-2:1996.
+- **Library behaviour:** unaffected. The typographical slip is in a
+  cross-reference, not in a number, and
+  [`ground_attenuation`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/environment/propagation/outdoor_propagation.py)
+  implements $q$ from footnote 2, which is what reproduces the printed 0,23.
+- **Status:** unreported.
+
 ## ANSI S3.5-1997, Annex C worked examples (official WG S3-79 errata)
 
 > **Not verified against the page.** ANSI S3.5-1997 is not held locally

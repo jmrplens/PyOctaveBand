@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 664 numerical conformance checks against 387 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 698 numerical conformance checks against 388 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 664 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 64 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 698 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 65 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -24050,6 +24050,48 @@ print(round(environment.directivity_omega(1.5, 1.5, 200.0), 2))                 
 print(round(environment.meteorological_correction(200.0, 1.5, 1.5, 2.0), 2))     # 1.7 dB
 ```
 
+### Ground of more than one kind, and the mean path height
+
+Both ground methods want a small number of inputs that a real site does not
+hand over directly. The general method wants one $G$ per region, and a path
+usually crosses several kinds of ground; the alternative method wants
+$h_\mathrm{m}$, and a terrain model holds heights, not areas. ISO 9613-2 leaves
+both reductions open, and two implementations that read them differently
+disagree on the same site. ISO/TR 17534-3 settles them for quality-assured
+software, and both rules are exposed here.
+
+`region_ground_factors` takes the ground projection of the path cut into
+segments, one per patch of ground it crosses and in order from the source, and
+returns the `GroundFactors` of the three regions: each is the mean of $G$
+weighted by the length of projection it covers. `mean_path_height` takes the
+ground profile as a polyline and returns $h_\mathrm{m} = F/d$ directly, by
+integrating the area between the straight ray and the ground beneath it.
+
+```python
+from phonometry import environment
+
+# A 194.16 m path crossing three grounds; source 1 m up, receiver 4 m up
+g = environment.region_ground_factors(
+    [40.88, 102.19, 51.10], [0.9, 0.5, 0.2], 1.0, 4.0)
+print(round(g.source, 2), round(g.middle, 2), round(g.receiver, 2))  # 0.9 0.6 0.37
+
+# The same path over ground that climbs 10 m under the receiver
+hm = environment.mean_path_height(
+    [0.0, 112.41, 178.83, 194.16], [0.0, 0.0, 10.0, 10.0],
+    1.0, 4.0, distance=194.60)
+print(round(hm, 2))                                                  # 4.99
+```
+
+Both figures are cells of the guideline's own worked cases. ISO/TR 17534-3
+prints nineteen of them, each a complete chain with every intermediate
+quantity, so that two implementations can be compared where a single formula
+would not separate them; it also fixes the envelope a result has to stay
+inside, $\pm 0{,}05$ dB per band and on the total. The seven that ISO 9613-2
+answers on its own (T01 to T07) are checked band by band in the
+[conformance report](https://jmrplens.github.io/phonometry/reference/conformance/).
+The other twelve build their ray paths by the additional recommendations of
+its Clause 5, over barriers and around buildings, and are not implemented.
+
 ### The image source behind the ground effect
 
 Every entry of Table 3 is an engineering fit to one physical picture: the
@@ -24352,6 +24394,14 @@ against the exact half-plane and coherent-ground models.
   this module implements the 1996 method).
   [iso.org catalogue](https://www.iso.org/standard/20649.html).
   The implemented attenuation chain of section 2.
+- International Organization for Standardization. (2015). *Acoustics —
+  Software for the calculation of sound outdoors — Part 3: Recommendations for
+  quality assured implementation of ISO 9613-2 in software according to
+  ISO 17534-1* (ISO/TR 17534-3:2015).
+  [iso.org catalogue](https://www.iso.org/standard/63697.html).
+  The nineteen worked test cases, the +/-0,05 dB envelope they are judged by,
+  and the two reductions of section 2: the region ground factors and the mean
+  path height.
 
 ## Standards
 
@@ -24365,7 +24415,12 @@ method of calculation*: the downwind receiver level (Eq. (3)/(4)) assembled
 from geometrical divergence (Eq. (7)), atmospheric absorption (Eq. (8)), the
 ground effect (Eq. (9), Table 3) with its A-weighted alternative
 (Eq. (10)/(11)), barrier screening (Eqs. (12)–(17)) and the meteorological
-correction (Eq. (21)/(22)). ISO 354:2003, *Acoustics — Measurement of sound
+correction (Eq. (21)/(22)). ISO/TR 17534-3:2015, *Acoustics — Software for the
+calculation of sound outdoors — Part 3: Recommendations for quality assured
+implementation of ISO 9613-2 in software according to ISO 17534-1*: the
+length-weighted region ground factors of 6.2.5 behind `region_ground_factors`,
+and test cases T01 to T07, the ones it marks as answerable by ISO 9613-2 alone.
+ISO 354:2003, *Acoustics — Measurement of sound
 absorption in a reverberation room*: only the clause 8.1.2.1 conversion
 $m = \alpha/(10 \log_{10} e)$ behind `air_attenuation_m`; the reverberation-room
 method itself is covered in the [Room Acoustics guide](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/).
@@ -36785,6 +36840,8 @@ documents, one page per module.
 | `ground_attenuation` | `function` | **Ground effect Agr, general method (ISO 9613-2 7.3.1, Eq. 9).**<br>• `distance` d, `source_height` hs, `receiver_height` hr [m]<br>• `frequencies` [Hz]<br>• `ground_source`/`ground_middle`/`ground_receiver` G ∈ [0,1]<br>• `projected_distance` dp [m] | `agr = environment.ground_attenuation(200, 2, 2, bands, 1, 1, 1)`<br><br>• As+Ar+Am per band [dB] (negative = gain) |
 | `ground_attenuation_alternative` | `function` | **Ground effect Agr, A-weighted method (ISO 9613-2 7.3.2, Eq. 10).**<br>• `distance` d [m]<br>• `mean_height` hm [m] | `agr = environment.ground_attenuation_alternative(200, 2)`<br><br>• 4.8 − (2hm/d)·(17+300/d) ≥ 0 [dB] |
 | `directivity_omega` | `function` | **Solid-angle directivity index DΩ (ISO 9613-2 Eq. 11).**<br>• `source_height` hs, `receiver_height` hr, `projected_distance` dp [m] | `dw = environment.directivity_omega(1.5, 1.5, 200)`<br><br>• 0…~3 dB (add to Dc for the 7.3.2 method) |
+| `region_ground_factors` | `function` | **Ground factors of the three regions of a path over mixed ground (ISO/TR 17534-3 6.2.5).**<br>• `segment_lengths` [m], `segment_ground_factors` G, in order from the source<br>• `source_height` hs, `receiver_height` hr [m] | `g = environment.region_ground_factors([40.9, 102.2, 51.1], [0.9, 0.5, 0.2], 1, 4)`<br><br>• `GroundFactors` (Gs, Gm, Gr), each a length-weighted mean over its region |
+| `mean_path_height` | `function` | **Mean path height hm above a ground profile (ISO 9613-2 Figure 3).**<br>• `profile_distances` [m], strictly increasing, `profile_heights` [m]<br>• `source_height` hs, `receiver_height` hr [m]<br>• `distance` d [m] (Default: the slant distance the profile implies) | `hm = environment.mean_path_height([0, 112.4, 178.8, 194.2], [0, 0, 10, 10], 1, 4)`<br><br>• hm = F/d [m], for the 7.3.2 method |
 | `Barrier` | `dataclass` | **Barrier diffraction geometry (ISO 9613-2 7.4).**<br>• `source_to_edge` dss, `edge_to_receiver` dsr [m]<br>• `parallel_distance` a [m] (Default: 0)<br>• `edge_separation` e [m] (Default: None → single diffraction)<br>• `ground_reflections_by_image` (Default: False → C₂=20)<br>• `lateral` (Default: False → top-edge)<br>• `line_of_sight_clear` (Default: False; True gives z the negative sign of Eq. 16 when the sight line passes above the edge) | `b = environment.Barrier(source_to_edge=101, edge_to_receiver=101)`<br><br>• `.is_double` when e is given |
 | `barrier_attenuation` | `function` | **Barrier diffraction Dz (ISO 9613-2 Eq. 14).**<br>• `barrier`: `Barrier`<br>• `distance` d [m]<br>• `frequencies` [Hz] | `dz = environment.barrier_attenuation(b, 200, bands)`<br><br>• 10 lg[3+(C₂/λ)C₃ z Kmet], capped 20/25 dB; 10 lg 3 at grazing (z = 0), decaying to ≥ 0 for negative z |
 | `meteorological_correction` | `function` | **Meteorological correction Cmet (ISO 9613-2 Eq. 21/22).**<br>• `projected_distance` dp, `source_height` hs, `receiver_height` hr [m]<br>• `c0`: factor C₀ [dB] | `c = environment.meteorological_correction(200, 1.5, 1.5, 2.0)`<br><br>• C₀[1 − 10(hs+hr)/dp] ≥ 0 [dB] |
@@ -51939,7 +51996,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 664 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 698 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -52307,7 +52364,7 @@ sample from the metrology core:
 | IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()`; IEC 61252:2025 has since superseded this print, and the transcription still targets the 1993+A2 text | `tests/signals/test_levels.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-664 numerical conformance checks across 64 domains and 387 standards, covering
+698 numerical conformance checks across 65 domains and 388 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise

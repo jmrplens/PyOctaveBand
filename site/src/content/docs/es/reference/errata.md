@@ -2302,6 +2302,31 @@ dos ediciones con las mismas entradas y en el mismo orden.
   así que da $4{,}15\ \text{dB/km}$ para esta condición.
 - **Estado:** sin notificar.
 
+## ISO/TR 17534-3:2015, Tabla 20 (q atribuida a la nota al pie equivocada de la Tabla 3 de la ISO 9613-2)
+
+- **Ubicación:** Tabla 20, «Single number step by step results» del caso de
+  prueba T08, la fila que nombra el factor de solape de la región media $q$.
+- **Lo impreso:** `q (ISO 9613-2:1996, Table 3, footnote 1)`.
+- **El problema:** la nota al pie 1 de la Tabla 3 de la ISO 9613-2:1996 trata
+  de qué factor de suelo y qué altura toma cada región exterior («For
+  calculating $A_s$, take $G = G_s$ and $h = h_s$...»). No dice nada de $q$. El
+  factor $q$ lo define la nota al pie 2 de esa misma tabla, que es adonde la
+  propia guía manda al lector en los otros cuatro sitios donde imprime la fila:
+  la Tabla 3 (T01), la Tabla 8 (T04), la Tabla 14 (T06) y la Tabla 22 (T09)
+  dicen todas «Table 3 footnote 2». La Tabla 20 es la única ocurrencia que dice
+  footnote 1, y el valor que lleva, $q = 0{,}23$, es el que produce la nota 2.
+- **Evidencia:** verificado en la página 23 del PDF (p. 17 impresa) de
+  ISO/TR 17534-3:2015, junto con las cuatro ocurrencias coherentes de esa misma
+  fila en las páginas 13, 16, 20 y 41 del PDF (pp. 7, 10, 14 y 35 impresas) de
+  esa misma edición; las dos notas al pie a las que apunta se leyeron en la
+  página 10 del PDF (p. 8 impresa) de ISO 9613-2:1996.
+- **Comportamiento de la biblioteca:** no le afecta. El desliz tipográfico está
+  en una referencia cruzada, no en un número, y
+  [`ground_attenuation`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/environment/propagation/outdoor_propagation.py)
+  implementa $q$ a partir de la nota 2, que es lo que reproduce el 0,23
+  impreso.
+- **Estado:** sin reportar.
+
 ## ANSI S3.5-1997, ejemplos resueltos del Anexo C (erratas oficiales del WG S3-79)
 
 > **Sin verificar contra la página.** ANSI S3.5-1997 no está en la biblioteca

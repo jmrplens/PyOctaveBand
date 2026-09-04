@@ -92,6 +92,10 @@ _LOWEST_NOMINAL_BAND = 63.0
 
 _NOMINAL_BANDS = np.array(DEFAULT_FREQUENCIES, dtype=np.float64)
 
+#: Fewest points a ground profile can have and still enclose an area: the
+#: two ends of one segment (ISO 9613-2:1996, Figure 3).
+_MIN_PROFILE_POINTS = 2
+
 
 @dataclass(frozen=True)
 class Barrier:
@@ -690,6 +694,193 @@ def directivity_omega(
     num = projected_distance**2 + (source_height - receiver_height) ** 2
     den = projected_distance**2 + (source_height + receiver_height) ** 2
     return float(10.0 * np.log10(1.0 + num / den))
+
+
+def _segment_edges(lengths: NDArray[np.float64]) -> NDArray[np.float64]:
+    """Cumulative boundaries of the segments, starting at the source (0 m)."""
+    return np.concatenate(([0.0], np.cumsum(lengths)))
+
+
+def _mean_ground_factor(
+    edges: NDArray[np.float64],
+    factors: NDArray[np.float64],
+    start: float,
+    end: float,
+) -> float:
+    """Length-weighted mean of ``G`` over the span ``[start, end]``.
+
+    A span of no length (a source or receiver sitting on the ground, whose
+    region is a point) takes the factor of the segment it falls in rather than
+    dividing by nought.
+    """
+    overlaps = np.clip(
+        np.minimum(edges[1:], end) - np.maximum(edges[:-1], start), 0.0, None
+    )
+    covered = float(np.sum(overlaps))
+    if covered > 0.0:
+        return float(np.sum(overlaps * factors) / covered)
+    index = int(np.searchsorted(edges[1:-1], start, side="right"))
+    return float(factors[index])
+
+
+def region_ground_factors(
+    segment_lengths: ArrayLike,
+    segment_ground_factors: ArrayLike,
+    source_height: float,
+    receiver_height: float,
+) -> GroundFactors:
+    r"""Ground factors of the three regions from a path crossing several grounds.
+
+    ISO 9613-2:1996, 7.3.1 splits the ground projection of the path into a
+    source region 30 :math:`h_\mathrm{s}` long, a receiver region 30
+    :math:`h_\mathrm{r}` long and whatever middle region is left between them,
+    and asks for one ground factor per region. Where the path runs over ground
+    of more than one kind, the standard does not say how to reduce the several
+    factors to the three the method wants. ISO/TR 17534-3:2015, 6.2.5 settles
+    it for quality-assured software: each region takes the mean of ``G``
+    weighted by the length of the ground projection it covers.
+
+    The ground projection of the path is the concatenation of the segments, so
+    :math:`d_\mathrm{p}` is their total length; give the segments in order from
+    the source.
+
+    :param segment_lengths: Length of each segment of the ground projection, in
+        metres, ordered from the source; each must be positive.
+    :param segment_ground_factors: Ground factor ``G`` of each segment
+        ([0, 1]), aligned with ``segment_lengths``.
+    :param source_height: Source height ``hs`` above ground, in metres.
+    :param receiver_height: Receiver height ``hr`` above ground, in metres.
+    :return: The :class:`GroundFactors` of the source, middle and receiver
+        regions.
+    :raises ValueError: If the two sequences disagree in length or are empty, a
+        length is not positive, a factor is outside ``[0, 1]``, or a height is
+        negative.
+
+    .. note::
+
+       Where the two outer regions meet or overlap there is no middle region,
+       and the returned :attr:`GroundFactors.middle` is the mean over the whole
+       projection. It does not reach the result: the overlap factor ``q`` of
+       Table 3, note 2 is nought over exactly that range, which drops the
+       middle-region term altogether.
+    """
+    lengths = require_finite_array(segment_lengths, "segment_lengths").astype(
+        np.float64, copy=False
+    )
+    factors = require_finite_array(
+        segment_ground_factors, "segment_ground_factors"
+    ).astype(np.float64, copy=False)
+    lengths = np.atleast_1d(lengths)
+    factors = np.atleast_1d(factors)
+    if lengths.size != factors.size:
+        msg = (
+            "'segment_lengths' and 'segment_ground_factors' must carry one "
+            f"value per segment; got {lengths.size} and {factors.size}."
+        )
+        raise ValueError(msg)
+    if np.any(lengths <= 0.0):
+        msg = "'segment_lengths' must be positive."
+        raise ValueError(msg)
+    if np.any(factors < 0.0) or np.any(factors > 1.0):
+        msg = "'segment_ground_factors' must be within [0, 1]."
+        raise ValueError(msg)
+    if source_height < 0.0 or receiver_height < 0.0:
+        msg = "Source and receiver heights must be non-negative."
+        raise ValueError(msg)
+
+    edges = _segment_edges(lengths)
+    dp = float(edges[-1])
+    source_end = min(30.0 * source_height, dp)
+    receiver_start = max(dp - 30.0 * receiver_height, 0.0)
+    middle = (
+        _mean_ground_factor(edges, factors, source_end, receiver_start)
+        if receiver_start > source_end
+        else _mean_ground_factor(edges, factors, 0.0, dp)
+    )
+    return GroundFactors(
+        source=_mean_ground_factor(edges, factors, 0.0, source_end),
+        middle=middle,
+        receiver=_mean_ground_factor(edges, factors, receiver_start, dp),
+    )
+
+
+def mean_path_height(
+    profile_distances: ArrayLike,
+    profile_heights: ArrayLike,
+    source_height: float,
+    receiver_height: float,
+    distance: float | None = None,
+) -> float:
+    r"""Mean height ``hm`` of the propagation path above the ground (Figure 3).
+
+    The alternative ground method of ISO 9613-2:1996, 7.3.2 is written in one
+    quantity the standard defines by a drawing: :math:`h_\mathrm{m} = F/d`,
+    with ``F`` the area between the straight source-to-receiver ray and the
+    ground beneath it (Figure 3). This computes that area for a ground given as
+    a polyline, which is the shape a terrain model reduces to once it is cut
+    along the vertical plane through source and receiver.
+
+    Source and receiver stand on the two ends of the profile, so the ray runs
+    from :math:`g(0) + h_\mathrm{s}` to :math:`g(d_\mathrm{p}) + h_\mathrm{r}`
+    and the profile fixes both the ground-projected length and the height
+    difference the slant distance is built from.
+
+    :param profile_distances: Ground-projected distance of each profile point
+        from the source, in metres, strictly increasing.
+    :param profile_heights: Ground height at each profile point, in metres, on
+        any one datum (only differences are used).
+    :param source_height: Source height ``hs`` above the ground at the first
+        profile point, in metres.
+    :param receiver_height: Receiver height ``hr`` above the ground at the last
+        profile point, in metres.
+    :param distance: Source-to-receiver distance ``d`` to divide the area by,
+        in metres; ``None`` takes the slant distance the profile implies.
+    :return: ``hm``, in metres.
+    :raises ValueError: If the two sequences disagree in length, describe fewer
+        than two points, the distances are not strictly increasing, a height is
+        negative, or ``distance`` is not positive.
+
+    .. note::
+
+       Ground rising above the ray subtracts from ``F``, exactly as the area of
+       Figure 3 is drawn. A path the ground screens outright is no longer a
+       7.3.2 path at all: its obstacle belongs in the screening term
+       :math:`A_\mathrm{bar}` of 7.4.
+    """
+    us = np.atleast_1d(
+        require_finite_array(profile_distances, "profile_distances").astype(
+            np.float64, copy=False
+        )
+    )
+    zs = np.atleast_1d(
+        require_finite_array(profile_heights, "profile_heights").astype(
+            np.float64, copy=False
+        )
+    )
+    if us.size != zs.size:
+        msg = (
+            "'profile_distances' and 'profile_heights' must carry one value "
+            f"per profile point; got {us.size} and {zs.size}."
+        )
+        raise ValueError(msg)
+    if us.size < _MIN_PROFILE_POINTS:
+        msg = "'profile_distances' must describe at least two points."
+        raise ValueError(msg)
+    if np.any(np.diff(us) <= 0.0):
+        msg = "'profile_distances' must be strictly increasing."
+        raise ValueError(msg)
+    if source_height < 0.0 or receiver_height < 0.0:
+        msg = "Source and receiver heights must be non-negative."
+        raise ValueError(msg)
+
+    dp = float(us[-1] - us[0])
+    rise = float(zs[-1] + receiver_height - zs[0] - source_height)
+    ray = zs[0] + source_height + rise * (us - us[0]) / dp
+    area = float(np.trapezoid(ray - zs, us))
+    span = float(np.hypot(dp, rise)) if distance is None else float(distance)
+    if span <= 0.0:
+        raise ValueError(_DISTANCE_NOT_POSITIVE)
+    return area / span
 
 
 # --------------------------------------------------------------------------- #
