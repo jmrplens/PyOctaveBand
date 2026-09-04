@@ -271,8 +271,7 @@ calculated_sound_reduction_index(
     resonant_only: bool = False,
     density: float | None = None,
     longitudinal_velocity: float | None = None,
-    speed_of_sound: float = 340.0,
-    air_density: float = 1.29,
+    fluid: Fluid = ...,
 ) -> np.ndarray
 ```
 
@@ -322,8 +321,7 @@ upwards on its lightweight blockwork.
 | `resonant_only` | Drop the forced-transmission term below `fc`. |
 | `density` | Density `ρ` of the material, in kg/m³; with `longitudinal_velocity` it enables the Formula (B.10) plateau. |
 | `longitudinal_velocity` | Quasi-longitudinal phase velocity `cL` of the material, in m/s. |
-| `speed_of_sound` | Speed of sound in air `co`, in m/s. |
-| `air_density` | Density of air `ρo`, in kg/m³. |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`EN_12354_AIR`](/phonometry/reference/api/building/detailed-model/#en_12354_air), the air EN/ISO 12354 works in, 340 m/s and 1,29 kg/m3). |
 
 **Returns:** The sound reduction index `R` per band, in dB.
 
@@ -643,6 +641,10 @@ laboratory value, Formula 8).
 | `delta_r_receiving` | `ΔRd,situ` on the receiving side, in dB. |
 
 **Returns:** `RDd` per band, in dB.
+
+## EN_12354_AIR
+
+*Constant* (`phonometry.fluids.Fluid`).
 
 ## flanking_impact_level
 
@@ -1075,8 +1077,7 @@ in_situ_element(
     *,
     bands: BandType = 'third',
     resonant_only: bool = False,
-    speed_of_sound: float = 340.0,
-    air_density: float = 1.29,
+    fluid: Fluid = ...,
 ) -> InSituElementResult
 ```
 
@@ -1101,8 +1102,7 @@ data come from a laboratory measurement.
 | `frequencies` | Band centre frequencies, in Hz. |
 | `bands` | `"third"` (default) or `"octave"`. |
 | `resonant_only` | Drop the forced-transmission term of Formula (B.2) below `fc` (Annex B.1, flanking paths). |
-| `speed_of_sound` | Speed of sound in air `co`, in m/s. |
-| `air_density` | Density of air `ρo`, in kg/m³. |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`EN_12354_AIR`](/phonometry/reference/api/building/detailed-model/#en_12354_air), the air EN/ISO 12354 works in, 340 m/s and 1,29 kg/m3). |
 
 **Returns:** The [`InSituElementResult`](/phonometry/reference/api/building/detailed-model/#insituelementresult).
 
@@ -1234,8 +1234,7 @@ in_situ_total_loss_factor(
     critical_frequency: float,
     radiation_factor: ArrayLike,
     perimeter_absorption: float,
-    speed_of_sound: float = 340.0,
-    air_density: float = 1.29,
+    fluid: Fluid = ...,
 ) -> np.ndarray
 ```
 
@@ -1259,8 +1258,7 @@ Formula (C.4) absorption coefficients (see
 | `critical_frequency` | Critical frequency `fc`, in Hz. |
 | `radiation_factor` | Radiation factor `σ` per band. |
 | `perimeter_absorption` | $\sum l_k \alpha_k$ over the element's perimeter, in m (may be zero for a free-edged element). |
-| `speed_of_sound` | Speed of sound in air `co`, in m/s. |
-| `air_density` | Density of air `ρo`, in kg/m³. |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`EN_12354_AIR`](/phonometry/reference/api/building/detailed-model/#en_12354_air), the air EN/ISO 12354 works in, 340 m/s and 1,29 kg/m3). |
 
 **Returns:** The total loss factor `ηtot,situ` per band (dimensionless).
 

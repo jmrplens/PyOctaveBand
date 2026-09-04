@@ -369,10 +369,20 @@ analytically.
 
 ```python
 from phonometry import building
+from phonometry.fluids import Fluid
+
+norton_air = Fluid(
+    temperature_c=20.0,
+    static_pressure_pa=101_325.0,
+    composition={},
+    model="the air behind Norton's worked answer",
+    validity="",
+    properties={"speed_of_sound": 343.0, "density": 1.21},
+)
 
 octaves = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
 res = building.plateau_transmission_loss(octaves, material="brick", thickness_mm=110.0,
-                                         air_density=1.21)
+                                         fluid=norton_air)
 print(res.transmission_loss.round(1))
 # [35.8 37.  37.  43.3 53.3 63.3 73.3]
 ```

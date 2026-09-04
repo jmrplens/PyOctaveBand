@@ -100,6 +100,7 @@ from ..._internal.validation import (
     require_ranks,
     require_same_length,
 )
+from ...materials.absorbers.porous import PUBLISHED_AIR
 from ...vibration.structural.point_mobility import plate_bending_stiffness
 from ...vibration.structural.radiation_efficiency import coincidence_frequency
 
@@ -107,15 +108,13 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import ArrayLike
 
+    from ...fluids import Fluid
     from ...materials.absorbers.porous import PorousMediumResult
     from ..measurement.insulation import WeightedRatingResult
 
-#: Default speed of sound in air ``c0``, m/s (20 degC).
-_SPEED_OF_SOUND: float = 343.0
-#: Default air density ``rho0``, kg/m^3 (Bies 5e Appendix D: 1,205 at 20 degC).
-_AIR_DENSITY: float = 1.205
-#: Ratio of specific heats of air ``gamma``.
-_GAMMA: float = 1.4
+#: Default speed of sound in air ``c0``, m/s, of the single-property entry
+#: points: the published air's own, so the module spells 343 m/s once.
+_SPEED_OF_SOUND: float = PUBLISHED_AIR.speed_of_sound
 #: Field-incidence correction ``dB`` (Bies Eq. 7.42), keyed by band width.
 _FIELD_CORRECTION: dict[str, float] = {"third": 5.5, "octave": 4.0}
 #: Error message for a non-positive frequency (shared by the module funcs).
@@ -191,8 +190,7 @@ def mass_law_transmission_loss(
     incidence: str = "field",
     band: str = "third",
     field_correction: float | None = None,
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> np.ndarray:
     r"""Mass-law transmission loss of a limp panel (Bies Eq. 7.40/7.42).
 
@@ -209,15 +207,15 @@ def mass_law_transmission_loss(
     :param band: Band width for the field correction (``"third"``/``"octave"``).
     :param field_correction: Explicit field-incidence correction, in dB
         (>= 0), overriding the band table (Default: ``None``).
-    :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
-    :param air_density: Air density ``rho0`` (Default: 1.205 kg/m^3).
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid` (Default:
+        :data:`PUBLISHED_AIR`, the air these models are published with).
     :return: The transmission loss ``TL``, in dB.
     :raises ValueError: for a non-positive input or unknown incidence/band.
     """
     incidence = require_choice(incidence, "incidence", ("normal", "field"))
     m2 = require_positive(mass_per_area, "mass_per_area")
-    c0 = require_positive(speed_of_sound, "speed_of_sound")
-    rho0 = require_positive(air_density, "air_density")
+    c0 = fluid.speed_of_sound
+    rho0 = fluid.density
     f = np.asarray(frequency, dtype=np.float64)
     if np.any(f <= 0.0):
         raise ValueError(_FREQ_POSITIVE_MSG)
@@ -379,8 +377,7 @@ def single_panel_transmission_loss(
     band: str = "third",
     coincidence_model: str = "sharp",
     field_correction: float | None = None,
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> SoundReductionResult:
     r"""Sound reduction index of a single panel, Sharp's method (Bies 7.2.4.1).
 
@@ -427,8 +424,8 @@ def single_panel_transmission_loss(
     :param field_correction: Explicit field-incidence correction of the mass-law
         region, in dB (>= 0), overriding the band table (Default: ``None``;
         Norton's Eq. 3.106 uses a flat 5 dB).
-    :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
-    :param air_density: Air density ``rho0`` (Default: 1.205 kg/m^3).
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid` (Default:
+        :data:`PUBLISHED_AIR`, the air these models are published with).
     :return: A :class:`SoundReductionResult` (model ``"sharp-single"`` or
         ``"cremer-single"``).
     :raises ValueError: for a non-positive input, an unknown coincidence model,
@@ -437,8 +434,7 @@ def single_panel_transmission_loss(
     model = require_choice(coincidence_model, "coincidence_model", ("sharp", "cremer"))
     m2 = require_positive(mass_per_area, "mass_per_area")
     eta = require_positive(loss_factor, "loss_factor")
-    c0 = require_positive(speed_of_sound, "speed_of_sound")
-    rho0 = require_positive(air_density, "air_density")
+    c0 = fluid.speed_of_sound
     f = _band_axis(frequency)
     if critical_frequency is not None:
         fc = require_positive(critical_frequency, "critical_frequency")
@@ -456,8 +452,7 @@ def single_panel_transmission_loss(
             freq,
             m2,
             incidence="normal",
-            speed_of_sound=c0,
-            air_density=rho0,
+            fluid=fluid,
         )
 
     correction = _resolve_field_correction(band, field_correction)
@@ -568,8 +563,7 @@ def plateau_transmission_loss(
     plateau_height: float | None = ...,
     frequency_ratio: float | None = ...,
     field_correction: float = ...,
-    speed_of_sound: float = ...,
-    air_density: float = ...,
+    fluid: Fluid = ...,
 ) -> SoundReductionResult: ...
 
 
@@ -583,8 +577,7 @@ def plateau_transmission_loss(
     plateau_height: float | None = ...,
     frequency_ratio: float | None = ...,
     field_correction: float = ...,
-    speed_of_sound: float = ...,
-    air_density: float = ...,
+    fluid: Fluid = ...,
 ) -> SoundReductionResult: ...
 
 
@@ -596,8 +589,7 @@ def plateau_transmission_loss(
     plateau_height: float,
     frequency_ratio: float,
     field_correction: float = ...,
-    speed_of_sound: float = ...,
-    air_density: float = ...,
+    fluid: Fluid = ...,
 ) -> SoundReductionResult: ...
 
 
@@ -610,8 +602,7 @@ def plateau_transmission_loss(
     plateau_height: float | None = None,
     frequency_ratio: float | None = None,
     field_correction: float = _NORTON_FIELD_CORRECTION,
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> SoundReductionResult:
     r"""Plateau-method estimate of a single panel's TL (Norton 3.9.1).
 
@@ -649,8 +640,8 @@ def plateau_transmission_loss(
         recovery (> 1).
     :param field_correction: Field-incidence correction of the mass-law line,
         in dB (Default: 5.0, Norton Eq. 3.106).
-    :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
-    :param air_density: Air density ``rho0`` (Default: 1.205 kg/m^3).
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid` (Default:
+        :data:`PUBLISHED_AIR`, the air these models are published with).
     :return: A :class:`SoundReductionResult` (model ``"plateau"``) carrying
         :attr:`~SoundReductionResult.plateau_height`,
         :attr:`~SoundReductionResult.plateau_start` (point A) and
@@ -662,8 +653,8 @@ def plateau_transmission_loss(
         material, thickness_mm, mass_per_area, plateau_height, frequency_ratio
     )
     correction = _resolve_field_correction("third", field_correction)
-    c0 = require_positive(speed_of_sound, "speed_of_sound")
-    rho0 = require_positive(air_density, "air_density")
+    c0 = fluid.speed_of_sound
+    rho0 = fluid.density
     f = _band_axis(frequency)
 
     # Point A: invert the field-incidence mass law at the plateau height,
@@ -683,8 +674,7 @@ def plateau_transmission_loss(
         m2,
         incidence="field",
         field_correction=correction,
-        speed_of_sound=c0,
-        air_density=rho0,
+        fluid=fluid,
     )
     on_plateau = (f >= f_a) & (f <= f_b)
     above = f > f_b
@@ -976,8 +966,7 @@ def _heckl_transmission_loss(
     fc1: float,
     fc2: float,
     *,
-    speed_of_sound: float,
-    air_density: float,
+    fluid: Fluid,
     correction: float,
 ) -> np.ndarray:
     r"""Heckl's (1960) piecewise orthotropic estimate (Bies 7.2.4.5).
@@ -988,17 +977,11 @@ def _heckl_transmission_loss(
     :math:`\log_{10} f` across the two
     gaps, as Bies Figure 7.9(b) draws them.
     """
-    z0 = air_density * speed_of_sound
+    z0 = fluid.density * fluid.speed_of_sound
 
     def mass_law(freq: np.ndarray) -> np.ndarray:
         return (
-            mass_law_transmission_loss(
-                freq,
-                m2,
-                incidence="normal",
-                speed_of_sound=speed_of_sound,
-                air_density=air_density,
-            )
+            mass_law_transmission_loss(freq, m2, incidence="normal", fluid=fluid)
             - correction
         )
 
@@ -1052,8 +1035,7 @@ def orthotropic_transmission_loss(
     area: float | None = None,
     limiting_angle: float = 78.0,
     band: str = "third",
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> SoundReductionResult:
     r"""Orthotropic-panel sound reduction index (Vigran 6.5.3, Bies 7.2.4.5).
 
@@ -1129,8 +1111,8 @@ def orthotropic_transmission_loss(
         routes.
     :param band: Band width for the field correction of the Heckl mass-law
         branch (``"third"``/``"octave"``).
-    :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
-    :param air_density: Air density ``rho0`` (Default: 1.205 kg/m^3).
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid` (Default:
+        :data:`PUBLISHED_AIR`, the air these models are published with).
     :return: A :class:`SoundReductionResult` (model ``"orthotropic-integral"``
         or ``"orthotropic-heckl"``) carrying ``fc1`` in
         :attr:`~SoundReductionResult.critical_frequency` and ``fc2`` in
@@ -1147,8 +1129,8 @@ def orthotropic_transmission_loss(
         msg = "'critical_frequency_upper' must exceed 'critical_frequency_lower'."
         raise ValueError(msg)
     eta = require_positive(loss_factor, "loss_factor")
-    c0 = require_positive(speed_of_sound, "speed_of_sound")
-    rho0 = require_positive(air_density, "air_density")
+    c0 = fluid.speed_of_sound
+    rho0 = fluid.density
     # Validated on both routes, so that an out-of-range argument is rejected
     # whichever method it was passed with, even where the method ignores it.
     if area is not None:
@@ -1172,8 +1154,7 @@ def orthotropic_transmission_loss(
             m2,
             fc1,
             fc2,
-            speed_of_sound=c0,
-            air_density=rho0,
+            fluid=fluid,
             correction=field_incidence_correction(band),
         )
         return SoundReductionResult(
@@ -1215,8 +1196,7 @@ def mass_spring_mass_resonance(
     *,
     cavity_medium: PorousMediumResult | None = None,
     tie_stiffness_per_area: float = 0.0,
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> float:
     r"""Mass-spring-mass resonance ``f0`` of a double wall (Bies Eq. 7.62).
 
@@ -1242,8 +1222,8 @@ def mass_spring_mass_resonance(
         modulus sets the cavity stiffness.
     :param tie_stiffness_per_area: Stiffness per unit area :math:`N k / S` of a
         connection array bridging the cavity, in N/m^3 (>= 0, Default: 0).
-    :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
-    :param air_density: Air density ``rho0`` (Default: 1.205 kg/m^3).
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid` (Default:
+        :data:`PUBLISHED_AIR`, the air these models are published with).
     :return: The mass-spring-mass resonance ``f0``, in hertz.
     :raises ValueError: for a non-positive input.
     """
@@ -1251,8 +1231,8 @@ def mass_spring_mass_resonance(
     m2 = require_positive(mass2, "mass2")
     d = require_positive(gap, "gap")
     ties = require_non_negative(tie_stiffness_per_area, "tie_stiffness_per_area")
-    c0 = require_positive(speed_of_sound, "speed_of_sound")
-    rho0 = require_positive(air_density, "air_density")
+    c0 = fluid.speed_of_sound
+    rho0 = fluid.density
     if cavity_medium is None:
         stiffness = rho0 * c0**2 / d
     else:
@@ -1277,8 +1257,7 @@ def double_wall_transmission_loss(
     cavity_medium: PorousMediumResult | None = None,
     tie_stiffness_per_area: float = 0.0,
     band: str = "third",
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
+    fluid: Fluid = PUBLISHED_AIR,
 ) -> SoundReductionResult:
     r"""Sound reduction index of a double wall (Bies 7.2.6, Eq. 7.64).
 
@@ -1304,8 +1283,8 @@ def double_wall_transmission_loss(
     :param tie_stiffness_per_area: Stiffness per unit area :math:`N k / S` of a
         connection array bridging the cavity, in N/m^3 (>= 0, Default: 0).
     :param band: Band width for the field correction (``"third"``/``"octave"``).
-    :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
-    :param air_density: Air density ``rho0`` (Default: 1.205 kg/m^3).
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid` (Default:
+        :data:`PUBLISHED_AIR`, the air these models are published with).
     :return: A :class:`SoundReductionResult` (model ``"double-wall"``).
     :raises ValueError: for a non-positive input.
     """
@@ -1313,8 +1292,7 @@ def double_wall_transmission_loss(
     m2 = require_positive(mass2, "mass2")
     d = require_positive(gap, "gap")
     require_positive(loss_factor, "loss_factor")
-    c0 = require_positive(speed_of_sound, "speed_of_sound")
-    rho0 = require_positive(air_density, "air_density")
+    c0 = fluid.speed_of_sound
     f = _band_axis(frequency)
 
     f0 = mass_spring_mass_resonance(
@@ -1323,8 +1301,7 @@ def double_wall_transmission_loss(
         d,
         cavity_medium=cavity_medium,
         tie_stiffness_per_area=tie_stiffness_per_area,
-        speed_of_sound=c0,
-        air_density=rho0,
+        fluid=fluid,
     )
     f_l = c0 / (2.0 * np.pi * d)
 
@@ -1334,8 +1311,7 @@ def double_wall_transmission_loss(
             mass,
             incidence="field",
             band=band,
-            speed_of_sound=c0,
-            air_density=rho0,
+            fluid=fluid,
         )
 
     tl = np.empty_like(f)

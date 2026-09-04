@@ -28,6 +28,7 @@ import numpy as np
 import pytest
 
 from phonometry import building
+from phonometry.fluids import Fluid
 
 # ---------------------------------------------------------------------------
 # Printed oracles
@@ -56,6 +57,16 @@ FIG_4_35_FMSM_TIED = 50.0
 #: such throughout Chapter 4; expressed as the density that goes with
 #: c0 = 343 m/s so it can be handed to the library's air-stiffness term.
 HOPKINS_AIR_DENSITY = 1.42e5 / 343.0**2
+
+#: The same, as the `Fluid` the models take.
+HOPKINS_AIR = Fluid(
+    temperature_c=20.0,
+    static_pressure_pa=101_325.0,
+    composition={},
+    model="Hopkins, rho0 c0^2 = 1,42e5 Pa at c0 = 343 m/s",
+    validity="",
+    properties={"speed_of_sound": 343.0, "density": HOPKINS_AIR_DENSITY},
+)
 
 
 # ---------------------------------------------------------------------------
@@ -121,7 +132,7 @@ def test_fig_4_35_untied_resonance() -> None:
         FIG_4_35_SURFACE_DENSITY,
         FIG_4_35_SURFACE_DENSITY,
         FIG_4_35_CAVITY_DEPTH,
-        air_density=HOPKINS_AIR_DENSITY,
+        fluid=HOPKINS_AIR,
     )
     assert f0 == pytest.approx(26.17, abs=0.02)
     assert round(f0) == FIG_4_35_FMSM_UNTIED
@@ -141,7 +152,7 @@ def test_fig_4_35_tied_resonance() -> None:
         FIG_4_35_SURFACE_DENSITY,
         FIG_4_35_CAVITY_DEPTH,
         tie_stiffness_per_area=ties,
-        air_density=HOPKINS_AIR_DENSITY,
+        fluid=HOPKINS_AIR,
     )
     assert f0 == pytest.approx(49.94, abs=0.02)
     assert round(f0) == FIG_4_35_FMSM_TIED

@@ -37,6 +37,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   Nothing else moved: the conformance evidence reproduces to the digit, 619 of
   619 checks across 62 domains.
 
+- The same rule reaches `building` and `simulation`. Nine `building` entry
+  points, `mass_law_transmission_loss`, `orthotropic_transmission_loss`,
+  `in_situ_element` and `in_situ_total_loss_factor` among them, and
+  `simulation.far_field_from_contour`, take a `Fluid` where they took a speed of
+  sound and a density side by side. `helmholtz_resonance_frequency` keeps its
+  scalar, since a resonance of a neck and a cavity needs only the speed of
+  sound.
+
+  Each domain publishes the air it is written around rather than repeating the
+  numbers: `building.EN_12354_AIR` is the 340 m/s of EN/ISO 12354 Annex A with
+  the 1,29 kg/m³ of Annex B, and `simulation.SIMULATION_AIR` is the `AIR`
+  material the solvers run in, written as a fluid. Both are `Fluid` values, so
+  a caller who has measured their air passes it instead.
+
+  A plate immersed in water is what showed the argument was never "the air":
+  two elastic-solver tests hand `mass_law_transmission_loss` the water they
+  integrate, and now say so.
+
+  Nothing moved: the conformance evidence reproduces to the digit.
+
 - A `Fluid` requires every property it carries to be a positive finite number,
   and every composition fraction to be finite and not negative, since dry air
   has no water vapour. Ten models used to re-check the same three or four floats

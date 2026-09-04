@@ -152,6 +152,20 @@ def _chk_corrugated_plate_mode_22() -> Outcome:
     return numeric(102.0, f22, 0.1, unit="Hz", places=2)
 
 
+#: The air Bies works in for the Heckl branches: the density that puts the
+#: characteristic impedance at the 414 N s/m3 those equations are written with,
+#: at the 343 m/s of the same appendix. Built here rather than imported, so the
+#: row stays an oracle independent of the library's own air.
+_BIES_414_AIR = ph.fluids.Fluid(
+    temperature_c=20.0,
+    static_pressure_pa=101_325.0,
+    composition={},
+    model="Bies 5e Appendix D, the air giving rho c = 414 N s/m3",
+    validity="",
+    properties={"speed_of_sound": 343.0, "density": 414.0 / 343.0},
+)
+
+
 @register(
     _PANEL,
     "Bies 5e Eq. (7.59) / Vigran Eq. (6.112)",
@@ -166,7 +180,7 @@ def _chk_heckl_coincidence_constant() -> Outcome:
             critical_frequency_lower=fc1,
             critical_frequency_upper=fc2,
             method="heckl",
-            air_density=414.0 / 343.0,
+            fluid=_BIES_414_AIR,
         ).transmission_loss[0]
     )
     constant = (
@@ -193,7 +207,7 @@ def _chk_heckl_recovery_constant() -> Outcome:
             critical_frequency_lower=fc1,
             critical_frequency_upper=fc2,
             method="heckl",
-            air_density=414.0 / 343.0,
+            fluid=_BIES_414_AIR,
         ).transmission_loss[0]
     )
     constant = (

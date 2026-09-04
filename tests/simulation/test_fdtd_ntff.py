@@ -57,6 +57,7 @@ import pytest
 from scipy.special import hankel2
 
 from phonometry import materials
+from phonometry.fluids import Fluid
 from phonometry.materials import (
     metadiffuser_polar_response,
     metadiffuser_reflection,
@@ -537,8 +538,24 @@ def test_far_field_input_validation() -> None:
         far_field_from_contour(phasors, [0.0], distance=0.01)
     with pytest.raises(ValueError, match=r"distance must be positive and finite"):
         far_field_from_contour(phasors, [0.0], distance=-1.0)
-    with pytest.raises(ValueError, match=r"speed_of_sound must be positive and finite"):
-        far_field_from_contour(phasors, [0.0], speed_of_sound=0.0)
+
+
+def test_a_fluid_with_no_speed_of_sound_is_refused_by_the_fluid() -> None:
+    """The guard on the speed of sound moved to the type that owns it.
+
+    ``far_field_from_contour`` used to check ``speed_of_sound`` itself. It
+    takes a `Fluid` now, which refuses a non-positive property on
+    construction, so the refusal happens a step earlier.
+    """
+    with pytest.raises(ValueError, match=r"'properties\['speed_of_sound'\]'"):
+        Fluid(
+            temperature_c=20.0,
+            static_pressure_pa=101_325.0,
+            composition={},
+            model="an air that carries no speed of sound",
+            validity="",
+            properties={"speed_of_sound": 0.0, "density": 1.2},
+        )
 
 
 def test_contour_phasors_subtract_mismatch() -> None:

@@ -41,6 +41,7 @@ import pytest
 from scipy.signal import hilbert
 
 from phonometry.building.prediction.panel_transmission import mass_law_transmission_loss
+from phonometry.fluids import Fluid
 from phonometry.simulation import (
     AIR,
     ALUMINIUM,
@@ -50,6 +51,17 @@ from phonometry.simulation import (
     ExplosionSource,
     Material,
     scholte_speed,
+)
+
+#: The nominal water as a fluid, for the mass law: the plate here is
+#: immersed, so the medium either side of it is water, not air.
+WATER_FLUID = Fluid(
+    temperature_c=20.0,
+    static_pressure_pa=101_325.0,
+    composition={},
+    model="the water this simulation integrates",
+    validity="",
+    properties={"speed_of_sound": WATER.c_p, "density": WATER.rho},
 )
 
 #: The van Vossen et al. (2002) benchmark media (their METHOD section).
@@ -414,8 +426,7 @@ def test_immersed_plate_transmission_and_thickness_resonance() -> None:
             10e3,
             STEEL.rho * h,
             incidence="normal",
-            speed_of_sound=WATER.c_p,
-            air_density=WATER.rho,
+            fluid=WATER_FLUID,
         )
     )
     assert tl_10k == pytest.approx(tl_mass_law, abs=1.0)
