@@ -175,12 +175,12 @@ from phonometry import noise_control
 
 CFM, IN_CA = 0.0004719474432, 249.0
 
-ventilador = noise_control.fan_sound_power(volume_flow=5000 * CFM, static_pressure=2 * IN_CA,
-                                           fan_type="forward_curved", relative_efficiency=80.0)
+ventilador = noise_control.fan_sound_power(volume_flow=5000 * CFM, fan_static_pressure_pa=2 * IN_CA,
+                                           fan_type="forward_curved", relative_efficiency_percent=80.0)
 print([round(float(v)) for v in ventilador.values])
 # [99, 99, 89, 84, 82, 77, 72, 67]
 
-print(noise_control.fan_efficiency_correction(80.0))          # 6.0 dB fuera del máximo
+print(noise_control.fan_efficiency_correction(relative_efficiency_percent=80.0))          # 6.0 dB fuera del máximo
 print(noise_control.blade_passing_frequency(1200.0, 24))      # 480.0 Hz, en la banda de 500 Hz
 print(noise_control.fan_casing_attenuation().values)          # lo que retiene la carcasa
 # [ 0.  0.  5. 10. 15. 20. 22. 25.]
@@ -261,16 +261,16 @@ import matplotlib.pyplot as plt
 
 # `fan_sound_power`, `fan_casing_attenuation` y `fan_efficiency_correction`
 # están importados arriba; CFM e IN_CA son las dos constantes de unidades.
-servicio = dict(volume_flow=5000 * CFM, static_pressure=2 * IN_CA,
+servicio = dict(volume_flow=5000 * CFM, fan_static_pressure_pa=2 * IN_CA,
                 fan_type="forward_curved")
 
 # Una línea para un ventilador: el espectro por bandas.
-noise_control.fan_sound_power(relative_efficiency=80.0, **servicio).plot(language="es")
+noise_control.fan_sound_power(relative_efficiency_percent=80.0, **servicio).plot(language="es")
 plt.show()
 
 fig, ax = plt.subplots()
 for rendimiento in (90.0, 80.0, 55.0):
-    res = noise_control.fan_sound_power(relative_efficiency=rendimiento, **servicio)
+    res = noise_control.fan_sound_power(relative_efficiency_percent=rendimiento, **servicio)
     ax.semilogx(res.frequencies, res.values, "o-",
                 label=f"{rendimiento:.0f} % del máximo")
 carcasa = noise_control.fan_casing_attenuation()

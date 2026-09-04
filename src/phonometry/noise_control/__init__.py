@@ -29,6 +29,7 @@ from .enclosures import (
 )
 from .hvac import (
     HvacSpectrumResult,
+    HvacWarning,
     air_terminal_damper_correction,
     air_terminal_velocity_limit,
     blade_passing_frequency,
@@ -85,6 +86,7 @@ __all__ = [
     "DuctPathStage",
     "EnclosureResult",
     "HvacSpectrumResult",
+    "HvacWarning",
     "PlaneWaveWarning",
     "ReactiveSilencerResult",
     "RoomToRoomResult",

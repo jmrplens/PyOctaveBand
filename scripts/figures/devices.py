@@ -9,6 +9,7 @@ under ``devices/``.
 """
 
 import re
+import warnings
 from typing import TYPE_CHECKING, Any
 
 import matplotlib.pyplot as plt
@@ -3750,9 +3751,9 @@ def generate_duct_sheet_verification(output_dir: str) -> None:
 
     fan = noise_control.fan_sound_power(
         volume_flow=5000 * cfm,
-        static_pressure=2 * in_wg,
+        fan_static_pressure_pa=2 * in_wg,
         fan_type="forward_curved",
-        relative_efficiency=80.0,
+        relative_efficiency_percent=80.0,
     )
     flex = hvac.flexible_duct_insertion_loss(
         bands[:7], diameter=12 * inch, length=6 * foot
@@ -3948,9 +3949,9 @@ def generate_fan_sound_power(output_dir: str) -> None:
     ):
         fan = noise_control.fan_sound_power(
             volume_flow,
-            static_pressure,
+            fan_static_pressure_pa=static_pressure,
             fan_type=fan_type,
-            relative_efficiency=efficiency,
+            relative_efficiency_percent=efficiency,
         )
         ax.semilogx(
             np.asarray(fan.frequencies),
@@ -3961,13 +3962,13 @@ def generate_fan_sound_power(output_dir: str) -> None:
             marker="o",
             ms=4,
             label=f"{efficiency:.0f} % of peak static efficiency "
-            f"(+{noise_control.fan_efficiency_correction(efficiency):.0f} dB)",
+            f"(+{noise_control.fan_efficiency_correction(relative_efficiency_percent=efficiency):.0f} dB)",
         )
     tone = noise_control.fan_sound_power(
         volume_flow,
-        static_pressure,
+        fan_static_pressure_pa=static_pressure,
         fan_type=fan_type,
-        relative_efficiency=80.0,
+        relative_efficiency_percent=80.0,
         blade_frequency=2000.0,
     )
     # The same fan again, so the same colour: what changed is the blade tone,
@@ -4020,12 +4021,19 @@ def generate_fan_sound_power(output_dir: str) -> None:
 
     inset = ax.inset_axes((0.07, 0.22, 0.33, 0.26))
     grid = np.linspace(40.0, 100.0, 400)
-    inset.plot(
-        grid,
-        [noise_control.fan_efficiency_correction(v) for v in grid],
-        color=COLOR_PRIMARY,
-        lw=1.8,
-    )
+    # The inset exists to show the staircase below the 50 % floor Table 13.6 is
+    # tabulated from, which is exactly what HvacWarning is there to flag. The
+    # warning is aimed at a caller who passed a fraction where a percentage was
+    # wanted, not at a figure drawing the extrapolation on purpose, so it is
+    # silenced here and nowhere wider: a warnings-as-errors run would otherwise
+    # stop before writing the asset.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", noise_control.HvacWarning)
+        corrections = [
+            noise_control.fan_efficiency_correction(relative_efficiency_percent=v)
+            for v in grid
+        ]
+    inset.plot(grid, corrections, color=COLOR_PRIMARY, lw=1.8)
     inset.set_xlabel("static efficiency [% of peak]", fontsize="x-small")
     inset.set_ylabel("$C_{\\mathrm{EFF}}$ [dB]", fontsize="x-small")
     inset.tick_params(labelsize="x-small")

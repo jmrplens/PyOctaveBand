@@ -172,12 +172,12 @@ from phonometry import noise_control
 
 CFM, IN_WG = 0.0004719474432, 249.0
 
-fan = noise_control.fan_sound_power(volume_flow=5000 * CFM, static_pressure=2 * IN_WG,
-                                    fan_type="forward_curved", relative_efficiency=80.0)
+fan = noise_control.fan_sound_power(volume_flow=5000 * CFM, fan_static_pressure_pa=2 * IN_WG,
+                                    fan_type="forward_curved", relative_efficiency_percent=80.0)
 print([round(float(v)) for v in fan.values])
 # [99, 99, 89, 84, 82, 77, 72, 67]
 
-print(noise_control.fan_efficiency_correction(80.0))          # 6.0 dB off the peak
+print(noise_control.fan_efficiency_correction(relative_efficiency_percent=80.0))          # 6.0 dB off the peak
 print(noise_control.blade_passing_frequency(1200.0, 24))      # 480.0 Hz, in the 500 Hz band
 print(noise_control.fan_casing_attenuation().values)          # what the housing holds back
 # [ 0.  0.  5. 10. 15. 20. 22. 25.]
@@ -250,16 +250,16 @@ import matplotlib.pyplot as plt
 
 # `fan_sound_power`, `fan_casing_attenuation` and `fan_efficiency_correction`
 # are imported above; CFM and IN_WG are the two unit constants.
-duty = dict(volume_flow=5000 * CFM, static_pressure=2 * IN_WG,
+duty = dict(volume_flow=5000 * CFM, fan_static_pressure_pa=2 * IN_WG,
             fan_type="forward_curved")
 
 # One line for one fan: the band spectrum.
-noise_control.fan_sound_power(relative_efficiency=80.0, **duty).plot()
+noise_control.fan_sound_power(relative_efficiency_percent=80.0, **duty).plot()
 plt.show()
 
 fig, ax = plt.subplots()
 for efficiency in (90.0, 80.0, 55.0):
-    res = noise_control.fan_sound_power(relative_efficiency=efficiency, **duty)
+    res = noise_control.fan_sound_power(relative_efficiency_percent=efficiency, **duty)
     ax.semilogx(res.frequencies, res.values, "o-",
                 label=f"{efficiency:.0f} % of peak")
 casing = noise_control.fan_casing_attenuation()

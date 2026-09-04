@@ -774,6 +774,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `phonometry.noise_control` publishes `HvacWarning`. It fires whenever a
+  relative efficiency lands below the 50 % floor Long Table 13.6 is tabulated
+  from, and it was the one warning class in the library a package could raise
+  and no package published, while its sibling `PlaneWaveWarning` was exported
+  beside it. A caller could see the warning and could not write the
+  `filterwarnings` rule for it; only the blanket `PhonometryWarning` rule
+  reached it, and that one silences twenty-six others too. An architecture test
+  now fails on any warning class a package can raise and does not publish.
+
+- The fan's pressure rise says what it is: `fan_sound_power`'s second argument
+  is `fan_static_pressure_pa`, keyword-only. It is a **gauge** pressure rise in
+  **pascals**, and it shared its name with the `static_pressure` the ISO 3740
+  family takes in **kilopascals absolute** — a different quantity, a different
+  unit and a different datum under one word.
+
+  No guard can separate those two, which is why the fix is the name. A fan
+  pressure of 101 325 Pa is a legitimate duty for a panel or propeller fan, so
+  no plausibility band exists that would refuse the ambient value without also
+  refusing a real operating point.
+
+  The rename went first, before the medium migration reads the tree, so that
+  `static_pressure` means one quantity when it does. Its usefulness showed up
+  immediately: a blanket rename across the figure scripts caught two calls to
+  `sound_power_reverberation` in the same file, which are the ambient kPa. One
+  word for two quantities confuses even the person removing the confusion.
+
+- `fan_efficiency_correction` takes `relative_efficiency_percent`, and warns
+  below the 50 % floor Long Table 13.6 is tabulated from. Eighty per cent is
+  `80`, not `0,8`; a caller who wrote the fraction fell into the table's
+  catch-all bottom row and got its worst-case 16 dB correction where 80 % earns
+  6, which is ten decibels on the sound power level with nothing on the page to
+  say it happened. The value is unchanged, because the
+  table is what it is; what changed is that the caller is told.
+
 - Two errata registered against Ainslie (2010). Its folio 177 quotes
   1024,2 kg/m3 for sea water at 23 degC, salinity 35 and atmospheric pressure,
   where its own Equation (4.6) read with its own Equation (4.4) gives

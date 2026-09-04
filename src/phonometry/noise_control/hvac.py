@@ -74,6 +74,7 @@ end-to-end fan-to-room calculation.
 from __future__ import annotations
 
 import math
+import warnings
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -86,6 +87,7 @@ from .._internal.validation import (
     require_ranks,
     require_same_length,
 )
+from .._internal.warnings import PhonometryWarning
 from ..room.steady_field import room_constant
 
 if TYPE_CHECKING:
@@ -855,7 +857,19 @@ def blade_passing_frequency(rotational_speed: float, blades: int) -> float:
     return rpm * float(blades) / 60.0
 
 
-def fan_efficiency_correction(relative_efficiency: float) -> float:
+class HvacWarning(PhonometryWarning):
+    """An HVAC input outside the span the table it feeds was tabulated from."""
+
+
+#: The lowest relative efficiency Long Table 13.6 tabulates, in per cent.
+#: Below it the table has one catch-all row, which is also where a caller who
+#: passed a fraction rather than a percentage lands. That landing is what
+#: :class:`HvacWarning` announces, since the two cases are indistinguishable
+#: from the value alone.
+_TABLE_13_6_FLOOR_PERCENT = 50.0
+
+
+def fan_efficiency_correction(*, relative_efficiency_percent: float) -> float:
     """Off-peak efficiency correction ``C_EFF`` (Long Table 13.6).
 
     A fan running away from its peak static efficiency is noisier at the same
@@ -865,15 +879,28 @@ def fan_efficiency_correction(relative_efficiency: float) -> float:
     efficiency is unknown Long recommends assuming 80 per cent, which lands in
     the 6 dB step.
 
-    :param relative_efficiency: Static efficiency as a percentage of the peak,
-        in ``(0, 100]``.
+    :param relative_efficiency_percent: Static efficiency as a **percentage**
+        of the peak, in ``(0, 100]``. A fraction is not accepted in disguise:
+        the table is tabulated from 50 % up, so 0,8 would fall to its bottom
+        row and return 16 dB where 80 % returns 6, ten decibels with nothing to
+        say it happened. Below 50 % the caller is warned that the value is
+        outside the span Table 13.6 tabulates.
     :return: The correction ``C_EFF``, dB.
     :raises ValueError: If the efficiency is not in ``(0, 100]``.
     """
-    eta = require_positive(relative_efficiency, "relative_efficiency")
+    eta = require_positive(relative_efficiency_percent, "relative_efficiency_percent")
     if eta > 100.0:  # noqa: PLR2004
-        msg = "'relative_efficiency' must not exceed 100 per cent."
+        msg = "'relative_efficiency_percent' must not exceed 100 per cent."
         raise ValueError(msg)
+    if eta < _TABLE_13_6_FLOOR_PERCENT:
+        warnings.warn(
+            f"A relative efficiency of {eta:g} % is below the 50 % floor Long "
+            f"Table 13.6 is tabulated from, so the table's worst-case "
+            f"correction is returned. A fraction such as 0,8 lands here; this "
+            f"argument is a percentage.",
+            HvacWarning,
+            stacklevel=2,
+        )
     for lower, correction in _EFFICIENCY_CORRECTION:
         if eta >= lower:
             return correction
@@ -882,10 +909,10 @@ def fan_efficiency_correction(relative_efficiency: float) -> float:
 
 def fan_sound_power(
     volume_flow: float,
-    static_pressure: float,
     *,
+    fan_static_pressure_pa: float,
     fan_type: str = "forward_curved",
-    relative_efficiency: float = 80.0,
+    relative_efficiency_percent: float = 80.0,
     blade_frequency: float | None = None,
     frequencies: ArrayLike | None = None,
 ) -> HvacSpectrumResult:
@@ -919,7 +946,13 @@ def fan_sound_power(
     module warning.
 
     :param volume_flow: Volume flow through the fan ``Q_\mathrm{F}``, m3/s.
-    :param static_pressure: Fan static pressure ``P_\mathrm{F}``, Pa (gauge).
+    :param fan_static_pressure_pa: Fan static pressure ``P_\mathrm{F}``, in
+        **pascals gauge**. This is the pressure rise the fan produces across
+        itself, not an ambient pressure, and it shares neither the unit nor the
+        datum of the ``static_pressure`` the ISO 3740 family takes in
+        kilopascals absolute. No plausibility guard can separate the two:
+        101,325 Pa is a legitimate duty for a panel or propeller fan, so the
+        name is what keeps them apart.
     :param fan_type: One of ``"airfoil_large"`` / ``"airfoil_small"``
         (backward-curved or backward-inclined centrifugal wheels above and
         below 36 in diameter), ``"forward_curved"``, ``"radial_low"`` /
@@ -928,8 +961,12 @@ def fan_sound_power(
         ``"vaneaxial_hub_high"`` (hub ratios 0.3-0.4, 0.4-0.6 and 0.6-0.8),
         ``"tubeaxial_large"`` / ``"tubeaxial_small"`` (above and below 40 in
         wheel diameter) or ``"propeller"``.
-    :param relative_efficiency: Static efficiency as a percentage of the peak
-        (default 80, Long's recommendation when the peak is unknown).
+    :param relative_efficiency_percent: Static efficiency as a **percentage**
+        of the peak (default 80, Long's recommendation when the peak is
+        unknown). Table 13.6 is tabulated from 50 % up, so a fraction such as
+        0,8 falls through to the table's bottom row and returns its worst-case
+        16 dB correction instead of the 6 dB that 80 % earns. That is what
+        :class:`HvacWarning` says when it fires below the floor.
     :param blade_frequency: Blade passing frequency ``f_bp``, Hz (from
         :func:`blade_passing_frequency`). ``None`` (default) places the
         increment in the octave band Table 13.7 tabulates for the fan type.
@@ -940,11 +977,13 @@ def fan_sound_power(
     """
     kind = require_choice(fan_type, "fan_type", tuple(_FAN_LEVEL_CORRECTION))
     q = require_positive(volume_flow, "volume_flow")
-    p = require_positive(static_pressure, "static_pressure")
+    p = require_positive(fan_static_pressure_pa, "fan_static_pressure_pa")
     f, idx = _octave_slots(frequencies)
 
     duty = 10.0 * np.log10(q * 1000.0 / 0.472) + 10.0 * np.log10(p / _PA_PER_IN_WG)
-    c_eff = fan_efficiency_correction(relative_efficiency)
+    c_eff = fan_efficiency_correction(
+        relative_efficiency_percent=relative_efficiency_percent
+    )
     band, c_bfi = _FAN_BLADE_INCREMENT[kind]
     if blade_frequency is not None:
         f_bp = require_positive(blade_frequency, "blade_frequency")

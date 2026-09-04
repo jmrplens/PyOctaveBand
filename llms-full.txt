@@ -19646,12 +19646,12 @@ from phonometry import noise_control
 
 CFM, IN_WG = 0.0004719474432, 249.0
 
-fan = noise_control.fan_sound_power(volume_flow=5000 * CFM, static_pressure=2 * IN_WG,
-                                    fan_type="forward_curved", relative_efficiency=80.0)
+fan = noise_control.fan_sound_power(volume_flow=5000 * CFM, fan_static_pressure_pa=2 * IN_WG,
+                                    fan_type="forward_curved", relative_efficiency_percent=80.0)
 print([round(float(v)) for v in fan.values])
 # [99, 99, 89, 84, 82, 77, 72, 67]
 
-print(noise_control.fan_efficiency_correction(80.0))          # 6.0 dB off the peak
+print(noise_control.fan_efficiency_correction(relative_efficiency_percent=80.0))          # 6.0 dB off the peak
 print(noise_control.blade_passing_frequency(1200.0, 24))      # 480.0 Hz, in the 500 Hz band
 print(noise_control.fan_casing_attenuation().values)          # what the housing holds back
 # [ 0.  0.  5. 10. 15. 20. 22. 25.]
@@ -36962,8 +36962,9 @@ documents, one page per module.
 | `plot_plenum_geometry` | `function` | **Plenum section honouring r and θ exactly.**<br>• `exit_area` S_out [m²], `line_of_sight` r [m], `wall_area` S_w [m²]<br>• `angle` θ [rad] (Default: 0)<br>• `language` | `plot_plenum_geometry(0.09, 1.2, 6.0, angle=0.35)`<br><br>• Box fixed by r/θ, S_out mouth to scale, S_w annotated |
 | `flow_noise_straight_duct` / `flow_noise_bend` | `function` | **HVAC flow-generated (self) noise sound power (VDI 2081, Bies Eqs. 8.251/8.254).**<br>• `frequencies`, `flow_velocity`, `area` (+ `height` for the bend) | `flow_noise_straight_duct(bands, 10.0, 0.04)`<br><br>• `HvacSpectrumResult` |
 | `HvacSpectrumResult` | `dataclass` | **Per-frequency HVAC attenuation or regenerated Lw.**<br>• `frequencies`, `values`, `quantity`, `label`<br>• `.plot()` | `res.values` |
-| `fan_sound_power` | `function` | **Octave-band fan sound power from the operating point (Long Eq. 13.1; ASHRAE 1987).**<br>• `volume_flow` Q [m³/s], `static_pressure` P [Pa]<br>• `fan_type` (Table 13.5 rows: `'forward_curved'`, `'airfoil_large'`, `'radial_high'`, `'vaneaxial_hub_low'`, `'tubeaxial_small'`, `'propeller'` …)<br>• `relative_efficiency` [% of peak] (Default: 80 → C_EFF 6 dB), `blade_frequency`, `frequencies` | `fan_sound_power(2.36, 498.0)`<br><br>• `HvacSpectrumResult`; prefer AMCA 300 manufacturer data |
-| `fan_efficiency_correction` / `blade_passing_frequency` / `fan_casing_attenuation` | `function` | **The three side terms of the fan model (Long Tables 13.6/13.7/13.8, Eq. 13.4).**<br>• `fan_efficiency_correction(relative_efficiency)` → C_EFF [dB]<br>• `blade_passing_frequency(rotational_speed, blades)` = rpm·N/60 [Hz]<br>• `fan_casing_attenuation(frequencies)` → casing-radiated attenuation | `blade_passing_frequency(1200.0, 12)  # 240 Hz` |
+| `fan_sound_power` | `function` | **Octave-band fan sound power from the operating point (Long Eq. 13.1; ASHRAE 1987).**<br>• `volume_flow` Q [m³/s], `fan_static_pressure_pa` P [Pa gauge]<br>• `fan_type` (Table 13.5 rows: `'forward_curved'`, `'airfoil_large'`, `'radial_high'`, `'vaneaxial_hub_low'`, `'tubeaxial_small'`, `'propeller'` …)<br>• `relative_efficiency_percent` [% of peak] (Default: 80 → C_EFF 6 dB), `blade_frequency`, `frequencies` | `fan_sound_power(2.36, fan_static_pressure_pa=498.0)`<br><br>• `HvacSpectrumResult`; prefer AMCA 300 manufacturer data |
+| `fan_efficiency_correction` / `blade_passing_frequency` / `fan_casing_attenuation` | `function` | **The three side terms of the fan model (Long Tables 13.6/13.7/13.8, Eq. 13.4).**<br>• `fan_efficiency_correction(relative_efficiency_percent=80.0)` → C_EFF [dB] (6,0 at 80 %)<br>• `blade_passing_frequency(rotational_speed, blades)` = rpm·N/60 [Hz]<br>• `fan_casing_attenuation(frequencies)` → casing-radiated attenuation | `blade_passing_frequency(1200.0, 12)  # 240 Hz` |
+| `HvacWarning` | `warning class` | **A relative efficiency below the 50 % floor Long Table 13.6 is tabulated from.**<br>The table's worst-case row is returned, which is where a caller who passed a fraction such as 0,8 instead of 80 also lands; the two are indistinguishable from the value alone | `warnings.simplefilter("error", noise_control.HvacWarning)` |
 | `unlined_rectangular_duct_attenuation` / `unlined_circular_duct_attenuation` | `function` | **Straight unlined sheet-metal duct attenuation (Long Eqs. 14.9-14.11, Table 14.1).**<br>• rectangular: `frequencies`, `width`, `height`, `length`, `wrapped` (fibreglass blanket doubles 63-250 Hz)<br>• circular: `frequencies`, `length` (about a tenth of the rectangular loss) | `unlined_rectangular_duct_attenuation(bands, 0.9, 0.6, 1.5)`<br><br>• `HvacSpectrumResult` |
 | `lined_rectangular_duct_attenuation` / `lined_circular_duct_attenuation` | `function` | **Lined-duct insertion loss, Reynolds (1990) regressions (Long Eqs. 14.12/14.13, Tables 14.2/14.3).**<br>• rectangular: `frequencies`, `width`, `height`, `length`, `lining_thickness`, `include_unlined`<br>• circular: `frequencies`, `diameter`, `length`, `lining_thickness`<br>• Flanking caps a run at 40 dB | `lined_rectangular_duct_attenuation(None, 0.46, 0.30, 1.8, 0.025)` |
 | `flexible_duct_insertion_loss` | `function` | **Lined round flexible duct IL (Long Table 14.4, ASHRAE 1995), 63 Hz-4 kHz.**<br>• `frequencies`, `diameter` (100-406 mm), `length` (0.9-3.7 m)<br>• Interpolated over length and log diameter | `flexible_duct_insertion_loss(None, 0.305, 1.8)` |
