@@ -721,9 +721,10 @@ def layered_absorber(
         excluded).
     :param termination: ``"rigid"`` (default), ``"free"``, or a non-zero
         complex impedance (scalar or per-frequency array), in Pa s/m.
-    :param speed_of_sound: Speed of sound ``c`` in air, in m/s.
-    :param air_density: Air density ``rho``, in kg/m3.
-    :param viscosity: Dynamic viscosity of air, in Pa s (sheet layers).
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid`
+        (Default: :data:`PUBLISHED_AIR`, the air this model was published
+        with). Pass a computed one, such as ``fluids.air(temperature_c=30.0,
+        relative_humidity_percent=70.0)``, to work in the air of the room.
     :return: A :class:`LayeredAbsorberResult`.
     """
     f = require_positive_array(frequency, "frequency")
@@ -832,9 +833,10 @@ def diffuse_field_absorption(
         (0 < theta_lim <= pi/2; default pi/2).
     :param quadrature_points: Gauss-Legendre order (default 64).
     :param termination: As in :func:`layered_absorber`.
-    :param speed_of_sound: Speed of sound ``c`` in air, in m/s.
-    :param air_density: Air density ``rho``, in kg/m3.
-    :param viscosity: Dynamic viscosity of air, in Pa s.
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid`
+        (Default: :data:`PUBLISHED_AIR`, the air this model was published
+        with). Pass a computed one, such as ``fluids.air(temperature_c=30.0,
+        relative_humidity_percent=70.0)``, to work in the air of the room.
     :return: A :class:`DiffuseFieldAbsorptionResult`.
     """
     f = require_positive_array(frequency, "frequency")

@@ -70,6 +70,31 @@ def test_excess_attenuation_stays_near_the_6_db_bound() -> None:
     assert np.all(np.abs(res.reflection_coefficient) <= 1.15)
 
 
+@pytest.mark.filterwarnings("ignore::phonometry.PhonometryWarning")
+def test_miki_ground_is_softer_than_delany_bazley() -> None:
+    """The second ground model is reachable, and it is a different ground.
+
+    Miki's revision of Delany-Bazley predicts a lower surface impedance at the
+    same flow resistivity: measured across 50 Hz to 5 kHz over a 200 kPa.s/m2
+    ground, between 0.58 and 0.96 of it, everywhere. A softer ground moves the
+    interference dip down, from 481 Hz to 381 Hz here, which is the whole
+    reason to offer the choice.
+    """
+    freqs = np.logspace(np.log10(50.0), np.log10(5000.0), 60)
+    bazley = environment.ground_effect(
+        freqs, 1.0, 2.0, 100.0, flow_resistivity=2e5, model="delany_bazley"
+    )
+    miki = environment.ground_effect(
+        freqs, 1.0, 2.0, 100.0, flow_resistivity=2e5, model="miki"
+    )
+    assert np.all(
+        np.abs(miki.normalized_impedance) < np.abs(bazley.normalized_impedance)
+    )
+    dip_bazley = freqs[np.argmin(bazley.excess_attenuation)]
+    dip_miki = freqs[np.argmin(miki.excess_attenuation)]
+    assert dip_miki < dip_bazley
+
+
 def test_sigma_to_infinity_tends_to_hard_ground() -> None:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")

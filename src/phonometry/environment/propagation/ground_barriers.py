@@ -392,8 +392,10 @@ def ground_effect(
         (it still extrapolates a value there).
     :param model: Porous model for ``flow_resistivity`` (``"delany_bazley"`` or
         ``"miki"``).
-    :param speed_of_sound: Speed of sound ``c``, in m/s.
-    :param air_density: Air density ``rho``, in kg/m3.
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid`
+        (Default: :data:`PUBLISHED_AIR`, the air this model was published
+        with). Pass a computed one, such as ``fluids.air(temperature_c=30.0,
+        relative_humidity_percent=70.0)``, to work in the air of the room.
     :return: A :class:`SphericalGroundResult`.
     :raises ValueError: If neither or both of ``impedance``/``flow_resistivity``
         are given, a height is negative, or the distance is not positive.
@@ -898,8 +900,10 @@ def barrier_insertion_loss(
     :param ground_flow_resistivity: Effective flow resistivity ``sigma``
         (Pa s/m2) for the ground model, as an alternative to ``ground_impedance``.
     :param ground_model: Porous model for ``ground_flow_resistivity``.
-    :param speed_of_sound: Speed of sound ``c``, in m/s.
-    :param air_density: Air density ``rho``, in kg/m3.
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid`
+        (Default: :data:`PUBLISHED_AIR`, the air this model was published
+        with). Pass a computed one, such as ``fluids.air(temperature_c=30.0,
+        relative_humidity_percent=70.0)``, to work in the air of the room.
     :return: A :class:`BarrierInsertionLoss`.
     :raises ValueError: On a non-positive/ordered geometry, or if a ground is
         requested with ``method="kurze_anderson"``.

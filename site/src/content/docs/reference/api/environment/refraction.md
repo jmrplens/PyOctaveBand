@@ -118,7 +118,7 @@ convention.
 | `max_height` | Top of the output height grid, in metres (the receiver region of interest; an absorbing layer is added above it). |
 | `range_step` | Range marching step `dr`, in metres. Default (`None`): one wavelength. |
 | `height_step` | Vertical grid spacing `dz`, in metres. Default (`None`): a tenth of a wavelength (Salomons Sec. G.2). |
-| `air_density` | Air density `rho`, in kg/m3 (for the porous model). |
+| `fluid` | The medium, a [`Fluid`](/phonometry/reference/api/fluids/fluids/#fluid) (Default: [`PUBLISHED_AIR`](/phonometry/reference/api/materials/porous/#published_air), the air this model was published with). Pass a computed one, such as `fluids.air(temperature_c=30.0, relative_humidity_percent=70.0)`, to work in the air of the room. |
 
 **Returns:** An [`AtmosphericPEResult`](/phonometry/reference/api/environment/refraction/#atmosphericperesult).
 

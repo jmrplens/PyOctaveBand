@@ -704,6 +704,47 @@ class TestResonantSheets:
         assert f_ad == pytest.approx(60.0 / np.sqrt(m * d), rel=0.02)
         assert f_iso == pytest.approx(50.0 / np.sqrt(m * d), rel=0.02)
 
+    def test_isothermal_stiffness_uses_the_fluids_own_gamma(self) -> None:
+        """The ratio of specific heats comes from the fluid, not the constant.
+
+        The isothermal branch divides the air-spring stiffness by ``gamma``.
+        Reading the published 1,4 there instead of the fluid's own would return
+        the published air's resonance under the caller's density and speed of
+        sound, which is neither air: warm humid air carries 1,3806, and the
+        0,7 % it moves the frequency by is invisible in the result.
+        """
+        import warnings
+
+        from phonometry import fluids
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            humid = fluids.air(
+                temperature_c=60.0,
+                static_pressure_pa=101_325.0,
+                relative_humidity_percent=90.0,
+            )
+        assert humid.heat_capacity_ratio != PUBLISHED_AIR.heat_capacity_ratio
+
+        m, d = 2.0, 0.05
+        got = membrane_resonance_frequency(
+            surface_density=m, cavity_depth=d, isothermal=True, fluid=humid
+        )
+        expected = np.sqrt(
+            humid.density * humid.speed_of_sound**2 / d / humid.heat_capacity_ratio / m
+        ) / (2.0 * np.pi)
+        assert got == pytest.approx(float(expected), rel=1e-12)
+
+        # And it is not the published-gamma answer, which is what the bug gave.
+        with_published_gamma = np.sqrt(
+            humid.density
+            * humid.speed_of_sound**2
+            / d
+            / PUBLISHED_AIR.heat_capacity_ratio
+            / m
+        ) / (2.0 * np.pi)
+        assert got != pytest.approx(float(with_published_gamma), rel=1e-4)
+
     @pytest.mark.filterwarnings("ignore::phonometry.PhonometryWarning")
     def test_membrane_over_cavity_peaks_at_resonance(self) -> None:
         m, d = 5.0, 0.05

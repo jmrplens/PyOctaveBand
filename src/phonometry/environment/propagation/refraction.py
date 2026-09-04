@@ -706,7 +706,10 @@ def atmospheric_parabolic_equation(
         (``None``): one wavelength.
     :param height_step: Vertical grid spacing ``dz``, in metres. Default
         (``None``): a tenth of a wavelength (Salomons Sec. G.2).
-    :param air_density: Air density ``rho``, in kg/m3 (for the porous model).
+    :param fluid: The medium, a :class:`~phonometry.fluids.Fluid`
+        (Default: :data:`PUBLISHED_AIR`, the air this model was published
+        with). Pass a computed one, such as ``fluids.air(temperature_c=30.0,
+        relative_humidity_percent=70.0)``, to work in the air of the room.
     :return: An :class:`AtmosphericPEResult`.
     :raises ValueError: If the inputs are invalid or the impedance is unspecified.
     """

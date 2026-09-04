@@ -187,3 +187,40 @@ def test_without_a_printed_one_it_closes_from_the_three(reference_air: Fluid) ->
         / (reference_air.density * reference_air.thermal_diffusivity),
         rel=1e-15,
     )
+
+
+@pytest.mark.parametrize(
+    "fraction", [-1e-12, -0.5, float("nan"), float("inf"), float("-inf")]
+)
+def test_a_composition_fraction_that_cannot_exist_is_refused(fraction: float) -> None:
+    """A fraction may be nought; it may not be negative or absent.
+
+    Dry air really does carry no water vapour, so nought passes where a
+    property would be refused. Everything below it, and every non-number,
+    describes a mixture that does not exist, and the refusal happens on
+    construction so that no model downstream has to ask.
+    """
+    with pytest.raises(
+        ValueError, match=r"'composition\['relative_humidity_percent'\]'"
+    ):
+        Fluid(
+            temperature_c=20.0,
+            static_pressure_pa=101_325.0,
+            composition={"relative_humidity_percent": fraction},
+            model="an air with an impossible amount of water in it",
+            validity="",
+            properties={"speed_of_sound": 343.0, "density": 1.2},
+        )
+
+
+def test_a_composition_fraction_of_nought_is_accepted() -> None:
+    """Dry air is a real air, and its water vapour fraction is nought."""
+    dry = Fluid(
+        temperature_c=20.0,
+        static_pressure_pa=101_325.0,
+        composition={"relative_humidity_percent": 0.0},
+        model="dry air",
+        validity="",
+        properties={"speed_of_sound": 343.0, "density": 1.2},
+    )
+    assert dry.composition["relative_humidity_percent"] == 0.0

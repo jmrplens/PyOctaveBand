@@ -563,11 +563,10 @@ def thermal_boundary_layer_thickness(
 
        b = \sqrt{\frac{2 c_0 l_\mathrm{h}}{\omega}}, \qquad \omega = 2\pi f \tag{A.4}
 
-    ``frequency`` is the piston frequency ``f`` (Hz); ``speed_of_sound`` ``c0`` (m/s),
-    ``air_density`` ``rho0`` (kg/m3), ``specific_heat_cp`` ``C_P`` (J/(kg*K)) and
-    ``thermal_conductivity`` ``k_a`` (J/(s*m*K)) are air properties, defaulting to air
-    at 23 degC, 101,325 kPa and 50 % relative humidity computed from IEC 61094-2:2009
-    Annex F. Note that ``c0`` cancels: ``b`` is
+    ``frequency`` is the piston frequency ``f`` (Hz). The air properties ``c0``,
+    ``rho0``, ``C_P`` and ``k_a`` come from ``fluid``, which defaults to
+    :data:`ANNEX_A_AIR`: air at 23 degC, 101 325 Pa and 50 % relative humidity
+    computed from IEC 61094-2:2009 Annex F. Note that ``c0`` cancels: ``b`` is
     :math:`\sqrt{2 k_\mathrm{a} / (\rho_0 C_\mathrm{P} \omega)}`, so only the pair
     ``k_a``/``C_P`` and the density move it.
 
@@ -608,9 +607,9 @@ def effective_kappa(
     of the air cavity (m2) and ``V`` its volume (m3).
 
     ``cavity_surface`` is ``S`` (m2), ``cavity_volume`` ``V`` (m3) and ``frequency``
-    the piston frequency ``f`` (Hz); ``specific_heat_ratio`` ``kappa`` (adiabatic) and
-    the remaining air properties default to air at the Annex A.3 reference state,
-    computed from IEC 61094-2:2009 Annex F (see
+    the piston frequency ``f`` (Hz). The adiabatic ``kappa`` and every other air
+    property come from ``fluid``, which defaults to :data:`ANNEX_A_AIR`, the
+    Annex A.3 reference state computed from IEC 61094-2:2009 Annex F (see
     :func:`thermal_boundary_layer_thickness` on why those differ from the pair
     Annex A.3 prints). Returns the dimensionless ``kappa'`` for use in
     :func:`alternating_airflow_resistance`; the Annex A.3 worked example

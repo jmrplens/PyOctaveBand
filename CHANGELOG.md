@@ -43,7 +43,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   each; the invariant belongs to the type that owns them, and the guards the
   models dropped are now tested where the check actually lives.
 
-### Changed
+- `membrane_resonance_frequency` reads the ratio of specific heats from the
+  fluid it is given. Its isothermal branch divided the air-spring stiffness by
+  the published 1.4 whatever fluid arrived, so an air the caller had computed
+  came back with the published air's resonance under the caller's density and
+  speed of sound, which is neither air. Warm humid air carries 1.3806 and the
+  frequency moves 0.70 %. The default air is unchanged, so nothing that took
+  the default moves.
+
+- The curated reference table stops offering arguments the signatures no longer
+  take. Ten rows still described the floats a `Fluid` replaced, `speed_of_sound`
+  and `air_density` among them, so a reader following the table got a
+  `TypeError`. The gate asked only that every public name have a row, never that
+  a row describe the function it names; it now refuses a row offering one of
+  those floats to a function that does not take it.
 
 - `corrugated_plate_stiffness` computes its `Bx` by calling
   `plate_bending_stiffness` instead of spelling out `E h^3 / (12 (1 - nu^2))` a
