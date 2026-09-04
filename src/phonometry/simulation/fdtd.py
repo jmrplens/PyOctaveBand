@@ -91,7 +91,8 @@ def _integer(name: str, value: int) -> int:
     """Validate that *value* is an integral scalar (bool is rejected)."""
     if isinstance(value, bool) or not isinstance(value, (int, np.integer)):
         msg = f"{name} must be an integer"
-        raise ValueError(msg)  # noqa: TRY004 - ValueError keeps the module validation errors uniform
+        # ValueError keeps the module validation errors uniform.
+        raise ValueError(msg)  # noqa: TRY004
     return int(value)
 
 
@@ -269,7 +270,8 @@ class PlaneWaveSource:
         """
         if not callable(self.waveform):
             msg = "waveform must be callable"
-            raise ValueError(msg)  # noqa: TRY004 - ValueError keeps the module validation errors uniform
+            # ValueError keeps the module validation errors uniform.
+            raise ValueError(msg)  # noqa: TRY004
         _finite("amplitude", self.amplitude)
 
 

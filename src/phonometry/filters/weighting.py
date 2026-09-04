@@ -795,7 +795,8 @@ class TimeWeightedEnvelope:
         """Length of the leading axis: channels when 2-D, samples for one channel."""
         return int(self.mean_square.shape[0])
 
-    def __getitem__(self, key: Any) -> Any:  # noqa: ANN401  # mirrors ndarray indexing, whose key union numpy does not export
+    # Mirrors ndarray indexing, whose key union numpy does not export.
+    def __getitem__(self, key: Any) -> Any:  # noqa: ANN401
         """Index the mean square; the result is bare values, not another envelope."""
         return self.mean_square[key]
 

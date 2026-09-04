@@ -135,6 +135,9 @@ def test_malformed_fields_are_refused(tmp_path: Path) -> None:
     }
     for corruption, message in (
         ({"calibration_factor": "loud"}, "must be a number"),
+        ({"schema_version": "1"}, "schema_version must be an integer"),
+        ({"calibrator": 5}, "calibrator must be an object or null"),
+        ({"calibrator": {"model": 5}}, "calibrator model must be a string or null"),
         (
             {"calibration_factor": -1.0},
             "calibration_factor must be finite and positive",

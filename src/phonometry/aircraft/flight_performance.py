@@ -1309,7 +1309,8 @@ class _Flight:
             gradient comes from does not exist.
         """
         engines = self.aircraft.engines
-        if engines < 2:  # noqa: PLR2004 -- the N-1 denominator of Eq. B-13
+        # The N-1 denominator of Eq. B-13.
+        if engines < 2:  # noqa: PLR2004
             msg = (
                 "Eq. B-13 minimum reduced thrust does not apply to a "
                 f"single-engine aeroplane; aircraft "

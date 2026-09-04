@@ -174,9 +174,8 @@ def _optional_number(payload: dict[str, object], key: str, path: Path) -> float 
         return None
     if isinstance(value, bool) or not isinstance(value, int | float):
         msg = f"{path}: {key} must be a number or null; got {value!r}"
-        raise ValueError(  # noqa: TRY004 - ValueError keeps the module validation errors uniform
-            msg
-        )
+        # ValueError keeps the module validation errors uniform.
+        raise ValueError(msg)  # noqa: TRY004
     return float(value)
 
 
@@ -196,9 +195,8 @@ def _load_sidecar_payload(source: Path) -> dict[str, object]:
     version = payload.get("schema_version")
     if not isinstance(version, int) or isinstance(version, bool):
         msg = f"{source}: schema_version must be an integer"
-        raise ValueError(  # noqa: TRY004 - ValueError keeps the module validation errors uniform
-            msg
-        )
+        # ValueError keeps the module validation errors uniform.
+        raise ValueError(msg)  # noqa: TRY004
     if version > SIDECAR_VERSION:
         msg = (
             f"{source}: sidecar schema version {version} is newer than the "
@@ -214,9 +212,8 @@ def _required_factor(payload: dict[str, object], source: Path) -> float:
     factor = payload.get("calibration_factor")
     if isinstance(factor, bool) or not isinstance(factor, int | float):
         msg = f"{source}: calibration_factor must be a number; got {factor!r}"
-        raise ValueError(  # noqa: TRY004 - ValueError keeps the module validation errors uniform
-            msg
-        )
+        # ValueError keeps the module validation errors uniform.
+        raise ValueError(msg)  # noqa: TRY004
     return float(factor)
 
 
@@ -229,9 +226,8 @@ def _calibrator_fields(
         calibrator = {}
     if not isinstance(calibrator, dict):
         msg = f"{source}: calibrator must be an object or null"
-        raise ValueError(  # noqa: TRY004 - ValueError keeps the module validation errors uniform
-            msg
-        )
+        # ValueError keeps the module validation errors uniform.
+        raise ValueError(msg)  # noqa: TRY004
     model = calibrator.get("model")
     if model is not None and not isinstance(model, str):
         msg = f"{source}: calibrator model must be a string or null"
