@@ -1258,6 +1258,15 @@ everything above 250 Hz with $R = 0.02 (P/S)^{0.8} l$. An external
 fibreglass blanket adds surface mass and doubles the low-frequency loss
 (`wrapped=True`).
 
+`model="vdi2081"` reads Table 5 of VDI 2081 Part 1 Section 6.1 instead: a
+step table in dB per metre, keyed on the **largest** clear side length and
+on five frequency columns, 63, 125, 250, 500 and above 1000 Hz. It is a
+different account of the same loss, not a restatement of this one: Reynolds
+fits a continuous power law of the perimeter-to-area ratio, VDI 2081
+tabulates four size bands of 1 mm steel sheet, and where the two overlap
+they differ by a decibel or two per metre. `wrapped` has no meaning there
+and is refused.
+
 **Parameters**
 
 | Name | Description |
@@ -1267,17 +1276,9 @@ fibreglass blanket adds surface mass and doubles the low-frequency loss
 | `height` | Duct height, m. |
 | `length` | Duct run length `l`, m. |
 | `wrapped` | The duct is externally wrapped with a fibreglass blanket, which doubles the 63 Hz to 250 Hz attenuation. |
+| `model` | `"ashrae"` (default, Reynolds) or `"vdi2081"` (Table 5, the largest side length selecting the row). |
 
 **Returns:** An [`HvacSpectrumResult`](/phonometry/reference/api/noise_control/hvac/#hvacspectrumresult) of the attenuation, dB.
-
-`model="vdi2081"` reads Table 5 of VDI 2081 Part 1 Section 6.1 instead: a
-step table in dB per metre, keyed on the **largest** clear side length and
-on five frequency columns, 63, 125, 250, 500 and above 1000 Hz. It is a
-different account of the same loss, not a restatement of this one: Reynolds
-fits a continuous power law of the perimeter-to-area ratio, VDI 2081
-tabulates four size bands of 1 mm steel sheet, and where the two overlap
-they differ by a decibel or two per metre. `wrapped` has no meaning there
-and is refused.
 
 ## VDI2081_SPECTRAL_CORRECTION
 

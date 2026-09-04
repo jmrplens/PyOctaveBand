@@ -7,7 +7,7 @@
     "passing": 664,
     "failing": 0,
     "domains": 64,
-    "standards": 401,
+    "standards": 387,
     "citations": 573,
     "designations": 121,
     "sources": 84
@@ -17711,13 +17711,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-sound-power-at-63-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-1/supply-fan-sound-power-at-63-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 1",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+        "clause": "Blatt 2:2005 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 1"
       },
       "quantity": "Supply fan sound power at 63 Hz, dB",
       "kind": "scalar",
@@ -17739,13 +17739,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-sound-power-at-125-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-1/supply-fan-sound-power-at-125-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 1",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+        "clause": "Blatt 2:2005 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 1"
       },
       "quantity": "Supply fan sound power at 125 Hz, dB",
       "kind": "scalar",
@@ -17767,13 +17767,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-sound-power-at-250-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-1/supply-fan-sound-power-at-250-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 1",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+        "clause": "Blatt 2:2005 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 1"
       },
       "quantity": "Supply fan sound power at 250 Hz, dB",
       "kind": "scalar",
@@ -17795,13 +17795,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-sound-power-at-500-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-1/supply-fan-sound-power-at-500-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 1",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+        "clause": "Blatt 2:2005 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 1"
       },
       "quantity": "Supply fan sound power at 500 Hz, dB",
       "kind": "scalar",
@@ -17823,13 +17823,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-sound-power-at-1000-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-1/supply-fan-sound-power-at-1000-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 1",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+        "clause": "Blatt 2:2005 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 1"
       },
       "quantity": "Supply fan sound power at 1000 Hz, dB",
       "kind": "scalar",
@@ -17851,13 +17851,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-sound-power-at-2000-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-1/supply-fan-sound-power-at-2000-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 1",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+        "clause": "Blatt 2:2005 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 1"
       },
       "quantity": "Supply fan sound power at 2000 Hz, dB",
       "kind": "scalar",
@@ -17879,13 +17879,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-sound-power-at-4000-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-1/supply-fan-sound-power-at-4000-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 1",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+        "clause": "Blatt 2:2005 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 1"
       },
       "quantity": "Supply fan sound power at 4000 Hz, dB",
       "kind": "scalar",
@@ -17907,13 +17907,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-sound-power-at-8000-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-1/supply-fan-sound-power-at-8000-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 1",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+        "clause": "Blatt 2:2005 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 1"
       },
       "quantity": "Supply fan sound power at 8000 Hz, dB",
       "kind": "scalar",
@@ -17935,13 +17935,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-1-eq-13/fan-sound-power-level-l-w4-from-the-duty-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-1-2001-eq-13/fan-sound-power-level-l-w4-from-the-duty-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 1 Eq. (13)",
-        "cite": "VDI 2081 Blatt 1 Eq. (13)"
+        "clause": "Blatt 1:2001 Eq. (13)",
+        "cite": "VDI 2081 Blatt 1:2001 Eq. (13)"
       },
       "quantity": "Fan sound power level L_W4 from the duty, dB",
       "kind": "scalar",
@@ -17963,13 +17963,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-total-sound-power-level-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-1/supply-fan-total-sound-power-level-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 1",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+        "clause": "Blatt 2:2005 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 1"
       },
       "quantity": "Supply fan total sound power level, dB",
       "kind": "scalar",
@@ -17991,13 +17991,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-1/supply-fan-a-weighted-sound-power-level-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-1/supply-fan-a-weighted-sound-power-level-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 1",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 1"
+        "clause": "Blatt 2:2005 Table 1, element 1",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 1"
       },
       "quantity": "Supply fan A-weighted sound power level, dB",
       "kind": "scalar",
@@ -18019,21 +18019,21 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-5/rectangular-duct-500-x-400-mm-over-4-m-level-reduction-per-octave-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-5/rectangular-duct-500-x-400-mm-over-4-m-worst-octave-deviation-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 5",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 5"
+        "clause": "Blatt 2:2005 Table 1, element 5",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 5"
       },
-      "quantity": "Rectangular duct 500 x 400 mm over 4 m, level reduction per octave, dB",
+      "quantity": "Rectangular duct 500 x 400 mm over 4 m, worst octave deviation, dB",
       "kind": "scalar",
       "expected": {
-        "value": 9.0
+        "value": 0.0
       },
       "computed": {
-        "value": 9.0
+        "value": 0.0
       },
       "unit": "dB",
       "tolerance": {
@@ -18043,25 +18043,25 @@
       "deviation": {
         "value": 0.0
       },
-      "precision": 3,
+      "precision": 4,
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-13/round-duct-160-mm-over-1-m-level-reduction-per-octave-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-13/round-duct-160-mm-over-1-m-worst-octave-deviation-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 13",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 13"
+        "clause": "Blatt 2:2005 Table 1, element 13",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 13"
       },
-      "quantity": "Round duct 160 mm over 1 m, level reduction per octave, dB",
+      "quantity": "Round duct 160 mm over 1 m, worst octave deviation, dB",
       "kind": "scalar",
       "expected": {
-        "value": 1.7
+        "value": 0.0
       },
       "computed": {
-        "value": 1.7
+        "value": 0.0
       },
       "unit": "dB",
       "tolerance": {
@@ -18071,17 +18071,17 @@
       "deviation": {
         "value": 0.0
       },
-      "precision": 3,
+      "precision": 4,
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-1-eq-34/limit-frequency-of-a-160-mm-round-duct-hz",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-1-2001-eq-34/limit-frequency-of-a-160-mm-round-duct-hz",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 1 Eq. (34)",
-        "cite": "VDI 2081 Blatt 1 Eq. (34)"
+        "clause": "Blatt 1:2001 Eq. (34)",
+        "cite": "VDI 2081 Blatt 1:2001 Eq. (34)"
       },
       "quantity": "Limit frequency of a 160 mm round duct, Hz",
       "kind": "scalar",
@@ -18103,21 +18103,21 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-14/round-bend-160-mm-table-7-shifted-onto-its-limit-frequency-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-14/round-bend-160-mm-table-7-shifted-onto-its-limit-frequency-worst-octave-deviation-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 14",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 14"
+        "clause": "Blatt 2:2005 Table 1, element 14",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 14"
       },
-      "quantity": "Round bend 160 mm, Table 7 shifted onto its limit frequency, dB",
+      "quantity": "Round bend 160 mm, Table 7 shifted onto its limit frequency, worst octave deviation, dB",
       "kind": "scalar",
       "expected": {
-        "value": 12.0
+        "value": 0.0
       },
       "computed": {
-        "value": 12.0
+        "value": 0.0
       },
       "unit": "dB",
       "tolerance": {
@@ -18127,17 +18127,17 @@
       "deviation": {
         "value": 0.0
       },
-      "precision": 3,
+      "precision": 4,
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-3/junction-into-0-3-m2-of-1-08-m2-total-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-3/junction-into-0-3-m2-of-1-08-m2-total-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 3",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 3"
+        "clause": "Blatt 2:2005 Table 1, element 3",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 3"
       },
       "quantity": "Junction into 0.3 m2 of 1.08 m2 total, dB",
       "kind": "scalar",
@@ -18159,13 +18159,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-7/junction-into-0-049-m2-of-0-147-m2-total-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-7/junction-into-0-049-m2-of-0-147-m2-total-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 7",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 7"
+        "clause": "Blatt 2:2005 Table 1, element 7",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 7"
       },
       "quantity": "Junction into 0.049 m2 of 0.147 m2 total, dB",
       "kind": "scalar",
@@ -18187,13 +18187,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-16/junction-into-0-02-m2-of-0-04-m2-total-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-16/junction-into-0-02-m2-of-0-04-m2-total-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 16",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 16"
+        "clause": "Blatt 2:2005 Table 1, element 16",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 16"
       },
       "quantity": "Junction into 0.02 m2 of 0.04 m2 total, dB",
       "kind": "scalar",
@@ -18215,13 +18215,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-1-eq-16/flow-noise-of-a-straight-duct-overall-sound-power-level-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-1-2001-eq-16/flow-noise-of-a-straight-duct-overall-sound-power-level-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 1 Eq. (16)",
-        "cite": "VDI 2081 Blatt 1 Eq. (16)"
+        "clause": "Blatt 1:2001 Eq. (16)",
+        "cite": "VDI 2081 Blatt 1:2001 Eq. (16)"
       },
       "quantity": "Flow noise of a straight duct, overall sound power level, dB",
       "kind": "scalar",
@@ -18243,13 +18243,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-1-eq-17/flow-noise-of-a-straight-duct-a-weighted-sound-power-level-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-1-2001-eq-17/flow-noise-of-a-straight-duct-a-weighted-sound-power-level-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 1 Eq. (17)",
-        "cite": "VDI 2081 Blatt 1 Eq. (17)"
+        "clause": "Blatt 1:2001 Eq. (17)",
+        "cite": "VDI 2081 Blatt 1:2001 Eq. (17)"
       },
       "quantity": "Flow noise of a straight duct, A-weighted sound power level, dB",
       "kind": "scalar",
@@ -18271,13 +18271,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-3/junction-flow-noise-at-63-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-3/junction-flow-noise-at-63-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 3",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 3"
+        "clause": "Blatt 2:2005 Table 1, element 3",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 3"
       },
       "quantity": "Junction flow noise at 63 Hz, dB",
       "kind": "scalar",
@@ -18299,13 +18299,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-3/junction-flow-noise-at-125-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-3/junction-flow-noise-at-125-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 3",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 3"
+        "clause": "Blatt 2:2005 Table 1, element 3",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 3"
       },
       "quantity": "Junction flow noise at 125 Hz, dB",
       "kind": "scalar",
@@ -18327,13 +18327,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-3/junction-flow-noise-at-250-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-3/junction-flow-noise-at-250-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 3",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 3"
+        "clause": "Blatt 2:2005 Table 1, element 3",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 3"
       },
       "quantity": "Junction flow noise at 250 Hz, dB",
       "kind": "scalar",
@@ -18355,13 +18355,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-3/junction-flow-noise-at-500-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-3/junction-flow-noise-at-500-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 3",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 3"
+        "clause": "Blatt 2:2005 Table 1, element 3",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 3"
       },
       "quantity": "Junction flow noise at 500 Hz, dB",
       "kind": "scalar",
@@ -18383,13 +18383,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-3/junction-flow-noise-at-1000-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-3/junction-flow-noise-at-1000-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 3",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 3"
+        "clause": "Blatt 2:2005 Table 1, element 3",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 3"
       },
       "quantity": "Junction flow noise at 1000 Hz, dB",
       "kind": "scalar",
@@ -18411,13 +18411,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-3/junction-flow-noise-at-2000-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-3/junction-flow-noise-at-2000-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 3",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 3"
+        "clause": "Blatt 2:2005 Table 1, element 3",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 3"
       },
       "quantity": "Junction flow noise at 2000 Hz, dB",
       "kind": "scalar",
@@ -18439,13 +18439,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-3/junction-flow-noise-at-4000-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-3/junction-flow-noise-at-4000-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 3",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 3"
+        "clause": "Blatt 2:2005 Table 1, element 3",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 3"
       },
       "quantity": "Junction flow noise at 4000 Hz, dB",
       "kind": "scalar",
@@ -18467,13 +18467,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-3/junction-flow-noise-at-8000-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-3/junction-flow-noise-at-8000-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 3",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 3"
+        "clause": "Blatt 2:2005 Table 1, element 3",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 3"
       },
       "quantity": "Junction flow noise at 8000 Hz, dB",
       "kind": "scalar",
@@ -18495,21 +18495,21 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-14/bend-flow-noise-sum-over-the-eight-octaves-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-14/bend-flow-noise-worst-octave-deviation-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 14",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 14"
+        "clause": "Blatt 2:2005 Table 1, element 14",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 14"
       },
-      "quantity": "Bend flow noise, sum over the eight octaves, dB",
+      "quantity": "Bend flow noise, worst octave deviation, dB",
       "kind": "scalar",
       "expected": {
-        "value": 28.906072029339764
+        "value": 0.0
       },
       "computed": {
-        "value": 28.904
+        "value": 0.0496
       },
       "unit": "dB",
       "tolerance": {
@@ -18517,19 +18517,19 @@
         "value": 0.05
       },
       "deviation": {
-        "value": -0.002
+        "value": 0.0496
       },
-      "precision": 3,
+      "precision": 4,
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-1-eq-49/splitter-silencer-self-noise-a-weighted-sound-power-level-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-1-2001-eq-49/splitter-silencer-self-noise-a-weighted-sound-power-level-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 1 Eq. (49)",
-        "cite": "VDI 2081 Blatt 1 Eq. (49)"
+        "clause": "Blatt 1:2001 Eq. (49)",
+        "cite": "VDI 2081 Blatt 1:2001 Eq. (49)"
       },
       "quantity": "Splitter silencer self-noise, A-weighted sound power level, dB",
       "kind": "scalar",
@@ -18537,7 +18537,7 @@
         "value": 52.0
       },
       "computed": {
-        "value": 52.015
+        "value": 52.099
       },
       "unit": "dB",
       "tolerance": {
@@ -18545,19 +18545,19 @@
         "value": 0.5
       },
       "deviation": {
-        "value": 0.015
+        "value": 0.099
       },
       "precision": 3,
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-2/splitter-silencer-self-noise-at-63-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-2/splitter-silencer-self-noise-at-63-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 2",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 2"
+        "clause": "Blatt 2:2005 Table 1, element 2",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 2"
       },
       "quantity": "Splitter silencer self-noise at 63 Hz, dB",
       "kind": "scalar",
@@ -18579,13 +18579,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-2/splitter-silencer-self-noise-at-125-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-2/splitter-silencer-self-noise-at-125-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 2",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 2"
+        "clause": "Blatt 2:2005 Table 1, element 2",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 2"
       },
       "quantity": "Splitter silencer self-noise at 125 Hz, dB",
       "kind": "scalar",
@@ -18607,13 +18607,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-2/splitter-silencer-self-noise-at-250-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-2/splitter-silencer-self-noise-at-250-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 2",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 2"
+        "clause": "Blatt 2:2005 Table 1, element 2",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 2"
       },
       "quantity": "Splitter silencer self-noise at 250 Hz, dB",
       "kind": "scalar",
@@ -18635,13 +18635,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-2/splitter-silencer-self-noise-at-500-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-2/splitter-silencer-self-noise-at-500-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 2",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 2"
+        "clause": "Blatt 2:2005 Table 1, element 2",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 2"
       },
       "quantity": "Splitter silencer self-noise at 500 Hz, dB",
       "kind": "scalar",
@@ -18663,13 +18663,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-2/splitter-silencer-self-noise-at-1000-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-2/splitter-silencer-self-noise-at-1000-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 2",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 2"
+        "clause": "Blatt 2:2005 Table 1, element 2",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 2"
       },
       "quantity": "Splitter silencer self-noise at 1000 Hz, dB",
       "kind": "scalar",
@@ -18691,13 +18691,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-2/splitter-silencer-self-noise-at-2000-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-2/splitter-silencer-self-noise-at-2000-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 2",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 2"
+        "clause": "Blatt 2:2005 Table 1, element 2",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 2"
       },
       "quantity": "Splitter silencer self-noise at 2000 Hz, dB",
       "kind": "scalar",
@@ -18719,13 +18719,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-2/splitter-silencer-self-noise-at-4000-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-2/splitter-silencer-self-noise-at-4000-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 2",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 2"
+        "clause": "Blatt 2:2005 Table 1, element 2",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 2"
       },
       "quantity": "Splitter silencer self-noise at 4000 Hz, dB",
       "kind": "scalar",
@@ -18747,13 +18747,13 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-element-2/splitter-silencer-self-noise-at-8000-hz-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-2/splitter-silencer-self-noise-at-8000-hz-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, element 2",
-        "cite": "VDI 2081 Blatt 2 Table 1, element 2"
+        "clause": "Blatt 2:2005 Table 1, element 2",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 2"
       },
       "quantity": "Splitter silencer self-noise at 8000 Hz, dB",
       "kind": "scalar",
@@ -18775,21 +18775,21 @@
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-2-element-18/end-reflection-of-a-200-mm-nozzle-in-a-ceiling-sum-over-the-octaves-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-2-element-18/end-reflection-of-a-200-mm-nozzle-in-a-ceiling-worst-octave-deviation-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 2, element 18",
-        "cite": "VDI 2081 Blatt 2 Table 2, element 18"
+        "clause": "Blatt 2:2005 Table 2, element 18",
+        "cite": "VDI 2081 Blatt 2:2005 Table 2, element 18"
       },
-      "quantity": "End reflection of a 200 mm nozzle in a ceiling, sum over the octaves, dB",
+      "quantity": "End reflection of a 200 mm nozzle in a ceiling, worst octave deviation, dB",
       "kind": "scalar",
       "expected": {
-        "value": 34.5
+        "value": 0.0
       },
       "computed": {
-        "value": 34.461
+        "value": 0.0449
       },
       "unit": "dB",
       "tolerance": {
@@ -18797,27 +18797,27 @@
         "value": 0.05
       },
       "deviation": {
-        "value": -0.039
+        "value": 0.0449
       },
-      "precision": 3,
+      "precision": 4,
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-section-1-1/spectral-assessment-correction-k-a-db-per-octave",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-section-1-1/spectral-assessment-correction-k-a-worst-octave-deviation-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Section 1.1",
-        "cite": "VDI 2081 Blatt 2 Section 1.1"
+        "clause": "Blatt 2:2005 Section 1.1",
+        "cite": "VDI 2081 Blatt 2:2005 Section 1.1"
       },
-      "quantity": "Spectral assessment correction K_A, dB per octave",
+      "quantity": "Spectral assessment correction K_A, worst octave deviation, dB",
       "kind": "scalar",
       "expected": {
-        "value": 13.0
+        "value": 0.0
       },
       "computed": {
-        "value": 13.0
+        "value": 0.0
       },
       "unit": "dB",
       "tolerance": {
@@ -18827,25 +18827,25 @@
       "deviation": {
         "value": 0.0
       },
-      "precision": 3,
+      "precision": 4,
       "verdict": "pass"
     },
     {
-      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-table-1-elements-1-to-3/chained-level-after-fan-silencer-and-junction-sum-over-the-octaves-db",
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-elements-1-to-3/chained-level-after-fan-silencer-and-junction-worst-octave-deviation-db",
       "domain": "hvac-noise-vdi-2081",
       "reference": {
         "kind": "standard",
         "designation": "VDI 2081",
-        "clause": "Blatt 2 Table 1, elements 1 to 3",
-        "cite": "VDI 2081 Blatt 2 Table 1, elements 1 to 3"
+        "clause": "Blatt 2:2005 Table 1, elements 1 to 3",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, elements 1 to 3"
       },
-      "quantity": "Chained level after fan, silencer and junction, sum over the octaves, dB",
+      "quantity": "Chained level after fan, silencer and junction, worst octave deviation, dB",
       "kind": "scalar",
       "expected": {
-        "value": 81.04311008280237
+        "value": 0.0
       },
       "computed": {
-        "value": 80.982
+        "value": 0.0719
       },
       "unit": "dB",
       "tolerance": {
@@ -18853,9 +18853,9 @@
         "value": 0.1
       },
       "deviation": {
-        "value": -0.061
+        "value": 0.0719
       },
-      "precision": 3,
+      "precision": 4,
       "verdict": "pass"
     },
     {

@@ -595,15 +595,15 @@ def require_summary_class(
     restates a class 1 bank perfectly and still builds ``margin_class1.0_db``,
     a key no band carries, when a reader splices it.
 
+    An empty band list is refused a class of its own: a verdict attested over
+    nothing is not a verdict, and the readers that take a binding margin from
+    it die on an empty sequence instead.
+
     :param owner: The result instance, named in the messages.
     :param bands: The per-band verdict mappings.
     :param overall: The class stated for the whole instrument, or ``None``.
     :param expected: The classes the standard defines.
     :param field: Name of the summary field, for the message.
-    An empty band list is refused a class of its own: a verdict attested over
-    nothing is not a verdict, and the readers that take a binding margin from
-    it die on an empty sequence instead.
-
     :raises ValueError: if a band carries no class or one that is no
         designation, if a class is claimed over no bands at all, or the
         summary is not the class the bands derive.

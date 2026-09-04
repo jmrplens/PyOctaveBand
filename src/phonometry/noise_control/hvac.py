@@ -1760,10 +1760,6 @@ def unlined_rectangular_duct_attenuation(
     fibreglass blanket adds surface mass and doubles the low-frequency loss
     (``wrapped=True``).
 
-    :param frequencies: Octave-band centre frequencies ``f``, Hz (1-D array).
-    :param width: Duct width, m.
-    :param height: Duct height, m.
-    :param length: Duct run length ``l``, m.
     ``model="vdi2081"`` reads Table 5 of VDI 2081 Part 1 Section 6.1 instead: a
     step table in dB per metre, keyed on the **largest** clear side length and
     on five frequency columns, 63, 125, 250, 500 and above 1000 Hz. It is a
@@ -1773,8 +1769,14 @@ def unlined_rectangular_duct_attenuation(
     they differ by a decibel or two per metre. ``wrapped`` has no meaning there
     and is refused.
 
+    :param frequencies: Octave-band centre frequencies ``f``, Hz (1-D array).
+    :param width: Duct width, m.
+    :param height: Duct height, m.
+    :param length: Duct run length ``l``, m.
     :param wrapped: The duct is externally wrapped with a fibreglass blanket,
         which doubles the 63 Hz to 250 Hz attenuation.
+    :param model: ``"ashrae"`` (default, Reynolds) or ``"vdi2081"``
+        (Table 5, the largest side length selecting the row).
     :return: An :class:`HvacSpectrumResult` of the attenuation, dB.
     """
     scheme = require_choice(model, "model", ("ashrae", "vdi2081"))

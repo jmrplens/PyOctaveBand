@@ -45,6 +45,24 @@ _PRINTED_A_WEIGHTING = (-26.2, -16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1)
 _PRINTED_TOLERANCE = 0.05
 
 
+def _worst_band(
+    printed: tuple[float, ...] | np.ndarray,
+    computed: np.ndarray,
+    tolerance: float,
+    *,
+    unit: str = "dB",
+) -> Outcome:
+    """Compare two spectra by their worst band rather than by their sum.
+
+    A sum is blind to the shape: any pair of compensating errors passes it, and
+    for a correction curve running from +21 to -6 dB a swapped pair or a
+    flipped sign leaves the total where it was. The largest absolute deviation
+    over the bands is one number that no such error survives.
+    """
+    deviation = float(np.max(np.abs(np.asarray(printed, dtype=float) - computed)))
+    return numeric(0.0, deviation, tolerance, unit=unit, places=4)
+
+
 def _fan() -> np.ndarray:
     """Element 1 of Table 1, from the printed service data alone."""
     return ph.noise_control.fan_sound_power(
@@ -72,7 +90,7 @@ def _register_fan_spectrum() -> None:
     for index, band in enumerate(_PRINTED_BANDS):
         register(
             _VDI2081,
-            "VDI 2081 Blatt 2 Table 1, element 1",
+            "VDI 2081 Blatt 2:2005 Table 1, element 1",
             f"Supply fan sound power at {band:g} Hz, dB",
         )(functools.partial(_band_outcome, index))
 
@@ -82,7 +100,7 @@ _register_fan_spectrum()
 
 @register(
     _VDI2081,
-    "VDI 2081 Blatt 1 Eq. (13)",
+    "VDI 2081 Blatt 1:2001 Eq. (13)",
     "Fan sound power level L_W4 from the duty, dB",
 )
 def _chk_overall_level() -> Outcome:
@@ -100,7 +118,7 @@ def _chk_overall_level() -> Outcome:
 
 @register(
     _VDI2081,
-    "VDI 2081 Blatt 2 Table 1, element 1",
+    "VDI 2081 Blatt 2:2005 Table 1, element 1",
     "Supply fan total sound power level, dB",
 )
 def _chk_total() -> Outcome:
@@ -111,7 +129,7 @@ def _chk_total() -> Outcome:
 
 @register(
     _VDI2081,
-    "VDI 2081 Blatt 2 Table 1, element 1",
+    "VDI 2081 Blatt 2:2005 Table 1, element 1",
     "Supply fan A-weighted sound power level, dB",
 )
 def _chk_total_a_weighted() -> Outcome:
@@ -143,8 +161,8 @@ _PRINTED_BEND = (0.0, 0.0, 0.0, 1.0, 2.0, 3.0, 3.0, 3.0)
 
 @register(
     _VDI2081,
-    "VDI 2081 Blatt 2 Table 1, element 5",
-    "Rectangular duct 500 x 400 mm over 4 m, level reduction per octave, dB",
+    "VDI 2081 Blatt 2:2005 Table 1, element 5",
+    "Rectangular duct 500 x 400 mm over 4 m, worst octave deviation, dB",
 )
 def _chk_rectangular_run() -> Outcome:
     """Table 5 read by the largest side, which is what puts 250 Hz at 0,3 dB/m."""
@@ -152,37 +170,25 @@ def _chk_rectangular_run() -> Outcome:
     values = ph.noise_control.unlined_rectangular_duct_attenuation(
         np.array(_PRINTED_BANDS), width, height, length, model="vdi2081"
     ).values
-    return numeric(
-        float(np.sum(_PRINTED_RECT)),
-        float(np.sum(values)),
-        1e-6,
-        unit="dB",
-        places=3,
-    )
+    return _worst_band(_PRINTED_RECT, values, 1e-6)
 
 
 @register(
     _VDI2081,
-    "VDI 2081 Blatt 2 Table 1, element 13",
-    "Round duct 160 mm over 1 m, level reduction per octave, dB",
+    "VDI 2081 Blatt 2:2005 Table 1, element 13",
+    "Round duct 160 mm over 1 m, worst octave deviation, dB",
 )
 def _chk_round_run() -> Outcome:
     """The round rows of Table 5, which do depend on the bore."""
     values = ph.noise_control.unlined_circular_duct_attenuation(
         np.array(_PRINTED_BANDS), 1.000, diameter=0.160, model="vdi2081"
     ).values
-    return numeric(
-        float(np.sum(_PRINTED_ROUND)),
-        float(np.sum(values)),
-        1e-6,
-        unit="dB",
-        places=3,
-    )
+    return _worst_band(_PRINTED_ROUND, values, 1e-6)
 
 
 @register(
     _VDI2081,
-    "VDI 2081 Blatt 1 Eq. (34)",
+    "VDI 2081 Blatt 1:2001 Eq. (34)",
     "Limit frequency of a 160 mm round duct, Hz",
 )
 def _chk_limit_frequency() -> Outcome:
@@ -194,8 +200,8 @@ def _chk_limit_frequency() -> Outcome:
 
 @register(
     _VDI2081,
-    "VDI 2081 Blatt 2 Table 1, element 14",
-    "Round bend 160 mm, Table 7 shifted onto its limit frequency, dB",
+    "VDI 2081 Blatt 2:2005 Table 1, element 14",
+    "Round bend 160 mm, Table 7 shifted onto its limit frequency, worst octave deviation, dB",
 )
 def _chk_bend() -> Outcome:
     """Table 7 carried three octaves up, since f_G lands in the 1 kHz octave."""
@@ -206,13 +212,7 @@ def _chk_bend() -> Outcome:
         speed_of_sound=_EXAMPLE_SPEED,
         model="vdi2081",
     ).values
-    return numeric(
-        float(np.sum(_PRINTED_BEND)),
-        float(np.sum(values)),
-        1e-6,
-        unit="dB",
-        places=3,
-    )
+    return _worst_band(_PRINTED_BEND, values, 1e-6)
 
 
 def _junction_outcome(
@@ -236,7 +236,7 @@ def _register_junctions() -> None:
     for element, fed, branches, printed in junctions:
         register(
             _VDI2081,
-            f"VDI 2081 Blatt 2 Table 1, element {element}",
+            f"VDI 2081 Blatt 2:2005 Table 1, element {element}",
             f"Junction into {fed:g} m2 of {sum(branches):g} m2 total, dB",
         )(functools.partial(_junction_outcome, fed, branches, printed))
 
@@ -265,7 +265,7 @@ _PRINTED_BEND_NOISE = (26.9, 23.0, 18.1, 12.5, 6.5, -0.1, -7.0, -14.4)
 
 @register(
     _VDI2081,
-    "VDI 2081 Blatt 1 Eq. (16)",
+    "VDI 2081 Blatt 1:2001 Eq. (16)",
     "Flow noise of a straight duct, overall sound power level, dB",
 )
 def _chk_straight_flow_noise() -> Outcome:
@@ -278,7 +278,7 @@ def _chk_straight_flow_noise() -> Outcome:
 
 @register(
     _VDI2081,
-    "VDI 2081 Blatt 1 Eq. (17)",
+    "VDI 2081 Blatt 1:2001 Eq. (17)",
     "Flow noise of a straight duct, A-weighted sound power level, dB",
 )
 def _chk_straight_flow_noise_a() -> Outcome:
@@ -317,7 +317,7 @@ def _register_junction_flow_noise() -> None:
     for index, band in enumerate(_PRINTED_BANDS):
         register(
             _VDI2081,
-            "VDI 2081 Blatt 2 Table 1, element 3",
+            "VDI 2081 Blatt 2:2005 Table 1, element 3",
             f"Junction flow noise at {band:g} Hz, dB",
         )(functools.partial(_flow_noise_outcome, index))
 
@@ -327,8 +327,8 @@ _register_junction_flow_noise()
 
 @register(
     _VDI2081,
-    "VDI 2081 Blatt 2 Table 1, element 14",
-    "Bend flow noise, sum over the eight octaves, dB",
+    "VDI 2081 Blatt 2:2005 Table 1, element 14",
+    "Bend flow noise, worst octave deviation, dB",
 )
 def _chk_bend_flow_noise() -> Outcome:
     """A bend is Equation (18) with the two velocities equal and no ``K``."""
@@ -340,11 +340,7 @@ def _chk_bend_flow_noise() -> Outcome:
         model="vdi2081",
         branch_diameter=0.160,
     ).values
-    printed = 10.0 * math.log10(
-        float(np.sum(10.0 ** (np.array(_PRINTED_BEND_NOISE) / 10.0)))
-    )
-    computed = 10.0 * math.log10(float(np.sum(10.0 ** (values / 10.0))))
-    return numeric(printed, computed, _PRINTED_TOLERANCE, unit="dB", places=3)
+    return _worst_band(_PRINTED_BEND_NOISE, values, _PRINTED_TOLERANCE)
 
 
 # ---------------------------------------------------------------------------
@@ -365,18 +361,30 @@ _PRINTED_NOZZLE = (15.8, 10.2, 5.3, 2.1, 0.7, 0.2, 0.1, 0.1)
 
 @register(
     _VDI2081,
-    "VDI 2081 Blatt 1 Eq. (49)",
+    "VDI 2081 Blatt 1:2001 Eq. (49)",
     "Splitter silencer self-noise, A-weighted sound power level, dB",
 )
 def _chk_silencer_a_weighted() -> Outcome:
-    """Element 2 of Table 1, printed as 52 dB."""
-    weighted = (
-        56.6 * math.log10(_SILENCER_GAP_VELOCITY)
-        - 0.5 * math.log10(_SILENCER_PRESSURE_DROP)
-        + 10.0 * math.log10(_SILENCER_APPROACH_AREA)
-        - 12.7
-    )
-    return numeric(52.0, weighted, 0.5, unit="dB", places=3)
+    """Element 2 of Table 1, printed as 52 dB.
+
+    Taken from the spectrum the implementation returns rather than by
+    re-evaluating Equation (49) here: recomputing it from the same scalars
+    would pass whatever the spectrum did, which is the one thing this row is
+    for. The A-weighting is the one Table 1 prints in its own header.
+    """
+    spectrum = ph.noise_control.silencer_self_noise(
+        np.array(_PRINTED_BANDS),
+        _SILENCER_GAP_VELOCITY,
+        5,
+        0.6,
+        model="vdi2081",
+        pressure_drop_pa=_SILENCER_PRESSURE_DROP,
+        approach_area=_SILENCER_APPROACH_AREA,
+        airway_width=_SILENCER_GAP,
+    ).values
+    weighted = spectrum + np.array(_PRINTED_A_WEIGHTING)
+    total = 10.0 * math.log10(float(np.sum(10.0 ** (weighted / 10.0))))
+    return numeric(52.0, total, 0.5, unit="dB", places=3)
 
 
 def _silencer_outcome(index: int) -> Outcome:
@@ -405,7 +413,7 @@ def _register_silencer_noise() -> None:
     for index, band in enumerate(_PRINTED_BANDS):
         register(
             _VDI2081,
-            "VDI 2081 Blatt 2 Table 1, element 2",
+            "VDI 2081 Blatt 2:2005 Table 1, element 2",
             f"Splitter silencer self-noise at {band:g} Hz, dB",
         )(functools.partial(_silencer_outcome, index))
 
@@ -415,8 +423,8 @@ _register_silencer_noise()
 
 @register(
     _VDI2081,
-    "VDI 2081 Blatt 2 Table 2, element 18",
-    "End reflection of a 200 mm nozzle in a ceiling, sum over the octaves, dB",
+    "VDI 2081 Blatt 2:2005 Table 2, element 18",
+    "End reflection of a 200 mm nozzle in a ceiling, worst octave deviation, dB",
 )
 def _chk_end_reflection() -> Outcome:
     """Figure 28 in closed form, before the 15 dB ceiling of Section 6.6."""
@@ -428,13 +436,7 @@ def _chk_end_reflection() -> Outcome:
         speed_of_sound=_EXAMPLE_SPEED,
         maximum_reduction_db=None,
     ).values
-    return numeric(
-        float(np.sum(_PRINTED_NOZZLE)),
-        float(np.sum(values)),
-        0.05,
-        unit="dB",
-        places=3,
-    )
+    return _worst_band(_PRINTED_NOZZLE, values, 0.05)
 
 
 # ---------------------------------------------------------------------------
@@ -450,25 +452,18 @@ _SILENCER_ATTENUATION = (6.0, 17.0, 42.0, 41.0, 47.0, 33.0, 20.0, 18.0)
 
 @register(
     _VDI2081,
-    "VDI 2081 Blatt 2 Section 1.1",
-    "Spectral assessment correction K_A, dB per octave",
+    "VDI 2081 Blatt 2:2005 Section 1.1",
+    "Spectral assessment correction K_A, worst octave deviation, dB",
 )
 def _chk_assessment_curve() -> Outcome:
     """``K_A = -A - 5``, the inverse A-weighting less the eight-band allowance."""
-    computed = ph.noise_control.VDI2081_SPECTRAL_CORRECTION
-    return numeric(
-        float(np.sum(_PRINTED_KA)),
-        float(np.sum(computed)),
-        1e-9,
-        unit="dB",
-        places=3,
-    )
+    return _worst_band(_PRINTED_KA, ph.noise_control.VDI2081_SPECTRAL_CORRECTION, 1e-9)
 
 
 @register(
     _VDI2081,
-    "VDI 2081 Blatt 2 Table 1, elements 1 to 3",
-    "Chained level after fan, silencer and junction, sum over the octaves, dB",
+    "VDI 2081 Blatt 2:2005 Table 1, elements 1 to 3",
+    "Chained level after fan, silencer and junction, worst octave deviation, dB",
 )
 def _chk_chain() -> Outcome:
     """Three models composed, which is what the worked example exists to check.
@@ -514,8 +509,4 @@ def _chk_chain() -> Outcome:
         10.0 ** ((running - split) / 10.0) + 10.0 ** (junction / 10.0)
     )
 
-    printed = 10.0 * math.log10(
-        float(np.sum(10.0 ** (np.array(_PRINTED_AFTER_JUNCTION) / 10.0)))
-    )
-    computed = 10.0 * math.log10(float(np.sum(10.0 ** (running / 10.0))))
-    return numeric(printed, computed, 0.1, unit="dB", places=3)
+    return _worst_band(_PRINTED_AFTER_JUNCTION, running, 0.1)

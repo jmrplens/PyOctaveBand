@@ -530,6 +530,46 @@ def test_no_curated_row_offers_a_fluid_float_that_is_gone() -> None:
     )
 
 
+def test_no_docstring_breaks_its_own_field_list() -> None:
+    """Prose between two `:param:` lines ends the field list where it sits.
+
+    Sphinx and every reader built on it stop the list at the first line that is
+    not a field or its continuation, so the parameters after the break vanish
+    from the generated table and the prose is printed after **Returns**. Two
+    docstrings did it: `unlined_rectangular_duct_attenuation`, where a
+    paragraph about the second model swallowed `:param wrapped:`, and
+    `require_summary_class`, where two sentences sat between `:param field:`
+    and `:raises:`. Neither looked wrong in the source, which is why this reads
+    the shape rather than the words.
+    """
+    import ast
+    import pathlib
+
+    fields = (":param", ":return", ":raises", ":ivar", ":type", ":rtype", ":vartype")
+    broken: list[str] = []
+    for path in sorted(pathlib.Path("src/phonometry").rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.FunctionDef):
+                continue
+            lines = (ast.get_docstring(node) or "").split("\n")
+            marked = [i for i, line in enumerate(lines) if line.startswith(fields)]
+            if len(marked) < 2:
+                continue
+            for index in range(marked[0], marked[-1]):
+                line = lines[index]
+                if line and not line.startswith((*fields, " ", "\t")):
+                    broken.append(
+                        f"{path.relative_to('src')}:{node.lineno} {node.name} "
+                        f"breaks its field list at {line[:50]!r}"
+                    )
+                    break
+
+    assert not broken, "docstrings with prose inside the field list:\n  " + "\n  ".join(
+        broken
+    )
+
+
 def test_every_warning_a_package_can_raise_is_published() -> None:
     """A warning you cannot name is a warning you cannot filter.
 
