@@ -774,6 +774,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `phonometry.noise_control` publishes `HvacWarning`. It fires whenever a
+  relative efficiency lands below the 50 % floor Long Table 13.6 is tabulated
+  from, and it was the one warning class in the library a package could raise
+  and no package published, while its sibling `PlaneWaveWarning` was exported
+  beside it. A caller could see the warning and could not write the
+  `filterwarnings` rule for it; only the blanket `PhonometryWarning` rule
+  reached it, and that one silences twenty-six others too. An architecture test
+  now fails on any warning class a package can raise and does not publish.
+
 - The fan's pressure rise says what it is: `fan_sound_power`'s second argument
   is `fan_static_pressure_pa`, keyword-only. It is a **gauge** pressure rise in
   **pascals**, and it shared its name with the `static_pressure` the ISO 3740

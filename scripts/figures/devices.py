@@ -9,6 +9,7 @@ under ``devices/``.
 """
 
 import re
+import warnings
 from typing import TYPE_CHECKING, Any
 
 import matplotlib.pyplot as plt
@@ -4020,15 +4021,19 @@ def generate_fan_sound_power(output_dir: str) -> None:
 
     inset = ax.inset_axes((0.07, 0.22, 0.33, 0.26))
     grid = np.linspace(40.0, 100.0, 400)
-    inset.plot(
-        grid,
-        [
+    # The inset exists to show the staircase below the 50 % floor Table 13.6 is
+    # tabulated from, which is exactly what HvacWarning is there to flag. The
+    # warning is aimed at a caller who passed a fraction where a percentage was
+    # wanted, not at a figure drawing the extrapolation on purpose, so it is
+    # silenced here and nowhere wider: a warnings-as-errors run would otherwise
+    # stop before writing the asset.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", noise_control.HvacWarning)
+        corrections = [
             noise_control.fan_efficiency_correction(relative_efficiency_percent=v)
             for v in grid
-        ],
-        color=COLOR_PRIMARY,
-        lw=1.8,
-    )
+        ]
+    inset.plot(grid, corrections, color=COLOR_PRIMARY, lw=1.8)
     inset.set_xlabel("static efficiency [% of peak]", fontsize="x-small")
     inset.set_ylabel("$C_{\\mathrm{EFF}}$ [dB]", fontsize="x-small")
     inset.tick_params(labelsize="x-small")

@@ -398,6 +398,56 @@ def test_every_public_name_is_reachable_from_its_domain() -> None:
     )
 
 
+def test_every_warning_a_package_can_raise_is_published() -> None:
+    """A warning you cannot name is a warning you cannot filter.
+
+    ``HvacWarning`` fires whenever a relative efficiency lands below the 50 %
+    floor Long Table 13.6 is tabulated from, which is the deliberate case as
+    well as the mistaken one, and ``phonometry.noise_control`` did not publish
+    it while publishing its sibling ``PlaneWaveWarning``. A caller could see it
+    and could not write the ``filterwarnings`` rule for it; only the blanket
+    ``PhonometryWarning`` rule reached it, which silences twenty-six others too.
+    """
+    import importlib
+    import inspect
+    import pkgutil
+
+    import phonometry
+
+    unpublished: list[str] = []
+    for domain in sorted(
+        name
+        for name in dir(phonometry)
+        if not name.startswith("_") and inspect.ismodule(getattr(phonometry, name))
+    ):
+        package = getattr(phonometry, domain)
+        exported = set(getattr(package, "__all__", ()))
+        for _, modname, _ in pkgutil.walk_packages(
+            getattr(package, "__path__", []), prefix=f"phonometry.{domain}."
+        ):
+            if "._" in modname:
+                continue
+            try:
+                module = importlib.import_module(modname)
+            except Exception:  # noqa: BLE001 - an optional dependency is absent
+                continue
+            for name, obj in vars(module).items():
+                if (
+                    inspect.isclass(obj)
+                    and issubclass(obj, Warning)
+                    and obj.__module__ == modname
+                    and not name.startswith("_")
+                    and name not in exported
+                ):
+                    unpublished.append(f"phonometry.{domain} does not publish {name}")
+
+    assert not unpublished, (
+        "warning classes a package can raise but does not publish:\n  "
+        + "\n  ".join(sorted(set(unpublished)))
+        + "\nExport each, so a caller can filter it by name."
+    )
+
+
 def test_a_published_field_type_is_published_too() -> None:
     """A type you can receive but cannot name is a type you cannot use.
 

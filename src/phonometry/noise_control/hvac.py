@@ -863,7 +863,9 @@ class HvacWarning(PhonometryWarning):
 
 #: The lowest relative efficiency Long Table 13.6 tabulates, in per cent.
 #: Below it the table has one catch-all row, which is also where a caller who
-#: passed a fraction rather than a percentage silently lands.
+#: passed a fraction rather than a percentage lands. That landing is what
+#: :class:`HvacWarning` announces, since the two cases are indistinguishable
+#: from the value alone.
 _TABLE_13_6_FLOOR_PERCENT = 50.0
 
 
@@ -962,8 +964,9 @@ def fan_sound_power(
     :param relative_efficiency_percent: Static efficiency as a **percentage**
         of the peak (default 80, Long's recommendation when the peak is
         unknown). Table 13.6 is tabulated from 50 % up, so a fraction such as
-        0,8 falls through to the table's bottom row and silently returns its
-        worst-case 16 dB correction instead of the 6 dB that 80 % earns.
+        0,8 falls through to the table's bottom row and returns its worst-case
+        16 dB correction instead of the 6 dB that 80 % earns. That is what
+        :class:`HvacWarning` says when it fires below the floor.
     :param blade_frequency: Blade passing frequency ``f_bp``, Hz (from
         :func:`blade_passing_frequency`). ``None`` (default) places the
         increment in the octave band Table 13.7 tabulates for the fan type.
