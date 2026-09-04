@@ -801,10 +801,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   word for two quantities confuses even the person removing the confusion.
 
 - `fan_efficiency_correction` takes `relative_efficiency_percent`, and warns
-  below the 50 % floor Long Table 13.6 is tabulated from. Passing 0,8 for 80 %
-  fell into the table's catch-all bottom row and returned its worst-case 16 dB
-  correction where 80 % earns 6: ten decibels on the sound power level with
-  nothing on the page to say it happened. The value is unchanged, because the
+  below the 50 % floor Long Table 13.6 is tabulated from. Eighty per cent is
+  `80`, not `0,8`; a caller who wrote the fraction fell into the table's
+  catch-all bottom row and got its worst-case 16 dB correction where 80 % earns
+  6, which is ten decibels on the sound power level with nothing on the page to
+  say it happened. The value is unchanged, because the
   table is what it is; what changed is that the caller is told.
 
 - Two errata registered against Ainslie (2010). Its folio 177 quotes
