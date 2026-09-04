@@ -153,7 +153,25 @@ def _as_float64(x: ArrayLike, name: str) -> np.ndarray:
     A string element raises numpy's anonymous "could not convert string to
     float", and an unconvertible object a bare ``TypeError``; both would
     escape the array guards below without saying which parameter refused.
+
+    A complex array is refused rather than converted. ``np.asarray(z,
+    dtype=float64)`` does not fail on one: it drops the imaginary part and
+    emits a ``ComplexWarning``, which is a warning and not an error, so
+    ``np.array([1 + 2j])`` would arrive at the guards below as ``[1.0]`` and
+    pass every one of them. A list of complex numbers already raised here, so
+    the two spellings of the same input disagreed.
     """
+    try:
+        complex_input = np.iscomplexobj(x)
+    except (TypeError, ValueError) as exc:
+        # `iscomplexobj` builds the array to read its dtype, so a ragged list
+        # fails here rather than below and would escape without naming the
+        # parameter. Its refusal is the same refusal, in the same words.
+        msg = f"'{name}' must be numeric."
+        raise ValueError(msg) from exc
+    if complex_input:
+        msg = f"'{name}' must be real, not complex."
+        raise ValueError(msg)
     try:
         return np.asarray(x, dtype=np.float64)
     except (TypeError, ValueError) as exc:

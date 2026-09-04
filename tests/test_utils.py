@@ -35,7 +35,6 @@ def test_typesignal_refuses_none_as_the_whole_signal() -> None:
         pytest.param("hello", id="string"),
         pytest.param({"a": 1.0}, id="dict"),
         pytest.param(object(), id="object"),
-        pytest.param(1 + 2j, id="complex"),
         pytest.param([[1.0, 2.0], [3.0]], id="ragged"),
     ],
 )
@@ -48,6 +47,18 @@ def test_typesignal_refuses_what_is_not_numeric_by_name(bad: Any) -> None:  # no
     """
     with pytest.raises(ValueError, match=r"'x' must be numeric"):
         _typesignal(bad)
+
+
+def test_typesignal_refuses_a_complex_signal_saying_so() -> None:
+    """A complex input gets its own message, because it is its own mistake.
+
+    It used to share the "must be numeric" refusal, which was true of the list
+    spelling only: numpy converts a complex *array* to float64 by dropping the
+    imaginary part, under a warning rather than an error. Saying "not complex"
+    tells a caller who passed an analytic signal what actually happened.
+    """
+    with pytest.raises(ValueError, match=r"'x' must be real, not complex"):
+        _typesignal(1 + 2j)
 
 
 @pytest.mark.parametrize(
