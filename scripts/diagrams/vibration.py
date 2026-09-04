@@ -1349,3 +1349,109 @@ def _d_power_injection_rig(s: SVG, th: Theme) -> None:
         13,
         th.muted,
     )
+
+
+def _d_machine_vibration_positions(s: SVG, th: Theme) -> None:
+    """Where machine vibration is measured (ISO 20816-1, 4.4).
+
+    Two kinds of measurement on one train. At the near bearing, the vibration
+    of the non-rotating parts, taken on the housing in three mutually
+    perpendicular directions. At the far bearing, the vibration of the shaft
+    itself, taken by a pair of non-contacting probes in one transverse plane,
+    with the cross-section that fixes the right angle between them and the
+    chain the reading runs through.
+    """
+    import math
+
+    gy = 508.0
+    shaft_y = 372.0
+    s.ground(gy, 96, 744)
+    s.rect(118, gy - 24, 596, 24, th.panel, th.fg, rx=3, sw=2)  # common baseplate
+
+    # --- The train: two pedestal bearings carrying a shaft between two bodies
+    bearing_x = (196.0, 636.0)
+    s.line(164, shaft_y, 672, shaft_y, th.fg, 5)  # shaft
+    # The second label is the longer one in both languages, so it is set a
+    # size down rather than pushed against the far bearing.
+    for x, w, label, size in (
+        (258.0, 128.0, "motor", 15),
+        (448.0, 152.0, "driven machine", 13),
+    ):
+        s.rect(x, shaft_y - 52, w, 104, th.panel, th.primary, rx=8, sw=2.2)
+        s.text(x + w / 2, shaft_y + 6, label, size)
+    s.rect(402, shaft_y - 16, 38, 32, th.bg, th.accent, rx=3, sw=2)  # coupling
+    s.text(421, shaft_y - 28, "coupling", 13, th.accent)
+    for bx in bearing_x:
+        s.rect(bx - 30, shaft_y - 26, 60, 26, th.secondary, th.fg, rx=4, sw=1.6)
+        s.rect(bx - 22, shaft_y + 12, 44, gy - 24 - shaft_y - 12, th.panel, th.fg, 2)
+
+    # --- Near bearing: the three perpendicular directions -------------------
+    nx = bearing_x[0]
+    _accel(s, nx, shaft_y - 26)
+    s.arrow(nx, shaft_y - 48, nx, shaft_y - 96, th.accent, 2.4)
+    s.text(nx, shaft_y - 106, "vertical", 14, th.accent)
+    s.arrow(nx - 34, shaft_y - 18, nx - 84, shaft_y - 18, th.accent, 2.4)
+    s.text(nx - 92, shaft_y - 14, "horizontal", 14, th.accent, anchor="end")
+    # The axial direction leaves the elevation, so it is drawn as a
+    # foreshortened diagonal rather than as a second horizontal arrow.
+    s.arrow(nx - 24, shaft_y + 6, nx - 62, shaft_y + 36, th.muted, 2.4)
+    s.text(nx - 70, shaft_y + 50, "axial", 14, th.muted, anchor="end")
+
+    # --- Far bearing: the pair of non-contacting probes ---------------------
+    fx = bearing_x[1]
+    for sign in (-1.0, 1.0):
+        tip_x, tip_y = fx + sign * 16.0, shaft_y - 16.0
+        end_x, end_y = fx + sign * 52.0, shaft_y - 52.0
+        s.line(tip_x, tip_y, end_x, end_y, th.fg, 2.4)
+        s.circle(end_x, end_y, 7, th.secondary, th.fg, 1.5)
+    s.text(fx, shaft_y - 76, "two probes", 14, th.secondary)
+
+    # --- The cross-section that fixes the right angle -----------------------
+    cx, cy, r = 744.0, 142.0, 48.0
+    s.line(fx + 52, shaft_y - 52, cx - 30, cy + r + 4, th.muted, 1.2, dash="5 5")
+    s.circle(cx, cy, r, th.panel, th.fg, 2)  # bearing bore
+    s.circle(cx, cy, r * 0.58, th.bg, th.fg, 2.4)  # shaft section
+    s.text(cx, cy + 5, "shaft", 13)
+    for angle in (135.0, 45.0):
+        rad = math.radians(angle)
+        s.line(
+            cx + r * 0.58 * math.cos(rad),
+            cy - r * 0.58 * math.sin(rad),
+            cx + (r + 20) * math.cos(rad),
+            cy - (r + 20) * math.sin(rad),
+            th.muted,
+            1.6,
+        )
+        s.circle(
+            cx + (r + 26) * math.cos(rad),
+            cy - (r + 26) * math.sin(rad),
+            7,
+            th.secondary,
+            th.fg,
+            1.5,
+        )
+    s.path(
+        f"M {cx - 30} {cy - 30} A 42 42 0 0 1 {cx + 30} {cy - 30}",
+        "none",
+        th.accent,
+        sw=2.0,
+    )
+    s.text(cx, cy - 54, "90° ± 5°", 14, th.accent)
+
+    # --- The chain a shaft reading runs through -----------------------------
+    box_y = gy + 108.0
+    for x, w, label in (
+        (196.0, 150.0, "transducer"),
+        (382.0, 166.0, "conditioning"),
+        (584.0, 166.0, "processing"),
+    ):
+        s.rect(x, box_y, w, 40, th.panel, th.fg, rx=6, sw=1.8)
+        s.text(x + w / 2, box_y + 26, label, 14)
+    s.arrow(350, box_y + 20, 378, box_y + 20, th.muted, 2.2)
+    s.arrow(552, box_y + 20, 580, box_y + 20, th.muted, 2.2)
+
+    # --- The two captions ---------------------------------------------------
+    s.text(250, gy + 54, "on non-rotating parts", 15, bold=True)
+    s.text(250, gy + 76, "axial only on a thrust bearing", 13, th.muted)
+    s.text(646, gy + 54, "on the rotating shaft", 15, bold=True)
+    s.text(646, gy + 76, "both probes on one bearing half", 13, th.muted)

@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 
@@ -23,6 +23,13 @@ from .common import (
     format_frequency_axis,
 )
 
+#: The three phasors of the ISO 20816-1 Figure D.1 diagram, named once so
+#: the label a curve carries and the key its translation is filed under
+#: cannot drift apart.
+_LABEL_INITIAL = "initial $A_1$"
+_LABEL_FINAL = "final $A_2$"
+_LABEL_CHANGE = "change $A_2 - A_1$"
+
 #: Bar colours for the per-operation partial exposures, cycled in order. Blue,
 #: green, purple, light blue and grey deliberately avoid the orange EAV and red
 #: ELV threshold-line colours, so a bar is never mistaken for a limit line.
@@ -35,6 +42,7 @@ if TYPE_CHECKING:
     from typing import Protocol
 
     from matplotlib.axes import Axes
+    from matplotlib.projections.polar import PolarAxes
     from numpy.typing import ArrayLike, NDArray
 
     from ..vibration.human.exposure import (
@@ -44,6 +52,7 @@ if TYPE_CHECKING:
     )
     from ..vibration.human.multiple_shock import MultipleShockResult
     from ..vibration.machinery.diagnostics import FaultFrequencyResult
+    from ..vibration.machinery.evaluation import VectorChangeResult
     from ..vibration.structural.experimental_sea import PowerInjectionResult
     from ..vibration.structural.junction_transmission import (
         JunctionTransmissionResult,
@@ -147,6 +156,10 @@ _STRINGS: dict[str, str] = {
     r"straight $\tau_{13}(\theta)$": r"recta $\tau_{13}(\theta)$",
     r"corner average $\bar\tau_{12}$ = {value}": r"media esquina $\bar\tau_{12}$ = {value}",
     r"straight average $\bar\tau_{13}$ = {value}": r"media recta $\bar\tau_{13}$ = {value}",
+    _LABEL_INITIAL: "inicial $A_1$",
+    _LABEL_FINAL: "final $A_2$",
+    _LABEL_CHANGE: "cambio $A_2 - A_1$",
+    "Change in vibration: magnitude {mag}, vector {vec}": "Cambio de vibración: magnitud {mag}, vector {vec}",
 }
 
 
@@ -1152,5 +1165,116 @@ def plot_junction_transmission(
     )
     ax.grid(True, color=_C_MUTED, alpha=0.3)
     ax.legend(loc="best", fontsize="small")
+    localize_axes(ax, language)
+    return ax
+
+
+def _radial_label_angle(first: complex, second: complex) -> float:
+    """Where to park the radial tick labels, in degrees.
+
+    The middle of the widest gap between the two phasors and the chord that
+    joins them, so the labels never run along a drawn line.
+    """
+    drawn = sorted(
+        float(np.degrees(np.angle(z)) % 360.0) for z in (first, second, second - first)
+    )
+    gaps = [
+        (drawn[(i + 1) % len(drawn)] - angle) % 360.0 for i, angle in enumerate(drawn)
+    ]
+    widest = int(np.argmax(gaps))
+    return (drawn[widest] + gaps[widest] / 2.0) % 360.0
+
+
+def _polar_chord(
+    first: complex, second: complex, points: int = 64
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """Sample the straight Cartesian segment between two phasors.
+
+    A polar axes interpolates between two points along an arc, so a chord
+    drawn as two points comes out bowed. The change vector of Annex D is a
+    straight line between the tips of the two states, and a bowed one would
+    misread as a path the vibration took, so the segment is sampled in the
+    plane and converted point by point.
+    """
+    t = np.linspace(0.0, 1.0, points)
+    line = first + (second - first) * t
+    return np.angle(line), np.abs(line)
+
+
+def plot_vector_change(
+    result: VectorChangeResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    unit: str | None = None,
+    **kwargs: Any,
+) -> Axes:
+    """Change in vibration between two steady states (ISO 20816-1, Figure D.1).
+
+    The two states as phasors from the origin and the change as the chord
+    joining their tips. The picture is the argument of Annex D: the chord can
+    be far longer than the difference of the two radii, so a criterion written
+    on broad-band magnitude alone misses the change entirely.
+
+    :param result: A
+        :class:`~phonometry.vibration.machinery.evaluation.VectorChangeResult`.
+    :param ax: Existing polar axes, or ``None`` to create a polar figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param unit: Unit of the two magnitudes, appended to the title's numbers.
+        The result carries whichever unit its inputs were in and cannot know
+        it, so the caller names it or the title stays bare.
+    :param kwargs: Forwarded to the change chord.
+    :return: The (polar) axes.
+    :raises ValueError: If *ax* is not a polar axes.
+    """
+    from .._i18n import format_number, localize_axes
+    from .electroacoustics import _new_polar_axes, _sign_theta_labels
+
+    if ax is not None and getattr(ax, "name", None) != "polar":
+        msg = (
+            "'ax' must be a polar axes (subplot_kw={'projection': 'polar'}); "
+            "pass ax=None to create one."
+        )
+        raise ValueError(msg)
+    polar = cast("PolarAxes", ax) if ax is not None else _new_polar_axes()
+    ax = polar
+
+    first = result.initial[0] * np.exp(1j * np.radians(result.initial[1]))
+    second = result.final[0] * np.exp(1j * np.radians(result.final[1]))
+    for phasor, color, key in (
+        (first, _C_PRIMARY, _LABEL_INITIAL),
+        (second, _C_SECONDARY, _LABEL_FINAL),
+    ):
+        angle = float(np.angle(phasor))
+        ax.plot(
+            [0.0, angle],
+            [0.0, float(abs(phasor))],
+            color=color,
+            linewidth=2.0,
+            marker="o",
+            markevery=[1],
+            label=_t(key, language),
+        )
+    kwargs.setdefault("color", _C_TERTIARY)
+    kwargs.setdefault("linewidth", 2.0)
+    kwargs.setdefault("linestyle", "--")
+    theta, radius = _polar_chord(first, second)
+    ax.plot(theta, radius, label=_t(_LABEL_CHANGE, language), **kwargs)
+
+    _sign_theta_labels(polar)
+    # The radial ticks would otherwise run along whichever phasor happens to
+    # lie near the default position; park them where no vector points.
+    polar.set_rlabel_position(_radial_label_angle(first, second))
+    suffix = f" {unit}" if unit else ""
+    ax.set_title(
+        _t("Change in vibration: magnitude {mag}, vector {vec}", language).format(
+            mag=format_number(result.magnitude_change, language, decimals=2, trim=True)
+            + suffix,
+            vec=format_number(result.magnitude, language, decimals=2, trim=True)
+            + suffix,
+        )
+    )
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc="lower left", fontsize="small", bbox_to_anchor=(-0.15, -0.1))
     localize_axes(ax, language)
     return ax

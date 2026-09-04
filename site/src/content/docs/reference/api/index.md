@@ -184,6 +184,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`vibration.structural.junction_transmission`](/phonometry/reference/api/vibration/junction-transmission/) | Bending-wave transmission coefficients for rigid plate junctions (Hopkins 2007, *Sound Insulation*, Section 5.2.1.3; Cremer et al. |
 | [`vibration.structural.experimental_sea`](/phonometry/reference/api/vibration/experimental-sea/) | Experimental statistical energy analysis: coupling loss factors from measured energies (Norton & Karczub Ch. |
 | [`vibration.machinery.diagnostics`](/phonometry/reference/api/vibration/diagnostics/) | Kinematic fault frequencies of rotating machinery (Norton & Karczub Ch. |
+| [`vibration.machinery.evaluation`](/phonometry/reference/api/vibration/evaluation/) | Evaluation of machine vibration by measurement (ISO 20816-1:2016). |
 | [`vibration.structural.transfer_stiffness`](/phonometry/reference/api/vibration/transfer-stiffness/) | Dynamic transfer stiffness of resilient elements (ISO 10846-1/-2/-3). |
 | [`vibration.human.exposure`](/phonometry/reference/api/vibration/exposure/) | Human exposure to whole-body and hand-transmitted vibration. |
 | [`vibration.human.multiple_shock`](/phonometry/reference/api/vibration/multiple-shock/) | Whole-body vibration containing multiple shocks (ISO 2631-5:2018). |

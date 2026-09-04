@@ -186,6 +186,7 @@ export const apiSections = {
       'reference/api/vibration/junction-transmission',
       'reference/api/vibration/experimental-sea',
       'reference/api/vibration/diagnostics',
+      'reference/api/vibration/evaluation',
       'reference/api/vibration/transfer-stiffness',
       'reference/api/vibration/exposure',
       'reference/api/vibration/multiple-shock',

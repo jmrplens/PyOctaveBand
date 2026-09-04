@@ -1,0 +1,234 @@
+---
+title: "Evaluar la vibración de una máquina"
+description: "Calificar una máquina a partir de una sola medida de banda ancha (ISO 20816-1:2016): las cuatro zonas de evaluación, el criterio de velocidad conformado en frecuencia de la Figura 9 con los factores de zona del Anexo C.2, los rangos típicos de frontera de la Tabla C.1 y la lectura vectorial de un cambio que una comparación de magnitudes no ve."
+references:
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2016
+    title: "Mechanical vibration — Measurement and evaluation of machine vibration — Part 1: General guidelines"
+    designation: "ISO 20816-1:2016"
+    url: "https://www.iso.org/standard/63180.html"
+    primary: true
+    note: "Las posiciones de medida del 4.4, la severidad de vibración del 4.3.3, las cuatro zonas de evaluación del 6.3.2.3, el criterio II del 6.3.3, el criterio de velocidad de la Figura 9 como Fórmula (C.1) con los factores de zona del Anexo C.2, los rangos típicos de frontera de la Tabla C.1 y el cambio vectorial del Anexo D. Esta primera edición anuló y sustituyó a la ISO 7919-1:1996 y a la ISO 10816-1:1995."
+---
+
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import SeeAlso from '../../../../../components/SeeAlso.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+[Frecuencias de fallo en máquinas](/phonometry/es/vibration/machinery/machine-diagnostics/)
+responde a *dónde se vería un fallo*. Esta página responde a lo que una planta
+pregunta antes: **¿es aceptable esta máquina?**. Son dos oficios distintos. Una
+línea cinemática dice qué va mal; una calificación de severidad dice si se
+sigue funcionando, y sale de un único número de banda ancha medido en un
+cojinete.
+
+La ISO 20816-1:2016 es el documento base de la serie ISO 20816, que fusionó y
+sustituyó a la ISO 10816-1 y a la ISO 7919-1. Fija la forma del juicio y deja
+los números a las partes específicas de cada máquina: la Parte 2 para turbinas
+de gas grandes, la Parte 3 para máquinas industriales, la Parte 4 para turbinas
+de gas, la Parte 5 para centrales hidráulicas, la Parte 8 para compresores
+alternativos y la Parte 9 para reductores.
+
+## 1. Qué se mide, y dónde
+
+Dos clases de medida, y una máquina puede llevar las dos.
+
+**En partes no rotativas**, un acelerómetro o un transductor de velocidad sobre
+el cojinete, su soporte o cualquier otra parte estructural que responda a las
+fuerzas dinámicas que llegan por el cojinete. El apartado 4.4.1 pide tres
+direcciones mutuamente perpendiculares en cada posición para el ensayo de
+recepción; la monitorización en servicio se suele resolver con una de las dos
+direcciones radiales o con las dos, y la axial sólo se evalúa en cojinetes
+axiales, donde se transmite fuerza dinámica axial directa.
+
+**En el eje que gira**, un par de sondas sin contacto que leen directamente el
+desplazamiento del eje. El apartado 4.4.2.1 las coloca radialmente en un mismo
+plano transversal, con sus ejes a menos de 5° de una línea radial,
+preferiblemente separadas 90° ± 5° en la misma mitad del cojinete, y en las
+mismas posiciones en todos los cojinetes de la máquina. Una sola sonda por
+plano se admite únicamente cuando se sabe que da información suficiente.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_machine_vibration_positions_es.svg" alt="Alzado de un tren de máquina sobre una bancada común: un motor y una máquina arrastrada unidos por un acoplamiento, cada extremo apoyado en un cojinete de pedestal. Sobre el cojinete cercano hay un acelerómetro en el soporte, del que salen tres flechas, una vertical, una horizontal hacia la izquierda y otra dibujada como diagonal escorzada para la dirección axial, que sale del plano del dibujo. En el cojinete lejano dos sondas sin contacto llegan al eje desde arriba a más y menos cuarenta y cinco grados, y una guía discontinua sube hasta una sección del alojamiento del cojinete en la que las dos sondas aparecen separadas noventa grados, con el ángulo acotado como noventa grados más menos cinco. Una franja inferior muestra la cadena por la que pasa una lectura, del transductor al acondicionamiento y al procesado." width="92%" loading="eager" />
+
+*Las dos familias de medida del apartado 4.4, sobre un mismo tren. La flecha
+axial va escorzada porque sale del plano de un alzado.*
+
+La magnitud medida es de banda ancha, y la **severidad de vibración** es la
+mayor magnitud encontrada en cualquier cojinete a la velocidad nominal en
+régimen permanente (4.3.3). Es ese único número el que califican las zonas.
+
+## 2. Cuatro zonas, no un apto y un no apto
+
+El apartado 6.3.2.3 califica en vez de juzgar:
+
+| Zona | Qué significa |
+| :--- | :--- |
+| **A** | Donde suelen caer las máquinas recién puestas en servicio. |
+| **B** | Aceptable para operación prolongada sin restricción. |
+| **C** | Insatisfactoria para operación continua prolongada; la máquina puede funcionar un tiempo limitado hasta que se pueda actuar. |
+| **D** | Lo bastante severa como para dañar la máquina. |
+
+Tres fronteras las separan, y `evaluation_zone` es la comparación misma. Es
+deliberadamente ciega a la magnitud: las partes de la serie fijan fronteras
+sobre desplazamiento de eje, velocidad de carcasa o aceleración de carcasa, y
+la calificación es la misma en los tres casos. Una magnitud justo en una
+frontera es el techo de la zona de abajo, que es como imprimen sus límites las
+tablas.
+
+```python
+from phonometry import vibration
+
+# Tres fronteras de la parte de la ISO 20816 que aplique, en mm/s eficaces.
+zones = vibration.ZoneBoundaries(2.8, 7.1, 11.2)
+print(vibration.evaluation_zone([0.9, 3.4, 8.0, 20.0], zones))   # ['A' 'B' 'C' 'D']
+print(vibration.evaluation_zone(2.8, zones))                     # A, el límite de A
+```
+
+Las fronteras tienen que crecer a lo largo de las zonas, y `ZoneBoundaries`
+rechaza un juego que no lo haga: desordenadas calificarían de mala una máquina
+buena sin decir nada.
+
+## 3. El criterio es una curva, no un número
+
+La velocidad sostiene un criterio de severidad en un rango amplio de
+velocidades de giro, que es por lo que las tablas se escriben en ella. Pero un
+límite único de velocidad *independiente de la frecuencia* admite
+desplazamientos inaceptables a baja frecuencia y aceleraciones inaceptables a
+alta (6.3.2.1). Así que el criterio de la Figura 9 sólo es plano entre dos
+frecuencias de esquina, y cae fuera de ellas. El Anexo C.2 lo escribe como
+Fórmula (C.1), y `allowable_velocity` es esa fórmula:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/machine_vibration_zones_es.svg" alt="Gráfica logarítmica de la velocidad eficaz admisible en milímetros por segundo frente a la frecuencia, de 2 a 3000 hercios. Tres curvas suben juntas por la izquierda, se aplanan entre las frecuencias de esquina de 10 hercios y 1 kilohercio, y caen juntas por la derecha; son los límites de las zonas A, B y C, a 1,12, 2,87 y 7,17 milímetros por segundo en la meseta. Las cuatro bandas en que dividen el plano están sombreadas y rotuladas: zona A recién puesta en servicio abajo, después zona B operación sin restricción, zona C operación limitada y zona D daño llenando la parte alta. Dos líneas verticales discontinuas marcan las frecuencias de esquina, rotuladas f sub x y f sub y." width="92%" />
+
+*Una sola curva, llevada a las tres fronteras por el factor `Zbound`. Por
+debajo de la esquina inferior el criterio mantiene constante el desplazamiento;
+por encima de la superior, la aceleración.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import vibration
+
+freq = np.logspace(np.log10(2.0), np.log10(3000.0), 600)
+common = dict(constant_velocity_mm_s=1.12, corner_low_hz=10.0,
+              corner_high_hz=1000.0)
+for zone, factor in vibration.ZONE_LIMIT_FACTORS.items():
+    plt.plot(freq, vibration.allowable_velocity(freq, zone_factor=factor,
+                                                **common),
+             label=f"límite de la zona {zone}")
+plt.xscale("log"); plt.yscale("log"); plt.legend()
+plt.xlabel("Frecuencia [Hz]"); plt.ylabel("Velocidad eficaz admisible (mm/s)")
+plt.show()
+```
+
+</details>
+
+El factor `Zbound` lleva la única curva a los tres límites, y el Anexo C.2
+imprime lo que vale: 1 para el límite de la zona A, **2,56** para la B y
+**6,4** para la C. Son 1,6 al cuadrado y 1,6 a la cuarta, con buena
+aproximación, y la escala de la Tabla C.1 también avanza en pasos de en torno a
+1,6, así que los tres límites caen cerca de sus escalones sin coincidir con
+ellos.
+
+```python
+from phonometry import vibration
+
+common = dict(constant_velocity_mm_s=1.12, corner_low_hz=10.0,
+              corner_high_hz=1000.0)
+for zone, factor in vibration.ZONE_LIMIT_FACTORS.items():
+    limit = vibration.allowable_velocity(100.0, zone_factor=factor, **common)
+    print(zone, round(float(limit), 2))       # A 1.12 / B 2.87 / C 7.17
+```
+
+Las frecuencias de esquina y los exponentes son de la máquina, y los fijan las
+partes específicas. Los valores por defecto de 1 son la lectura física de la
+forma, no un número tomado de ningún sitio: desplazamiento constante por debajo
+de la esquina inferior y aceleración constante por encima de la superior, que
+caen ambos a 6 dB por octava.
+
+## 4. Un cambio es un vector
+
+El criterio I juzga una magnitud. El **criterio II** (6.3.3) juzga un *cambio*
+respecto de una línea base establecida, y existe porque una máquina puede
+estropearse dentro de la zona B: puede darse un aumento o una disminución
+significativos, y exigir actuación, mucho antes de llegar a la zona C.
+
+La trampa es que una magnitud de banda ancha no sabe expresar un cambio. El
+Anexo D lo enseña con una máquina cuya vibración bajó de 3 mm/s a 2,5 mm/s
+mientras su fase giraba de 40° a 180°:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/machine_vector_change_es.svg" alt="Diagrama polar de magnitud de vibración frente a fase. Un vector continuo va del origen a 3 milímetros por segundo a 40 grados, el estado inicial; otro vector continuo va a 2,5 milímetros por segundo a 180 grados, el estado final; y una línea discontinua une las dos puntas, el cambio. La línea discontinua es con diferencia la más larga de las tres. El título dice que la magnitud cambió en menos 0,5 milímetros por segundo mientras que el vector cambió en 5,17." width="70%" />
+
+*La magnitud bajó medio milímetro por segundo. La vibración se movió 5,2, diez
+veces más.*
+
+```python
+from phonometry import vibration
+
+change = vibration.vibration_vector_change(3.0, 40.0, 2.5, 180.0)
+print(round(change.magnitude, 2))          # 5.17 mm/s: el cambio real
+print(round(change.magnitude_change, 2))   # -0.5 mm/s: lo que dicen las magnitudes
+```
+
+Por eso la fase pertenece al registro de tendencia. Una componente que gira
+mientras su aportación baja cambia la máquina, y un criterio de sola magnitud
+ve una pequeña mejora.
+
+## 5. De dónde salen los números
+
+Para una máquina cubierta por una parte de la serie, de esa parte. Para una que
+no lo está, y donde no hay experiencia disponible, el Anexo C.1 ofrece la Tabla
+C.1: una escala de magnitudes preferentes y el rango del que se suele tomar
+cada frontera, con las máquinas pequeñas (motores eléctricos de hasta 15 kW) en
+el extremo bajo y las grandes sobre apoyos flexibles en el alto.
+
+```python
+from phonometry import vibration
+
+print(vibration.TYPICAL_ZONE_BOUNDARY_RANGES_MM_S["B/C"])   # (1.8, 9.3)
+print(vibration.TYPICAL_BOUNDARY_LADDER_MM_S[:5])           # los primeros escalones
+```
+
+Los rangos se solapan a propósito: la frontera A/B de una máquina grande puede
+quedar por encima de la B/C de una pequeña, que es lo que los hace rangos y no
+límites. Son un punto de partida para el acuerdo entre suministrador y cliente,
+y la norma dice sin rodeos que los valores asignados a las fronteras de zona no
+pretenden servir de especificación de recepción (6.3.2.5).
+
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Las cuatro zonas de evaluación y la calificación del 6.3.2.3, el criterio
+conformado en frecuencia de la Figura 9 como Fórmula (C.1) con los factores de
+zona del Anexo C.2, los rangos y la escala típicos de la Tabla C.1, y la
+lectura vectorial de un cambio del Anexo D, mediante `ZoneBoundaries`,
+`evaluation_zone`, `allowable_velocity` y `vibration_vector_change`.
+</ScopeClaim>
+<ScopeClaim status="not-covered" label="No cubierto">
+Las fronteras numéricas de zona de las partes específicas, que esta página toma
+como datos de entrada; los ajustes de ALARMA y DISPARO del 6.4, que la norma
+describe sin números y deja a las partes; y el criterio de eje de la Figura 10,
+cuyos valores el Anexo C.1 se niega a dar para máquinas que ninguna parte
+cubre, por entender que esas máquinas no suelen llevar transductores de eje.
+</ScopeClaim>
+</Scope>
+
+<SeeAlso>
+
+## Véase también
+
+- [Frecuencias de fallo en máquinas](/phonometry/es/vibration/machinery/machine-diagnostics/):
+  dónde se vería un fallo, una vez que la severidad dice que hay algo que
+  mirar.
+- [Movilidad mecánica y la familia de FRF (ISO 7626-1)](/phonometry/es/vibration/structural/mechanical-mobility/):
+  el vocabulario de respuesta en frecuencia que hay detrás de la respuesta del
+  soporte que lee una medida en partes no rotativas.
+- [Exposición humana a vibración](/phonometry/es/vibration/human/human-vibration/):
+  el mismo movimiento juzgado frente a una persona en vez de frente a una
+  máquina.
+
+</SeeAlso>

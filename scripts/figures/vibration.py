@@ -2288,3 +2288,127 @@ def generate_mobility_random_error(output_dir: str) -> None:
     plt.tight_layout()
     save_figure(output_dir, "mobility_random_error.svg")
     plt.close()
+
+
+def generate_machine_vibration_zones(output_dir: str) -> None:
+    """The four evaluation zones as a frequency-shaped velocity criterion."""
+    print("Generating machine_vibration_zones...")
+    from phonometry import vibration
+
+    # ISO 20816-1 Formula (C.1) drawn for one machine: flat between the two
+    # corners, constant displacement below and constant acceleration above.
+    # The specific parts of the series set the corners; 10 Hz and 1 kHz are
+    # the pair the older ISO 10816-3 used for most machines.
+    f_x, f_y = 10.0, 1000.0
+    v_a = 1.12
+    freq = np.logspace(np.log10(2.0), np.log10(3000.0), 600)
+    curves = [
+        ("A", vibration.ZONE_LIMIT_FACTORS["A"], COLOR_PRIMARY),
+        ("B", vibration.ZONE_LIMIT_FACTORS["B"], COLOR_SECONDARY),
+        ("C", vibration.ZONE_LIMIT_FACTORS["C"], COLOR_TERTIARY),
+    ]
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    limits = {}
+    for zone, factor, colour in curves:
+        v = np.asarray(
+            vibration.allowable_velocity(
+                freq,
+                constant_velocity_mm_s=v_a,
+                zone_factor=factor,
+                corner_low_hz=f_x,
+                corner_high_hz=f_y,
+            )
+        )
+        limits[zone] = v
+        ax.plot(
+            freq,
+            v,
+            color=colour,
+            linewidth=1.8,
+            label=f"limit of zone {zone} ($Z$ = {factor:g})",
+        )
+
+    floor = np.full_like(freq, 1.0e-3)
+    ceiling = np.full_like(freq, 1.0e3)
+    bands = (
+        (floor, limits["A"], COLOR_PRIMARY, "zone A: newly commissioned"),
+        (limits["A"], limits["B"], COLOR_SECONDARY, "zone B: unrestricted operation"),
+        (limits["B"], limits["C"], COLOR_TERTIARY, "zone C: limited operation"),
+        (limits["C"], ceiling, COLOR_MUTED, "zone D: damage"),
+    )
+    for lower, upper, colour, label in bands:
+        ax.fill_between(
+            freq, lower, upper, color=theme_fill(colour, ax), zorder=0, label=label
+        )
+
+    for corner, name in ((f_x, "$f_x$"), (f_y, "$f_y$")):
+        ax.axvline(corner, color=COLOR_FG, linestyle="--", linewidth=1.0, alpha=0.55)
+        # Over the shaded zone D, so the label needs a chip to stay readable.
+        ax.annotate(
+            name,
+            xy=(corner, 0.72),
+            xycoords=("data", "axes fraction"),
+            ha="center",
+            va="center",
+            fontsize=10,
+            color=COLOR_FG,
+            bbox={
+                "boxstyle": "round,pad=0.25",
+                "facecolor": COLOR_PANEL,
+                "edgecolor": COLOR_GRID,
+            },
+        )
+
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlim(2.0, 3000.0)
+    ax.set_ylim(0.012, 60.0)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Allowable r.m.s. velocity (mm/s)")
+    ax.set_title("Evaluation Zones as a Frequency-Shaped Velocity Criterion", pad=12)
+    format_frequency_axis(ax)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right", fontsize=8, ncol=2)
+
+    info = [
+        r"$v_\mathrm{rms} = v_A Z (f_z/f_x)^k (f_y/f_w)^m$, "
+        r"$v_A$ = 1.12 mm/s, $k = m = 1$",
+        "flat between the corners; constant displacement below, "
+        "constant acceleration above",
+        "the B and C limits fall within 3 % of the 2.8 and 7.1 rungs of "
+        "the Table C.1 ladder",
+    ]
+    ax.text(
+        0.015,
+        0.035,
+        "\n".join(info),
+        transform=ax.transAxes,
+        va="bottom",
+        ha="left",
+        fontsize=9,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "machine_vibration_zones.svg")
+    plt.close()
+
+
+def generate_machine_vector_change(output_dir: str) -> None:
+    """The Annex D vector change: a magnitude that falls while the vibration grows."""
+    print("Generating machine_vector_change...")
+    from phonometry import vibration
+
+    # ISO 20816-1 Annex D, D.2: the worked case the annex prints.
+    result = vibration.vibration_vector_change(3.0, 40.0, 2.5, 180.0)
+    _fig, ax = plt.subplots(figsize=(7.6, 7.0), subplot_kw={"projection": "polar"})
+    result.plot(ax=ax, language=_LANG, unit="mm/s")
+    plt.tight_layout()
+    save_figure(output_dir, "machine_vector_change.svg")
+    plt.close()

@@ -178,6 +178,7 @@ from .vibration import (
     _d_iso2631_5_setup,
     _d_junction_rig,
     _d_machine_diagnostics,
+    _d_machine_vibration_positions,
     _d_mobility_rig,
     _d_multiple_shock,
     _d_power_injection_rig,
@@ -639,6 +640,11 @@ DIAGRAMS = {
         _d_machine_diagnostics,
         "Condition monitoring on a motor-gearbox train (Norton Section 8.4)",
         600,
+    ),
+    "diagram_machine_vibration_positions": (
+        _d_machine_vibration_positions,
+        "Where machine vibration is measured (ISO 20816-1)",
+        700,
     ),
     "diagram_vibration_sound_power": (
         _d_vibration_sound_power,
