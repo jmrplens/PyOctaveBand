@@ -3,12 +3,12 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 698,
-    "passing": 698,
+    "checks": 703,
+    "passing": 703,
     "failing": 0,
     "domains": 65,
     "standards": 388,
-    "citations": 585,
+    "citations": 587,
     "designations": 122,
     "sources": 84
   },
@@ -453,8 +453,8 @@
     {
       "id": "hvac-noise-vdi-2081",
       "title": "HVAC noise (VDI 2081)",
-      "checks": 41,
-      "passing": 41
+      "checks": 46,
+      "passing": 46
     },
     {
       "id": "cnossos-eu-railway-source-directive-2002-49-ec-annex-ii",
@@ -19841,6 +19841,146 @@
         "value": 0.0719
       },
       "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-20/room-attenuation-of-a-ceiling-diffuser-worst-octave-deviation-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2:2005 Table 1, element 20",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 20"
+      },
+      "quantity": "Room attenuation of a ceiling diffuser, worst octave deviation, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0467
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.0467
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-1-2001-eq-36/room-attenuation-of-a-hemispherical-outlet-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 1:2001 Eq. (36)",
+        "cite": "VDI 2081 Blatt 1:2001 Eq. (36)"
+      },
+      "quantity": "Room attenuation of a hemispherical outlet, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 5.7
+      },
+      "computed": {
+        "value": 5.675
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.025
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-20/sound-pressure-level-in-room-102-worst-octave-deviation-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2:2005 Table 1, element 20",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 20"
+      },
+      "quantity": "Sound pressure level in room 102, worst octave deviation, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.4913
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.5
+      },
+      "deviation": {
+        "value": 0.4913
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-20/total-sound-pressure-level-in-room-102-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2:2005 Table 1, element 20",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 20"
+      },
+      "quantity": "Total sound pressure level in room 102, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 51.4
+      },
+      "computed": {
+        "value": 51.384
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.016
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "hvac-noise-vdi-2081/vdi-2081-blatt-2-2005-table-1-element-20/a-weighted-sound-pressure-level-in-room-102-db",
+      "domain": "hvac-noise-vdi-2081",
+      "reference": {
+        "kind": "standard",
+        "designation": "VDI 2081",
+        "clause": "Blatt 2:2005 Table 1, element 20",
+        "cite": "VDI 2081 Blatt 2:2005 Table 1, element 20"
+      },
+      "quantity": "A-weighted sound pressure level in room 102, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 40.0
+      },
+      "computed": {
+        "value": 40.037
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.037
+      },
+      "precision": 3,
       "verdict": "pass"
     },
     {

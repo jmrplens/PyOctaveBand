@@ -76,7 +76,7 @@ overlapping modes where the statistical field of this module applies.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
 
@@ -109,6 +109,53 @@ def _require_fraction_below_one(value: ArrayLike, name: str) -> NDArray[np.float
     return arr
 
 
+def _require_positive_array(value: ArrayLike, name: str) -> NDArray[np.float64]:
+    """Validate a positive, finite quantity that may be one value per band.
+
+    An empty array is refused before the range checks, because it passes
+    them: ``np.any`` over nothing is false and ``np.all`` over nothing is
+    true, so an empty absorption measure would sail through and hand back an
+    empty level spectrum, which reads as a room with no bands rather than as
+    the mistake it is.
+    """
+    arr = np.asarray(value, dtype=np.float64)
+    if arr.ndim > 1 or arr.size == 0:
+        msg = f"'{name}' must be a scalar or a non-empty 1-D array."
+        raise ValueError(msg)
+    if np.any(arr <= 0.0) or not np.all(np.isfinite(arr)):
+        msg = f"'{name}' must be positive and finite."
+        raise ValueError(msg)
+    return arr
+
+
+def _one_absorption_measure(
+    room_constant: ArrayLike | None, absorption_area: ArrayLike | None
+) -> NDArray[np.float64]:
+    r"""The reverberant-field denominator, from whichever measure was given.
+
+    The two are not the same number. The room constant is
+    :math:`R = S \bar{\alpha} / (1 - \bar{\alpha})` and the equivalent
+    absorption area is :math:`A = S \bar{\alpha}`, so they part company as
+    the room gets deader: at :math:`\bar{\alpha} = 0{,}3`, ``R`` is already
+    a seventh larger than ``A``. Which one a source says it means is the whole
+    reason both are accepted, and why neither is silently substituted for the
+    other. VDI 2081 Blatt 1 Equation (36) is written in ``A``; Bies Equation
+    (6.43) in ``R``.
+
+    :raises ValueError: unless exactly one of the two was given.
+    """
+    if room_constant is not None and absorption_area is None:
+        return _require_positive_array(room_constant, "room_constant")
+    if absorption_area is not None and room_constant is None:
+        return _require_positive_array(absorption_area, "absorption_area")
+    got = "both" if room_constant is not None else "neither"
+    msg = (
+        "Give exactly one of 'room_constant' (R = S alpha / (1 - alpha)) and "
+        f"'absorption_area' (A = S alpha); got {got}."
+    )
+    raise ValueError(msg)
+
+
 def room_constant(
     surface_area: float, mean_absorption: ArrayLike
 ) -> np.ndarray | float:
@@ -127,8 +174,23 @@ def room_constant(
     return as_float_or_array(surface_area * alpha / (1.0 - alpha))
 
 
+@overload
 def critical_distance(
-    room_constant: ArrayLike, *, directivity: float = 1.0
+    room_constant: ArrayLike, *, directivity: ArrayLike = ...
+) -> np.ndarray | float: ...
+
+
+@overload
+def critical_distance(
+    *, absorption_area: ArrayLike, directivity: ArrayLike = ...
+) -> np.ndarray | float: ...
+
+
+def critical_distance(
+    room_constant: ArrayLike | None = None,
+    *,
+    absorption_area: ArrayLike | None = None,
+    directivity: ArrayLike = 1.0,
 ) -> np.ndarray | float:
     r"""Critical (reverberation) distance
     :math:`r_\mathrm{c} = \sqrt{Q R / (16 \pi)}`.
@@ -139,18 +201,61 @@ def critical_distance(
     absorption area :math:`A = S \bar{\alpha}` instead of the room constant
     ``R``, the two differing by :math:`1 - \bar{\alpha}`).
 
+    Written in ``A`` and with the hemispherical :math:`Q = 2` of an outlet in
+    a room surface, the same expression is the ``rH = 0,2 sqrt(A)`` that
+    VDI 2081 Blatt 1 Section 6.7.3 prints for where the reverberant field of a
+    ventilation opening begins.
+
     :param room_constant: Room constant ``R``, m2 (scalar or per-band); from
-        :func:`room_constant`.
+        :func:`room_constant`. Give this or ``absorption_area``, not both.
+    :param absorption_area: Equivalent absorption area ``A``, m2 (scalar or
+        per-band); from :func:`sabine_absorption_area`. Give this or
+        ``room_constant``, not both.
     :param directivity: Source directivity factor ``Q`` (``1`` omnidirectional,
-        ``2`` on one reflecting plane, ``4`` in an edge, ``8`` in a corner).
+        ``2`` on one reflecting plane, ``4`` in an edge, ``8`` in a corner),
+        scalar or per-band.
     :return: The critical distance ``rc``, m.
+    :raises ValueError: unless exactly one absorption measure is given, or if
+        a value is not positive and finite.
     """
-    directivity = require_positive(directivity, "directivity")
-    r = np.asarray(room_constant, dtype=np.float64)
-    if np.any(r <= 0.0) or not np.all(np.isfinite(r)):
-        msg = "'room_constant' must be positive and finite."
-        raise ValueError(msg)
-    return as_float_or_array(np.sqrt(directivity * r / (16.0 * np.pi)))
+    measure = _one_absorption_measure(room_constant, absorption_area)
+    q = _require_positive_array(directivity, "directivity")
+    return as_float_or_array(np.sqrt(q * measure / (16.0 * np.pi)))
+
+
+def sabine_absorption_area(
+    volume: float,
+    reverberation_time: ArrayLike,
+    *,
+    speed_of_sound: float = 343.0,
+) -> np.ndarray | float:
+    r"""Equivalent absorption area from a reverberation time (Sabine, inverted).
+
+    .. math::
+
+       A = \frac{24 \ln 10}{c_0} \frac{V}{T}
+
+    which is :func:`phonometry.room.sabine_reverberation_time` read the other
+    way about: the absorption a measured or assumed ``T`` implies, which is
+    what a level calculation needs and what a room survey actually delivers.
+
+    The leading constant follows the speed of sound: ``0,161`` at the 343 m/s
+    of 20 degC, and the ``0,163`` VDI 2081 Blatt 1 Equation (37) prints, which
+    is the same expression at 339 m/s.
+
+    :param volume: Room volume ``V``, m3.
+    :param reverberation_time: Reverberation time ``T``, s (scalar or
+        per-band).
+    :param speed_of_sound: Speed of sound ``c0``, m/s (default 343, giving the
+        familiar 0,161; pass 339 for the 0,163 of VDI 2081).
+    :return: The equivalent absorption area ``A``, m2.
+    :raises ValueError: If the volume, the time or the speed is not positive
+        and finite.
+    """
+    v = require_positive(volume, "volume")
+    c = require_positive(speed_of_sound, "speed_of_sound")
+    t = _require_positive_array(reverberation_time, "reverberation_time")
+    return as_float_or_array(24.0 * np.log(10.0) / c * v / t)
 
 
 def schroeder_frequency(
@@ -189,12 +294,37 @@ SOURCE_POWER_MODELS: dict[str, float] = {
 }
 
 
+@overload
 def steady_state_spl(
     sound_power_level: ArrayLike,
     distance: ArrayLike | None,
     room_constant: ArrayLike,
     *,
-    directivity: float = 1.0,
+    directivity: ArrayLike = ...,
+    source_model: str = ...,
+    characteristic_impedance: float | None = ...,
+) -> np.ndarray | float: ...
+
+
+@overload
+def steady_state_spl(
+    sound_power_level: ArrayLike,
+    distance: ArrayLike | None,
+    *,
+    absorption_area: ArrayLike,
+    directivity: ArrayLike = ...,
+    source_model: str = ...,
+    characteristic_impedance: float | None = ...,
+) -> np.ndarray | float: ...
+
+
+def steady_state_spl(
+    sound_power_level: ArrayLike,
+    distance: ArrayLike | None,
+    room_constant: ArrayLike | None = None,
+    *,
+    absorption_area: ArrayLike | None = None,
+    directivity: ArrayLike = 1.0,
     source_model: str = "constant_power",
     characteristic_impedance: float | None = None,
 ) -> np.ndarray | float:
@@ -219,9 +349,16 @@ def steady_state_spl(
     :param distance: Source-receiver distance ``r``, m (scalar or array), or
         ``None`` for the reverberant field alone.
     :param room_constant: Room constant ``R``, m2 (scalar or per-band); from
-        :func:`room_constant`.
+        :func:`room_constant`. Give this or ``absorption_area``, not both.
+    :param absorption_area: Equivalent absorption area ``A``, m2 (scalar or
+        per-band); from :func:`sabine_absorption_area`. Give this or
+        ``room_constant``, not both. Written in ``A``, the expression is
+        VDI 2081 Blatt 1 Equation (36) for the level a ventilation outlet
+        produces in a room.
     :param directivity: Source directivity factor ``Q`` (default 1; ``2`` on
-        one reflecting plane, ``4`` in an edge, ``8`` in a corner).
+        one reflecting plane, ``4`` in an edge, ``8`` in a corner), scalar or
+        per-band. A diffuser is more directional the shorter the wavelength,
+        which is why the factor is allowed to vary across the bands.
     :param source_model: Sound power model of Norton & Karczub 2e Table 4.5:
         ``"constant_power"`` (default, :math:`\Pi = \Pi_0`, the position of
         the source does not change its radiated power), ``"constant_volume"``
@@ -234,32 +371,26 @@ def steady_state_spl(
         added (about ``+0.14 dB`` at 20 degC where :math:`\rho c = 413`);
         ``None`` (default) omits it, matching the common textbook form.
     :return: The steady-state SPL ``Lp``, dB; a float for scalar inputs,
-        otherwise an array broadcasting ``sound_power_level``, ``distance``
-        and ``room_constant``.
-    :raises ValueError: If ``distance`` or ``room_constant`` is not positive and
-        finite, or ``source_model`` is not one of
+        otherwise an array broadcasting ``sound_power_level``, ``distance``,
+        the absorption measure and ``directivity``.
+    :raises ValueError: unless exactly one absorption measure is given; if
+        ``distance``, the measure or ``directivity`` is not positive and
+        finite; or if ``source_model`` is not one of
         :data:`SOURCE_POWER_MODELS`.
     """
     lw = np.asarray(sound_power_level, dtype=np.float64)
-    # Named r_const (not rc) to avoid confusion with the critical distance rc.
-    r_const = np.asarray(room_constant, dtype=np.float64)
-    directivity = require_positive(directivity, "directivity")
+    # Named measure (not rc) to avoid confusion with the critical distance rc.
+    measure = _one_absorption_measure(room_constant, absorption_area)
+    q = _require_positive_array(directivity, "directivity")
     model = require_choice(source_model, "source_model", tuple(SOURCE_POWER_MODELS))
-    if np.any(r_const <= 0.0) or not np.all(np.isfinite(r_const)):
-        msg = "'room_constant' must be positive and finite."
-        raise ValueError(msg)
-    bracket = 4.0 / r_const
+    bracket = 4.0 / measure
     if distance is not None:
         r = np.asarray(distance, dtype=np.float64)
         if np.any(r <= 0.0) or not np.all(np.isfinite(r)):
             msg = "'distance' must be positive and finite."
             raise ValueError(msg)
-        bracket = directivity / (4.0 * np.pi * r**2) + bracket
-    lp = (
-        lw
-        + SOURCE_POWER_MODELS[model] * 10.0 * np.log10(directivity)
-        + 10.0 * np.log10(bracket)
-    )
+        bracket = q / (4.0 * np.pi * r**2) + bracket
+    lp = lw + SOURCE_POWER_MODELS[model] * 10.0 * np.log10(q) + 10.0 * np.log10(bracket)
     if characteristic_impedance is not None:
         rho_c = require_positive(characteristic_impedance, "characteristic_impedance")
         lp = lp + 10.0 * np.log10(rho_c / 400.0)

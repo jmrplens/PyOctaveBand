@@ -510,3 +510,118 @@ def _chk_chain() -> Outcome:
     )
 
     return _worst_band(_PRINTED_AFTER_JUNCTION, running, 0.1)
+
+
+# ---------------------------------------------------------------------------
+# Table 1 again: the room the supply air finally arrives in
+# ---------------------------------------------------------------------------
+#: Table 1, element 19: the sound power of the two swirl diffusers together,
+#: which is what enters the room, dB re 1e-12 W.
+_ENTERING_SOUND_POWER = (53.4, 51.4, 50.1, 41.2, 29.9, 27.8, 33.0, 32.6)
+#: Table 1, element 20, row "Richtwirkungsmass (Abstrahlwinkel 0 deg)": the
+#: eight values Figure 30 gives for this outlet. The figure itself is a chart
+#: the held copy does not resolve to a tenth, so the guideline's own reading of
+#: it is the input here, which is what a caller does with a manufacturer's.
+_OUTLET_DIRECTIVITY = (2.1, 2.4, 3.0, 4.0, 5.5, 6.7, 7.0, 7.2)
+#: Table 1, element 20: the room, and where the listener stands in it.
+_ROOM_ABSORPTION_AREA = 20.0
+_ROOM_DISTANCE = 1.5
+#: Table 1, element 20, row "Raumdaempfung": L_W - L_p, dB, and the single
+#: value printed beside it.
+_PRINTED_ROOM_ATTENUATION = (5.6, 5.5, 5.1, 4.7, 4.0, 3.6, 3.5, 3.4)
+_PRINTED_ROOM_ATTENUATION_SINGLE = 5.7
+#: Table 1, element 20, row "Schalldruckpegel": the band levels, printed whole.
+_PRINTED_ROOM_LEVELS = (48.0, 46.0, 45.0, 37.0, 26.0, 24.0, 30.0, 29.0)
+#: The two summed columns of that row: L_p and L_pA, dB.
+_PRINTED_ROOM_TOTAL = 51.4
+_PRINTED_ROOM_TOTAL_A = 40.0
+
+
+def _room_attenuation() -> np.ndarray:
+    """Element 20 by Equation (36), from the printed room data alone."""
+    return np.asarray(
+        ph.noise_control.room_effect(
+            _ROOM_DISTANCE,
+            absorption_area=_ROOM_ABSORPTION_AREA,
+            directivity=np.array(_OUTLET_DIRECTIVITY),
+        )
+    )
+
+
+def _room_levels() -> np.ndarray:
+    """The band levels at the listener, before the table rounds them whole."""
+    return np.asarray(
+        np.array(_ENTERING_SOUND_POWER) - _room_attenuation(), dtype=np.float64
+    )
+
+
+@register(
+    _VDI2081,
+    "VDI 2081 Blatt 2:2005 Table 1, element 20",
+    "Room attenuation of a ceiling diffuser, worst octave deviation, dB",
+)
+def _chk_room_attenuation() -> Outcome:
+    """``L_W - L_p = -10 lg[Q/(4 pi r^2) + 4/A]`` over the eight octaves."""
+    return _worst_band(
+        _PRINTED_ROOM_ATTENUATION, _room_attenuation(), _PRINTED_TOLERANCE
+    )
+
+
+@register(
+    _VDI2081,
+    "VDI 2081 Blatt 1:2001 Eq. (36)",
+    "Room attenuation of a hemispherical outlet, dB",
+)
+def _chk_room_attenuation_hemispherical() -> Outcome:
+    """The single 5,7 dB printed beside the row, which no octave of it equals.
+
+    It is the same room and distance with the directivity a half space gives,
+    Q = 2, before Figure 30 makes the factor a function of frequency.
+    """
+    return numeric(
+        _PRINTED_ROOM_ATTENUATION_SINGLE,
+        float(
+            ph.noise_control.room_effect(
+                _ROOM_DISTANCE, absorption_area=_ROOM_ABSORPTION_AREA
+            )
+        ),
+        _PRINTED_TOLERANCE,
+        unit="dB",
+        places=3,
+    )
+
+
+@register(
+    _VDI2081,
+    "VDI 2081 Blatt 2:2005 Table 1, element 20",
+    "Sound pressure level in room 102, worst octave deviation, dB",
+)
+def _chk_room_levels() -> Outcome:
+    """The row is printed whole, so a band is met when it rounds onto it."""
+    return _worst_band(_PRINTED_ROOM_LEVELS, _room_levels(), 0.5)
+
+
+@register(
+    _VDI2081,
+    "VDI 2081 Blatt 2:2005 Table 1, element 20",
+    "Total sound pressure level in room 102, dB",
+)
+def _chk_room_total() -> Outcome:
+    """The unweighted sum of the eight octaves, printed as 51,4 dB."""
+    levels = _room_levels()
+    total = 10.0 * math.log10(float(np.sum(10.0 ** (levels / 10.0))))
+    return numeric(_PRINTED_ROOM_TOTAL, total, _PRINTED_TOLERANCE, unit="dB", places=3)
+
+
+@register(
+    _VDI2081,
+    "VDI 2081 Blatt 2:2005 Table 1, element 20",
+    "A-weighted sound pressure level in room 102, dB",
+)
+def _chk_room_total_a_weighted() -> Outcome:
+    """The A-weighted sum, printed as 40,0 dB, against the table's own weighting."""
+    levels = _room_levels() + np.array(_PRINTED_A_WEIGHTING)
+    total = 10.0 * math.log10(float(np.sum(10.0 ** (levels / 10.0))))
+    return numeric(
+        _PRINTED_ROOM_TOTAL_A, total, _PRINTED_TOLERANCE, unit="dB", places=3
+    )

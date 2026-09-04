@@ -2325,6 +2325,52 @@ dos ediciones con las mismas entradas y en el mismo orden.
   [`ground_attenuation`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/environment/propagation/outdoor_propagation.py)
   implementa $q$ a partir de la nota 2, que es lo que reproduce el 0,23
   impreso.
+## VDI 2081 Blatt 1:2001, apartado 6.7.3 (la lista de símbolos de la ecuación (36) remite A a la propia ecuación (36))
+
+- **Ubicación:** apartado 6.7.3, la lista de símbolos bajo la ecuación (36), la
+  entrada del área de absorción equivalente ``A``.
+- **Lo impreso:** «A  äquivalente Absorptionsfläche; in m², Gleichung (36)» /
+  «A  is the equivalent absorption area; in m², Equation (36)».
+- **El problema:** la ecuación (36) es la ecuación de nivel a la que pertenece
+  la lista, $L_P = L_W + 10\lg[Q/(4\pi r^2) + 4/A]$, en la que ``A`` es un
+  dato de entrada. No define ``A``. La guía lo define dos veces más abajo en el
+  mismo apartado: la ecuación (37), $A = 0{,}163\,V/T$, y la ecuación (39),
+  $A = \sum \alpha_i S_n + \sum A_n$. La referencia es circular, y está en las
+  dos columnas de idioma, así que es un desliz de composición del original y no
+  de la traducción.
+- **Evidencia:** verificado en la página 43 del PDF (p. 43 impresa) de la
+  VDI 2081 Blatt 1:2001-07, con las ecuaciones (37) y (39) en la página 44 del
+  PDF (p. 44 impresa) de la misma tirada.
+- **Comportamiento de la biblioteca:** no le afecta. El desliz está en una
+  referencia cruzada, no en un número:
+  [`room_effect`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/noise_control/hvac.py) toma ``A`` como
+  argumento y
+  [`sabine_absorption_area`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/room/steady_field.py)
+  implementa la ecuación (37).
+- **Estado:** sin reportar.
+
+## VDI 2081 Blatt 1:2001, apartado 6.7.3 (la columna inglesa llama esférica a una propagación semiesférica)
+
+- **Ubicación:** apartado 6.7.3, la frase que dice dónde empieza el campo
+  reverberante, justo después de la ecuación (36b).
+- **Lo impreso:** en alemán, «Der Nachhallbereich beginnt bei
+  **halbkugelförmiger** Schallausbreitung in einer Entfernung, die größer ist
+  als $r_H = 0{,}2\sqrt{A}$»; en inglés, «The reverberation area begins as a
+  **spherical** sound propagation at a distance which is greater than
+  $r_H = 0.2\sqrt{A}$».
+- **El problema:** *halbkugelförmig* es semiesférica, no esférica, y la
+  constante impresa da la razón al alemán. El radio de reverberación es
+  $r_H = \sqrt{Q A / 16\pi}$, que vale $0{,}199\sqrt{A}$ con la $Q = 2$ de un
+  semiespacio y $0{,}141\sqrt{A}$ con la $Q = 1$ del espacio entero. Sólo la
+  primera redondea al $0{,}2$ impreso. Quien siga la columna inglesa tomará
+  $0{,}2\sqrt{A}$ por el radio esférico y situará el campo reverberante un 41 %
+  más lejos de lo que toca.
+- **Evidencia:** verificado en la página 44 del PDF (p. 44 impresa) de la
+  VDI 2081 Blatt 1:2001-07, leyendo las dos columnas de la misma frase una al
+  lado de la otra.
+- **Comportamiento de la biblioteca:** no le afecta.
+  [`critical_distance`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/room/steady_field.py) toma ``Q`` como
+  argumento y deja dicha la lectura semiesférica en su propio texto.
 - **Estado:** sin reportar.
 
 ## ANSI S3.5-1997, ejemplos resueltos del Anexo C (erratas oficiales del WG S3-79)

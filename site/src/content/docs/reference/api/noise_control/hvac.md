@@ -987,7 +987,14 @@ room_effect(
     distance: float,
     room_constant: ArrayLike,
     *,
-    directivity: float = 2.0,
+    directivity: ArrayLike = ...,
+) -> np.ndarray | float
+
+room_effect(
+    distance: float,
+    *,
+    absorption_area: ArrayLike,
+    directivity: ArrayLike = ...,
 ) -> np.ndarray | float
 ```
 
@@ -1004,15 +1011,30 @@ cascade beside every other loss; Long's worked sheets print it as the
 negative level change. A ceiling diffuser radiates into a half space,
 hence the default $Q = 2$.
 
+VDI 2081 Blatt 1 Section 6.7.3 closes its own chain with the same
+expression, written in the equivalent absorption area `A` rather than
+the room constant `R` (Equation (36)), and prints the result as the
+*Raumdämpfung* $L_W - L_p$, which is what this returns. The two
+measures are not interchangeable, so each has its own argument; and the
+guideline's directivity comes from a chart against frequency, which is why
+`Q` may be given one value per band.
+
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `distance` | Terminal-to-listener distance `r`, m. |
-| `room_constant` | Room constant $R = S \alpha / (1 - \alpha)$, m2 (scalar or per-band; from [`phonometry.room.room_constant`](/phonometry/reference/api/rooms/steady-field/#room_constant)). |
-| `directivity` | Directivity factor `Q` of the terminal device (`2` flush in a ceiling or wall, `4` at an edge, `8` in a corner). |
+| `room_constant` | Room constant $R = S \alpha / (1 - \alpha)$, m2 (scalar or per-band; from [`phonometry.room.room_constant`](/phonometry/reference/api/rooms/steady-field/#room_constant)). Give this or `absorption_area`, not both. |
+| `absorption_area` | Equivalent absorption area $A = S \alpha$, m2 (scalar or per-band; from [`phonometry.room.equivalent_absorption_area`](/phonometry/reference/api/rooms/enclosed-space-absorption/#equivalent_absorption_area)). Give this or `room_constant`, not both. |
+| `directivity` | Directivity factor `Q` of the terminal device (`2` flush in a ceiling or wall, `4` at an edge, `8` in a corner), scalar or per-band. |
 
-**Returns:** The room effect as a positive attenuation, dB (a float for a scalar room constant, otherwise a per-band array).
+**Returns:** The room effect as a positive attenuation, dB (a float when every input is scalar, otherwise a per-band array).
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | unless exactly one absorption measure is given, or if an argument is not positive and finite. |
 
 ## silencer_self_noise
 

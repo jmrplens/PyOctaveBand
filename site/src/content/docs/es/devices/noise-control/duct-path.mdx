@@ -34,6 +34,12 @@ references:
     institution: "ASHRAE"
     note: "Los límites de velocidad en las unidades terminales (Tabla 9), las correcciones por compuerta de regulación (Tabla 10) y la indicación de que la potencia acústica de un ventilador se toma preferentemente de los ensayos del fabricante."
   - type: standard
+    organization: "Verein Deutscher Ingenieure"
+    year: 2001
+    title: "Geräuscherzeugung und Lärmminderung in Raumlufttechnischen Anlagen"
+    designation: "VDI 2081 Blatt 1:2001-07"
+    note: "Apartado 6.7.3: el nivel que un difusor de aire produce en una sala (ecuación (36)), el área de absorción equivalente que implica un tiempo de reverberación (ecuación (37)) y el radio de reverberación rH = 0,2 sqrt(A). El elemento 20 del ejemplo resuelto de su Parte 2:2005-05 es el caso que se comprueba aquí."
+  - type: standard
     organization: "Air-Conditioning, Heating and Refrigeration Institute"
     designation: "AHRI Standard 885"
     title: "Procedure for estimating occupied space sound levels in the application of air terminals and air outlets"
@@ -716,6 +722,44 @@ especificación el veredicto que se va a medir — banda a banda contra la curva
 la valoración de la S12.2 — y no uno para el diseño y otro para el ensayo.
 [Criterios de ruido de fondo (NC / RC Mark II)](/phonometry/es/buildings/rooms/room-noise/)
 tiene el procedimiento de valoración en sí.
+
+### El mismo paso según la VDI 2081
+
+La VDI 2081 Blatt 1 cierra su propia cadena con la misma relación, la
+ecuación (36), escrita con el área de absorción equivalente $A$ en lugar de la
+constante de sala $R$. No son el mismo número, $R = A/(1-\bar\alpha)$, así que
+cada una tiene su argumento y ninguna sustituye a la otra. La guía además lee
+la directividad de un ábaco frente a la frecuencia, de modo que $Q$ admite un
+valor por banda: un difusor es tanto más directivo cuanto más corta es la
+longitud de onda.
+
+```python
+import numpy as np
+from phonometry import noise_control, room
+
+# La sala 102 del ejemplo resuelto: A = 20 m2, oyente a 1,5 m, y la
+# directividad que su Figura 30 da para el difusor de techo.
+q = np.array([2.1, 2.4, 3.0, 4.0, 5.5, 6.7, 7.0, 7.2])
+print(np.round(noise_control.room_effect(1.5, absorption_area=20.0, directivity=q), 1))
+# [5.6 5.5 5.1 4.7 4.  3.6 3.5 3.4]
+
+# Dónde toma el relevo el campo reverberante, ecuación (36a): rH = 0,2 sqrt(A).
+print(round(float(room.critical_distance(absorption_area=20.0, directivity=2.0)), 2))  # 0.89
+# Y la absorción que implica un tiempo de reverberación medido, ecuación (37).
+print(round(float(room.sabine_absorption_area(54.4, 0.44, speed_of_sound=339.0)), 1))  # 20.2
+```
+
+`sabine_absorption_area` es la relación de Sabine de siempre leída al revés,
+del tiempo al área, que es la dirección en la que un levantamiento de sala
+entrega los datos. Su constante sigue a la velocidad del sonido: $0{,}161$ a
+343 m/s, y el $0{,}163$ que imprime la guía, que es la misma expresión a
+339 m/s.
+
+La Figura 30 no está implementada. Es un ábaco de $Q$ frente al producto de la
+frecuencia por la raíz cuadrada del área de salida, para dos ángulos de
+emisión y cuatro posiciones en la sala, y la copia disponible no lo resuelve
+mejor que una décima de la magnitud que lleva. Léela, o toma $Q$ de los datos
+del propio difusor, y pasa los ocho valores.
 
 ## 6. El ejemplo resuelto: la Tabla 14.9 de Long
 

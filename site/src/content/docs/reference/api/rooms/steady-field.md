@@ -85,7 +85,13 @@ overlapping modes where the statistical field of this module applies.
 critical_distance(
     room_constant: ArrayLike,
     *,
-    directivity: float = 1.0,
+    directivity: ArrayLike = ...,
+) -> np.ndarray | float
+
+critical_distance(
+    *,
+    absorption_area: ArrayLike,
+    directivity: ArrayLike = ...,
 ) -> np.ndarray | float
 ```
 
@@ -98,14 +104,26 @@ Kuttruff Equation (5.44) states the $Q = 1$ form with the Sabine
 absorption area $A = S \bar{\alpha}$ instead of the room constant
 `R`, the two differing by $1 - \bar{\alpha}$).
 
+Written in `A` and with the hemispherical $Q = 2$ of an outlet in
+a room surface, the same expression is the `rH = 0,2 sqrt(A)` that
+VDI 2081 Blatt 1 Section 6.7.3 prints for where the reverberant field of a
+ventilation opening begins.
+
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `room_constant` | Room constant `R`, m2 (scalar or per-band); from [`room_constant`](/phonometry/reference/api/rooms/steady-field/#room_constant). |
-| `directivity` | Source directivity factor `Q` (`1` omnidirectional, `2` on one reflecting plane, `4` in an edge, `8` in a corner). |
+| `room_constant` | Room constant `R`, m2 (scalar or per-band); from [`room_constant`](/phonometry/reference/api/rooms/steady-field/#room_constant). Give this or `absorption_area`, not both. |
+| `absorption_area` | Equivalent absorption area `A`, m2 (scalar or per-band); from [`sabine_absorption_area`](/phonometry/reference/api/rooms/steady-field/#sabine_absorption_area). Give this or `room_constant`, not both. |
+| `directivity` | Source directivity factor `Q` (`1` omnidirectional, `2` on one reflecting plane, `4` in an edge, `8` in a corner), scalar or per-band. |
 
 **Returns:** The critical distance `rc`, m.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | unless exactly one absorption measure is given, or if a value is not positive and finite. |
 
 ## room_constant
 
@@ -127,6 +145,47 @@ Room constant $R = S \bar{\alpha} / (1 - \bar{\alpha})$
 | `mean_absorption` | Area-weighted mean Sabine absorption `alpha_bar` in `(0, 1)` (scalar or per-band); e.g. from [`phonometry.room.mean_absorption`](/phonometry/reference/api/rooms/reverberation-prediction/#mean_absorption). |
 
 **Returns:** The room constant `R`, m2; a float for a scalar input, otherwise a per-band array.
+
+## sabine_absorption_area
+
+```python
+sabine_absorption_area(
+    volume: float,
+    reverberation_time: ArrayLike,
+    *,
+    speed_of_sound: float = 343.0,
+) -> np.ndarray | float
+```
+
+Equivalent absorption area from a reverberation time (Sabine, inverted).
+
+$$
+A = \frac{24 \ln 10}{c_0} \frac{V}{T}
+$$
+
+which is [`phonometry.room.sabine_reverberation_time`](/phonometry/reference/api/rooms/reverberation-prediction/#sabine_reverberation_time) read the other
+way about: the absorption a measured or assumed `T` implies, which is
+what a level calculation needs and what a room survey actually delivers.
+
+The leading constant follows the speed of sound: `0,161` at the 343 m/s
+of 20 degC, and the `0,163` VDI 2081 Blatt 1 Equation (37) prints, which
+is the same expression at 339 m/s.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `volume` | Room volume `V`, m3. |
+| `reverberation_time` | Reverberation time `T`, s (scalar or per-band). |
+| `speed_of_sound` | Speed of sound `c0`, m/s (default 343, giving the familiar 0,161; pass 339 for the 0,163 of VDI 2081). |
+
+**Returns:** The equivalent absorption area `A`, m2.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the volume, the time or the speed is not positive and finite. |
 
 ## schroeder_frequency
 
@@ -204,9 +263,19 @@ steady_state_spl(
     distance: ArrayLike | None,
     room_constant: ArrayLike,
     *,
-    directivity: float = 1.0,
-    source_model: str = 'constant_power',
-    characteristic_impedance: float | None = None,
+    directivity: ArrayLike = ...,
+    source_model: str = ...,
+    characteristic_impedance: float | None = ...,
+) -> np.ndarray | float
+
+steady_state_spl(
+    sound_power_level: ArrayLike,
+    distance: ArrayLike | None,
+    *,
+    absorption_area: ArrayLike,
+    directivity: ArrayLike = ...,
+    source_model: str = ...,
+    characteristic_impedance: float | None = ...,
 ) -> np.ndarray | float
 ```
 
@@ -231,18 +300,19 @@ such as a room-to-room transmission uses.
 | :--- | :--- |
 | `sound_power_level` | Source sound power level `Lw`, dB re 1 pW (scalar or per-band); e.g. from `phonometry.emission`. |
 | `distance` | Source-receiver distance `r`, m (scalar or array), or `None` for the reverberant field alone. |
-| `room_constant` | Room constant `R`, m2 (scalar or per-band); from [`room_constant`](/phonometry/reference/api/rooms/steady-field/#room_constant). |
-| `directivity` | Source directivity factor `Q` (default 1; `2` on one reflecting plane, `4` in an edge, `8` in a corner). |
+| `room_constant` | Room constant `R`, m2 (scalar or per-band); from [`room_constant`](/phonometry/reference/api/rooms/steady-field/#room_constant). Give this or `absorption_area`, not both. |
+| `absorption_area` | Equivalent absorption area `A`, m2 (scalar or per-band); from [`sabine_absorption_area`](/phonometry/reference/api/rooms/steady-field/#sabine_absorption_area). Give this or `room_constant`, not both. Written in `A`, the expression is VDI 2081 Blatt 1 Equation (36) for the level a ventilation outlet produces in a room. |
+| `directivity` | Source directivity factor `Q` (default 1; `2` on one reflecting plane, `4` in an edge, `8` in a corner), scalar or per-band. A diffuser is more directional the shorter the wavelength, which is why the factor is allowed to vary across the bands. |
 | `source_model` | Sound power model of Norton & Karczub 2e Table 4.5: `"constant_power"` (default, $\Pi = \Pi_0$, the position of the source does not change its radiated power), `"constant_volume"` ($\Pi = \Pi_0 Q$, reflecting boundaries raise the radiated power by $10 \log_{10} Q$; the conservative upper bound) or `"constant_pressure"` ($\Pi = \Pi_0 / Q$, the theoretical lower bound). See [`SOURCE_POWER_MODELS`](/phonometry/reference/api/rooms/steady-field/#source_power_models). |
 | `characteristic_impedance` | Air characteristic impedance `rho c`, Pa s/m. When given, the $10 \log_{10}(\rho c / 400)$ term is added (about `+0.14 dB` at 20 degC where $\rho c = 413$); `None` (default) omits it, matching the common textbook form. |
 
-**Returns:** The steady-state SPL `Lp`, dB; a float for scalar inputs, otherwise an array broadcasting `sound_power_level`, `distance` and `room_constant`.
+**Returns:** The steady-state SPL `Lp`, dB; a float for scalar inputs, otherwise an array broadcasting `sound_power_level`, `distance`, the absorption measure and `directivity`.
 
 **Raises**
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If `distance` or `room_constant` is not positive and finite, or `source_model` is not one of [`SOURCE_POWER_MODELS`](/phonometry/reference/api/rooms/steady-field/#source_power_models). |
+| ValueError | unless exactly one absorption measure is given; if `distance`, the measure or `directivity` is not positive and finite; or if `source_model` is not one of [`SOURCE_POWER_MODELS`](/phonometry/reference/api/rooms/steady-field/#source_power_models). |
 
 ## SteadyFieldResult
 
