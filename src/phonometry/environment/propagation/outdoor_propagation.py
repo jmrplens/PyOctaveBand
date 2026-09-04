@@ -67,6 +67,10 @@ _D0 = 1.0
 #: Message of the shared guard on the source-to-receiver distance: every term of
 #: the method divides by ``d`` or takes ``log10(d)``, so ``d`` must be positive.
 _DISTANCE_NOT_POSITIVE = "'distance' must be positive."
+#: Message of the shared guard on the two heights: every region of the
+#: ground method is a length measured up from the ground, so a negative one
+#: is not a geometry the method can be read for.
+_HEIGHTS_NEGATIVE = "Source and receiver heights must be non-negative."
 #: Speed of sound used for the barrier wavelength ``lambda = c/f``
 #: (ISO 9613-2:1996, clause 7.5 writes ``lambda = 340/f``), in m/s.
 _C_SOUND = 340.0
@@ -613,8 +617,7 @@ def ground_attenuation(
     if distance <= 0.0:
         raise ValueError(_DISTANCE_NOT_POSITIVE)
     if source_height < 0.0 or receiver_height < 0.0:
-        msg = "Source and receiver heights must be non-negative."
-        raise ValueError(msg)
+        raise ValueError(_HEIGHTS_NEGATIVE)
     freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if np.any(freqs <= 0.0):
         msg = "'frequencies' must be positive."
@@ -785,8 +788,7 @@ def region_ground_factors(
         msg = "'segment_ground_factors' must be within [0, 1]."
         raise ValueError(msg)
     if source_height < 0.0 or receiver_height < 0.0:
-        msg = "Source and receiver heights must be non-negative."
-        raise ValueError(msg)
+        raise ValueError(_HEIGHTS_NEGATIVE)
 
     edges = _segment_edges(lengths)
     dp = float(edges[-1])
@@ -870,8 +872,7 @@ def mean_path_height(
         msg = "'profile_distances' must be strictly increasing."
         raise ValueError(msg)
     if source_height < 0.0 or receiver_height < 0.0:
-        msg = "Source and receiver heights must be non-negative."
-        raise ValueError(msg)
+        raise ValueError(_HEIGHTS_NEGATIVE)
 
     dp = float(us[-1] - us[0])
     rise = float(zs[-1] + receiver_height - zs[0] - source_height)
