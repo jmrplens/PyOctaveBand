@@ -1,6 +1,6 @@
 ---
 title: "Evaluar la vibración de una máquina"
-description: "Calificar una máquina a partir de una sola medida de banda ancha (ISO 20816-1:2016): las cuatro zonas de evaluación, el criterio de velocidad conformado en frecuencia de la Figura 9 con los factores de zona del Anexo C.2, los rangos típicos de frontera de la Tabla C.1 y la lectura vectorial de un cambio que una comparación de magnitudes no ve."
+description: "Calificar una máquina a partir de una sola medida de banda ancha: las cuatro zonas de evaluación de la ISO 20816-1:2016, su criterio de velocidad conformado en frecuencia y su lectura vectorial de un cambio, y las fronteras impresas, la ALARMA y el DISPARO que las tablas de la ISO 10816-3 dan para máquinas industriales de más de 15 kW."
 references:
   - type: standard
     organization: "International Organization for Standardization"
@@ -10,6 +10,13 @@ references:
     url: "https://www.iso.org/standard/63180.html"
     primary: true
     note: "Las posiciones de medida del 4.4, la severidad de vibración del 4.3.3, las cuatro zonas de evaluación del 6.3.2.3, el criterio II del 6.3.3, el criterio de velocidad de la Figura 9 como Fórmula (C.1) con los factores de zona del Anexo C.2, los rangos típicos de frontera de la Tabla C.1 y el cambio vectorial del Anexo D. Esta primera edición anuló y sustituyó a la ISO 7919-1:1996 y a la ISO 10816-1:1995."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2009
+    title: "Mechanical vibration \u2014 Evaluation of machine vibration by measurements on non-rotating parts \u2014 Part 3: Industrial machines with nominal power above 15 kW and nominal speeds between 120 r/min and 15 000 r/min when measured in situ"
+    designation: "ISO 10816-3:2009"
+    url: "https://www.iso.org/standard/50528.html"
+    note: "Los grupos de máquinas del 4.2 y la clasificación de soportes del 4.3, las fronteras de zona de las Tablas A.1 y A.2 en las dos magnitudes con la banda de medida del A.1, la regla de la más restrictiva del 5.2.3, el cambio significativo del 5.3 y los ajustes de ALARMA y DISPARO del 5.4. Esta edición está sustituida por la ISO 20816-3:2022, que no está en la biblioteca; las fronteras se toman de la edición que sí lo está."
 ---
 
 import Scope from '../../../../../components/Scope.astro';
@@ -201,20 +208,124 @@ límites. Son un punto de partida para el acuerdo entre suministrador y cliente,
 y la norma dice sin rodeos que los valores asignados a las fronteras de zona no
 pretenden servir de especificación de recepción (6.3.2.5).
 
+## 6. Los números, para las máquinas que llenan una planta
+
+La Parte 1 fija la forma del juicio y se niega a dar fronteras. La
+**ISO 10816-3** las da, para las máquinas de las que de verdad está hecha una
+instalación industrial: compresores rotativos, generadores, motores eléctricos
+de cualquier tipo, soplantes y ventiladores, turbinas de vapor de hasta 50 MW
+y turbinas de gas industriales de hasta 3 MW, todas medidas in situ sobre las
+partes no rotativas.
+
+Dos preguntas colocan a una máquina en una de cuatro clases.
+
+**Cómo de grande es** (4.2). El *grupo 1* es una máquina grande de potencia
+nominal superior a 300 kW y no mayor de 50 MW, o una máquina eléctrica de
+altura de eje de 315 mm o más. El *grupo 2* es una máquina mediana de más de
+15 kW y hasta 300 kW inclusive, o una máquina eléctrica de altura de eje desde
+160 mm hasta 315 mm sin incluirlo.
+
+**Sobre qué se apoya** (4.3). Si la frecuencia natural más baja del conjunto
+máquina y soporte, *en la dirección en la que se mide*, supera en al menos un
+25 % a la frecuencia de excitación principal, que casi siempre es la de giro,
+el soporte es **rígido** en esa dirección. Cualquier otro soporte es
+**flexible**. La cláusula es explícita en que las dos cosas pueden convivir en
+una misma máquina: una cimentación rígida en vertical y blanda en horizontal se
+juzga con la tabla rígida en una dirección y con la flexible en la otra.
+
+Cada una de las cuatro clases se enuncia entonces **dos veces**, una en
+desplazamiento y otra en velocidad, y el 5.2.3 resuelve el desacuerdo: se
+aplica la zona de severidad más restrictiva.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/industrial_machine_zones.svg" alt="Dos paneles de barras, la velocidad en milímetros por segundo a la izquierda y el desplazamiento en micrómetros a la derecha. Cada panel muestra cuatro barras apiladas, una por clase de máquina: grupo 1 rígido, grupo 1 flexible, grupo 2 rígido y grupo 2 flexible. Cada barra se divide en cuatro bandas de color, la zona A abajo y la zona D arriba, con el valor de cada frontera impreso al lado. Una línea discontinua con un marcador cruza la barra del grupo 2 rígido en 2,0 milímetros por segundo en el panel izquierdo, dentro de la zona B, y en 50 micrómetros en el panel derecho, dentro de la zona C." width="100%" />
+
+*La misma máquina, leída de dos maneras. La velocidad dice zona B; el
+desplazamiento dice zona C; la calificación es C.*
+
+```python
+from phonometry import vibration
+
+print(vibration.industrial_machine_zone("group_2", "rigid", velocity_mm_s=2.0))
+# B
+print(vibration.industrial_machine_zone("group_2", "rigid", displacement_um=50.0))
+# C
+print(
+    vibration.industrial_machine_zone(
+        "group_2", "rigid", displacement_um=50.0, velocity_mm_s=2.0
+    )
+)  # C
+```
+
+Se pasan las magnitudes que se hayan medido. El Anexo A dice que la velocidad
+sola basta en la mayoría de los casos, y que una máquina cuyo espectro se
+espere con componentes de baja frecuencia debe juzgarse con las dos. Los
+límites son valores eficaces de banda ancha entre 10 Hz y 1 kHz, o desde 2 Hz
+para una máquina que gire por debajo de 600 r/min.
+
+La edición implementada aquí es la ISO 10816-3:2009, a la que la
+ISO 20816-3:2022 ya ha sustituido. La Parte 3 es la única de la serie que no
+está en la biblioteca, así que las fronteras vienen de su predecesora directa,
+y esta página lo dice en lugar de aparentar una vigencia que no tiene.
+
+## 7. ALARMA y DISPARO, con números detrás
+
+La Parte 1 describe los dos límites operativos y deja sus valores a las partes.
+La Parte 3 los da, y cada uno se fija a partir de una cosa distinta.
+
+**Un cambio significativo** (5.3) es un aumento *o una disminución* de más del
+25 % del límite superior de la zona B, medido en la misma posición y
+orientación del transductor y en las mismas condiciones de funcionamiento. Es
+el criterio II hecho aritmética.
+
+**Una ALARMA** (5.4.1) se sitúa un 25 % del límite superior de la zona B por
+encima de la referencia establecida para esa posición, y no debería superar
+normalmente 1,25 veces ese límite. Las dos mitades importan. Fijada desde la
+referencia, la alarma de una máquina silenciosa puede caer bien dentro de la
+zona B, que es justo lo que se busca. Topada en 1,25 veces el límite, la alarma
+de una máquina cuya referencia ha ido subiendo no puede seguirla sin fin.
+
+**Un DISPARO** (5.4.2) tiene que ver con la integridad mecánica de la máquina,
+así que suele ser el mismo para todas las máquinas de un diseño y *no* se ata a
+la referencia. Normalmente caerá dentro de la zona C o de la D, y no debería
+superar 1,25 veces el límite superior de la zona C.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/machine_alarm_trip.svg" alt="Un eje de velocidad en milímetros por segundo dividido en bandas por las cuatro zonas de evaluación. Dos barras marcan sendas referencias, una en 0,9 milímetros por segundo dentro de la zona A y otra en 2,9 dentro de la zona C, con una flecha que sube desde cada una hasta su ALARMA: 1,6 para la primera y 3,5 para la segunda. Una línea de puntos en 3,5 marca el tope de 1,25 veces el límite superior de la zona B, con el que la segunda ALARMA ha chocado, y una línea de trazo y punto en 5,62 marca el DISPARO de 1,25 veces el límite superior de la zona C." width="100%" />
+
+*La máquina silenciosa recibe una alarma dentro de la zona B. La que ha
+derivado choca con el tope.*
+
+```python
+from phonometry import vibration
+
+limits = vibration.INDUSTRIAL_MACHINE_ZONES["group_2", "rigid"].velocity_mm_s
+
+print(vibration.is_significant_change(0.8, limits.b_c))   # True
+print(vibration.is_significant_change(0.6, limits.b_c))   # False
+print(round(vibration.alarm_limit(0.9, limits.b_c), 3))   # 1.6
+print(round(vibration.alarm_limit(2.9, limits.b_c), 3))   # 3.5, en el tope
+print(round(vibration.trip_limit(limits.c_d), 3))         # 5.625
+```
+
 <Scope>
 <ScopeClaim status="covered" label="Cubierto">
 Las cuatro zonas de evaluación y la calificación del 6.3.2.3, el criterio
 conformado en frecuencia de la Figura 9 como Fórmula (C.1) con los factores de
 zona del Anexo C.2, los rangos y la escala típicos de la Tabla C.1, y la
 lectura vectorial de un cambio del Anexo D, mediante `ZoneBoundaries`,
-`evaluation_zone`, `allowable_velocity` y `vibration_vector_change`.
+`evaluation_zone`, `allowable_velocity` y `vibration_vector_change`. Para
+máquinas industriales, las fronteras de las Tablas A.1 y A.2 en las dos
+magnitudes, la regla de la más restrictiva del 5.2.3, el cambio significativo
+del 5.3 y los ajustes de ALARMA y DISPARO del 5.4, mediante
+`INDUSTRIAL_MACHINE_ZONES`, `industrial_machine_zone`,
+`is_significant_change`, `alarm_limit` y `trip_limit`.
 </ScopeClaim>
 <ScopeClaim status="not-covered" label="No cubierto">
-Las fronteras numéricas de zona de las partes específicas, que esta página toma
-como datos de entrada; los ajustes de ALARMA y DISPARO del 6.4, que la norma
-describe sin números y deja a las partes; y el criterio de eje de la Figura 10,
-cuyos valores el Anexo C.1 se niega a dar para máquinas que ninguna parte
-cubre, por entender que esas máquinas no suelen llevar transductores de eje.
+Las fronteras de zona de las demás partes específicas, que esta página toma
+como datos de entrada; el criterio de eje de la Figura 10, cuyos valores el
+Anexo C.1 se niega a dar para máquinas que ninguna parte cubre, por entender
+que esas máquinas no suelen llevar transductores de eje; y la tercera edición
+vigente de la Parte 3, la ISO 20816-3:2022, que no está en la biblioteca, así
+que las fronteras industriales las pone su predecesora.
 </ScopeClaim>
 </Scope>
 

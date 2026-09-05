@@ -438,6 +438,11 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     "TYPICAL_BOUNDARY_LADDER_MM_S": "phonometry.vibration.machinery.evaluation",
     "TYPICAL_ZONE_BOUNDARY_RANGES_MM_S": "phonometry.vibration.machinery.evaluation",
     "ZONE_LIMIT_FACTORS": "phonometry.vibration.machinery.evaluation",
+    # Likewise the ISO 10816-3 tables and the two fractions its operational
+    # limits are built from.
+    "INDUSTRIAL_MACHINE_ZONES": "phonometry.vibration.machinery.evaluation",
+    "SIGNIFICANT_CHANGE_FRACTION": "phonometry.vibration.machinery.evaluation",
+    "OPERATIONAL_LIMIT_HEADROOM": "phonometry.vibration.machinery.evaluation",
     # Defined in phonometry._internal.warnings, exported at the top level.
     "PhonometryWarning": "phonometry",
     # The io subpackage keeps its implementation modules private and

@@ -37,6 +37,7 @@ from .theme import (
     COLOR_MUTED,
     COLOR_PANEL,
     COLOR_PRIMARY,
+    COLOR_QUATERNARY,
     COLOR_SECONDARY,
     COLOR_TERTIARY,
     LABEL_FREQ_HZ,
@@ -2411,4 +2412,302 @@ def generate_machine_vector_change(output_dir: str) -> None:
     result.plot(ax=ax, language=_LANG, unit="mm/s")
     plt.tight_layout()
     save_figure(output_dir, "machine_vector_change.svg")
+    plt.close()
+
+
+def generate_industrial_machine_zones(output_dir: str) -> None:
+    """Tables A.1 and A.2, and the rule that decides when the two disagree."""
+    print("Generating industrial_machine_zones...")
+    from phonometry import vibration
+
+    classes = (
+        ("group_1", "rigid", "group 1\nrigid"),
+        ("group_1", "flexible", "group 1\nflexible"),
+        ("group_2", "rigid", "group 2\nrigid"),
+        ("group_2", "flexible", "group 2\nflexible"),
+    )
+    # ISO 10816-3:2009, 5.2.3: a machine measured in both quantities takes the
+    # more restrictive of the two gradings. This pair is the case that makes
+    # the clause matter, on a group 2 machine on a rigid support.
+    measured_um, measured_mm_s = 50.0, 2.0
+    marked = 2
+
+    panels = (
+        (
+            "velocity_mm_s",
+            "R.m.s. velocity (mm/s)",
+            13.0,
+            measured_mm_s,
+            "%.1f",
+            "the marked machine reads 2.0 mm/s, which is zone B",
+        ),
+        (
+            "displacement_um",
+            "R.m.s. displacement (µm)",
+            165.0,
+            measured_um,
+            "%.0f",
+            "the same machine reads 50 µm, which is zone C,\n"
+            "and the more restrictive of the two gradings applies",
+        ),
+    )
+    zones = (
+        ("A", COLOR_PRIMARY, "zone A: newly commissioned"),
+        ("B", COLOR_SECONDARY, "zone B: unrestricted operation"),
+        ("C", COLOR_TERTIARY, "zone C: limited operation"),
+        ("D", COLOR_MUTED, "zone D: damage"),
+    )
+    fig, axes = plt.subplots(1, 2, figsize=(11.0, 6.6))
+    positions = np.arange(len(classes), dtype=float)
+
+    for ax, panel in zip(axes, panels, strict=True):
+        attribute, ylabel, ceiling, measured, fmt, note = panel
+        for index, (group, support, _label) in enumerate(classes):
+            limits = vibration.INDUSTRIAL_MACHINE_ZONES[group, support]
+            a_b, b_c, c_d = getattr(limits, attribute).as_tuple
+            edges = (0.0, a_b, b_c, c_d, ceiling)
+            for (letter, colour, legend), lower, upper in zip(
+                zones, edges[:-1], edges[1:], strict=True
+            ):
+                ax.bar(
+                    positions[index],
+                    upper - lower,
+                    bottom=lower,
+                    width=0.66,
+                    color=theme_fill(colour, ax),
+                    edgecolor=colour,
+                    linewidth=1.1,
+                    zorder=2,
+                    label=legend if index == 0 and ax is axes[0] else None,
+                )
+                if index == 0:
+                    ax.text(
+                        positions[index],
+                        0.5 * (lower + min(upper, ceiling)),
+                        letter,
+                        ha="center",
+                        va="center",
+                        fontsize=11,
+                        color=COLOR_FG,
+                        zorder=4,
+                    )
+            for boundary in (a_b, b_c, c_d):
+                ax.text(
+                    positions[index] + 0.36,
+                    boundary,
+                    fmt % boundary,
+                    ha="left",
+                    va="center",
+                    fontsize=8,
+                    color=COLOR_FG,
+                    zorder=4,
+                )
+
+        ax.plot(
+            [positions[marked] - 0.42, positions[marked] + 0.42],
+            [measured, measured],
+            color=COLOR_FG,
+            linewidth=1.6,
+            linestyle="--",
+            zorder=5,
+        )
+        ax.plot(
+            positions[marked],
+            measured,
+            marker="o",
+            markersize=7,
+            color=COLOR_FG,
+            zorder=6,
+        )
+        # Over the shaded zone D, so the note needs a chip to stay readable.
+        ax.text(
+            0.015,
+            0.975,
+            note,
+            transform=ax.transAxes,
+            va="top",
+            ha="left",
+            fontsize=8.5,
+            color=COLOR_FG,
+            bbox={
+                "boxstyle": "round,pad=0.32",
+                "facecolor": COLOR_PANEL,
+                "edgecolor": COLOR_GRID,
+            },
+            zorder=7,
+        )
+        ax.set_xticks(positions)
+        ax.set_xticklabels([label for _g, _s, label in classes], fontsize=9)
+        ax.set_xlim(-0.6, len(classes) - 0.15)
+        ax.set_ylim(0.0, ceiling)
+        ax.set_ylabel(ylabel)
+        ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
+        ax.set_axisbelow(True)
+
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(
+        handles,
+        labels,
+        loc="lower center",
+        ncol=4,
+        fontsize=9,
+        frameon=False,
+        bbox_to_anchor=(0.5, 0.005),
+    )
+    fig.suptitle("Zone Boundaries for Industrial Machines, Stated Twice", y=0.975)
+    plt.tight_layout(rect=(0.0, 0.055, 1.0, 0.96))
+    save_figure(output_dir, "industrial_machine_zones.svg")
+    plt.close()
+
+
+def generate_machine_alarm_trip(output_dir: str) -> None:
+    """ALARM from the baseline, TRIP from the zone, and the cap on both."""
+    print("Generating machine_alarm_trip...")
+    from phonometry import vibration
+
+    # A group 2 machine on a rigid support, judged in velocity: the class the
+    # 15 kW to 300 kW plant is full of.
+    limits = vibration.INDUSTRIAL_MACHINE_ZONES["group_2", "rigid"].velocity_mm_s
+    a_b, b_c, c_d = limits.as_tuple
+    ceiling = 8.0
+    baselines = (0.9, 2.9)
+
+    _fig, ax = plt.subplots(figsize=(9.6, 6.0))
+    bands = (
+        (0.0, a_b, COLOR_PRIMARY, "A", "zone A: newly commissioned"),
+        (a_b, b_c, COLOR_SECONDARY, "B", "zone B: unrestricted operation"),
+        (b_c, c_d, COLOR_TERTIARY, "C", "zone C: limited operation"),
+        (c_d, ceiling, COLOR_MUTED, "D", "zone D: damage"),
+    )
+    for lower, upper, colour, letter, legend in bands:
+        ax.axhspan(lower, upper, color=theme_fill(colour, ax), zorder=0, label=legend)
+        ax.text(
+            0.012,
+            0.5 * (lower + upper),
+            letter,
+            transform=ax.get_yaxis_transform(),
+            ha="left",
+            va="center",
+            fontsize=11,
+            color=COLOR_FG,
+        )
+
+    cap = vibration.OPERATIONAL_LIMIT_HEADROOM * b_c
+    ax.axhline(
+        cap,
+        color=COLOR_FG,
+        linestyle=":",
+        linewidth=1.4,
+        label="the cap on an ALARM: 1.25 times the upper limit of zone B",
+    )
+    trip = vibration.trip_limit(c_d)
+    ax.axhline(
+        trip,
+        color=COLOR_SECONDARY,
+        linestyle="-.",
+        linewidth=1.6,
+        label="TRIP: 1.25 times the upper limit of zone C",
+    )
+
+    positions = np.arange(len(baselines), dtype=float)
+    for index, baseline in enumerate(baselines):
+        alarm = vibration.alarm_limit(baseline, b_c)
+        x = positions[index]
+        ax.bar(
+            x,
+            baseline,
+            width=0.34,
+            color=theme_fill(COLOR_QUATERNARY, ax),
+            edgecolor=COLOR_QUATERNARY,
+            linewidth=1.2,
+            zorder=3,
+        )
+        ax.annotate(
+            "",
+            xy=(x, alarm),
+            xytext=(x, baseline),
+            arrowprops={"arrowstyle": "->", "color": COLOR_FG, "linewidth": 1.4},
+            zorder=4,
+        )
+        ax.plot(
+            [x - 0.24, x + 0.24],
+            [alarm, alarm],
+            color=COLOR_FG,
+            linewidth=2.0,
+            zorder=5,
+        )
+        capped = alarm >= cap - 1.0e-9
+        note = "ALARM (capped)" if capped else "ALARM"
+        ax.text(
+            x + 0.28,
+            alarm,
+            f"{note}: {alarm:.3g} mm/s",
+            ha="left",
+            va="bottom",
+            fontsize=9,
+            color=COLOR_FG,
+            zorder=5,
+        )
+        ax.text(
+            x,
+            0.5 * baseline,
+            f"baseline\n{baseline:.3g} mm/s",
+            ha="center",
+            va="center",
+            fontsize=8.5,
+            color=COLOR_FG,
+            zorder=6,
+        )
+
+    for level, name, colour, x_frac, align in (
+        (cap, "the cap", COLOR_FG, 0.30, "left"),
+        (trip, "TRIP", COLOR_SECONDARY, 0.988, "right"),
+    ):
+        ax.annotate(
+            f"{name}: {level:.3g} mm/s",
+            xy=(x_frac, level),
+            xycoords=("axes fraction", "data"),
+            ha=align,
+            va="bottom",
+            fontsize=9,
+            color=colour,
+        )
+    ax.set_xticks(positions)
+    ax.set_xticklabels(
+        [
+            "a machine settled in zone A",
+            "a machine that has drifted into zone C",
+        ],
+        fontsize=9,
+    )
+    ax.set_xlim(-0.6, len(baselines) + 0.55)
+    ax.set_ylim(0.0, ceiling)
+    ax.set_ylabel("R.m.s. velocity (mm/s)")
+    ax.set_title("Setting an ALARM from the Baseline, and a TRIP from the Zone", pad=12)
+    ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower right", fontsize=8)
+
+    info = [
+        "ALARM = baseline + 25 % of the upper limit of zone B,",
+        "and never more than 1.25 times that limit",
+        "TRIP guards against damage, so it comes from the machine",
+    ]
+    ax.text(
+        0.015,
+        0.965,
+        "\n".join(info),
+        transform=ax.transAxes,
+        va="top",
+        ha="left",
+        fontsize=8.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.35",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "machine_alarm_trip.svg")
     plt.close()

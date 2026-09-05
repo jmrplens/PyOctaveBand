@@ -3,13 +3,13 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 718,
-    "passing": 718,
+    "checks": 731,
+    "passing": 731,
     "failing": 0,
     "domains": 66,
-    "standards": 389,
-    "citations": 591,
-    "designations": 123,
+    "standards": 390,
+    "citations": 597,
+    "designations": 124,
     "sources": 84
   },
   "units": [
@@ -70,7 +70,8 @@
     "tu_HMS",
     "vacil",
     "vacil_HMS",
-    "yr"
+    "yr",
+    "µm"
   ],
   "domains": [
     {
@@ -184,8 +185,8 @@
     {
       "id": "machine-vibration-evaluation-iso-20816",
       "title": "Machine vibration evaluation (ISO 20816)",
-      "checks": 15,
-      "passing": 15
+      "checks": 28,
+      "passing": 28
     },
     {
       "id": "speech-intelligibility-ansi-s3-5-1997",
@@ -9405,6 +9406,378 @@
       },
       "deviation": {
         "value": -8.67e-08
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-10816-3-2009-table-a-1/zone-boundaries-group-1-on-rigid-supports-displacement-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 10816-3",
+        "edition": "2009",
+        "clause": "Table A.1",
+        "cite": "ISO 10816-3:2009 Table A.1"
+      },
+      "quantity": "Zone boundaries, group 1 on rigid supports, displacement, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "µm",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-10816-3-2009-table-a-1/zone-boundaries-group-1-on-rigid-supports-velocity-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 10816-3",
+        "edition": "2009",
+        "clause": "Table A.1",
+        "cite": "ISO 10816-3:2009 Table A.1"
+      },
+      "quantity": "Zone boundaries, group 1 on rigid supports, velocity, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-10816-3-2009-table-a-1/zone-boundaries-group-1-on-flexible-supports-displacement-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 10816-3",
+        "edition": "2009",
+        "clause": "Table A.1",
+        "cite": "ISO 10816-3:2009 Table A.1"
+      },
+      "quantity": "Zone boundaries, group 1 on flexible supports, displacement, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "µm",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-10816-3-2009-table-a-1/zone-boundaries-group-1-on-flexible-supports-velocity-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 10816-3",
+        "edition": "2009",
+        "clause": "Table A.1",
+        "cite": "ISO 10816-3:2009 Table A.1"
+      },
+      "quantity": "Zone boundaries, group 1 on flexible supports, velocity, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-10816-3-2009-table-a-2/zone-boundaries-group-2-on-rigid-supports-displacement-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 10816-3",
+        "edition": "2009",
+        "clause": "Table A.2",
+        "cite": "ISO 10816-3:2009 Table A.2"
+      },
+      "quantity": "Zone boundaries, group 2 on rigid supports, displacement, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "µm",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-10816-3-2009-table-a-2/zone-boundaries-group-2-on-rigid-supports-velocity-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 10816-3",
+        "edition": "2009",
+        "clause": "Table A.2",
+        "cite": "ISO 10816-3:2009 Table A.2"
+      },
+      "quantity": "Zone boundaries, group 2 on rigid supports, velocity, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-10816-3-2009-table-a-2/zone-boundaries-group-2-on-flexible-supports-displacement-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 10816-3",
+        "edition": "2009",
+        "clause": "Table A.2",
+        "cite": "ISO 10816-3:2009 Table A.2"
+      },
+      "quantity": "Zone boundaries, group 2 on flexible supports, displacement, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "µm",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-10816-3-2009-table-a-2/zone-boundaries-group-2-on-flexible-supports-velocity-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 10816-3",
+        "edition": "2009",
+        "clause": "Table A.2",
+        "cite": "ISO 10816-3:2009 Table A.2"
+      },
+      "quantity": "Zone boundaries, group 2 on flexible supports, velocity, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-10816-3-2009-5-2-3/the-more-restrictive-of-the-two-quantities-decides-the-zone",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 10816-3",
+        "edition": "2009",
+        "clause": "5.2.3",
+        "cite": "ISO 10816-3:2009 5.2.3"
+      },
+      "quantity": "The more restrictive of the two quantities decides the zone",
+      "kind": "scalar",
+      "expected": {
+        "value": 3.0
+      },
+      "computed": {
+        "value": 3.0
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.5
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 1,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-10816-3-2009-5-4-1/alarm-above-a-baseline-as-a-fraction-of-the-zone-b-c-boundary",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 10816-3",
+        "edition": "2009",
+        "clause": "5.4.1",
+        "cite": "ISO 10816-3:2009 5.4.1"
+      },
+      "quantity": "ALARM above a baseline, as a fraction of the zone B/C boundary",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.25
+      },
+      "computed": {
+        "value": 0.25
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-10816-3-2009-5-4-1/alarm-ceiling-as-a-multiple-of-the-zone-b-c-boundary",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 10816-3",
+        "edition": "2009",
+        "clause": "5.4.1",
+        "cite": "ISO 10816-3:2009 5.4.1"
+      },
+      "quantity": "ALARM ceiling, as a multiple of the zone B/C boundary",
+      "kind": "scalar",
+      "expected": {
+        "value": 1.25
+      },
+      "computed": {
+        "value": 1.25
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-10816-3-2009-5-4-2/trip-ceiling-as-a-multiple-of-the-zone-c-d-boundary",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 10816-3",
+        "edition": "2009",
+        "clause": "5.4.2",
+        "cite": "ISO 10816-3:2009 5.4.2"
+      },
+      "quantity": "TRIP ceiling, as a multiple of the zone C/D boundary",
+      "kind": "scalar",
+      "expected": {
+        "value": 1.25
+      },
+      "computed": {
+        "value": 1.25
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-10816-3-2009-5-3/threshold-of-a-significant-change-as-a-fraction-of-the-zone-b-c-boundary",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 10816-3",
+        "edition": "2009",
+        "clause": "5.3",
+        "cite": "ISO 10816-3:2009 5.3"
+      },
+      "quantity": "Threshold of a significant change, as a fraction of the zone B/C boundary",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.25
+      },
+      "computed": {
+        "value": 0.25
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 5.55e-17
       },
       "precision": 4,
       "verdict": "pass"

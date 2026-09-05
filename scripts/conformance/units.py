@@ -37,6 +37,7 @@ ALIASES: dict[str, str] = {
     "W/m^2": "W/m²",
     "kg/m3": "kg/m³",
     "m/(N·s)": "m/(N·s)",
+    "um": "µm",
 }
 
 #: Every unit the artefact may carry, canonical spelling only. Sorted at the
@@ -90,6 +91,7 @@ UNITS: frozenset[str] = frozenset(
         "m·Hz",
         "modes/Hz",
         "ms",
+        "µm",
         "nm",
         "ohm",
         "rad",

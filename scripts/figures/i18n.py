@@ -306,6 +306,28 @@ _ES_EXACT = {
     "aceleración constante por encima\n"
     "los límites B y C quedan a menos del 3 % de los escalones 2,8 y 7,1 "
     "de la escala de la Tabla C.1",
+    # industrial_machine_zones and machine_alarm_trip (ISO 10816-3).
+    "Zone Boundaries for Industrial Machines, Stated Twice": "Fronteras de zona de las máquinas industriales, dichas dos veces",
+    "R.m.s. velocity (mm/s)": "Velocidad eficaz (mm/s)",
+    "R.m.s. displacement (µm)": "Desplazamiento eficaz (µm)",
+    "group 1\nrigid": "grupo 1\nrígido",
+    "group 1\nflexible": "grupo 1\nflexible",
+    "group 2\nrigid": "grupo 2\nrígido",
+    "group 2\nflexible": "grupo 2\nflexible",
+    "the marked machine reads 2.0 mm/s, which is zone B": "la máquina marcada da 2,0 mm/s, que es zona B",
+    "the same machine reads 50 µm, which is zone C,\n"
+    "and the more restrictive of the two gradings applies": "la misma máquina da 50 µm, que es zona C,\n"
+    "y se aplica la más restrictiva de las dos calificaciones",
+    "Setting an ALARM from the Baseline, and a TRIP from the Zone": "Fijar una ALARMA desde la referencia y un DISPARO desde la zona",
+    "the cap on an ALARM: 1.25 times the upper limit of zone B": "tope de la ALARMA: 1,25 veces el límite superior de la zona B",
+    "TRIP: 1.25 times the upper limit of zone C": "DISPARO: 1,25 veces el límite superior de la zona C",
+    "a machine settled in zone A": "una máquina asentada en la zona A",
+    "a machine that has drifted into zone C": "una máquina que ha derivado a la zona C",
+    "ALARM = baseline + 25 % of the upper limit of zone B,\n"
+    "and never more than 1.25 times that limit\n"
+    "TRIP guards against damage, so it comes from the machine": "ALARMA = referencia + 25 % del límite superior de la zona B,\n"
+    "y nunca más de 1,25 veces ese límite\n"
+    "el DISPARO protege del daño, así que sale de la máquina",
     "envelope spectrum of the 2-4 kHz band": "espectro de envolvente de la banda 2-4 kHz",
     "predicted BPFO and harmonics": "BPFO previsto y sus armónicos",
     "predicted BPFI": "BPFI previsto",
@@ -3708,6 +3730,12 @@ _ES_EXACT = {
 }
 
 _ES_PATTERNS = [
+    # machine_alarm_trip: the readouts carry the computed limits.
+    (r"^ALARM: (.+) mm/s$", r"ALARMA: \1 mm/s"),
+    (r"^ALARM \(capped\): (.+) mm/s$", r"ALARMA (topada): \1 mm/s"),
+    (r"^the cap: (.+) mm/s$", r"el tope: \1 mm/s"),
+    (r"^TRIP: (.+) mm/s$", r"DISPARO: \1 mm/s"),
+    (r"^baseline\n(.+) mm/s$", "referencia\n\\1 mm/s"),
     # in_situ_sound_power: the lower title carries the computed LWA and U.
     (
         (
