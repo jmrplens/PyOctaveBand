@@ -5946,3 +5946,134 @@ def generate_vdi2081_room_step(output_dir: str) -> None:
     plt.tight_layout()
     save_figure(output_dir, "vdi2081_room_step.svg")
     plt.close()
+
+
+def generate_vdi2081_section_change(output_dir: str) -> None:
+    """Figure 26: what a sudden change of duct section reflects, and when."""
+    print("Generating vdi2081_section_change...")
+    from phonometry import noise_control
+
+    ratios = np.logspace(np.log10(0.03), np.log10(33.0), 400)
+    uncapped = 10.0 * np.log10((ratios + 1.0) ** 2 / (4.0 * ratios))
+    cap = 5.0
+    _fig, (ax, ax2) = plt.subplots(1, 2, figsize=(11.4, 5.6))
+
+    ax.semilogx(
+        ratios,
+        uncapped,
+        "--",
+        color=COLOR_MUTED,
+        lw=1.6,
+        label=r"$10\,\lg\,(r+1)^2/(4r)$, as the figure prints it",
+    )
+    ax.semilogx(
+        ratios,
+        np.minimum(uncapped, cap),
+        "-",
+        color=COLOR_PRIMARY,
+        lw=2.0,
+        label="what the library returns, with the VDI 3733 ceiling",
+    )
+    ax.axhline(cap, color=COLOR_SECONDARY, ls=":", lw=1.4)
+    # The ceiling bites where the expression reaches it, at a ratio of 10,55
+    # and again at its reciprocal.
+    for crossing in (0.0947, 10.5544):
+        ax.plot(crossing, cap, marker="o", ms=6, color=COLOR_SECONDARY, zorder=5)
+    ax.annotate(
+        "5 dB from $r$ = 10.55 up,\nand from 0.095 down",
+        xy=(10.5544, cap),
+        xytext=(0.42, 0.78),
+        textcoords="axes fraction",
+        ha="center",
+        va="center",
+        fontsize=8.5,
+        color=COLOR_FG,
+        arrowprops={"arrowstyle": "->", "color": COLOR_FG, "linewidth": 1.0},
+        bbox={
+            "boxstyle": "round,pad=0.32",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    # A ratio axis reads in ratios, not in powers of ten.
+    ax.set_xticks([0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0])
+    ax.set_xticklabels(["0.05", "0.1", "0.2", "0.5", "1", "2", "5", "10", "20"])
+    ax.minorticks_off()
+    ax.set_xlim(0.03, 33.0)
+    ax.set_xlabel("Section ratio $r = S_1/S_2$")
+    ax.set_ylabel("Reflection loss (dB)")
+    ax.set_title("Symmetric in the Ratio, and Capped at 5 dB", pad=10)
+    ax.set_ylim(0.0, 10.5)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower center", fontsize=8)
+
+    bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+    widening = noise_control.section_change_loss(
+        bands, 0.2, 0.5, shape="rectangular", upstream_size=0.8
+    )
+    narrowing = noise_control.section_change_loss(
+        bands, 0.5, 0.2, shape="rectangular", upstream_size=0.8
+    )
+    ax2.semilogx(
+        bands,
+        np.asarray(narrowing.values),
+        "-",
+        color=COLOR_PRIMARY,
+        lw=2.0,
+        marker="o",
+        ms=4,
+        label="a sudden reduction: every band",
+    )
+    ax2.semilogx(
+        bands,
+        np.asarray(widening.values),
+        "--",
+        color=COLOR_SECONDARY,
+        lw=2.0,
+        marker="s",
+        ms=4,
+        label="a sudden increase: below the limit frequency only",
+    )
+    limit = 343.0 / (2.0 * 0.8)
+    ax2.axvline(limit, color=COLOR_FG, linestyle="--", linewidth=1.0, alpha=0.55)
+    ax2.annotate(
+        f"$f_G$ = {limit:.0f} Hz",
+        xy=(limit, 0.5),
+        xycoords=("data", "axes fraction"),
+        ha="center",
+        va="center",
+        fontsize=9,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.25",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    ax2.set_xlabel(LABEL_FREQ_HZ)
+    ax2.set_ylabel("Reflection loss (dB)")
+    ax2.set_title("The Same 0.88 dB, on Two Different Rules", pad=10)
+    ax2.set_ylim(-0.15, 1.3)
+    format_frequency_axis(ax2)
+    ax2.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+    ax2.set_axisbelow(True)
+    ax2.legend(loc="upper right", fontsize=8)
+    ax2.text(
+        0.015,
+        0.035,
+        "0.5 m² and 0.2 m² either way about, in a 0.8 m duct",
+        transform=ax2.transAxes,
+        va="bottom",
+        ha="left",
+        fontsize=8.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.32",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "vdi2081_section_change.svg")
+    plt.close()

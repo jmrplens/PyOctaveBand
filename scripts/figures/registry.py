@@ -186,6 +186,7 @@ from .devices import (
     generate_vdi2081_chain_cascade,
     generate_vdi2081_fan_assemblies,
     generate_vdi2081_room_step,
+    generate_vdi2081_section_change,
     generate_vibration_sound_power,
 )
 from .environment import (
@@ -1177,6 +1178,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # describes, the worked sheet element by element, and the room step.
     generate_vdi2081_fan_assemblies,
     generate_vdi2081_chain_cascade,
+    generate_vdi2081_section_change,
     generate_vdi2081_room_step,
     generate_room_to_room_chain,
     generate_room_to_room_partitions,

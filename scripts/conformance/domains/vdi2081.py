@@ -625,3 +625,85 @@ def _chk_room_total_a_weighted() -> Outcome:
     return numeric(
         _PRINTED_ROOM_TOTAL_A, total, _PRINTED_TOLERANCE, unit="dB", places=3
     )
+
+
+# ---------------------------------------------------------------------------
+# Section 6.3: the reflection at a sudden change of duct section
+# ---------------------------------------------------------------------------
+#: Figure 26 on printed folio 39 prints the reduction as a closed form rather
+#: than as a curve, so the oracle is the expression itself, evaluated at the
+#: ratios its own chart is drawn over.
+_PRINTED_SECTION_RATIOS = (0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 7.0, 10.0)
+#: VDI 3733's recommendation, quoted by 6.3: take no more than this.
+_PRINTED_SECTION_CAP = 5.0
+
+
+def _chk_section_change_ratio(ratio: float) -> Outcome:
+    """One abscissa of Figure 26, uncapped, against the printed expression."""
+    printed = 10.0 * math.log10((ratio + 1.0) ** 2 / (4.0 * ratio))
+    # A reduction reflects in every band, so the first one carries the value
+    # whichever way the section goes; the increase branch is checked below.
+    computed = float(
+        ph.noise_control.section_change_loss(
+            np.array(_PRINTED_BANDS),
+            ratio,
+            1.0,
+            shape="round",
+            upstream_size=0.4,
+            cap=100.0,
+        ).values[0]
+    )
+    return numeric(printed, computed, _PRINTED_TOLERANCE, unit="dB", places=4)
+
+
+def _register_section_change() -> None:
+    """Register the nine abscissae the figure's chart is drawn over."""
+    for ratio in _PRINTED_SECTION_RATIOS:
+        register(
+            _VDI2081,
+            "VDI 2081 Blatt 1:2001 Section 6.3, Figure 26",
+            f"Reflection at a section change of ratio {ratio:g}, dB",
+        )(functools.partial(_chk_section_change_ratio, ratio))
+
+
+_register_section_change()
+
+
+@register(
+    _VDI2081,
+    "VDI 2081 Blatt 1:2001 Section 6.3, Figure 26",
+    "Bands a sudden increase still reflects in, of eight",
+)
+def _chk_section_change_increase_band_count() -> Outcome:
+    """Above the limit frequency of the upstream duct the figure prints nought.
+
+    A 0,8 m side puts Equation (33) at 214,4 Hz, which leaves the 63 and
+    125 Hz octaves below it and the other six above.
+    """
+    values = ph.noise_control.section_change_loss(
+        np.array(_PRINTED_BANDS),
+        0.2,
+        0.5,
+        shape="rectangular",
+        upstream_size=0.8,
+    ).values
+    return numeric(2.0, float(np.count_nonzero(values)), 0.5, places=1)
+
+
+@register(
+    _VDI2081,
+    "VDI 2081 Blatt 1:2001 Section 6.3",
+    "Ceiling VDI 3733 recommends for a section change, dB",
+)
+def _chk_section_change_cap() -> Outcome:
+    """However far the sections differ, 6.3 says to take no more than 5 dB."""
+    values = ph.noise_control.section_change_loss(
+        np.array(_PRINTED_BANDS), 1000.0, 1.0, shape="round"
+    ).values
+    return numeric(
+        _PRINTED_SECTION_CAP,
+        float(np.max(values)),
+        _PRINTED_TOLERANCE,
+        unit="dB",
+        places=3,
+    )

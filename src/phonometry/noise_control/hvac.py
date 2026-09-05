@@ -2057,6 +2057,96 @@ def flexible_duct_insertion_loss(
     )
 
 
+def section_change_loss(
+    frequencies: ArrayLike,
+    upstream_area: float,
+    downstream_area: float,
+    *,
+    shape: str = "rectangular",
+    upstream_size: float | None = None,
+    speed_of_sound: float = _C_AIR,
+    cap: float = _VDI2081_SECTION_CHANGE_CAP,
+) -> HvacSpectrumResult:
+    r"""Reflection at a sudden change of duct section (VDI 2081 Part 1, 6.3).
+
+    Figure 26 gives the reduction of the internal sound power level in closed
+    form, for the area ratio :math:`r = S_1/S_2`:
+
+    .. math::
+
+       \Delta L_{Wi} = 10 \log_{10} rac{(r + 1)^{2}}{4r}
+
+    and it applies differently on the two sides of unity. A **sudden
+    reduction** (:math:`r > 1`) reflects at every frequency; the figure's own
+    column says the frequency has no effect. A **sudden increase**
+    (:math:`r < 1`) reflects only below the limit frequency of the upstream
+    duct, Equation (33) or (34), and above it the figure gives nought: past
+    that frequency the duct carries more than plane waves and the mismatch
+    stops behaving as one.
+
+    A gradual change is not this: 6.3 says that where the transition is
+    smooth, through a tapered adapter long compared with the wavelength, the
+    reduction is negligibly small.
+
+    The reduction is reached only with the duct anechoically terminated at
+    both ends, which practice rarely is, so VDI 3733 recommends taking no more
+    than 5 dB from it. That is the default ``cap``, and it binds from an area
+    ratio of about 10,5 upwards, or 0,095 downwards.
+
+    There is no ASHRAE counterpart to call through ``model=``: Long folds the
+    reflection from a change of total section into the junction itself, which
+    is what :func:`split_loss` implements for ``model="ashrae"``, while
+    VDI 2081 treats the two as separate elements of the chain.
+
+    :param frequencies: Frequencies ``f``, Hz (1-D array).
+    :param upstream_area: Section ``S1`` the sound arrives through, m².
+    :param downstream_area: Section ``S2`` it continues into, m².
+    :param shape: ``"rectangular"`` (default) or ``"round"``, which decides
+        which limit-frequency equation the upstream duct takes.
+    :param upstream_size: The largest side of the upstream duct, m, for a
+        rectangular one; its internal diameter for a round one. May be omitted
+        for a round duct, where it follows from the area.
+    :param speed_of_sound: Speed of sound ``c``, m/s.
+    :param cap: The largest reduction to take, dB (default 5).
+    :return: An :class:`HvacSpectrumResult` of the reflection loss, dB.
+    :raises ValueError: If an area, a size or the speed of sound is not
+        positive, the shape is unknown, or a rectangular duct is given no
+        size.
+    """
+    f = _frequencies(frequencies)
+    s_1 = require_positive(upstream_area, "upstream_area")
+    s_2 = require_positive(downstream_area, "downstream_area")
+    c = require_positive(speed_of_sound, "speed_of_sound")
+    ceiling = require_positive(cap, "cap")
+    kind = require_choice(shape, "shape", ("rectangular", "round"))
+    if upstream_size is None:
+        if kind == "rectangular":
+            msg = (
+                "'upstream_size' is the largest side of a rectangular duct and "
+                "cannot be recovered from its area; give it, or pass "
+                "shape='round'."
+            )
+            raise ValueError(msg)
+        size = equivalent_diameter(s_1)
+    else:
+        size = require_positive(upstream_size, "upstream_size")
+
+    ratio = s_1 / s_2
+    reduction = min(10.0 * math.log10((ratio + 1.0) ** 2 / (4.0 * ratio)), ceiling)
+    values = np.full_like(f, reduction)
+    if ratio < 1.0:
+        # A sudden increase reflects only while the upstream duct carries
+        # plane waves alone; Figure 26 prints "approximately 0" above that.
+        values = np.where(f <= _vdi2081_limit_frequency(kind, size, c), reduction, 0.0)
+    direction = "reduction" if ratio > 1.0 else "increase"
+    return HvacSpectrumResult(
+        frequencies=f,
+        values=values,
+        quantity="attenuation",
+        label=f"Section change, VDI 2081 (sudden {direction}, r = {ratio:.3g})",
+    )
+
+
 def split_loss(
     main_area: float,
     branch_areas: ArrayLike,

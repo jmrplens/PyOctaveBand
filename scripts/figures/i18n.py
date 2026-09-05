@@ -45,6 +45,17 @@ _LANG = "en"
 _LANG_SUFFIX = ""
 
 _ES_EXACT = {
+    # VDI 2081 Section 6.3, the sudden change of duct section (Figure 26).
+    "Symmetric in the Ratio, and Capped at 5 dB": "Simétrica en la razón, y topada en 5 dB",
+    "Reflection loss (dB)": "Pérdida por reflexión (dB)",
+    "Section ratio $r = S_1/S_2$": "Razón de secciones $r = S_1/S_2$",
+    "$10\\,\\lg\\,(r+1)^2/(4r)$, as the figure prints it": "$10\\,\\lg\\,(r+1)^2/(4r)$, tal como lo imprime la figura",
+    "what the library returns, with the VDI 3733 ceiling": "lo que devuelve la biblioteca, con el techo de la VDI 3733",
+    "5 dB from $r$ = 10.55 up,\nand from 0.095 down": "5 dB de $r$ = 10,55 hacia arriba,\ny de 0,095 hacia abajo",
+    "The Same 0.88 dB, on Two Different Rules": "Los mismos 0,88 dB, con dos reglas distintas",
+    "a sudden reduction: every band": "un estrechamiento súbito: todas las bandas",
+    "a sudden increase: below the limit frequency only": "una ampliación súbita: solo bajo la frecuencia límite",
+    "0.5 m² and 0.2 m² either way about, in a 0.8 m duct": "0,5 m² y 0,2 m² en los dos sentidos, en un conducto de 0,8 m",
     # ISO/TR 17534-3 quality-assurance cases (environment/propagation).
     "The Same Path Over Three Grounds": "El mismo camino sobre tres suelos",
     "Level at the receiver (dB)": "Nivel en el receptor (dB)",

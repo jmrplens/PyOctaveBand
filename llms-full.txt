@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 731 numerical conformance checks against 390 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 742 numerical conformance checks against 390 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 731 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 66 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 742 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 66 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -21892,9 +21892,15 @@ it.
 - **Bend** (Section 6.2, Table 7): keyed on the bend's own size, through
   `elbow_insertion_loss`. The table is printed once, for a 1250 mm side, and
   carried along the frequency axis for every other size.
-- **Change of section** (Section 6.3): the reduction VDI 3733 gives, capped at
-  5 dB, because the printed value is only reached when the duct is anechoically
-  terminated at both ends.
+- **Change of section** (Section 6.3, Figure 26): the reflection at a sudden
+  step, through `section_change_loss`. It is one expression,
+  $10 \lg (r+1)^2/(4r)$ in the area ratio $r = S_1/S_2$, and two rules about
+  when it applies: a sudden reduction reflects in every band, a sudden
+  increase only below the limit frequency of the duct it arrives through.
+  VDI 3733 recommends taking no more than 5 dB from it, because the printed
+  value is only reached when the duct is anechoically terminated at both ends,
+  and a gradual change through a long tapered adapter reflects nothing worth
+  counting.
 - **Branch** (Section 6.4, Equation (35)): the share of the flow the branch
   takes, through `split_loss`.
 
@@ -21909,6 +21915,21 @@ run = noise_control.unlined_rectangular_duct_attenuation(
 print([round(float(v), 2) for v in run.values])
 ```
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_section_change_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_section_change.svg" alt="Two panels. On the left, the reflection loss against the section ratio: a dashed grey curve is the printed expression, symmetric about a ratio of one where it is zero and rising to 9 decibels at the ends, and a solid blue curve is the same thing held at the 5 decibel ceiling, which it reaches at a ratio of 10.55 and again at 0.095. On the right, the same 0.88 decibel loss under the two frequency rules: a solid line flat across all eight octaves for a sudden reduction, and a dashed line that holds the value at 63 and 125 hertz and drops to zero above the limit frequency of 214 hertz for a sudden increase" width="100%"></picture>
+
+*The expression is symmetric: a duct that widens by a factor reflects what the
+same duct narrowing by it does. What differs is when.*
+
+```python
+from phonometry import noise_control
+import numpy as np
+
+bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+step = noise_control.section_change_loss(
+    bands, 0.5, 0.2, shape="rectangular", upstream_size=0.8
+)
+print(round(float(step.values[0]), 2))   # 0.88 dB, in every band
+```
 A splitter silencer is not one of these: its insertion loss comes from the
 maker's measurement, to ISO 7235, and the guideline says so.
 `splitter_silencer_insertion_loss` is the estimate for when there is none.
@@ -37431,6 +37452,7 @@ documents, one page per module.
 | `flexible_duct_insertion_loss` | `function` | **Lined round flexible duct IL (Long Table 14.4, ASHRAE 1995), 63 Hz-4 kHz.**<br>• `frequencies`, `diameter` (100-406 mm), `length` (0.9-3.7 m)<br>• Interpolated over length and log diameter | `flexible_duct_insertion_loss(None, 0.305, 1.8)` |
 | `splitter_silencer_insertion_loss` | `function` | **Parallel-splitter (dissipative) silencer IL: each airway a lined duct of half the splitter thickness, combined by Bies Eq. (8.241).**<br>• `frequencies`, `height`, `length`, `airway_widths` (scalar or per airway), `splitter_thickness`<br>• Prefer the manufacturer's dynamic insertion loss | `splitter_silencer_insertion_loss(None, 0.6, 1.5, [0.1]*3, 0.2)` |
 | `silencer_self_noise` | `function` | **Regenerated (self) noise of a splitter silencer (Long Eq. 14.31 + Table 14.8, Fry 1988).**<br>• `frequencies`, `airway_velocity` V [m/s], `passages` N, `height` H [m]<br>L_W = 55·lg V + 10·lg N + 10·lg(H/1 mm) − 45 | `silencer_self_noise(None, 10.0, 4, 0.9)` |
+| `section_change_loss` | `function` | **Reflection at a sudden change of duct section (VDI 2081 6.3, Figure 26).**<br>• `upstream_area` S1, `downstream_area` S2; the loss is `10 lg (r+1)²/(4r)` in `r = S1/S2`<br>• a sudden reduction reflects in every band; a sudden increase only below the limit frequency of the upstream duct, so `shape` and `upstream_size` are needed for it<br>• `cap` (Default: 5 dB, VDI 3733's recommendation) | `noise_control.section_change_loss(bands, 0.5, 0.2, shape='round')`<br><br>• 0.88 dB |
 | `split_loss` | `function` | **Branch power-division loss at a duct split (Long Eq. 14.17), returned as a positive attenuation.**<br>• `main_area` S_m [m²], `branch_areas` [m²], `branch` index | `split_loss(0.6, [0.15]*4)  # 6.02 dB` |
 | `end_reflection_loss_closed_form` / `equivalent_diameter` | `function` | **Reynolds' closed-form duct end reflection (Long Eqs. 14.14-14.16); the alternative to the `end_reflection_loss` table look-up (`method='long'`).**<br>• `frequencies`, `diameter`, `termination` 'flush'/'free'<br>• `equivalent_diameter(area)` = √(4S/π) for a rectangular duct | `end_reflection_loss(bands, 0.3, method='long')` |
 | `diffuser_sound_power` | `function` | **Regenerated (self) noise of a grille, register or diffuser (Long Eqs. 13.27-13.33, Reynolds 1990).**<br>• `frequencies`, `face_area` S_G [m²], `volume_flow` Q [m³/s], `pressure_drop` ΔP [Pa]<br>• `shape` 'rectangular'/'round', `count` n (adds 10·lg n)<br>• 18 dB per doubling of approach velocity; peak band at f_P = 48.8·U_G | `diffuser_sound_power(None, 0.372, 0.147, 12.4)` |
@@ -52398,7 +52420,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 731 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 742 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -52767,7 +52789,7 @@ sample from the metrology core:
 | IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()`; IEC 61252:2025 has since superseded this print, and the transcription still targets the 1993+A2 text | `tests/signals/test_levels.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-731 numerical conformance checks across 66 domains and 390 standards, covering
+742 numerical conformance checks across 66 domains and 390 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise
