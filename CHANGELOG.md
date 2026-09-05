@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `phonometry.vibration` grades a machine from one broad-band measurement, the
+  way ISO 20816-1:2016 asks for it. `evaluation_zone` places a magnitude in
+  zone A, B, C or D against the three boundaries of whichever part of the
+  series applies, carried by `ZoneBoundaries`; a magnitude that lands exactly
+  on a boundary belongs to the zone below. `allowable_velocity` is the
+  frequency-shaped criterion of Figure 9 written as Formula (C.1), flat between
+  the two corners with constant displacement below and constant acceleration
+  above, and `ZONE_LIMIT_FACTORS` moves the one curve onto the three
+  boundaries. For a machine no part of the series covers, Table C.1 arrives as
+  `TYPICAL_BOUNDARY_LADDER_MM_S` and `TYPICAL_ZONE_BOUNDARY_RANGES_MM_S`, which
+  are ranges rather than limits and overlap on purpose.
+
+  `vibration_vector_change` is Criterion II read the way Annex D reads it. A
+  change in vibration is a vector, and the annex makes the point with a machine
+  that fell from 3 mm/s at 40 degrees to 2,5 mm/s at 180: the magnitude
+  improved by half a millimetre per second while the vibration itself moved by
+  5,17. The result carries both numbers and plots the two states and the chord
+  between them.
+
 - The last step of the VDI 2081 chain, the level the air finally makes in the
   room. `noise_control.room_effect` and `room.steady_state_spl` already carried
   the relation the guideline's Equation (36) states, but written in the room
