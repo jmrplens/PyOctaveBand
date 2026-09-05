@@ -2351,6 +2351,7 @@ it.
 
 ```python
 from phonometry import noise_control
+import numpy as np
 
 bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
 run = noise_control.unlined_rectangular_duct_attenuation(
@@ -2414,6 +2415,7 @@ costs about a decibel in this room, and more in a livelier one.*
 
 ```python
 from phonometry import noise_control
+import numpy as np
 
 directivity = np.array([2.1, 2.4, 3.0, 4.0, 5.5, 6.7, 7.0, 7.2])
 shaped = noise_control.room_effect(1.5, absorption_area=20.0, directivity=directivity)
