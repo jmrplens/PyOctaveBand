@@ -36,13 +36,13 @@ materials, vibration, environmental, aircraft and underwater acoustics,
 electroacoustics and wave simulation. Every metric is implemented from its
 governing standard and numerically checked against it: the auto-generated
 [conformance report](https://github.com/jmrplens/phonometry/blob/v3.3.0/docs/CONFORMANCE.md)
-runs 767 conformance checks across 66 domains and 391 standards, each pinning
+runs 778 conformance checks across 66 domains and 391 standards, each pinning
 an expected normative value to the value the library computes, and CI
 regenerates it on every pull request. Filters are class 1 per
 **IEC 61260-1:2014 / ANSI S1.11-2004** and weightings and levels class 1 per
 **IEC 61672-1:2013**.
 
-<a href="https://github.com/jmrplens/phonometry/blob/v3.3.0/docs/CONFORMANCE.md"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/v3.3.0/.github/badges/conformance-summary.svg" alt="All 767 conformance checks pass, across 66 domains and 391 standards"></a>
+<a href="https://github.com/jmrplens/phonometry/blob/v3.3.0/docs/CONFORMANCE.md"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/v3.3.0/.github/badges/conformance-summary.svg" alt="All 778 conformance checks pass, across 66 domains and 391 standards"></a>
 
 <img src="https://raw.githubusercontent.com/jmrplens/phonometry/v3.3.0/.github/images/anim_fdtd_pillar_hall_poster.jpg" alt="An 800 Hz plane wavefront sweeps through a hall of rigid columns in a 2D FDTD simulation; every column diffracts the front and the scattered wavelets interfere until the whole hall is filled" width="100%">
 

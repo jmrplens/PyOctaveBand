@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**767/767 conformance checks pass** across 66 domains and 391 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**778/778 conformance checks pass** across 66 domains and 391 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -1296,7 +1296,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>HVAC noise (VDI 2081)</b>: 100% (46/46)</summary>
+<summary><b>HVAC noise (VDI 2081)</b>: 100% (57/57)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -1346,6 +1346,17 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | VDI 2081 Blatt 2:2005 Table 1, element 20 | Sound pressure level in room 102, worst octave deviation, dB | 0 dB (+/-0.5 dB) | 0.4913 dB | 0.4913 dB | 98 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2:2005 Table 1, element 20 | Total sound pressure level in room 102, dB | 51.4 dB (+/-0.05 dB) | 51.384 dB | -0.016 dB | 32 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2:2005 Table 1, element 20 | A-weighted sound pressure level in room 102, dB | 40 dB (+/-0.05 dB) | 40.037 dB | 0.037 dB | 74 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Reflection at a section change of ratio 0.05, dB | 7.4135 dB (+/-0.05 dB) | 7.4135 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Reflection at a section change of ratio 0.1, dB | 4.8073 dB (+/-0.05 dB) | 4.8073 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Reflection at a section change of ratio 0.2, dB | 2.5527 dB (+/-0.05 dB) | 2.5527 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Reflection at a section change of ratio 0.5, dB | 0.5115 dB (+/-0.05 dB) | 0.5115 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Reflection at a section change of ratio 1, dB | 0 dB (+/-0.05 dB) | 0 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Reflection at a section change of ratio 2, dB | 0.5115 dB (+/-0.05 dB) | 0.5115 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Reflection at a section change of ratio 5, dB | 2.5527 dB (+/-0.05 dB) | 2.5527 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Reflection at a section change of ratio 7, dB | 3.5902 dB (+/-0.05 dB) | 3.5902 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Reflection at a section change of ratio 10, dB | 4.8073 dB (+/-0.05 dB) | 4.8073 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Bands a sudden increase still reflects in, of eight | 2 (+/-0.5) | 2 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1:2001 Section 6.3 | Ceiling VDI 3733 recommends for a section change, dB | 5 dB (+/-0.05 dB) | 5 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 
 </details>
 
