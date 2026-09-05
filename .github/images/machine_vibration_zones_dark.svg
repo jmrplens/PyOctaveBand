@@ -38,7 +38,7 @@ z
    </g>
    <g id="FillBetweenPolyCollection_1">
     <defs>
-     <path id="mf43e5f5b1b" d="M 51.700781 -166.207963 
+     <path id="m3545c91c45" d="M 51.700781 -166.207963 
 L 51.700781 70.480459 
 L 52.792263 70.480459 
 L 53.883745 70.480459 
@@ -1241,15 +1241,15 @@ L 53.883745 -167.275934
 L 52.792263 -166.741949 
 L 51.700781 -166.207963 
 z
-" style="stroke: #081e2e"/>
+" style="stroke: #071807"/>
     </defs>
     <g clip-path="url(#p120eb9ebd9)">
-     <use xlink:href="#mf43e5f5b1b" x="0" y="439.035" style="fill: #081e2e; stroke: #081e2e"/>
+     <use xlink:href="#m3545c91c45" x="0" y="439.035" style="fill: #071807; stroke: #071807"/>
     </g>
    </g>
    <g id="FillBetweenPolyCollection_2">
     <defs>
-     <path id="mbce974ce80" d="M 51.700781 -207.320932 
+     <path id="m45ef5b3eec" d="M 51.700781 -207.320932 
 L 51.700781 -166.207963 
 L 52.792263 -166.741949 
 L 53.883745 -167.275934 
@@ -2452,15 +2452,15 @@ L 53.883745 -208.388903
 L 52.792263 -207.854917 
 L 51.700781 -207.320932 
 z
-" style="stroke: #1f0606"/>
+" style="stroke: #1e1b02"/>
     </defs>
     <g clip-path="url(#p120eb9ebd9)">
-     <use xlink:href="#mbce974ce80" x="0" y="439.035" style="fill: #1f0606; stroke: #1f0606"/>
+     <use xlink:href="#m45ef5b3eec" x="0" y="439.035" style="fill: #1e1b02; stroke: #1e1b02"/>
     </g>
    </g>
    <g id="FillBetweenPolyCollection_3">
     <defs>
-     <path id="m13064753ab" d="M 51.700781 -247.396614 
+     <path id="maf4f03388a" d="M 51.700781 -247.396614 
 L 51.700781 -207.320932 
 L 52.792263 -207.854917 
 L 53.883745 -208.388903 
@@ -3663,15 +3663,15 @@ L 53.883745 -248.464585
 L 52.792263 -247.9306 
 L 51.700781 -247.396614 
 z
-" style="stroke: #071807"/>
+" style="stroke: #261505"/>
     </defs>
     <g clip-path="url(#p120eb9ebd9)">
-     <use xlink:href="#m13064753ab" x="0" y="439.035" style="fill: #071807; stroke: #071807"/>
+     <use xlink:href="#maf4f03388a" x="0" y="439.035" style="fill: #261505; stroke: #261505"/>
     </g>
    </g>
    <g id="FillBetweenPolyCollection_4">
     <defs>
-     <path id="m35bf7e9930" d="M 51.700781 -533.766634 
+     <path id="mc3904c3136" d="M 51.700781 -533.766634 
 L 51.700781 -247.396614 
 L 52.792263 -247.9306 
 L 53.883745 -248.464585 
@@ -4874,10 +4874,10 @@ L 53.883745 -533.766634
 L 52.792263 -533.766634 
 L 51.700781 -533.766634 
 z
-" style="stroke: #2f2f2f"/>
+" style="stroke: #1f0606"/>
     </defs>
     <g clip-path="url(#p120eb9ebd9)">
-     <use xlink:href="#m35bf7e9930" x="0" y="439.035" style="fill: #2f2f2f; stroke: #2f2f2f"/>
+     <use xlink:href="#mc3904c3136" x="0" y="439.035" style="fill: #1f0606; stroke: #1f0606"/>
     </g>
    </g>
    <g id="matplotlib.axis_1">
@@ -6559,7 +6559,7 @@ L 607.265067 202.435271
 L 622.545813 209.902228 
 L 705.498438 250.485127 
 L 705.498438 250.485127 
-" clip-path="url(#p120eb9ebd9)" style="fill: none; stroke: #1f77b4; stroke-width: 1.8; stroke-linecap: square"/>
+" clip-path="url(#p120eb9ebd9)" style="fill: none; stroke: #2ca02c; stroke-width: 1.8; stroke-linecap: square"/>
    </g>
    <g id="line2d_130">
     <path d="M 51.700781 231.714068 
@@ -6568,7 +6568,7 @@ L 607.265067 161.322303
 L 622.545813 168.789259 
 L 705.498438 209.372158 
 L 705.498438 209.372158 
-" clip-path="url(#p120eb9ebd9)" style="fill: none; stroke: #d62728; stroke-width: 1.8; stroke-linecap: square"/>
+" clip-path="url(#p120eb9ebd9)" style="fill: none; stroke: #b8a70b; stroke-width: 1.8; stroke-linecap: square"/>
    </g>
    <g id="line2d_131">
     <path d="M 51.700781 191.638386 
@@ -6577,7 +6577,7 @@ L 607.265067 121.24662
 L 622.545813 128.713577 
 L 705.498438 169.296476 
 L 705.498438 169.296476 
-" clip-path="url(#p120eb9ebd9)" style="fill: none; stroke: #2ca02c; stroke-width: 1.8; stroke-linecap: square"/>
+" clip-path="url(#p120eb9ebd9)" style="fill: none; stroke: #e07b1f; stroke-width: 1.8; stroke-linecap: square"/>
    </g>
    <g id="line2d_132">
     <path d="M 195.583596 400.833437 
@@ -7530,7 +7530,7 @@ z
      <path d="M 399.804688 38.798125 
 L 407.804688 38.798125 
 L 415.804688 38.798125 
-" style="fill: none; stroke: #1f77b4; stroke-width: 1.8; stroke-linecap: square"/>
+" style="fill: none; stroke: #2ca02c; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_21">
      <!-- limit of zone A ($Z$ = 1) -->
@@ -7564,7 +7564,7 @@ L 415.804688 38.798125
      <path d="M 399.804688 50.8 
 L 407.804688 50.8 
 L 415.804688 50.8 
-" style="fill: none; stroke: #d62728; stroke-width: 1.8; stroke-linecap: square"/>
+" style="fill: none; stroke: #b8a70b; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_22">
      <!-- limit of zone B ($Z$ = 2.56) -->
@@ -7601,7 +7601,7 @@ L 415.804688 50.8
      <path d="M 399.804688 62.801875 
 L 407.804688 62.801875 
 L 415.804688 62.801875 
-" style="fill: none; stroke: #2ca02c; stroke-width: 1.8; stroke-linecap: square"/>
+" style="fill: none; stroke: #e07b1f; stroke-width: 1.8; stroke-linecap: square"/>
     </g>
     <g id="text_23">
      <!-- limit of zone C ($Z$ = 6.4) -->
@@ -7639,7 +7639,7 @@ L 415.804688 77.6025
 L 415.804688 72.0025 
 L 399.804688 72.0025 
 z
-" style="fill: #081e2e; stroke: #081e2e; stroke-linejoin: miter"/>
+" style="fill: #071807; stroke: #071807; stroke-linejoin: miter"/>
     </g>
     <g id="text_24">
      <!-- zone A: newly commissioned -->
@@ -7693,7 +7693,7 @@ L 570.063438 41.598125
 L 570.063438 35.998125 
 L 554.063438 35.998125 
 z
-" style="fill: #1f0606; stroke: #1f0606; stroke-linejoin: miter"/>
+" style="fill: #1e1b02; stroke: #1e1b02; stroke-linejoin: miter"/>
     </g>
     <g id="text_25">
      <!-- zone B: unrestricted operation -->
@@ -7736,7 +7736,7 @@ L 570.063438 53.59875
 L 570.063438 47.99875 
 L 554.063438 47.99875 
 z
-" style="fill: #071807; stroke: #071807; stroke-linejoin: miter"/>
+" style="fill: #261505; stroke: #261505; stroke-linejoin: miter"/>
     </g>
     <g id="text_26">
      <!-- zone C: limited operation -->
@@ -7774,7 +7774,7 @@ L 570.063438 65.599375
 L 570.063438 59.999375 
 L 554.063438 59.999375 
 z
-" style="fill: #2f2f2f; stroke: #2f2f2f; stroke-linejoin: miter"/>
+" style="fill: #1f0606; stroke: #1f0606; stroke-linejoin: miter"/>
     </g>
     <g id="text_27">
      <!-- zone D: damage -->

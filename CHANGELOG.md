@@ -321,6 +321,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   test holds the class shut: a standard's number always follows its body, so a
   designation with no digit whose clause opens with one has lost it.
 
+- The evaluation zones were shaded with the series palette, which told the
+  reader the opposite of what the scale says. Zone B, "unrestricted
+  operation", came out red and zone C, "limited operation", came out green, so
+  the better of the two looked like the alarming one, and zone D, damage, was
+  a neutral grey behind both. Four figures did it: the Table C.1 zone
+  criterion, the ISO 10816-3 boundary bars, the ALARM and TRIP settings and
+  the twelve-month trend.
+
+  A categorical palette on an ordered scale is the defect, so the zones get a
+  ramp of their own that runs one way, calm to alarming, and the letter drawn
+  in each band and the order of the bands repeat the same information for a
+  reader who does not separate red from green. Nothing else in the corpus
+  moved: the other 2388 figures reproduce byte for byte.
+
+  The flow-noise figure's own note is redrawn to match the prose above it:
+  what Figure 16 prints is a level difference, not a share.
+
 - `flow_noise_straight_duct` was credited to Bies, Hansen & Howard 5e
   Eq. (8.251), a second-hand citation of a law this project holds the primary
   source for. The printed page settles it: Bies gives that equation as "(VDI

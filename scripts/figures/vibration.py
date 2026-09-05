@@ -40,6 +40,10 @@ from .theme import (
     COLOR_QUATERNARY,
     COLOR_SECONDARY,
     COLOR_TERTIARY,
+    COLOR_ZONE_A,
+    COLOR_ZONE_B,
+    COLOR_ZONE_C,
+    COLOR_ZONE_D,
     LABEL_FREQ_HZ,
     _band_index_axis,
     save_figure,
@@ -2304,9 +2308,9 @@ def generate_machine_vibration_zones(output_dir: str) -> None:
     v_a = 1.12
     freq = np.logspace(np.log10(2.0), np.log10(3000.0), 600)
     curves = [
-        ("A", vibration.ZONE_LIMIT_FACTORS["A"], COLOR_PRIMARY),
-        ("B", vibration.ZONE_LIMIT_FACTORS["B"], COLOR_SECONDARY),
-        ("C", vibration.ZONE_LIMIT_FACTORS["C"], COLOR_TERTIARY),
+        ("A", vibration.ZONE_LIMIT_FACTORS["A"], COLOR_ZONE_A),
+        ("B", vibration.ZONE_LIMIT_FACTORS["B"], COLOR_ZONE_B),
+        ("C", vibration.ZONE_LIMIT_FACTORS["C"], COLOR_ZONE_C),
     ]
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
@@ -2333,10 +2337,10 @@ def generate_machine_vibration_zones(output_dir: str) -> None:
     floor = np.full_like(freq, 1.0e-3)
     ceiling = np.full_like(freq, 1.0e3)
     bands = (
-        (floor, limits["A"], COLOR_PRIMARY, "zone A: newly commissioned"),
-        (limits["A"], limits["B"], COLOR_SECONDARY, "zone B: unrestricted operation"),
-        (limits["B"], limits["C"], COLOR_TERTIARY, "zone C: limited operation"),
-        (limits["C"], ceiling, COLOR_MUTED, "zone D: damage"),
+        (floor, limits["A"], COLOR_ZONE_A, "zone A: newly commissioned"),
+        (limits["A"], limits["B"], COLOR_ZONE_B, "zone B: unrestricted operation"),
+        (limits["B"], limits["C"], COLOR_ZONE_C, "zone C: limited operation"),
+        (limits["C"], ceiling, COLOR_ZONE_D, "zone D: damage"),
     )
     for lower, upper, colour, label in bands:
         ax.fill_between(
@@ -2452,10 +2456,10 @@ def generate_industrial_machine_zones(output_dir: str) -> None:
         ),
     )
     zones = (
-        ("A", COLOR_PRIMARY, "zone A: newly commissioned"),
-        ("B", COLOR_SECONDARY, "zone B: unrestricted operation"),
-        ("C", COLOR_TERTIARY, "zone C: limited operation"),
-        ("D", COLOR_MUTED, "zone D: damage"),
+        ("A", COLOR_ZONE_A, "zone A: newly commissioned"),
+        ("B", COLOR_ZONE_B, "zone B: unrestricted operation"),
+        ("C", COLOR_ZONE_C, "zone C: limited operation"),
+        ("D", COLOR_ZONE_D, "zone D: damage"),
     )
     fig, axes = plt.subplots(1, 2, figsize=(11.0, 6.6))
     positions = np.arange(len(classes), dtype=float)
@@ -2574,10 +2578,10 @@ def generate_machine_alarm_trip(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(9.6, 6.0))
     bands = (
-        (0.0, a_b, COLOR_PRIMARY, "A", "zone A: newly commissioned"),
-        (a_b, b_c, COLOR_SECONDARY, "B", "zone B: unrestricted operation"),
-        (b_c, c_d, COLOR_TERTIARY, "C", "zone C: limited operation"),
-        (c_d, ceiling, COLOR_MUTED, "D", "zone D: damage"),
+        (0.0, a_b, COLOR_ZONE_A, "A", "zone A: newly commissioned"),
+        (a_b, b_c, COLOR_ZONE_B, "B", "zone B: unrestricted operation"),
+        (b_c, c_d, COLOR_ZONE_C, "C", "zone C: limited operation"),
+        (c_d, ceiling, COLOR_ZONE_D, "D", "zone D: damage"),
     )
     for lower, upper, colour, letter, legend in bands:
         ax.axhspan(lower, upper, color=theme_fill(colour, ax), zorder=0, label=legend)
@@ -2852,10 +2856,10 @@ def generate_machine_vibration_trend(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(9.6, 6.0))
     for lower, upper, colour, letter in (
-        (0.0, a_b, COLOR_PRIMARY, "A"),
-        (a_b, b_c, COLOR_SECONDARY, "B"),
-        (b_c, c_d, COLOR_TERTIARY, "C"),
-        (c_d, ceiling, COLOR_MUTED, "D"),
+        (0.0, a_b, COLOR_ZONE_A, "A"),
+        (a_b, b_c, COLOR_ZONE_B, "B"),
+        (b_c, c_d, COLOR_ZONE_C, "C"),
+        (c_d, ceiling, COLOR_ZONE_D, "D"),
     ):
         ax.axhspan(lower, upper, color=theme_fill(colour, ax), zorder=0)
         # Chipped, because the baseline crosses zone A where its letter sits.
