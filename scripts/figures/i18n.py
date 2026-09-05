@@ -56,6 +56,13 @@ _ES_EXACT = {
     "a sudden reduction: every band": "un estrechamiento súbito: todas las bandas",
     "a sudden increase: below the limit frequency only": "una ampliación súbita: solo bajo la frecuencia límite",
     "0.5 m² and 0.2 m² either way about, in a 0.8 m duct": "0,5 m² y 0,2 m² en los dos sentidos, en un conducto de 0,8 m",
+    # Gear-unit rating curves (ISO 20816-9 Annex A).
+    "Shaft Displacement: Flat, Then 10 dB per Decade": "Desplazamiento del eje: plano y luego 10 dB por década",
+    "Peak-to-peak displacement (µm)": "Desplazamiento pico a pico (µm)",
+    "Housing Velocity: Formula (C.1) With Part 9's Corners": "Velocidad de la carcasa: la Fórmula (C.1) con las esquinas de la Parte 9",
+    "14 dB per decade outside both corners,\n"
+    "which is $k = m = 0.7$ in Formula (C.1)": "14 dB por década fuera de las dos esquinas,\n"
+    "que es $k = m = 0{,}7$ en la Fórmula (C.1)",
     # ISO/TR 17534-3 quality-assurance cases (environment/propagation).
     "The Same Path Over Three Grounds": "El mismo camino sobre tres suelos",
     "Level at the receiver (dB)": "Nivel en el receptor (dB)",

@@ -653,6 +653,91 @@ print(round(vibration.alarm_limit(2.9, limits.b_c), 3))   # 3.5, at the cap
 print(round(vibration.trip_limit(limits.c_d), 3))         # 5.625
 ```
 
+## 8. Gear units, and a rating instead of a machine class
+
+Part 3 asks what the machine is and what it stands on. **Part 9** asks a
+different question: it grades a gear unit against a **rating number**, chosen
+for the unit at the start of negotiation, and the rating indexes a row of
+boundaries.
+
+There are three ratings, one per quantity, and Table 1 fixes the vocabulary of
+each: `DR` for shaft relative peak-to-peak displacement in micrometres, `VR`
+for housing r.m.s. velocity in millimetres per second, and `AR` for housing
+true peak acceleration in metres per second squared. Tables 2, 3 and 4 give
+the boundaries.
+
+Those three tables are one ladder seen three times. Every printed row is three
+consecutive rungs of 2, 3.15, 5, 8, 12.5, 20, 31.5, 50, 80, 125, 200, 315, with
+the rating itself as the B/C boundary and its neighbours as the other two. So
+choosing a rating is choosing a rung, and the library refuses a rating between
+two rows rather than interpolating one: the ladder is an agreement, not a
+continuum.
+
+Table 5 is where a unit gets its ratings. Class I is special-purpose precision
+parallel-shaft units, class II general-purpose parallel-shaft, helical and
+spiral-bevel units, class III epicyclic units, and class IV straight-cut units;
+subclass a) covers any power and subclass b) splits by it.
+
+```python
+from phonometry import vibration
+
+ratings = vibration.GEAR_UNIT_CLASSES["III", "a"]
+print(ratings.displacement, ratings.velocity, ratings.acceleration)
+# 80.0 8.0 125.0
+
+boundaries = vibration.gear_unit_zone_boundaries("velocity", ratings.velocity)
+print(boundaries.as_tuple)                          # (5.0, 8.0, 12.5)
+print(vibration.evaluation_zone(6.0, boundaries))   # B
+```
+
+Only the subclass a) rows carry an acceleration rating. Every b) row prints
+"no information available at this time", and the library carries that as
+`None` rather than filling the gap with a plausible number.
+
+### The rating curves, and where Part 1 reappears
+
+A rating is not only a set of three boundaries: Annex A draws it as a curve
+against frequency, so a filtered measurement can be judged line by line rather
+than as one broad-band value. The rating of a shaft or a position is then the
+lowest curve that encloses its whole spectrum.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/gear_unit_rating_curves_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/gear_unit_rating_curves.svg" alt="Two log-log panels. On the left, five shaft displacement rating curves, one for each rating from 31.5 to 200 micrometres: each is flat at its rating number up to a dashed line at 50 hertz and then falls at 10 decibels per decade. On the right, five housing velocity rating curves from 3.15 to 20 millimetres per second: each rises to its rating at a dashed line at 45 hertz, stays flat to a second dashed line at 1590 hertz, and falls beyond it, both slopes at 14 decibels per decade" width="100%"></picture>
+
+*Left, Figure A.1; right, Figure A.2. The right-hand family is the criterion of
+section 3 again, with the corners and the slope Part 9 states.*
+
+```python
+from phonometry import vibration
+
+print(round(float(vibration.gear_housing_velocity_limit(3000.0, rating=8.0)), 2))
+# 5.13 mm/s: a 3 kHz mesh line is judged against less than the rating
+print(round(float(vibration.gear_shaft_displacement_limit(500.0, rating=80.0)), 1))
+# 25.3 µm
+```
+
+The velocity curve is worth a second look. Flat between two corners and falling
+outside them at one rate is exactly Formula (C.1) of Part 1, and this is that
+formula with $f_x$ = 45 Hz, $f_y$ = 1590 Hz and $k = m = 0.7$, which is 14 dB
+per decade. The library computes it by calling `allowable_velocity`, so the two
+parts of the series share one curve rather than two implementations of it.
+
+### What Part 9 does not repeat
+
+ALARM and TRIP: 8.2 sends the reader to Part 1 for them, which is section 7 of
+this page. Acceptance criteria: 8.3 says they are agreed between manufacturer
+and customer, are historically specified inside zone A or B, and would normally
+not exceed 1,25 times the A/B boundary, which for a class II unit judged on
+velocity is 3,94 mm/s.
+
+Measurement is Clause 6. Shaft displacement is read relative to the housing by
+non-contacting probes in orthogonal pairs through the journal bearing housing,
+and the combined mechanical and electrical runout should not exceed a quarter
+of the allowable displacement at shaft rotational frequency, or 6 µm, whichever
+is greater. Housing vibration is read on a rigid section such as a bearing
+block, in up to three orthogonal directions, two of them perpendicular to the
+gear axis; a housing panel that supports no bearing does not give a true
+indication of the unit.
+
 ## Covered and not covered
 
 Covered: the four evaluation zones and the grading, the frequency-shaped
@@ -660,9 +745,11 @@ criterion of Figure 9 with the zone factors of Annex C.2, the typical ranges
 and ladder of Table C.1, and the vector reading of a change from Annex D. For
 industrial machines, the boundaries of Tables A.1 and A.2 in both quantities,
 the most-restrictive rule of 5.2.3, the significant change of 5.3 and the
-ALARM and TRIP settings of 5.4.
+ALARM and TRIP settings of 5.4. For gear units, the three rating tables and the
+classification of ISO 20816-9, and the two rating curves of its Annex A.
 
-Not covered: the zone boundaries of the other machine-specific parts, which
+Not covered: the zone boundaries of the machine-specific parts this page
+does not name, which
 this page takes as inputs; the shaft criterion of Figure 10, whose values
 Annex C.1 declines to give for machines no part covers, on the grounds that
 such machines are not normally fitted with shaft transducers; and the current
@@ -698,6 +785,13 @@ predecessor supplies the industrial boundaries.
   boundaries of Tables A.1 and A.2, the most-restrictive rule (5.2.3), the
   significant change (5.3) and the ALARM and TRIP settings (5.4). Superseded
   by ISO 20816-3:2022, which is not held here.
+- International Organization for Standardization. (2020). *Mechanical
+  vibration — Measurement and evaluation of machine vibration — Part 9: Gear
+  units* (ISO 20816-9:2020).
+  The rating system: the units of Table 1, the shaft and housing measurements
+  of Clause 6, the evaluation zones of 8.2, the acceptance ceiling of 8.3, the
+  boundary tables 2, 3 and 4, the classification of Table 5, and the rating
+  curves of Annex A.
 
 ## Standards
 
@@ -715,5 +809,11 @@ measured in situ*: the machine groups of 4.2, the support classification of
 4.3, the zone boundaries of Tables A.1 and A.2 in both quantities with the
 measurement band of A.1, the most-restrictive rule of 5.2.3, the significant
 change of 5.3, and the ALARM and TRIP settings of 5.4.
+
+ISO 20816-9:2020, *Mechanical vibration — Measurement and evaluation of machine
+vibration — Part 9: Gear units*: the units of Table 1, the shaft and housing
+measurements of Clause 6, the evaluation zones of 8.2, the acceptance ceiling
+of 8.3, the zone boundaries of Tables 2, 3 and 4, the classification of
+Table 5, and the rating curves of Figures A.1 and A.2.
 
 ---

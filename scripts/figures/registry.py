@@ -559,6 +559,7 @@ from .vibration import (
     generate_daily_vibration_exposure,
     generate_envelope_chain_steps,
     generate_experimental_sea_clf,
+    generate_gear_unit_rating_curves,
     generate_hav_vwf_lifetime,
     generate_industrial_machine_zones,
     generate_infinite_mobilities,
@@ -717,6 +718,8 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # quantities, and the operational limits set from them.
     generate_industrial_machine_zones,
     generate_machine_alarm_trip,
+    # Gear units (ISO 20816-9): the two rating curves of Annex A.
+    generate_gear_unit_rating_curves,
     generate_experimental_sea_clf,
     generate_plateau_transmission_loss,
     generate_orthotropic_transmission_loss,

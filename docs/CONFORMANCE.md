@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**742/742 conformance checks pass** across 66 domains and 390 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**766/766 conformance checks pass** across 66 domains and 391 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -513,7 +513,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>Machine vibration evaluation (ISO 20816)</b>: 100% (28/28)</summary>
+<summary><b>Machine vibration evaluation (ISO 20816)</b>: 100% (63/63)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -545,6 +545,41 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 10816-3:2009 5.4.1 | ALARM ceiling, as a multiple of the zone B/C boundary | 1.25 (+/-0.0005) | 1.25 | 0 | 0 % | ![Pass][cv-pass] Pass |
 | ISO 10816-3:2009 5.4.2 | TRIP ceiling, as a multiple of the zone C/D boundary | 1.25 (+/-0.0005) | 1.25 | 0 | 0 % | ![Pass][cv-pass] Pass |
 | ISO 10816-3:2009 5.3 | Threshold of a significant change, as a fraction of the zone B/C boundary | 0.25 (+/-0.0005) | 0.25 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 2 | Gear-unit displacement zone boundaries at a rating of 31.5, worst deviation | 0 µm (+/-0.0005 µm) | 0 µm | 0 µm | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 2 | Gear-unit displacement zone boundaries at a rating of 50, worst deviation | 0 µm (+/-0.0005 µm) | 0 µm | 0 µm | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 2 | Gear-unit displacement zone boundaries at a rating of 80, worst deviation | 0 µm (+/-0.0005 µm) | 0 µm | 0 µm | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 2 | Gear-unit displacement zone boundaries at a rating of 125, worst deviation | 0 µm (+/-0.0005 µm) | 0 µm | 0 µm | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 2 | Gear-unit displacement zone boundaries at a rating of 200, worst deviation | 0 µm (+/-0.0005 µm) | 0 µm | 0 µm | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 3 | Gear-unit velocity zone boundaries at a rating of 3.15, worst deviation | 0 mm/s (+/-0.0005 mm/s) | 0 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 3 | Gear-unit velocity zone boundaries at a rating of 5, worst deviation | 0 mm/s (+/-0.0005 mm/s) | 0 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 3 | Gear-unit velocity zone boundaries at a rating of 8, worst deviation | 0 mm/s (+/-0.0005 mm/s) | 0 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 3 | Gear-unit velocity zone boundaries at a rating of 12.5, worst deviation | 0 mm/s (+/-0.0005 mm/s) | 0 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 3 | Gear-unit velocity zone boundaries at a rating of 20, worst deviation | 0 mm/s (+/-0.0005 mm/s) | 0 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 4 | Gear-unit acceleration zone boundaries at a rating of 5, worst deviation | 0 m/s² (+/-0.0005 m/s²) | 0 m/s² | 0 m/s² | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 4 | Gear-unit acceleration zone boundaries at a rating of 8, worst deviation | 0 m/s² (+/-0.0005 m/s²) | 0 m/s² | 0 m/s² | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 4 | Gear-unit acceleration zone boundaries at a rating of 12.5, worst deviation | 0 m/s² (+/-0.0005 m/s²) | 0 m/s² | 0 m/s² | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 4 | Gear-unit acceleration zone boundaries at a rating of 20, worst deviation | 0 m/s² (+/-0.0005 m/s²) | 0 m/s² | 0 m/s² | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 4 | Gear-unit acceleration zone boundaries at a rating of 31.5, worst deviation | 0 m/s² (+/-0.0005 m/s²) | 0 m/s² | 0 m/s² | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 4 | Gear-unit acceleration zone boundaries at a rating of 50, worst deviation | 0 m/s² (+/-0.0005 m/s²) | 0 m/s² | 0 m/s² | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 4 | Gear-unit acceleration zone boundaries at a rating of 80, worst deviation | 0 m/s² (+/-0.0005 m/s²) | 0 m/s² | 0 m/s² | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 4 | Gear-unit acceleration zone boundaries at a rating of 125, worst deviation | 0 m/s² (+/-0.0005 m/s²) | 0 m/s² | 0 m/s² | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 4 | Gear-unit acceleration zone boundaries at a rating of 200, worst deviation | 0 m/s² (+/-0.0005 m/s²) | 0 m/s² | 0 m/s² | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 5 | Gear-unit ratings for class I, subclass a, worst deviation | 0 (+/-0.0005) | 0 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 5 | Gear-unit ratings for class I, subclass b, low power, worst deviation | 0 (+/-0.0005) | 0 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 5 | Gear-unit ratings for class I, subclass b, high power, worst deviation | 0 (+/-0.0005) | 0 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 5 | Gear-unit ratings for class II, subclass a, worst deviation | 0 (+/-0.0005) | 0 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 5 | Gear-unit ratings for class II, subclass b, low power, worst deviation | 0 (+/-0.0005) | 0 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 5 | Gear-unit ratings for class II, subclass b, high power, worst deviation | 0 (+/-0.0005) | 0 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 5 | Gear-unit ratings for class III, subclass a, worst deviation | 0 (+/-0.0005) | 0 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 5 | Gear-unit ratings for class III, subclass b, low power, worst deviation | 0 (+/-0.0005) | 0 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 5 | Gear-unit ratings for class III, subclass b, high power, worst deviation | 0 (+/-0.0005) | 0 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 5 | Gear-unit ratings for class IV, subclass a, worst deviation | 0 (+/-0.0005) | 0 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 5 | Gear-unit ratings for class IV, subclass b, low power, worst deviation | 0 (+/-0.0005) | 0 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 5 | Gear-unit ratings for class IV, subclass b, high power, worst deviation | 0 (+/-0.0005) | 0 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Figure A.1 | Fall of the displacement rating curve a decade above its corner, dB | 10 dB (+/-0.0005 dB) | 10 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Figure A.1 | Displacement rating curve below its corner, worst deviation from DR, µm | 0 µm (+/-0.0005 µm) | 0 µm | 0 µm | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Figure A.2 | Fall of the velocity rating curve a decade outside each corner, dB | 14 dB (+/-0.0005 dB) | 14 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Figure A.2 | Velocity rating curve between its corners, worst deviation from VR, mm/s | 0 mm/s (+/-0.0005 mm/s) | 0 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
 
 </details>
 
@@ -1260,7 +1295,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>HVAC noise (VDI 2081)</b>: 100% (57/57)</summary>
+<summary><b>HVAC noise (VDI 2081)</b>: 100% (46/46)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -1310,17 +1345,6 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | VDI 2081 Blatt 2:2005 Table 1, element 20 | Sound pressure level in room 102, worst octave deviation, dB | 0 dB (+/-0.5 dB) | 0.4913 dB | 0.4913 dB | 98 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2:2005 Table 1, element 20 | Total sound pressure level in room 102, dB | 51.4 dB (+/-0.05 dB) | 51.384 dB | -0.016 dB | 32 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2:2005 Table 1, element 20 | A-weighted sound pressure level in room 102, dB | 40 dB (+/-0.05 dB) | 40.037 dB | 0.037 dB | 74 % | ![Pass][cv-pass] Pass |
-| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Reflection at a section change of ratio 0.05, dB | 7.4135 dB (+/-0.05 dB) | 7.4135 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
-| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Reflection at a section change of ratio 0.1, dB | 4.8073 dB (+/-0.05 dB) | 4.8073 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
-| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Reflection at a section change of ratio 0.2, dB | 2.5527 dB (+/-0.05 dB) | 2.5527 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
-| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Reflection at a section change of ratio 0.5, dB | 0.5115 dB (+/-0.05 dB) | 0.5115 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
-| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Reflection at a section change of ratio 1, dB | 0 dB (+/-0.05 dB) | 0 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
-| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Reflection at a section change of ratio 2, dB | 0.5115 dB (+/-0.05 dB) | 0.5115 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
-| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Reflection at a section change of ratio 5, dB | 2.5527 dB (+/-0.05 dB) | 2.5527 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
-| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Reflection at a section change of ratio 7, dB | 3.5902 dB (+/-0.05 dB) | 3.5902 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
-| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Reflection at a section change of ratio 10, dB | 4.8073 dB (+/-0.05 dB) | 4.8073 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
-| VDI 2081 Blatt 1:2001 Section 6.3, Figure 26 | Bands a sudden increase still reflects in, of eight | 2 (+/-0.5) | 2 | 0 | 0 % | ![Pass][cv-pass] Pass |
-| VDI 2081 Blatt 1:2001 Section 6.3 | Ceiling VDI 3733 recommends for a section change, dB | 5 dB (+/-0.05 dB) | 5 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 
 </details>
 

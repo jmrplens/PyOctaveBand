@@ -20,6 +20,7 @@ folio 30 and Annex D.2 on printed folio 31.
 from __future__ import annotations
 
 import functools
+import math
 
 import numpy as np
 
@@ -345,3 +346,210 @@ def _chk_significant_change() -> Outcome:
         else:
             low = middle
     return numeric(_PRINTED_CHANGE_FRACTION, high, 0.0005, places=4)
+
+
+# ---------------------------------------------------------------------------
+# ISO 20816-9:2020: the rating system gear units are graded by
+# ---------------------------------------------------------------------------
+#: Tables 2, 3 and 4 on printed folios 7 and 8, transcribed from the page. The
+#: unit of each is the one Table 1 fixes for that quantity.
+_PRINTED_GEAR_ZONES: dict[str, tuple[str, dict[float, tuple[float, float, float]]]] = {
+    "displacement": (
+        "um",
+        {
+            31.5: (20.0, 31.5, 50.0),
+            50.0: (31.5, 50.0, 80.0),
+            80.0: (50.0, 80.0, 125.0),
+            125.0: (80.0, 125.0, 200.0),
+            200.0: (125.0, 200.0, 315.0),
+        },
+    ),
+    "velocity": (
+        "mm/s",
+        {
+            3.15: (2.0, 3.15, 5.0),
+            5.0: (3.15, 5.0, 8.0),
+            8.0: (5.0, 8.0, 12.5),
+            12.5: (8.0, 12.5, 20.0),
+            20.0: (12.5, 20.0, 31.5),
+        },
+    ),
+    "acceleration": (
+        "m/s²",
+        {
+            5.0: (3.15, 5.0, 8.0),
+            8.0: (5.0, 8.0, 12.5),
+            12.5: (8.0, 12.5, 20.0),
+            20.0: (12.5, 20.0, 31.5),
+            31.5: (20.0, 31.5, 50.0),
+            50.0: (31.5, 50.0, 80.0),
+            80.0: (50.0, 80.0, 125.0),
+            125.0: (80.0, 125.0, 200.0),
+            200.0: (125.0, 200.0, 315.0),
+        },
+    ),
+}
+
+#: Table 5 on printed folio 9: the ratings each class and subclass is given.
+#: A subclass b) row prints "no information available at this time" in the
+#: acceleration column, which is carried here as ``None``.
+_PRINTED_GEAR_CLASSES: dict[tuple[str, str], tuple[float, float, float | None]] = {
+    ("I", "a"): (31.5, 3.15, 50.0),
+    ("I", "b_low"): (31.5, 3.15, None),
+    ("I", "b_high"): (50.0, 5.0, None),
+    ("II", "a"): (50.0, 5.0, 80.0),
+    ("II", "b_low"): (50.0, 5.0, None),
+    ("II", "b_high"): (80.0, 8.0, None),
+    ("III", "a"): (80.0, 8.0, 125.0),
+    ("III", "b_low"): (80.0, 8.0, None),
+    ("III", "b_high"): (125.0, 12.5, None),
+    ("IV", "a"): (125.0, 20.0, 125.0),
+    ("IV", "b_low"): (125.0, 12.5, None),
+    ("IV", "b_high"): (200.0, 20.0, None),
+}
+
+#: The tables are printed to three significant figures, so a tenth of the
+#: smallest printed step is a generous envelope for a transcription.
+_GEAR_TOLERANCE = 0.0005
+
+
+def _chk_gear_zone_row(quantity: str, rating: float) -> Outcome:
+    """One row of Table 2, 3 or 4, compared boundary by boundary."""
+    unit, rows = _PRINTED_GEAR_ZONES[quantity]
+    published = ph.vibration.gear_unit_zone_boundaries(quantity, rating).as_tuple
+    deviation = float(
+        np.max(np.abs(np.array(rows[rating]) - np.array(published, dtype=float)))
+    )
+    return numeric(0.0, deviation, _GEAR_TOLERANCE, unit=unit, places=4)
+
+
+def _register_gear_zone_rows() -> None:
+    """Register the nineteen rows of the three boundary tables."""
+    table_of = {
+        "displacement": "Table 2",
+        "velocity": "Table 3",
+        "acceleration": "Table 4",
+    }
+    for quantity, (_unit, rows) in _PRINTED_GEAR_ZONES.items():
+        for rating in rows:
+            register(
+                _MACHINE_VIB,
+                f"ISO 20816-9:2020 {table_of[quantity]}",
+                f"Gear-unit {quantity} zone boundaries at a rating of "
+                f"{rating:g}, worst deviation",
+            )(functools.partial(_chk_gear_zone_row, quantity, rating))
+
+
+_register_gear_zone_rows()
+
+
+def _chk_gear_class_row(gear_class: str, subclass: str) -> Outcome:
+    """One row of Table 5, over the three ratings it prints."""
+    printed = _PRINTED_GEAR_CLASSES[gear_class, subclass]
+    ratings = ph.vibration.GEAR_UNIT_CLASSES[gear_class, subclass]
+    published: tuple[float | None, ...] = (
+        ratings.displacement,
+        ratings.velocity,
+        ratings.acceleration,
+    )
+    deviations: list[float] = []
+    for want, got in zip(printed, published, strict=True):
+        if want is None or got is None:
+            # A rating the page leaves blank and the library fills in, or the
+            # other way about, is a disagreement no subtraction would see, so
+            # it is reported as a full unit of deviation rather than skipped.
+            deviations.append(0.0 if want is None and got is None else 1.0)
+        else:
+            deviations.append(abs(want - got))
+    return numeric(0.0, max(deviations), _GEAR_TOLERANCE, places=4)
+
+
+def _register_gear_class_rows() -> None:
+    """Register the twelve rows of the classification."""
+    label = {
+        "a": "subclass a",
+        "b_low": "subclass b, low power",
+        "b_high": "subclass b, high power",
+    }
+    for gear_class, subclass in _PRINTED_GEAR_CLASSES:
+        register(
+            _MACHINE_VIB,
+            "ISO 20816-9:2020 Table 5",
+            f"Gear-unit ratings for class {gear_class}, {label[subclass]}, "
+            f"worst deviation",
+        )(functools.partial(_chk_gear_class_row, gear_class, subclass))
+
+
+_register_gear_class_rows()
+
+
+@register(
+    _MACHINE_VIB,
+    "ISO 20816-9:2020 Figure A.1",
+    "Fall of the displacement rating curve a decade above its corner, dB",
+)
+def _chk_gear_displacement_slope() -> Outcome:
+    """The note prints 10 dB per decade above 50 Hz."""
+    corner = ph.vibration.GEAR_DISPLACEMENT_CORNER_HZ
+    at_corner = ph.vibration.gear_shaft_displacement_limit(corner, rating=80.0)
+    a_decade_up = ph.vibration.gear_shaft_displacement_limit(10.0 * corner, rating=80.0)
+    fall = 20.0 * math.log10(float(at_corner) / float(a_decade_up))
+    return numeric(10.0, fall, 0.0005, unit="dB", places=4)
+
+
+@register(
+    _MACHINE_VIB,
+    "ISO 20816-9:2020 Figure A.1",
+    "Displacement rating curve below its corner, worst deviation from DR, µm",
+)
+def _chk_gear_displacement_plateau() -> Outcome:
+    """The rating number is the displacement of the curve up to 50 Hz."""
+    rating = 125.0
+    freqs = np.array([1.0, 5.0, 20.0, 49.0, 50.0])
+    values = np.asarray(
+        ph.vibration.gear_shaft_displacement_limit(freqs, rating=rating)
+    )
+    return numeric(
+        0.0,
+        float(np.max(np.abs(values - rating))),
+        _GEAR_TOLERANCE,
+        unit="um",
+        places=4,
+    )
+
+
+@register(
+    _MACHINE_VIB,
+    "ISO 20816-9:2020 Figure A.2",
+    "Fall of the velocity rating curve a decade outside each corner, dB",
+)
+def _chk_gear_velocity_slope() -> Outcome:
+    """The note prints 14 dB per decade below 45 Hz and above 1590 Hz."""
+    low, high = ph.vibration.GEAR_VELOCITY_CORNERS_HZ
+    rating = 8.0
+    below = ph.vibration.gear_housing_velocity_limit(low / 10.0, rating=rating)
+    above = ph.vibration.gear_housing_velocity_limit(high * 10.0, rating=rating)
+    falls = [
+        20.0 * math.log10(rating / float(below)),
+        20.0 * math.log10(rating / float(above)),
+    ]
+    return numeric(14.0, max(falls), 0.0005, unit="dB", places=4)
+
+
+@register(
+    _MACHINE_VIB,
+    "ISO 20816-9:2020 Figure A.2",
+    "Velocity rating curve between its corners, worst deviation from VR, mm/s",
+)
+def _chk_gear_velocity_plateau() -> Outcome:
+    """The rating number is the velocity of the curve from 45 Hz to 1590 Hz."""
+    rating = 12.5
+    freqs = np.array([45.0, 100.0, 500.0, 1000.0, 1590.0])
+    values = np.asarray(ph.vibration.gear_housing_velocity_limit(freqs, rating=rating))
+    return numeric(
+        0.0,
+        float(np.max(np.abs(values - rating))),
+        _GEAR_TOLERANCE,
+        unit="mm/s",
+        places=4,
+    )

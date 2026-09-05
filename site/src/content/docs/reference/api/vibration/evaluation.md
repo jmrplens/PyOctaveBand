@@ -168,6 +168,181 @@ limit reads in the tables of the machine-specific parts.
 | :--- | :--- |
 | ValueError | If a magnitude is negative or not finite. |
 
+## GEAR_ACCEPTANCE_HEADROOM
+
+*Constant* (`float`).
+
+```python
+GEAR_ACCEPTANCE_HEADROOM = 1.25
+```
+
+## GEAR_DISPLACEMENT_CORNER_HZ
+
+*Constant* (`float`).
+
+```python
+GEAR_DISPLACEMENT_CORNER_HZ = 50.0
+```
+
+## GEAR_DISPLACEMENT_SLOPE_DB_PER_DECADE
+
+*Constant* (`float`).
+
+```python
+GEAR_DISPLACEMENT_SLOPE_DB_PER_DECADE = 10.0
+```
+
+## gear_housing_velocity_limit
+
+```python
+gear_housing_velocity_limit(
+    frequency: ArrayLike,
+    *,
+    rating: float,
+) -> float | NDArray[np.float64]
+```
+
+The housing velocity rating curve of Figure A.2.
+
+Flat between 45 Hz and 1590 Hz and falling outside both corners at 14 dB
+per decade, which is the shape [`allowable_velocity`](/phonometry/reference/api/vibration/evaluation/#allowable_velocity) already draws
+for ISO 20816-1 Formula (C.1); this is that formula with the corners and
+the exponents Part 9 states, so the two parts of the series share one
+curve rather than two implementations of it.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `frequency` | Frequency `f`, in hertz (scalar or array). |
+| `rating` | The velocity rating `VR`, in millimetres per second. |
+
+**Returns:** The allowable r.m.s. velocity, in millimetres per second; a float for a scalar frequency, otherwise an array.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If a frequency or the rating is not positive. |
+
+## gear_shaft_displacement_limit
+
+```python
+gear_shaft_displacement_limit(
+    frequency: ArrayLike,
+    *,
+    rating: float,
+) -> float | NDArray[np.float64]
+```
+
+The shaft displacement rating curve of Figure A.1.
+
+$$
+d(f) = \mathrm{DR} \qquad f \leq 50\ \mathrm{Hz}
+$$
+
+$$
+d(f) = \mathrm{DR}\,(f/50)^{-1/2} \qquad f > 50\ \mathrm{Hz}
+$$
+
+The note under the figure states both halves: the rating number is the
+displacement of the curve up to 50 Hz, and above 50 Hz the curves decrease
+by 10 dB per decade, which on an amplitude is an exponent of one half.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `frequency` | Frequency `f`, in hertz (scalar or array). |
+| `rating` | The displacement rating `DR`, in micrometres. |
+
+**Returns:** The allowable peak-to-peak displacement, in micrometres; a float for a scalar frequency, otherwise an array.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If a frequency or the rating is not positive. |
+
+## GEAR_UNIT_CLASSES
+
+*Constant* (`dict`).
+
+```python
+GEAR_UNIT_CLASSES = {('I', 'a'): GearUnitRatings(displacement=31.5, velocity=3.15, acceleration=50.0), ('I', 'b_low'): GearUnitRatings(displacement=31.5, velocity=3.15, acceleration=None), ('I', 'b_high'): GearUnitRatings(displacement=50.0, velocity=5.0, acceleration=None), ('II', 'a'): GearUnitRatings(displacement=50.0, velocity=5.0, acceleration=80.0), ('II', 'b_low'): GearUnitRatings(displacement=50.0, velocity=5.0, acceleration=None), ('II', 'b_high'): GearUnitRatings(displacement=80.0, velocity=8.0, acceleration=None), ('III', 'a'): GearUnitRatings(displacement=80.0, velocity=8.0, acceleration=125.0), ('III', 'b_low'): GearUnitRatings(displacement=80.0, velocity=8.0, acceleration=None), ('III', 'b_high'): GearUnitRatings(displacement=125.0, velocity=12.5, acceleration=None), ('IV', 'a'): GearUnitRatings(displacement=125.0, velocity=20.0, acceleration=125.0), ('IV', 'b_low'): GearUnitRatings(displacement=125.0, velocity=12.5, acceleration=None), ('IV', 'b_high'): GearUnitRatings(displacement=200.0, velocity=20.0, acceleration=None)}
+```
+
+## gear_unit_zone_boundaries
+
+```python
+gear_unit_zone_boundaries(quantity: str, rating: float) -> ZoneBoundaries
+```
+
+The three boundaries Table 2, 3 or 4 prints for one rating.
+
+The tables are printed for the rating numbers they list and for no others,
+so a rating between two rows is refused rather than interpolated: the
+ladder is a choice made with the manufacturer, not a continuum.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `quantity` | `"displacement"` (Table 2, shaft relative peak-to-peak, µm), `"velocity"` (Table 3, housing r.m.s., mm/s) or `"acceleration"` (Table 4, housing true peak, m/s²). |
+| `rating` | The rating number, `DR`, `VR` or `AR`. |
+
+**Returns:** The A/B, B/C and C/D boundaries of that row.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the quantity is unknown or the table prints no row for that rating. |
+
+## GEAR_UNIT_ZONES
+
+*Constant* (`dict`).
+
+```python
+GEAR_UNIT_ZONES = {'displacement': {31.5: ZoneBoundaries(a_b=20.0, b_c=31.5, c_d=50.0), 50.0: ZoneBoundaries(a_b=31.5, b_c=50.0, c_d=80.0), 80.0: ZoneBoundaries(a_b=50.0, b_c=80.0, c_d=125.0), 125.0: ZoneBoundaries(a_b=80.0, b_c=125.0, c_d=200.0), 200.0: ZoneBoundaries(a_b=125.0, b_c=200.0, c_d=315.0)}, 'velocity': {3.15: ZoneBoundaries(a_b=2.0, b_c=3.15, c_d=5.0), 5.0: ZoneBoundaries(a_b=3.15, b_c=5.0, c_d=8.0), 8.0: ZoneBoundaries(a_b=5.0, b_c=8.0, c_d=12.5), 12.5: ZoneBoundaries(a_b=8.0, b_c=12.5, c_d=20.0), 20.0: ZoneBoundaries(a_b=12.5, b_c=20.0, c_d=31.5)}, 'acceleration': {5.0: ZoneBoundaries(a_b=3.15, b_c=5.0, c_d=8.0), 8.0: ZoneBoundaries(a_b=5.0, b_c=8.0, c_d=12.5), 12.5: ZoneBoundaries(a_b=8.0, b_c=12.5, c_d=20.0), 20.0: ZoneBoundaries(a_b=12.5, b_c=20.0, c_d=31.5), 31.5: ZoneBoundaries(a_b=20.0, b_c=31.5, c_d=50.0), 50.0: ZoneBoundaries(a_b=31.5, b_c=50.0, c_d=80.0), 80.0: ZoneBoundaries(a_b=50.0, b_c=80.0, c_d=125.0), 125.0: ZoneBoundaries(a_b=80.0, b_c=125.0, c_d=200.0), 200.0: ZoneBoundaries(a_b=125.0, b_c=200.0, c_d=315.0)}}
+```
+
+## GEAR_VELOCITY_CORNERS_HZ
+
+*Constant* (`tuple`).
+
+```python
+GEAR_VELOCITY_CORNERS_HZ = (45.0, 1590.0)
+```
+
+## GEAR_VELOCITY_SLOPE_DB_PER_DECADE
+
+*Constant* (`float`).
+
+```python
+GEAR_VELOCITY_SLOPE_DB_PER_DECADE = 14.0
+```
+
+## GearUnitRatings
+
+```python
+GearUnitRatings(
+    displacement: float,
+    velocity: float,
+    acceleration: float | None,
+)
+```
+
+The three rating numbers Table 5 gives one class of gear unit.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `displacement` | The displacement rating `DR`, which indexes Table 2. |
+| `velocity` | The velocity rating `VR`, which indexes Table 3. |
+| `acceleration` | The acceleration rating `AR`, which indexes Table 4, or `None` where the table prints "no information available at this time", which it does for every subclass b) row. |
+
 ## industrial_machine_zone
 
 ```python
