@@ -16,11 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and only spread over the octaves by the relative spectrum of Figure 16, which
   does not sum back to it.
 
-  The A-weighted form is not the other one weighted. It carries a seventieth
-  power of the duct velocity where the unweighted form carries a fiftieth,
-  because raising the speed also moves the spectrum up into the part of the
-  curve the weighting stops attenuating: halving the velocity is worth 15 dB on
-  one number and 21 dB on the other.
+  The A-weighted form is not the other one weighted. Fifty times the logarithm
+  of the duct velocity is a fifth power of it and seventy is a seventh, because
+  raising the speed also moves the spectrum up into the part of the curve the
+  weighting stops attenuating: halving the velocity is worth 15 dB on one
+  number and 21 dB on the other.
 
   The three conformance rows for Equations (16), (17) and (34) called nothing
   and computed their own expected value, so no defect in the library could have

@@ -504,11 +504,12 @@ def test_the_straight_run_flow_noise_is_equations_16_and_17() -> None:
 def test_the_two_overall_forms_are_the_printed_closed_forms() -> None:
     """Equation (16) and Equation (17), each against its own expression.
 
-    They are not one number weighted: the A-weighted form carries a seventieth
-    power of the speed and the unweighted one a fiftieth, because raising the
-    speed also moves the spectrum into the part of the curve the weighting
-    stops attenuating. Doubling the speed is worth 15,05 dB unweighted and
-    21,07 dB A-weighted, and the two forms cross at 8,7 m/s in a square metre.
+    They are not one number weighted: fifty times the logarithm is a fifth
+    power of the speed and seventy is a seventh, because raising the speed
+    also moves the spectrum into the part of the curve the weighting stops
+    attenuating. Doubling the speed is worth 15,05 dB unweighted and 21,07 dB
+    A-weighted, and the two forms meet where 20 lg v reaches 32, at 39,8 m/s,
+    which is far outside any ventilation duct.
     """
     for velocity, area in ((2.0, 0.1), (5.8333333, 0.2), (12.0, 1.5)):
         assert hvac.flow_noise_straight_duct_overall(velocity, area) == pytest.approx(
