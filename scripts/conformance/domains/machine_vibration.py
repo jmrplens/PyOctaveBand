@@ -40,7 +40,12 @@ _PRINTED_MAGNITUDE_CHANGE = -0.5
 #: The annex prints one decimal.
 _TOLERANCE = 0.05
 
-#: Table C.1: the range each boundary is typically drawn from, mm/s r.m.s.
+#: Table C.1 on printed folio 29 (PDF page 35): the range each boundary is
+#: typically drawn from, mm/s r.m.s. Read against the rendered page on
+#: 2026-09-05 together with the fourteen rungs of the ladder the table is drawn
+#: on, which live in ``TYPICAL_BOUNDARY_LADDER_MM_S``; nothing differs. Nine of
+#: the ladder's thirteen steps are the factor of about 1,6 that makes it R5,
+#: and the four in the middle of the run are closer together than that.
 _PRINTED_RANGES = {
     "A/B": (0.71, 4.5),
     "B/C": (1.8, 9.3),
@@ -352,8 +357,14 @@ def _chk_significant_change() -> Outcome:
 # ---------------------------------------------------------------------------
 # ISO 20816-9:2020: the rating system gear units are graded by
 # ---------------------------------------------------------------------------
-#: Tables 2, 3 and 4 on printed folios 7 and 8, transcribed from the page. The
-#: unit of each is the one Table 1 fixes for that quantity.
+#: Tables 2, 3 and 4 on printed folios 7 and 8 (PDF pages 13 and 14),
+#: transcribed from the rendered page. The unit of each is the one Table 1
+#: fixes for that quantity.
+#:
+#: This is deliberately a **second** transcription: ``GEAR_UNIT_ZONES`` in the
+#: library is the first, and a row that compared the library with itself would
+#: certify nothing. The two were read against the printed page separately on
+#: 2026-09-05, 57 cells each, and neither differs from it.
 _PRINTED_GEAR_ZONES: dict[str, tuple[str, dict[float, tuple[float, float, float]]]] = {
     "displacement": (
         "um",

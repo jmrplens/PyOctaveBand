@@ -13,6 +13,35 @@ Method: VDI 2081 Part 1:2001-07, Section 4.3 on printed folios 18 to 25.
 Both prints are superseded, by Part 1:2022-04 and Part 2:2022-10, and neither
 successor is held. The pair is self-consistent: Part 2:2005 was written against
 Part 1:2001 and every cross-reference in its tables resolves there.
+
+Where the ``_PRINTED_*`` constants were read
+--------------------------------------------
+
+The Part 2 PDF held here **has no text layer**: ``pdftotext`` returns nothing
+for any of its 48 pages, so every constant below was read by rendering the page
+and looking at it. They were checked again cell by cell on 2026-09-05, 126
+cells, and none differs from the print:
+
+===================================== ===== ==================================
+Constant                              Folio Row
+===================================== ===== ==================================
+``_PRINTED_KA``                       3     Section 1.1, the ``K_A`` table
+``_PRINTED_SPECTRUM``                 12    element 1, "Ventilatorspektrum"
+``_SILENCER_ATTENUATION``             12    element 2, ``dL_W`` (dB/Okt)
+``_PRINTED_SILENCER_NOISE``           12    element 2, "Strömungsrauschen"
+``_PRINTED_BANDS``                    12-16 header "Frequenzen", on every folio
+``_PRINTED_A_WEIGHTING``              12-16 header "A-Korrektur", likewise
+``_PRINTED_JUNCTION_NOISE``           13    element 3, "Strömungsrauschen"
+``_PRINTED_AFTER_JUNCTION``           13    element 3, ``SL_W`` (log)
+``_PRINTED_RECT``                     13    element 5, ``dL_W`` (dB/Okt)
+``_PRINTED_ROUND``                    15    element 13, ``dL_W/m`` (dB/Okt)
+``_PRINTED_BEND``                     15    element 14, ``dL_W`` (dB/Okt)
+``_PRINTED_BEND_NOISE``               15    element 14, ``L_W`` (dB/Okt)
+``_EXAMPLE_SPEED``, 1245 Hz           15    element 14, ``f_G`` (Hz)
+``_PRINTED_NOZZLE``                   16    element 18, ``dL_W`` before the cap
+``_PRINTED_ROOM_ATTENUATION``         16    element 20, "Raumdämpfung"
+``_PRINTED_ROOM_LEVELS`` and totals   16    element 20, ``L_p`` and ``L_pA``
+===================================== ===== ==================================
 """
 
 from __future__ import annotations
@@ -41,7 +70,11 @@ _PRINTED_SPECTRUM = (90.4, 88.8, 86.3, 82.9, 78.6, 73.4, 67.2, 60.2)
 _PRINTED_BANDS = (63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0)
 #: Table 1, row "A-Korrektur", dB.
 _PRINTED_A_WEIGHTING = (-26.2, -16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1)
-#: The table prints one decimal.
+#: The table prints one decimal, and Section 1.3 on printed folio 5 says why
+#: that is the resolution to judge it at: the spreadsheet rounds each result to
+#: whole decibels and "kleine Differenzen (< 0,1 dB) in den Berechnungen"
+#: follow from it. Half of that 0,1 dB is the tolerance, 0,05 dB, and not half
+#: of the whole decibel the rounding is to.
 _PRINTED_TOLERANCE = 0.05
 
 
