@@ -1100,7 +1100,7 @@ VDI 2081 treats the two as separate elements of the chain.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If an area, a size or the speed of sound is not positive, the shape is unknown, a round duct's size contradicts its area, or a rectangular duct meeting a sudden increase is given no size. |
+| ValueError | If an area, a size, the speed of sound or the cap is not positive, the shape is unknown, a round duct's size contradicts its area, or a rectangular duct meeting a sudden increase is given no size. |
 
 ## silencer_self_noise
 

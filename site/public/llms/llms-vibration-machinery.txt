@@ -605,8 +605,10 @@ print(
 ```
 
 A month of daily readings is one call. Pass the run as an array and each
-reading is graded on its own, which is the shape Criterion II is watched in:
-what matters there is not the reading but the walk from one zone to the next.
+reading is graded on its own, which is the series Criterion II is judged on:
+that criterion does not read the zone at all, it reads the change from the
+established baseline, and a machine can be well inside zone B and still owe an
+investigation.
 
 ```python
 import numpy as np

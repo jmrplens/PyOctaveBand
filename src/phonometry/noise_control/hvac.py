@@ -2119,9 +2119,9 @@ def section_change_loss(
     :param speed_of_sound: Speed of sound ``c``, m/s.
     :param cap: The largest reduction to take, dB (default 5).
     :return: An :class:`HvacSpectrumResult` of the reflection loss, dB.
-    :raises ValueError: If an area, a size or the speed of sound is not
-        positive, the shape is unknown, a round duct's size contradicts its
-        area, or a rectangular duct meeting a sudden increase is given no
+    :raises ValueError: If an area, a size, the speed of sound or the cap is
+        not positive, the shape is unknown, a round duct's size contradicts
+        its area, or a rectangular duct meeting a sudden increase is given no
         size.
     """
     f = _frequencies(frequencies)
