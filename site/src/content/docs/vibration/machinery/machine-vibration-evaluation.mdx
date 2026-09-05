@@ -21,7 +21,9 @@ import ThemeImage from '../../../../components/ThemeImage.astro';
 answers *where a fault would show*. This page answers the question a plant asks
 first: **is this machine acceptable at all**. The two are different trades. A
 kinematic line tells you what is wrong; a severity grade tells you whether to
-keep running, and it comes from one broad-band number measured at a bearing.
+keep running. It comes from one broad-band number, and 4.3.3 says which one:
+the largest of the magnitudes measured over the agreed positions and
+directions.
 
 ISO 20816-1:2016 is the basis document of the ISO 20816 series, which merged
 and replaced ISO 10816-1 and ISO 7919-1. It fixes the shape of the judgement
@@ -143,8 +145,9 @@ for zone, factor in vibration.ZONE_LIMIT_FACTORS.items():
 The corner frequencies and the exponents belong to the machine, and the
 specific parts state them. The defaults of 1 are the physical reading of the
 shape rather than a value taken from anywhere: constant displacement below the
-lower corner, constant acceleration above the upper one, both of which fall at
-6 dB per octave.
+lower corner, which makes the allowable velocity rise at 6 dB per octave, and
+constant acceleration above the upper one, which makes it fall at the same
+rate. The curve is lowest at both ends and flat in between.
 
 ## 4. A change is a vector
 

@@ -1259,7 +1259,8 @@ def plot_vector_change(
     kwargs.setdefault("linewidth", 2.0)
     kwargs.setdefault("linestyle", "--")
     theta, radius = _polar_chord(first, second)
-    ax.plot(theta, radius, label=_t(_LABEL_CHANGE, language), **kwargs)
+    kwargs.setdefault("label", _t(_LABEL_CHANGE, language))
+    ax.plot(theta, radius, **kwargs)
 
     _sign_theta_labels(polar)
     # The radial ticks would otherwise run along whichever phasor happens to

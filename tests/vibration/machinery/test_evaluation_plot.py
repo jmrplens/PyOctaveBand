@@ -95,6 +95,12 @@ def test_the_chord_takes_the_style_the_caller_passes() -> None:
     assert chord.get_linestyle() == ":"
 
 
+def test_a_caller_supplied_label_replaces_the_default() -> None:
+    """The chord's label is a default, not a keyword the caller collides with."""
+    ax = _annex_d().plot(label="the move")
+    assert [line.get_label() for line in ax.get_lines()][2] == "the move"
+
+
 def test_it_draws_on_the_polar_axes_it_is_given() -> None:
     import matplotlib.pyplot as plt
 

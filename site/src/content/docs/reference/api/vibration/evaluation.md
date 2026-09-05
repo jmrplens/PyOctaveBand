@@ -82,9 +82,11 @@ Frequency-shaped velocity criterion of Figure 9 (Formula (C.1)).
 Flat between the two corner frequencies and sloped outside them. The
 default exponents of 1 are the physical reading of that shape: below the
 lower corner the criterion holds displacement constant, so the allowable
-velocity falls with frequency, and above the upper corner it holds
-acceleration constant, so it falls with the reciprocal. A machine-specific
-part that states its own `k` and `m` overrides them.
+velocity *rises* with frequency at 6 dB per octave, and above the upper
+corner it holds acceleration constant, so it falls at the same rate. The
+curve is therefore lowest where the machine is slowest and where it is
+fastest, and flat in between. A machine-specific part that states its own
+`k` and `m` overrides them.
 
 **Parameters**
 

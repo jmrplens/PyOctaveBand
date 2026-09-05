@@ -21,8 +21,8 @@ import ThemeImage from '../../../../../components/ThemeImage.astro';
 responde a *dónde se vería un fallo*. Esta página responde a lo que una planta
 pregunta antes: **¿es aceptable esta máquina?**. Son dos oficios distintos. Una
 línea cinemática dice qué va mal; una calificación de severidad dice si se
-sigue funcionando, y sale de un único número de banda ancha medido en un
-cojinete.
+sigue funcionando. Sale de un único número de banda ancha, y el 4.3.3 dice de
+cuál: el mayor de los medidos en las posiciones y direcciones acordadas.
 
 La ISO 20816-1:2016 es el documento base de la serie ISO 20816, que fusionó y
 sustituyó a la ISO 10816-1 y a la ISO 7919-1. Fija la forma del juicio y deja
@@ -148,8 +148,9 @@ for zone, factor in vibration.ZONE_LIMIT_FACTORS.items():
 Las frecuencias de esquina y los exponentes son de la máquina, y los fijan las
 partes específicas. Los valores por defecto de 1 son la lectura física de la
 forma, no un número tomado de ningún sitio: desplazamiento constante por debajo
-de la esquina inferior y aceleración constante por encima de la superior, que
-caen ambos a 6 dB por octava.
+de la esquina inferior, que hace *subir* la velocidad admisible a 6 dB por
+octava, y aceleración constante por encima de la superior, que la hace bajar al
+mismo ritmo. La curva queda baja en los dos extremos y plana en medio.
 
 ## 4. Un cambio es un vector
 
