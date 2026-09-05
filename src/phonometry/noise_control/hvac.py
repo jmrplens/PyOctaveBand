@@ -1734,10 +1734,11 @@ def _vdi2081_limit_frequency(shape: str, size: float, speed_of_sound: float) -> 
     ``a`` and ``0,586 c / d`` for a round one of bore ``d``, and both are the
     first cut-on frequency of the duct, which :func:`plane_wave_limit` already
     computes from the mode theory: the rectangular one exactly, and the round
-    one to the four figures the guideline rounds 1,8412 over pi to. So the
-    law is called rather than written a second time, and the width the
-    rectangular form needs is the one it is given, the other side being
-    irrelevant to the first mode across the largest one.
+    one to the three figures the guideline rounds 1,8412 over pi to: 0,586
+    against 0,58607, which is one part in eight thousand. So the law is called
+    rather than written a second time, and the width the rectangular form
+    needs is the one it is given, the other side being irrelevant to the first
+    mode across the largest one.
     """
     if shape == "rectangular":
         return plane_wave_limit(width=size, height=size, speed_of_sound=speed_of_sound)

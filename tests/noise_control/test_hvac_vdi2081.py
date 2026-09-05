@@ -552,8 +552,8 @@ def test_the_limit_frequency_is_the_ducts_own_first_cut_on() -> None:
 
     The rectangular form is exactly ``c / (2 a)``, and the round one is the
     guideline's rounding of the first circular mode: ``0,586`` for
-    ``1,8412 / pi``, which agrees to four figures. Written twice, the two
-    could drift; called once, they cannot.
+    ``1,8412 / pi``, which the guideline prints to three figures. Written
+    twice, the two could drift; called once, they cannot.
     """
     from phonometry import noise_control as nc
 
