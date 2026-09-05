@@ -299,6 +299,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   judged against the other branch's printed formula, which is what continuity
   at the split means and what neither branch can fake alone.
 
+### Fixed
+
+- The conformance report filed two documents under one name whenever the
+  document's number is separated from its issuing body by a space. `ECAC Doc
+  29` is the airport-noise method and `Doc 32` the rotorcraft one, and both
+  were `ECAC Doc`; `EBU Tech 3285`, `3341` and `3342` were `EBU Tech`;
+  `ISO/PAS 1996-3` and `ISO/PAS 20065` were `ISO/PAS`; `Directive (EU)
+  2015/996` and `2021/1226` were `Directive (EU)`. The reference parser reads a
+  designation as the body plus one glued token, which is right for `ISO 9613-2`
+  and stops one token early for a document published in a numbered series, so
+  the series prefixes are now recognised the way the bodies already were.
+
+  `ISO 10140-5:2010+A1` was worse: the amendment marker matched no year, so the
+  whole of `10140-5:2010+A1` fell into the clause and the document became the
+  bare body `ISO`. An edition now takes its amendment.
+
+  The count of distinct normative designations the report publishes goes from
+  125 to 130 and the further sources from 84 to 83, which is what the same
+  corpus reads as once the eighty-two affected citations name their document. A
+  test holds the class shut: a standard's number always follows its body, so a
+  designation with no digit whose clause opens with one has lost it.
+
+- Three railway coefficient rows cited `Appendix G` with no document, which is
+  the CNOSSOS-EU case the override file exists for: the appendix belongs to
+  Annex II of Directive 2002/49/EC and the tables inside each row are owned by
+  the 2015 text and the 2021 replacement between them, so no single directive
+  is the answer and the string alone cannot say. Two more cited the Bies
+  handbook by its title where the other twenty-one cite it as `Bies 5e`, which
+  filed one book as two.
+
 ### Changed
 
 - Ten visco-thermal models take a `phonometry.fluids.Fluid` where they took

@@ -9,8 +9,8 @@
     "domains": 66,
     "standards": 392,
     "citations": 607,
-    "designations": 125,
-    "sources": 84
+    "designations": 130,
+    "sources": 83
   },
   "units": [
     "%",
@@ -1826,14 +1826,14 @@
       "verdict": "pass"
     },
     {
-      "id": "room-acoustics/bies-engineering-noise-control-5e-eq-6-44/room-constant-r-s-1-s-100-m-0-2-25-m",
+      "id": "room-acoustics/bies-5e-eq-6-44/room-constant-r-s-1-s-100-m-0-2-25-m",
       "domain": "room-acoustics",
       "reference": {
         "kind": "book",
-        "designation": "Bies Engineering Noise Control",
+        "designation": "Bies",
         "edition": "5e",
         "clause": "Eq. (6.44)",
-        "cite": "Bies Engineering Noise Control 5e, Eq. (6.44)"
+        "cite": "Bies 5e Eq. (6.44)"
       },
       "quantity": "Room constant R = Sᾱ/(1-ᾱ)  (S = 100 m², ᾱ = 0.2 → 25 m²)",
       "kind": "scalar",
@@ -1855,14 +1855,14 @@
       "verdict": "pass"
     },
     {
-      "id": "room-acoustics/bies-engineering-noise-control-5e-eq-6-43/critical-distance-rc-direct-field-reverberant-field-r-25-q-1",
+      "id": "room-acoustics/bies-5e-eq-6-43/critical-distance-rc-direct-field-reverberant-field-r-25-q-1",
       "domain": "room-acoustics",
       "reference": {
         "kind": "book",
-        "designation": "Bies Engineering Noise Control",
+        "designation": "Bies",
         "edition": "5e",
         "clause": "Eq. (6.43)",
-        "cite": "Bies Engineering Noise Control 5e, Eq. (6.43)"
+        "cite": "Bies 5e Eq. (6.43)"
       },
       "quantity": "Critical distance rc: direct field = reverberant field (R = 25, Q = 1)",
       "kind": "scalar",
@@ -1913,14 +1913,14 @@
       "verdict": "pass"
     },
     {
-      "id": "room-acoustics/bies-engineering-noise-control-5e-eq-6-43/steady-state-spl-lp-lw-10lg-q-4-r-4-r-lw-90-r-1-r-25-q-1",
+      "id": "room-acoustics/bies-5e-eq-6-43/steady-state-spl-lp-lw-10lg-q-4-r-4-r-lw-90-r-1-r-25-q-1",
       "domain": "room-acoustics",
       "reference": {
         "kind": "book",
-        "designation": "Bies Engineering Noise Control",
+        "designation": "Bies",
         "edition": "5e",
         "clause": "Eq. (6.43)",
-        "cite": "Bies Engineering Noise Control 5e, Eq. (6.43)"
+        "cite": "Bies 5e Eq. (6.43)"
       },
       "quantity": "Steady-state SPL Lp = Lw + 10lg(Q/4πr² + 4/R)  (Lw=90, r=1, R=25, Q=1)",
       "kind": "scalar",
@@ -4570,8 +4570,9 @@
       "domain": "room-building-acoustics",
       "reference": {
         "kind": "standard",
-        "designation": "ISO",
-        "clause": "10140-5:2010+A1 Annex B, Table B.1",
+        "designation": "ISO 10140-5",
+        "edition": "2010+A1",
+        "clause": "Annex B, Table B.1",
         "cite": "ISO 10140-5:2010+A1 Annex B, Table B.1"
       },
       "quantity": "Reference elements end-to-end: printed Rw (C; Ctr) of all three",
@@ -4593,8 +4594,9 @@
       "domain": "room-building-acoustics",
       "reference": {
         "kind": "standard",
-        "designation": "ISO",
-        "clause": "10140-5:2010+A1 Annex C, Table C.1",
+        "designation": "ISO 10140-5",
+        "edition": "2010+A1",
+        "clause": "Annex C, Table C.1",
         "cite": "ISO 10140-5:2010+A1 Annex C, Table C.1"
       },
       "quantity": "Reference floors end-to-end: printed Ln,t,r,0,w (CI) of both",
@@ -10847,8 +10849,8 @@
       "domain": "speech-intelligibility-ansi-s3-5-1997",
       "reference": {
         "kind": "standard",
-        "designation": "ASA WG",
-        "clause": "S3-79 SII.C (clause 5.4)",
+        "designation": "ASA WG S3-79",
+        "clause": "SII.C (clause 5.4)",
         "cite": "ASA WG S3-79 SII.C (clause 5.4)"
       },
       "quantity": "Equivalent masking spectrum level at 200 Hz",
@@ -10903,8 +10905,8 @@
       "domain": "speech-intelligibility-ansi-s3-5-1997",
       "reference": {
         "kind": "standard",
-        "designation": "ASA WG",
-        "clause": "S3-79 SII.C (clause 6)",
+        "designation": "ASA WG S3-79",
+        "clause": "SII.C (clause 6)",
         "cite": "ASA WG S3-79 SII.C (clause 6)"
       },
       "quantity": "SII, noise 30 dB plus hearing loss 40 dB",
@@ -10987,8 +10989,8 @@
       "domain": "speech-intelligibility-ansi-s3-5-1997",
       "reference": {
         "kind": "standard",
-        "designation": "ASA WG",
-        "clause": "S3-79 SII.C (clause 6)",
+        "designation": "ASA WG S3-79",
+        "clause": "SII.C (clause 6)",
         "cite": "ASA WG S3-79 SII.C (clause 6)"
       },
       "quantity": "SII, standard speech in quiet, normal hearing",
@@ -11014,8 +11016,8 @@
       "domain": "speech-intelligibility-ansi-s3-5-1997",
       "reference": {
         "kind": "standard",
-        "designation": "ASA WG",
-        "clause": "S3-79 TO.TST",
+        "designation": "ASA WG S3-79",
+        "clause": "TO.TST",
         "cite": "ASA WG S3-79 TO.TST"
       },
       "quantity": "Official one-third-octave test case",
@@ -11041,8 +11043,8 @@
       "domain": "speech-intelligibility-ansi-s3-5-1997",
       "reference": {
         "kind": "standard",
-        "designation": "ASA WG",
-        "clause": "S3-79 TO_1.TST",
+        "designation": "ASA WG S3-79",
+        "clause": "TO_1.TST",
         "cite": "ASA WG S3-79 TO_1.TST"
       },
       "quantity": "Official test case, alternative importance",
@@ -11068,8 +11070,8 @@
       "domain": "speech-intelligibility-ansi-s3-5-1997",
       "reference": {
         "kind": "standard",
-        "designation": "ASA WG",
-        "clause": "S3-79 CB.TST",
+        "designation": "ASA WG S3-79",
+        "clause": "CB.TST",
         "cite": "ASA WG S3-79 CB.TST"
       },
       "quantity": "Official critical-band test case",
@@ -11095,8 +11097,8 @@
       "domain": "speech-intelligibility-ansi-s3-5-1997",
       "reference": {
         "kind": "standard",
-        "designation": "ASA WG",
-        "clause": "S3-79 CB_1.TST",
+        "designation": "ASA WG S3-79",
+        "clause": "CB_1.TST",
         "cite": "ASA WG S3-79 CB_1.TST"
       },
       "quantity": "Critical band, alternative importance",
@@ -11122,8 +11124,8 @@
       "domain": "speech-intelligibility-ansi-s3-5-1997",
       "reference": {
         "kind": "standard",
-        "designation": "ASA WG",
-        "clause": "S3-79 ECB.TST",
+        "designation": "ASA WG S3-79",
+        "clause": "ECB.TST",
         "cite": "ASA WG S3-79 ECB.TST"
       },
       "quantity": "Official equally-contributing test case",
@@ -11149,8 +11151,8 @@
       "domain": "speech-intelligibility-ansi-s3-5-1997",
       "reference": {
         "kind": "standard",
-        "designation": "ASA WG",
-        "clause": "S3-79 ECB_1.TST",
+        "designation": "ASA WG S3-79",
+        "clause": "ECB_1.TST",
         "cite": "ASA WG S3-79 ECB_1.TST"
       },
       "quantity": "Equally contributing, alternative importance",
@@ -11176,8 +11178,8 @@
       "domain": "speech-intelligibility-ansi-s3-5-1997",
       "reference": {
         "kind": "standard",
-        "designation": "ASA WG",
-        "clause": "S3-79 OCTAVE.TST",
+        "designation": "ASA WG S3-79",
+        "clause": "OCTAVE.TST",
         "cite": "ASA WG S3-79 OCTAVE.TST"
       },
       "quantity": "Official octave-band test case",
@@ -11203,8 +11205,8 @@
       "domain": "speech-intelligibility-ansi-s3-5-1997",
       "reference": {
         "kind": "standard",
-        "designation": "ASA WG",
-        "clause": "S3-79 OCTAVE_1.TST",
+        "designation": "ASA WG S3-79",
+        "clause": "OCTAVE_1.TST",
         "cite": "ASA WG S3-79 OCTAVE_1.TST"
       },
       "quantity": "Octave band, alternative importance",
@@ -11427,8 +11429,8 @@
       "domain": "speech-intelligibility-ansi-s3-5-1997",
       "reference": {
         "kind": "standard",
-        "designation": "ASA WG",
-        "clause": "S3-79 SII.C (clause 6)",
+        "designation": "ASA WG S3-79",
+        "clause": "SII.C (clause 6)",
         "cite": "ASA WG S3-79 SII.C (clause 6)"
       },
       "quantity": "Flat-input cases, all four procedures",
@@ -11621,8 +11623,9 @@
       "domain": "impulsive-sound-prominence-iso-pas-1996-3",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/PAS",
-        "clause": "1996-3:2022 3.5",
+        "designation": "ISO/PAS 1996-3",
+        "edition": "2022",
+        "clause": "3.5",
         "cite": "ISO/PAS 1996-3:2022 3.5"
       },
       "quantity": "Onset rate of a 30 dB ramp over 0.30 s",
@@ -11649,8 +11652,9 @@
       "domain": "impulsive-sound-prominence-iso-pas-1996-3",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/PAS",
-        "clause": "1996-3:2022 Formula 3",
+        "designation": "ISO/PAS 1996-3",
+        "edition": "2022",
+        "clause": "Formula 3",
         "cite": "ISO/PAS 1996-3:2022 Formula 3"
       },
       "quantity": "Adjustment KI of the ramp onset",
@@ -11848,8 +11852,8 @@
       "domain": "measurement-uncertainty-gum-supplement-1",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/IEC Guide",
-        "clause": "98-3-1 clause 9.2",
+        "designation": "ISO/IEC Guide 98-3-1",
+        "clause": "clause 9.2",
         "cite": "ISO/IEC Guide 98-3-1 clause 9.2"
       },
       "quantity": "Combined uncertainty, additive model",
@@ -11875,8 +11879,8 @@
       "domain": "measurement-uncertainty-gum-supplement-1",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/IEC Guide",
-        "clause": "98-3 Table G.2",
+        "designation": "ISO/IEC Guide 98-3",
+        "clause": "Table G.2",
         "cite": "ISO/IEC Guide 98-3 Table G.2"
       },
       "quantity": "Coverage factor, p=0.99, v=16",
@@ -11902,8 +11906,8 @@
       "domain": "measurement-uncertainty-gum-supplement-1",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/IEC Guide",
-        "clause": "98-3 Annex G.4",
+        "designation": "ISO/IEC Guide 98-3",
+        "clause": "Annex G.4",
         "cite": "ISO/IEC Guide 98-3 Annex G.4"
       },
       "quantity": "Welch-Satterthwaite effective dof",
@@ -11929,8 +11933,8 @@
       "domain": "measurement-uncertainty-gum-supplement-1",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/IEC Guide",
-        "clause": "98-3 Annex H.1",
+        "designation": "ISO/IEC Guide 98-3",
+        "clause": "Annex H.1",
         "cite": "ISO/IEC Guide 98-3 Annex H.1"
       },
       "quantity": "End-gauge combined uncertainty uc, nm",
@@ -11957,8 +11961,8 @@
       "domain": "measurement-uncertainty-gum-supplement-1",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/IEC Guide",
-        "clause": "98-3 Annex H.1",
+        "designation": "ISO/IEC Guide 98-3",
+        "clause": "Annex H.1",
         "cite": "ISO/IEC Guide 98-3 Annex H.1"
       },
       "quantity": "End-gauge expanded uncertainty U99, nm",
@@ -11985,8 +11989,8 @@
       "domain": "measurement-uncertainty-gum-supplement-1",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/IEC Guide",
-        "clause": "98-3 Annex H.2 (Table H.3)",
+        "designation": "ISO/IEC Guide 98-3",
+        "clause": "Annex H.2 (Table H.3)",
         "cite": "ISO/IEC Guide 98-3 Annex H.2 (Table H.3)"
       },
       "quantity": "Correlated V/I/phi budget: uc(R), ohm",
@@ -12013,8 +12017,8 @@
       "domain": "measurement-uncertainty-gum-supplement-1",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/IEC Guide",
-        "clause": "98-3-1 Table 3 (clause 9.2.3)",
+        "designation": "ISO/IEC Guide 98-3-1",
+        "clause": "Table 3 (clause 9.2.3)",
         "cite": "ISO/IEC Guide 98-3-1 Table 3 (clause 9.2.3)"
       },
       "quantity": "Seeded Monte Carlo, rectangular sum: 95 % interval endpoint",
@@ -12585,8 +12589,9 @@
       "domain": "tonal-audibility-iso-pas-20065",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/PAS",
-        "clause": "20065:2016 Formulae (12)-(14)",
+        "designation": "ISO/PAS 20065",
+        "edition": "2016",
+        "clause": "Formulae (12)-(14)",
         "cite": "ISO/PAS 20065:2016 Formulae (12)-(14)"
       },
       "quantity": "Audibility at 137.3 Hz, Annex E spectrum 1",
@@ -12613,8 +12618,9 @@
       "domain": "tonal-audibility-iso-pas-20065",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/PAS",
-        "clause": "20065:2016 Formula (13)",
+        "designation": "ISO/PAS 20065",
+        "edition": "2016",
+        "clause": "Formula (13)",
         "cite": "ISO/PAS 20065:2016 Formula (13)"
       },
       "quantity": "Masking index av at 137.3 / 592.2 Hz",
@@ -12636,8 +12642,9 @@
       "domain": "tonal-audibility-iso-pas-20065",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/PAS",
-        "clause": "20065:2016 Formula (20)",
+        "designation": "ISO/PAS 20065",
+        "edition": "2016",
+        "clause": "Formula (20)",
         "cite": "ISO/PAS 20065:2016 Formula (20)"
       },
       "quantity": "Mean audibility of the five spectra, Annex E",
@@ -12664,8 +12671,9 @@
       "domain": "tonal-audibility-iso-pas-20065",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/PAS",
-        "clause": "20065:2016 Formula (6)",
+        "designation": "ISO/PAS 20065",
+        "edition": "2016",
+        "clause": "Formula (6)",
         "cite": "ISO/PAS 20065:2016 Formula (6)"
       },
       "quantity": "Mean narrow-band level LS from spectrum, Table E.1",
@@ -12692,8 +12700,9 @@
       "domain": "tonal-audibility-iso-pas-20065",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/PAS",
-        "clause": "20065:2016 Clause 6",
+        "designation": "ISO/PAS 20065",
+        "edition": "2016",
+        "clause": "Clause 6",
         "cite": "ISO/PAS 20065:2016 Clause 6"
       },
       "quantity": "Extended uncertainty U of the 137.3 Hz tone, Table E.2",
@@ -12720,8 +12729,9 @@
       "domain": "tonal-audibility-iso-pas-20065",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/PAS",
-        "clause": "20065:2016 Formulae (28)-(29)",
+        "designation": "ISO/PAS 20065",
+        "edition": "2016",
+        "clause": "Formulae (28)-(29)",
         "cite": "ISO/PAS 20065:2016 Formulae (28)-(29)"
       },
       "quantity": "Extended uncertainty of the mean audibility, Annex E Step 4",
@@ -12748,8 +12758,9 @@
       "domain": "tonal-audibility-iso-pas-20065",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/PAS",
-        "clause": "20065:2016 Formula (8)",
+        "designation": "ISO/PAS 20065",
+        "edition": "2016",
+        "clause": "Formula (8)",
         "cite": "ISO/PAS 20065:2016 Formula (8)"
       },
       "quantity": "Tone level LT from spectrum, Table E.1",
@@ -12776,8 +12787,9 @@
       "domain": "tonal-audibility-iso-pas-20065",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/PAS",
-        "clause": "20065:2016 Clause 5.3.8",
+        "designation": "ISO/PAS 20065",
+        "edition": "2016",
+        "clause": "Clause 5.3.8",
         "cite": "ISO/PAS 20065:2016 Clause 5.3.8"
       },
       "quantity": "Tone detection over the spectrum, Table E.1",
@@ -12799,8 +12811,9 @@
       "domain": "tonal-audibility-iso-pas-20065",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/PAS",
-        "clause": "20065:2016 Clause 5.3.8 Step 3",
+        "designation": "ISO/PAS 20065",
+        "edition": "2016",
+        "clause": "Clause 5.3.8 Step 3",
         "cite": "ISO/PAS 20065:2016 Clause 5.3.8 Step 3"
       },
       "quantity": "Same-band FG combination inside analyze_spectrum, Table E.2 row 2 FG",
@@ -12827,8 +12840,9 @@
       "domain": "tonal-audibility-iso-pas-20065",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/PAS",
-        "clause": "20065:2016 Formula (17)",
+        "designation": "ISO/PAS 20065",
+        "edition": "2016",
+        "clause": "Formula (17)",
         "cite": "ISO/PAS 20065:2016 Formula (17)"
       },
       "quantity": "Multi-tone FG combination, Table E.1",
@@ -12855,8 +12869,9 @@
       "domain": "tonal-audibility-iso-pas-20065",
       "reference": {
         "kind": "standard",
-        "designation": "ISO/PAS",
-        "clause": "20065:2016 Formulae (18)/(19)",
+        "designation": "ISO/PAS 20065",
+        "edition": "2016",
+        "clause": "Formulae (18)/(19)",
         "cite": "ISO/PAS 20065:2016 Formulae (18)/(19)"
       },
       "quantity": "Two-tone separation fD (DIN 45681 Annex J), 137.3 / 212 Hz",
@@ -15783,8 +15798,8 @@
       "domain": "aircraft-noise-icao-annex-16-iec-61265",
       "reference": {
         "kind": "report",
-        "designation": "ECAC Doc",
-        "clause": "29 noise fraction (half path)",
+        "designation": "ECAC Doc 29",
+        "clause": "noise fraction (half path)",
         "cite": "ECAC Doc 29 noise fraction (half path)"
       },
       "quantity": "Finite-segment correction ΔF for a perpendicular foot at the segment start, dB",
@@ -15811,8 +15826,8 @@
       "domain": "aircraft-noise-icao-annex-16-iec-61265",
       "reference": {
         "kind": "report",
-        "designation": "ECAC Doc",
-        "clause": "29 single-event chain",
+        "designation": "ECAC Doc 29",
+        "clause": "single-event chain",
         "cite": "ECAC Doc 29 single-event chain"
       },
       "quantity": "SEL of a long level flyover vs the infinite-path limit LE∞ + ΔI − Λ, dB",
@@ -15839,8 +15854,8 @@
       "domain": "aircraft-noise-icao-annex-16-iec-61265",
       "reference": {
         "kind": "report",
-        "designation": "ECAC Doc",
-        "clause": "29 impedance adjustment (standard atmosphere)",
+        "designation": "ECAC Doc 29",
+        "clause": "impedance adjustment (standard atmosphere)",
         "cite": "ECAC Doc 29 impedance adjustment (standard atmosphere)"
       },
       "quantity": "Acoustic-impedance adjustment of NPD data at 15 °C / 101.325 kPa (Eq. 4-6/4-7), dB",
@@ -15867,8 +15882,8 @@
       "domain": "aircraft-noise-icao-annex-16-iec-61265",
       "reference": {
         "kind": "report",
-        "designation": "ECAC Doc",
-        "clause": "29 reference workbook (segment Λ)",
+        "designation": "ECAC Doc 29",
+        "clause": "reference workbook (segment Λ)",
         "cite": "ECAC Doc 29 reference workbook (segment Λ)"
       },
       "quantity": "Lateral attenuation of a climbing segment vs the ECAC Vol 3 Part 1 workbook, dB",
@@ -15895,8 +15910,8 @@
       "domain": "aircraft-noise-icao-annex-16-iec-61265",
       "reference": {
         "kind": "report",
-        "designation": "ECAC Doc",
-        "clause": "29 start-of-roll directivity (jet)",
+        "designation": "ECAC Doc 29",
+        "clause": "start-of-roll directivity (jet)",
         "cite": "ECAC Doc 29 start-of-roll directivity (jet)"
       },
       "quantity": "ΔSOR behind a takeoff ground-roll segment vs the Vol 3 Part 1 workbook, dB",
@@ -15923,8 +15938,8 @@
       "domain": "aircraft-noise-icao-annex-16-iec-61265",
       "reference": {
         "kind": "report",
-        "designation": "ECAC Doc",
-        "clause": "29 start-of-roll directivity (turboprop)",
+        "designation": "ECAC Doc 29",
+        "clause": "start-of-roll directivity (turboprop)",
         "cite": "ECAC Doc 29 start-of-roll directivity (turboprop)"
       },
       "quantity": "ΔSOR behind a takeoff ground-roll segment (turboprop, Eq. 4-24b), dB",
@@ -15951,8 +15966,8 @@
       "domain": "aircraft-noise-icao-annex-16-iec-61265",
       "reference": {
         "kind": "report",
-        "designation": "ECAC Doc",
-        "clause": "29 workbook event assembly (JETFDS/R03, behind SOR)",
+        "designation": "ECAC Doc 29",
+        "clause": "workbook event assembly (JETFDS/R03, behind SOR)",
         "cite": "ECAC Doc 29 workbook event assembly (JETFDS/R03, behind SOR)"
       },
       "quantity": "Energy sum of the reference per-segment SELs vs the B-1 event total, dB",
@@ -15979,8 +15994,8 @@
       "domain": "aircraft-noise-icao-annex-16-iec-61265",
       "reference": {
         "kind": "standard",
-        "designation": "SAE ARP",
-        "clause": "5534 low branch at the split (Eq. 7)",
+        "designation": "SAE ARP 5534",
+        "clause": "low branch at the split (Eq. 7)",
         "cite": "SAE ARP 5534 low branch at the split (Eq. 7)"
       },
       "quantity": "SAE-Method δ_B just below δ_t = 150 dB vs the printed Eq. 8 value there, dB",
@@ -16007,8 +16022,8 @@
       "domain": "aircraft-noise-icao-annex-16-iec-61265",
       "reference": {
         "kind": "standard",
-        "designation": "SAE ARP",
-        "clause": "5534 high branch at the split (Eq. 8)",
+        "designation": "SAE ARP 5534",
+        "clause": "high branch at the split (Eq. 8)",
         "cite": "SAE ARP 5534 high branch at the split (Eq. 8)"
       },
       "quantity": "SAE-Method δ_B just above δ_t = 150 dB vs the printed Eq. 7 value there, dB",
@@ -16063,8 +16078,8 @@
       "domain": "aircraft-noise-icao-annex-16-iec-61265",
       "reference": {
         "kind": "report",
-        "designation": "ECAC Doc",
-        "clause": "29 NPD interpolation",
+        "designation": "ECAC Doc 29",
+        "clause": "NPD interpolation",
         "cite": "ECAC Doc 29 NPD interpolation"
       },
       "quantity": "Log-linear NPD level at the log-midpoint distance (Eq. 4-4), dB",
@@ -16091,8 +16106,8 @@
       "domain": "rotorcraft-noise-ecac-doc-32-norah2",
       "reference": {
         "kind": "report",
-        "designation": "ECAC Doc",
-        "clause": "32 atmospheric attenuation (Table 4)",
+        "designation": "ECAC Doc 32",
+        "clause": "atmospheric attenuation (Table 4)",
         "cite": "ECAC Doc 32 atmospheric attenuation (Table 4)"
       },
       "quantity": "ΔLa over a 1 km excess path at 1 kHz vs the NORAH2 guidance Table 4, dB",
@@ -16119,8 +16134,8 @@
       "domain": "rotorcraft-noise-ecac-doc-32-norah2",
       "reference": {
         "kind": "report",
-        "designation": "ECAC Doc",
-        "clause": "32 spherical spreading",
+        "designation": "ECAC Doc 32",
+        "clause": "spherical spreading",
         "cite": "ECAC Doc 32 spherical spreading"
       },
       "quantity": "ΔLs at ten times the 60 m hemisphere reference distance (Eq. 24), dB",
@@ -16147,8 +16162,8 @@
       "domain": "rotorcraft-noise-ecac-doc-32-norah2",
       "reference": {
         "kind": "report",
-        "designation": "ECAC Doc",
-        "clause": "32 ground effect (rigid limit)",
+        "designation": "ECAC Doc 32",
+        "clause": "ground effect (rigid limit)",
         "cite": "ECAC Doc 32 ground effect (rigid limit)"
       },
       "quantity": "ΔLg over a rigid surface at grazing incidence tends to +6 dB (Eq. 29), dB",
@@ -16175,8 +16190,8 @@
       "domain": "rotorcraft-noise-ecac-doc-32-norah2",
       "reference": {
         "kind": "report",
-        "designation": "ECAC Doc",
-        "clause": "32 propagation chain (NORAH2 prototype)",
+        "designation": "ECAC Doc 32",
+        "clause": "propagation chain (NORAH2 prototype)",
         "cite": "ECAC Doc 32 propagation chain (NORAH2 prototype)"
       },
       "quantity": "LA of a single-hemisphere emission vs the NORAH2 prototype single-event history (R22 approach, 223.66 m slant), dB(A)",
@@ -16259,8 +16274,8 @@
       "domain": "rotorcraft-noise-ecac-doc-32-norah2",
       "reference": {
         "kind": "report",
-        "designation": "ECAC Doc",
-        "clause": "32 flight-condition interpolation (NORAH2 Eq. 8)",
+        "designation": "ECAC Doc 32",
+        "clause": "flight-condition interpolation (NORAH2 Eq. 8)",
         "cite": "ECAC Doc 32 flight-condition interpolation (NORAH2 Eq. 8)"
       },
       "quantity": "Distance-scaled triangle blend of three uniform hemispheres, hand-checked, dB",
@@ -16287,8 +16302,8 @@
       "domain": "rotorcraft-noise-ecac-doc-32-norah2",
       "reference": {
         "kind": "report",
-        "designation": "ECAC Doc",
-        "clause": "32 flight-path kinematics (Eq. 17)",
+        "designation": "ECAC Doc 32",
+        "clause": "flight-path kinematics (Eq. 17)",
         "cite": "ECAC Doc 32 flight-path kinematics (Eq. 17)"
       },
       "quantity": "Airspeed of a straight climbing track, 40 m/s ground speed at a 5° path angle, m/s",
@@ -16315,8 +16330,8 @@
       "domain": "rotorcraft-noise-ecac-doc-32-norah2",
       "reference": {
         "kind": "report",
-        "designation": "ECAC Doc",
-        "clause": "32 retarded time (Eq. 22)",
+        "designation": "ECAC Doc 32",
+        "clause": "retarded time (Eq. 22)",
         "cite": "ECAC Doc 32 retarded time (Eq. 22)"
       },
       "quantity": "Recorded-time delay at 100 m slant distance, r/c with c = 346.1 m/s, s",
@@ -16343,8 +16358,8 @@
       "domain": "rotorcraft-noise-ecac-doc-32-norah2",
       "reference": {
         "kind": "report",
-        "designation": "ECAC Doc",
-        "clause": "32 single event (Eq. 27)",
+        "designation": "ECAC Doc 32",
+        "clause": "single event (Eq. 27)",
         "cite": "ECAC Doc 32 single event (Eq. 27)"
       },
       "quantity": "SEL − LASmax of a constant-speed level flyover, 10·lg(π·d/V) closed form, dB",
@@ -16483,8 +16498,8 @@
       "domain": "aircraft-noise-icao-annex-16-iec-61265",
       "reference": {
         "kind": "standard",
-        "designation": "SAE ARP",
-        "clause": "5534 pure-tone coefficient (ISO 9613-1)",
+        "designation": "SAE ARP 5534",
+        "clause": "pure-tone coefficient (ISO 9613-1)",
         "cite": "SAE ARP 5534 pure-tone coefficient (ISO 9613-1)"
       },
       "quantity": "Mid-band α at 1 kHz, 25 °C, 70 % RH, 101.325 kPa, dB/m",
@@ -16511,8 +16526,8 @@
       "domain": "aircraft-noise-icao-annex-16-iec-61265",
       "reference": {
         "kind": "standard",
-        "designation": "ICAO Annex",
-        "clause": "16 Vol. I App. 2 Table A2-3",
+        "designation": "ICAO Annex 16",
+        "clause": "Vol. I App. 2 Table A2-3",
         "cite": "ICAO Annex 16 Vol. I App. 2 Table A2-3"
       },
       "quantity": "Perceived noisiness at SPL(b), 1 kHz band, in noys",
@@ -16538,8 +16553,8 @@
       "domain": "aircraft-noise-icao-annex-16-iec-61265",
       "reference": {
         "kind": "standard",
-        "designation": "ICAO Doc",
-        "clause": "9501 ETM Vol. I Table 3-7",
+        "designation": "ICAO Doc 9501",
+        "clause": "ETM Vol. I Table 3-7",
         "cite": "ICAO Doc 9501 ETM Vol. I Table 3-7"
       },
       "quantity": "Tone correction of the turbofan example, dB",
@@ -16565,8 +16580,8 @@
       "domain": "aircraft-noise-icao-annex-16-iec-61265",
       "reference": {
         "kind": "standard",
-        "designation": "ICAO Doc",
-        "clause": "9501 ETM Vol. I Table 4-4",
+        "designation": "ICAO Doc 9501",
+        "clause": "ETM Vol. I Table 4-4",
         "cite": "ICAO Doc 9501 ETM Vol. I Table 4-4"
       },
       "quantity": "Integrated-method reference EPNL, EPNdB",
@@ -16622,8 +16637,8 @@
       "domain": "aircraft-noise-icao-annex-16-iec-61265",
       "reference": {
         "kind": "report",
-        "designation": "ECAC Doc",
-        "clause": "29 Appendix B take-off ground roll",
+        "designation": "ECAC Doc 29",
+        "clause": "Appendix B take-off ground roll",
         "cite": "ECAC Doc 29 Appendix B take-off ground roll"
       },
       "quantity": "Equivalent take-off distance of reference case 6 (Eq. B-15/B-16), ft",
@@ -16650,8 +16665,8 @@
       "domain": "aircraft-noise-icao-annex-16-iec-61265",
       "reference": {
         "kind": "report",
-        "designation": "ECAC Doc",
-        "clause": "29 Appendix B approach thrust",
+        "designation": "ECAC Doc 29",
+        "clause": "Appendix B approach thrust",
         "cite": "ECAC Doc 29 Appendix B approach thrust"
       },
       "quantity": "Corrected net thrust at the top of reference case 2A (Eq. B-40/B-48), lb",
@@ -16707,8 +16722,8 @@
       "domain": "cnossos-eu-road-source-directive-2002-49-ec-annex-ii",
       "reference": {
         "kind": "standard",
-        "designation": "Directive (EU)",
-        "clause": "2021/1226 Annex pt (19)(a), Table F-1",
+        "designation": "Directive (EU) 2021/1226",
+        "clause": "Annex pt (19)(a), Table F-1",
         "cite": "Directive (EU) 2021/1226 Annex pt (19)(a), Table F-1"
       },
       "quantity": "Rolling and propulsion coefficients, 5 categories x 4 rows x 8 bands",
@@ -16736,8 +16751,8 @@
       "domain": "cnossos-eu-road-source-directive-2002-49-ec-annex-ii",
       "reference": {
         "kind": "standard",
-        "designation": "Directive (EU)",
-        "clause": "2021/1226 Annex pt (19)(b), Table F-4",
+        "designation": "Directive (EU) 2021/1226",
+        "clause": "Annex pt (19)(b), Table F-4",
         "cite": "Directive (EU) 2021/1226 Annex pt (19)(b), Table F-4"
       },
       "quantity": "Road-surface coefficients, 15 surfaces x 5 categories x (8 alpha + beta)",
@@ -16765,8 +16780,8 @@
       "domain": "cnossos-eu-road-source-directive-2002-49-ec-annex-ii",
       "reference": {
         "kind": "standard",
-        "designation": "Directive (EU)",
-        "clause": "2015/996 Appendix F, Tables F-2 and F-3",
+        "designation": "Directive (EU) 2015/996",
+        "clause": "Appendix F, Tables F-2 and F-3",
         "cite": "Directive (EU) 2015/996 Appendix F, Tables F-2 and F-3"
       },
       "quantity": "Studded-tyre and junction coefficients, unchanged since 2015",
@@ -16794,8 +16809,8 @@
       "domain": "cnossos-eu-road-source-directive-2002-49-ec-annex-ii",
       "reference": {
         "kind": "standard",
-        "designation": "Directive (EU)",
-        "clause": "2015/996 Annex II 2.2.4 / 2.2.11",
+        "designation": "Directive (EU) 2015/996",
+        "clause": "Annex II 2.2.4 / 2.2.11",
         "cite": "Directive (EU) 2015/996 Annex II 2.2.4 / 2.2.11"
       },
       "quantity": "Sound power at v_ref = 70 km/h under reference conditions, dB re 1 pW",
@@ -16823,8 +16838,8 @@
       "domain": "cnossos-eu-road-source-directive-2002-49-ec-annex-ii",
       "reference": {
         "kind": "standard",
-        "designation": "Directive (EU)",
-        "clause": "2021/1226 Annex pt (8)(b)",
+        "designation": "Directive (EU) 2021/1226",
+        "clause": "Annex pt (8)(b)",
         "cite": "Directive (EU) 2021/1226 Annex pt (8)(b)"
       },
       "quantity": "Octave-band A-weighting AWC_f,i prescribed by 2.5.5, dB",
@@ -17620,8 +17635,9 @@
       "domain": "program-loudness-itu-r-bs-1770-ebu-r-128",
       "reference": {
         "kind": "standard",
-        "designation": "EBU Tech",
-        "clause": "3341:2023 Table 1 case 1",
+        "designation": "EBU Tech 3341",
+        "edition": "2023",
+        "clause": "Table 1 case 1",
         "cite": "EBU Tech 3341:2023 Table 1 case 1"
       },
       "quantity": "Integrated loudness of the -23 dBFS stereo sine, LUFS",
@@ -17648,8 +17664,9 @@
       "domain": "program-loudness-itu-r-bs-1770-ebu-r-128",
       "reference": {
         "kind": "standard",
-        "designation": "EBU Tech",
-        "clause": "3341:2023 Table 1 case 5",
+        "designation": "EBU Tech 3341",
+        "edition": "2023",
+        "clause": "Table 1 case 5",
         "cite": "EBU Tech 3341:2023 Table 1 case 5"
       },
       "quantity": "Gated integrated loudness of the -26/-20/-26 dBFS steps, LUFS",
@@ -17676,8 +17693,9 @@
       "domain": "program-loudness-itu-r-bs-1770-ebu-r-128",
       "reference": {
         "kind": "standard",
-        "designation": "EBU Tech",
-        "clause": "3341:2023 Table 1 case 6",
+        "designation": "EBU Tech 3341",
+        "edition": "2023",
+        "clause": "Table 1 case 6",
         "cite": "EBU Tech 3341:2023 Table 1 case 6"
       },
       "quantity": "Integrated loudness of the 5.0-channel sine (Table 3 weights), LUFS",
@@ -17704,8 +17722,9 @@
       "domain": "program-loudness-itu-r-bs-1770-ebu-r-128",
       "reference": {
         "kind": "standard",
-        "designation": "EBU Tech",
-        "clause": "3341:2023 Table 1 case 15",
+        "designation": "EBU Tech 3341",
+        "edition": "2023",
+        "clause": "Table 1 case 15",
         "cite": "EBU Tech 3341:2023 Table 1 case 15"
       },
       "quantity": "True-peak level of the fs/4 sine at 0.5 FFS, dBTP",
@@ -17736,8 +17755,9 @@
       "domain": "program-loudness-itu-r-bs-1770-ebu-r-128",
       "reference": {
         "kind": "standard",
-        "designation": "EBU Tech",
-        "clause": "3341:2023 Table 1 case 19",
+        "designation": "EBU Tech 3341",
+        "edition": "2023",
+        "clause": "Table 1 case 19",
         "cite": "EBU Tech 3341:2023 Table 1 case 19"
       },
       "quantity": "True-peak level of the fs/4 sine at 1.41 FFS, dBTP",
@@ -17768,8 +17788,9 @@
       "domain": "program-loudness-itu-r-bs-1770-ebu-r-128",
       "reference": {
         "kind": "standard",
-        "designation": "EBU Tech",
-        "clause": "3342:2023 Table 1 case 1",
+        "designation": "EBU Tech 3342",
+        "edition": "2023",
+        "clause": "Table 1 case 1",
         "cite": "EBU Tech 3342:2023 Table 1 case 1"
       },
       "quantity": "Loudness range of the -20/-30 dBFS tone steps, LU",
@@ -17796,8 +17817,9 @@
       "domain": "program-loudness-itu-r-bs-1770-ebu-r-128",
       "reference": {
         "kind": "standard",
-        "designation": "EBU Tech",
-        "clause": "3342:2023 Table 1 case 3",
+        "designation": "EBU Tech 3342",
+        "edition": "2023",
+        "clause": "Table 1 case 3",
         "cite": "EBU Tech 3342:2023 Table 1 case 3"
       },
       "quantity": "Loudness range of the -40/-20 dBFS tone steps, LU",
@@ -18116,8 +18138,9 @@
       "domain": "broadcast-wave-metadata-ebu-tech-3285-itu-r-bs-2088",
       "reference": {
         "kind": "standard",
-        "designation": "EBU Tech",
-        "clause": "3285:2011 (2.3)",
+        "designation": "EBU Tech 3285",
+        "edition": "2011",
+        "clause": "(2.3)",
         "cite": "EBU Tech 3285:2011 (2.3)"
       },
       "quantity": "bext fixed part: every field at its cumulative offset, 602 bytes",
@@ -18139,8 +18162,9 @@
       "domain": "broadcast-wave-metadata-ebu-tech-3285-itu-r-bs-2088",
       "reference": {
         "kind": "standard",
-        "designation": "EBU Tech",
-        "clause": "3285:2011 (2.3)",
+        "designation": "EBU Tech 3285",
+        "edition": "2011",
+        "clause": "(2.3)",
         "cite": "EBU Tech 3285:2011 (2.3)"
       },
       "quantity": "bext round trip: written metadata returns identically through the reader",
@@ -18162,8 +18186,9 @@
       "domain": "broadcast-wave-metadata-ebu-tech-3285-itu-r-bs-2088",
       "reference": {
         "kind": "standard",
-        "designation": "EBU Tech",
-        "clause": "3285:2011 (2.4)",
+        "designation": "EBU Tech 3285",
+        "edition": "2011",
+        "clause": "(2.4)",
         "cite": "EBU Tech 3285:2011 (2.4)"
       },
       "quantity": "Loudness int16 = 100 x value, ties away from zero: negative examples",
@@ -18185,8 +18210,9 @@
       "domain": "broadcast-wave-metadata-ebu-tech-3285-itu-r-bs-2088",
       "reference": {
         "kind": "standard",
-        "designation": "EBU Tech",
-        "clause": "3285:2011 (2.4)",
+        "designation": "EBU Tech 3285",
+        "edition": "2011",
+        "clause": "(2.4)",
         "cite": "EBU Tech 3285:2011 (2.4)"
       },
       "quantity": "Loudness int16 = 100 x value, ties away from zero: positive examples",
@@ -18208,8 +18234,9 @@
       "domain": "broadcast-wave-metadata-ebu-tech-3285-itu-r-bs-2088",
       "reference": {
         "kind": "standard",
-        "designation": "EBU Tech",
-        "clause": "3285:2011 (2.4)",
+        "designation": "EBU Tech 3285",
+        "edition": "2011",
+        "clause": "(2.4)",
         "cite": "EBU Tech 3285:2011 (2.4)"
       },
       "quantity": "Unused loudness parameters: 7FFFh on disk, None through the reader",
@@ -18231,8 +18258,9 @@
       "domain": "broadcast-wave-metadata-ebu-tech-3285-itu-r-bs-2088",
       "reference": {
         "kind": "standard",
-        "designation": "EBU Tech",
-        "clause": "3285:2011 (2.4)",
+        "designation": "EBU Tech 3285",
+        "edition": "2011",
+        "clause": "(2.4)",
         "cite": "EBU Tech 3285:2011 (2.4)"
       },
       "quantity": "Out-of-range loudness clamps to 7FFEh/8000h, never the 7FFFh sentinel",
@@ -18254,8 +18282,9 @@
       "domain": "broadcast-wave-metadata-ebu-tech-3285-itu-r-bs-2088",
       "reference": {
         "kind": "standard",
-        "designation": "EBU Tech",
-        "clause": "3285:2011 (2.3)",
+        "designation": "EBU Tech 3285",
+        "edition": "2011",
+        "clause": "(2.3)",
         "cite": "EBU Tech 3285:2011 (2.3)"
       },
       "quantity": "TimeReference: 64-bit first-sample count split low/high at 338/342",
@@ -18277,8 +18306,9 @@
       "domain": "broadcast-wave-metadata-ebu-tech-3285-itu-r-bs-2088",
       "reference": {
         "kind": "standard",
-        "designation": "EBU Tech",
-        "clause": "3285:2011 (2.3): CodingHistory row per EBU R 98 Appendix 1",
+        "designation": "EBU Tech 3285",
+        "edition": "2011",
+        "clause": "(2.3): CodingHistory row per EBU R 98 Appendix 1",
         "cite": "EBU Tech 3285:2011 (2.3): CodingHistory row per EBU R 98 Appendix 1"
       },
       "quantity": "Appended row is A=PCM,F=48000,W=16,M=stereo,T=... + CR/LF (Example 1)",
@@ -18300,8 +18330,9 @@
       "domain": "broadcast-wave-metadata-ebu-tech-3285-itu-r-bs-2088",
       "reference": {
         "kind": "standard",
-        "designation": "EBU Tech",
-        "clause": "3285:2011 (2.3): CodingHistory row per EBU R 98 Appendix 1",
+        "designation": "EBU Tech 3285",
+        "edition": "2011",
+        "clause": "(2.3): CodingHistory row per EBU R 98 Appendix 1",
         "cite": "EBU Tech 3285:2011 (2.3): CodingHistory row per EBU R 98 Appendix 1"
       },
       "quantity": "Prior coding row preserved verbatim, new row added beneath it",
@@ -18323,8 +18354,9 @@
       "domain": "broadcast-wave-metadata-ebu-tech-3285-itu-r-bs-2088",
       "reference": {
         "kind": "standard",
-        "designation": "EBU Tech",
-        "clause": "3285:2011 (1.1/2.3)",
+        "designation": "EBU Tech 3285",
+        "edition": "2011",
+        "clause": "(1.1/2.3)",
         "cite": "EBU Tech 3285:2011 (1.1/2.3)"
       },
       "quantity": "UMID exists from v1 (64 of the 254 reserved bytes): v0 refused, v1 at 348",
@@ -18346,8 +18378,9 @@
       "domain": "broadcast-wave-metadata-ebu-tech-3285-itu-r-bs-2088",
       "reference": {
         "kind": "standard",
-        "designation": "EBU Tech",
-        "clause": "3285:2011 (1.1/2.3)",
+        "designation": "EBU Tech 3285",
+        "edition": "2011",
+        "clause": "(1.1/2.3)",
         "cite": "EBU Tech 3285:2011 (1.1/2.3)"
       },
       "quantity": "Loudness exists from v2 (10 of the 190 reserved bytes): v1 refused/zeroed",
@@ -22194,9 +22227,9 @@
       "id": "cnossos-eu-railway-source-directive-2002-49-ec-annex-ii/appendix-g-tables-g-1a-and-g-1b-roughness/wheel-roughness-by-brake-type-3-x-32-and-rail-roughness-by-class-2-x-35-db",
       "domain": "cnossos-eu-railway-source-directive-2002-49-ec-annex-ii",
       "reference": {
-        "kind": "book",
-        "designation": "Appendix G",
-        "clause": "Tables G-1a and G-1b (roughness)",
+        "kind": "standard",
+        "designation": "Directive 2002/49/EC",
+        "clause": "Appendix G Tables G-1a and G-1b (roughness)",
         "cite": "Appendix G Tables G-1a and G-1b (roughness)"
       },
       "quantity": "Wheel roughness by brake type (3 x 32) and rail roughness by class (2 x 35), dB",
@@ -22224,8 +22257,8 @@
       "domain": "cnossos-eu-railway-source-directive-2002-49-ec-annex-ii",
       "reference": {
         "kind": "standard",
-        "designation": "Directive (EU)",
-        "clause": "2021/1226 Annex pt (20)(b), Table G-2",
+        "designation": "Directive (EU) 2021/1226",
+        "clause": "Annex pt (20)(b), Table G-2",
         "cite": "Directive (EU) 2021/1226 Annex pt (20)(b), Table G-2"
       },
       "quantity": "Contact filter A3 for 5 wheel load and diameter combinations x 35 wavelengths, dB",
@@ -22252,9 +22285,9 @@
       "id": "cnossos-eu-railway-source-directive-2002-49-ec-annex-ii/appendix-g-table-g-3-transfer-functions/track-transfer-8-x-24-wheel-transfer-4-x-24-and-superstructure-transfer-24-db-per-axle",
       "domain": "cnossos-eu-railway-source-directive-2002-49-ec-annex-ii",
       "reference": {
-        "kind": "book",
-        "designation": "Appendix G",
-        "clause": "Table G-3 (transfer functions)",
+        "kind": "standard",
+        "designation": "Directive 2002/49/EC",
+        "clause": "Appendix G Table G-3 (transfer functions)",
         "cite": "Appendix G Table G-3 (transfer functions)"
       },
       "quantity": "Track transfer (8 x 24), wheel transfer (4 x 24) and superstructure transfer (24), dB per axle",
@@ -22281,9 +22314,9 @@
       "id": "cnossos-eu-railway-source-directive-2002-49-ec-annex-ii/appendix-g-tables-g-4-to-g-7/impact-roughness-35-traction-5-x-2-x-24-aerodynamic-2-x-24-and-bridge-2-x-24-db",
       "domain": "cnossos-eu-railway-source-directive-2002-49-ec-annex-ii",
       "reference": {
-        "kind": "book",
-        "designation": "Appendix G",
-        "clause": "Tables G-4 to G-7",
+        "kind": "standard",
+        "designation": "Directive 2002/49/EC",
+        "clause": "Appendix G Tables G-4 to G-7",
         "cite": "Appendix G Tables G-4 to G-7"
       },
       "quantity": "Impact roughness (35), traction (5 x 2 x 24), aerodynamic (2 x 24) and bridge (2 x 24), dB",
