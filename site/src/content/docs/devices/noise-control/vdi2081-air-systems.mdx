@@ -8,7 +8,7 @@ references:
     title: "Geräuscherzeugung und Lärmminderung in Raumlufttechnischen Anlagen"
     designation: "VDI 2081 Blatt 1:2001-07"
     primary: true
-    note: "The method: the fan of Section 4.3 with Equations (13) and (15), the duct attenuation of Section 6 with Tables 5 and 8, the flow noise of Equations (16) and (17), the splitter silencer and its self-noise of Equation (49), the end reflection of Section 6.6 and the room step of Equation (36). Superseded by Blatt 1:2022-04, which is not held here."
+    note: "The method: the fan of Section 4.3 with Equations (13) and (15), the duct attenuation of Section 6 with Tables 5 and 7, the flow noise of Equations (16) and (17), the splitter silencer and its self-noise of Equation (49), the end reflection of Section 6.6 and the room step of Equation (36). Superseded by Blatt 1:2022-04, which is not held here."
   - type: standard
     organization: "Verein Deutscher Ingenieure"
     year: 2005
@@ -69,8 +69,8 @@ along by its own $c_3$.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_fan_assemblies.svg" alt="Two panels. On the left, octave-band sound power level against frequency for three fan assemblies at the same duty point: radial with rearwards curved blades falling from 90 to 60 decibels, cylindrical rotor with forwards curved blades about three decibels above it, and axial with a downstream diffuser far above both, peaking near 250 hertz at 99 decibels and reaching 106 decibels overall. On the right, the band correction of Equation 15 as a continuous parabola for each of the three spectral parameters, with the eight octave markers of the sheet sitting on the curves." width="100%" />
 
-*The same air, the same pressure rise, and eight more decibels overall for
-choosing an axial machine.*
+*The same air, the same pressure rise, and twelve more decibels overall for
+choosing an axial machine over a radial one.*
 
 ```python
 from phonometry import noise_control
@@ -122,8 +122,10 @@ it.
   value is only reached when the duct is anechoically terminated at both ends,
   and a gradual change through a long tapered adapter reflects nothing worth
   counting.
-- **Branch** (Section 6.4, Equation (35)): the share of the flow the branch
-  takes, through `split_loss`.
+- **Branch** (Section 6.4, Equation (35)): the share of the cross section the
+  branch takes, `10 lg (S1 / sum Si)`, through `split_loss`. It is written on
+  area and not on flow, and the same page says the reduction does not depend
+  on frequency.
 
 ```python
 from phonometry import noise_control
@@ -146,11 +148,16 @@ from phonometry import noise_control
 import numpy as np
 
 bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
-step = noise_control.section_change_loss(
-    bands, 0.5, 0.2, shape="rectangular", upstream_size=0.8
-)
+step = noise_control.section_change_loss(bands, 0.5, 0.2)
 print(round(float(step.values[0]), 2))   # 0.88 dB, in every band
 ```
+
+A reduction needs nothing else. The frequency column of Figure 26 reads "no
+effect" for it, so no limit frequency enters the answer and neither does the
+duct's shape or its size. An increase does need them, and a rectangular duct
+has to be given its largest side, because that is the one thing its area does
+not tell you.
+
 A splitter silencer is not one of these: its insertion loss comes from the
 maker's measurement, to ISO 7235, and the guideline says so.
 `splitter_silencer_insertion_loss` is the estimate for when there is none.
@@ -246,7 +253,7 @@ print([round(float(v)) for v in limits.values])
 
 ## 7. What the guideline itself gets wrong
 
-Four defects are recorded in [the errata
+Five defects are recorded in [the errata
 register](/phonometry/reference/errata/), all verified against the printed
 page.
 
@@ -254,10 +261,14 @@ page.
   Equation (36) itself, which is where they already are.
 - The English column of Section 6.7.3 calls a hemispherical radiation
   spherical, and the German column beside it does not.
-- The English column of Section 6.4 says the opposite of the German about
-  which way a duct's attenuation runs with frequency.
+- The English column of Section 6.4 says a junction's level reduction depends
+  on the frequency; the German column beside it says it does not, and Figure 27
+  on the same page has no frequency axis.
 - Table 1 of Part 2 prints a hydraulic diameter for element 2 that is not the
   one it computes with.
+- Table 1 of Part 2 credits the splitter-silencer coefficients of element 2 to
+  Section 7.3.2 of Part 1, which is the airborne sound insulation of a building
+  component. They are printed in Section 7.2.3.2.
 
 The editions implemented here are Part 1:2001-07 and Part 2:2005-05. Both are
 superseded, by the 2022 editions, and neither successor is held; the pair in
@@ -275,8 +286,8 @@ curve of Part 2 Section 1.1, all against the worked sheet of Part 2 Table 1.
 <ScopeClaim status="not-covered" label="Not covered">
 The air-handling unit and the outdoor-propagation chapters the 2019 revision
 added, which are in the editions not held here; the room acoustics VDI 2081
-leaves to VDI 2569; and the vibration isolation of the plant, which is a
-different guideline again.
+leaves to VDI 2569; and the vibration isolation of the plant, which Section 7.6
+of Blatt 1 does cover and this library does not.
 </ScopeClaim>
 </Scope>
 

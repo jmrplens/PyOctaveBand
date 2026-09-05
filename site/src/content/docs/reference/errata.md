@@ -2145,6 +2145,8 @@ in the same order.
   cross-reference, not in a number, and
   [`ground_attenuation`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/environment/propagation/outdoor_propagation.py)
   implements $q$ from footnote 2, which is what reproduces the printed 0,23.
+- **Status:** unreported.
+
 ## VDI 2081 Blatt 1:2001, Section 6.7.3 (the symbol list of Equation (36) sends A back to Equation (36))
 
 - **Location:** Section 6.7.3, the symbol list under Equation (36), the entry
@@ -3985,6 +3987,7 @@ in the same order.
 - **Library behaviour:** the Annex E uncertainty budget is not modelled, so no
   library number depends on it. Recorded so that a future reader chasing the
   derivation is not sent to the wrong equation.
+- **Status:** unreported.
 
 ## ISO 5136:2003, Table A.5, 5 000 Hz row (the leading digit of $a_3$ is missing)
 

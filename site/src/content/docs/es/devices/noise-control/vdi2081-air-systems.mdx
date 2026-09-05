@@ -8,7 +8,7 @@ references:
     title: "Geräuscherzeugung und Lärmminderung in Raumlufttechnischen Anlagen"
     designation: "VDI 2081 Blatt 1:2001-07"
     primary: true
-    note: "El método: el ventilador del apartado 4.3 con las Ecuaciones (13) y (15), la atenuación de conducto del apartado 6 con las Tablas 5 y 8, el ruido de flujo de las Ecuaciones (16) y (17), el silenciador de bafles y su ruido propio de la Ecuación (49), la reflexión de boca del apartado 6.6 y el paso a la sala de la Ecuación (36). Sustituida por Blatt 1:2022-04, que no está en la biblioteca."
+    note: "El método: el ventilador del apartado 4.3 con las Ecuaciones (13) y (15), la atenuación de conducto del apartado 6 con las Tablas 5 y 7, el ruido de flujo de las Ecuaciones (16) y (17), el silenciador de bafles y su ruido propio de la Ecuación (49), la reflexión de boca del apartado 6.6 y el paso a la sala de la Ecuación (36). Sustituida por Blatt 1:2022-04, que no está en la biblioteca."
   - type: standard
     organization: "Verein Deutscher Ingenieure"
     year: 2005
@@ -40,7 +40,7 @@ cálculo no puede acabar medio en uno y medio en el otro.
 La Parte 2 es una tabla de veinte elementos numerados. Se lee mejor como un
 lugar.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vdi2081_sheet.svg" alt="Sección de una sala de máquinas y una oficina. En la sala de máquinas, un ventilador de impulsión, el elemento 1, que da 16 000 metros cúbicos por hora contra 600 pascales. De él sale un conducto que recorre de izquierda a derecha cuatro cajas: el elemento 2, un silenciador de bafles de cinco bafles; el elemento 3, una ramificación que toma 0,30 de 1,08 metros cuadrados; el elemento 5, cuatro metros de conducto recto de 0,5 por 0,4 metros; y el elemento 14, un codo circular de 160 milímetros. Termina en el elemento 19, dos difusores, y baja por el techo de la sala 102, donde un oyente de pie está a 1,5 metros de la boca. Una franja inferior nombra la ecuación o la tabla de la que sale el número de cada elemento." width="100%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vdi2081_sheet_es.svg" alt="Sección de una sala de máquinas y una oficina. En la sala de máquinas, un ventilador de impulsión, el elemento 1, que da 16 000 metros cúbicos por hora contra 600 pascales. De él sale un conducto que recorre de izquierda a derecha cuatro cajas: el elemento 2, un silenciador de bafles de cinco bafles; el elemento 3, una ramificación que toma 0,30 de 1,08 metros cuadrados; el elemento 5, cuatro metros de conducto recto de 0,5 por 0,4 metros; y el elemento 14, un codo circular de 160 milímetros. Termina en el elemento 19, dos difusores, y baja por el techo de la sala 102, donde un oyente de pie está a 1,5 metros de la boca. Una franja inferior nombra la ecuación o la tabla de la que sale el número de cada elemento." width="100%" />
 
 *Cada caja es una fila de la Tabla 1. La franja bajo el dibujo es lo que una
 tabla de resultados no puede enseñar: de qué ecuación, tabla o medida sale cada
@@ -67,10 +67,10 @@ delante y 42 dB para un axial con difusor aguas abajo. La forma sale luego de
 la Ecuación (15), una parábola en el logaritmo del número de Strouhal que cada
 montaje desplaza con su propio $c_3$.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_fan_assemblies.svg" alt="Dos paneles. A la izquierda, el nivel de potencia sonora por bandas de octava frente a la frecuencia para tres montajes de ventilador en el mismo punto de trabajo: el radial con álabes hacia atrás cae de 90 a 60 decibelios, el rotor cilíndrico con álabes hacia delante va unos tres decibelios por encima, y el axial con difusor aguas abajo está muy por encima de ambos, con un máximo cerca de 250 hercios en 99 decibelios y 106 decibelios globales. A la derecha, la corrección por banda de la Ecuación 15 como parábola continua para cada uno de los tres parámetros espectrales, con los marcadores de las ocho octavas de la hoja sobre las curvas." width="100%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_fan_assemblies_es.svg" alt="Dos paneles. A la izquierda, el nivel de potencia sonora por bandas de octava frente a la frecuencia para tres montajes de ventilador en el mismo punto de trabajo: el radial con álabes hacia atrás cae de 90 a 60 decibelios, el rotor cilíndrico con álabes hacia delante va unos tres decibelios por encima, y el axial con difusor aguas abajo está muy por encima de ambos, con un máximo cerca de 250 hercios en 99 decibelios y 106 decibelios globales. A la derecha, la corrección por banda de la Ecuación 15 como parábola continua para cada uno de los tres parámetros espectrales, con los marcadores de las ocho octavas de la hoja sobre las curvas." width="100%" />
 
-*El mismo aire, el mismo aumento de presión, y ocho decibelios globales más por
-elegir una máquina axial.*
+*El mismo aire, el mismo aumento de presión, y doce decibelios globales más por
+elegir una máquina axial en lugar de una radial.*
 
 ```python
 from phonometry import noise_control
@@ -122,8 +122,10 @@ directriz detrás.
   valor impreso solo se alcanza con el conducto terminado anecoicamente por los
   dos extremos, y un cambio gradual con un cono largo no refleja nada que
   merezca contarse.
-- **Ramificación** (apartado 6.4, Ecuación (35)): la parte del caudal que se
-  lleva la rama, con `split_loss`.
+- **Ramificación** (apartado 6.4, Ecuación (35)): la parte de la sección que se
+  lleva la rama, `10 lg (S1 / suma Si)`, con `split_loss`. Está escrita sobre
+  área y no sobre caudal, y esa misma página dice que la reducción no depende
+  de la frecuencia.
 
 ```python
 from phonometry import noise_control
@@ -136,7 +138,7 @@ run = noise_control.unlined_rectangular_duct_attenuation(
 print([round(float(v), 2) for v in run.values])
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_section_change.svg" alt="Dos paneles. A la izquierda, la pérdida por reflexión frente a la razón de secciones: una curva discontinua gris es la expresión impresa, simétrica en torno a una razón de uno donde vale cero y subiendo hasta 9 decibelios en los extremos, y una curva azul continua es lo mismo sujeto al techo de 5 decibelios, que alcanza en una razón de 10,55 y otra vez en 0,095. A la derecha, la misma pérdida de 0,88 decibelios con las dos reglas de frecuencia: una línea continua plana en las ocho octavas para un estrechamiento súbito, y una discontinua que mantiene el valor en 63 y 125 hercios y cae a cero por encima de la frecuencia límite de 214 hercios para una ampliación súbita" width="100%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_section_change_es.svg" alt="Dos paneles. A la izquierda, la pérdida por reflexión frente a la razón de secciones: una curva discontinua gris es la expresión impresa, simétrica en torno a una razón de uno donde vale cero y subiendo hasta 9 decibelios en los extremos, y una curva azul continua es lo mismo sujeto al techo de 5 decibelios, que alcanza en una razón de 10,55 y otra vez en 0,095. A la derecha, la misma pérdida de 0,88 decibelios con las dos reglas de frecuencia: una línea continua plana en las ocho octavas para un estrechamiento súbito, y una discontinua que mantiene el valor en 63 y 125 hercios y cae a cero por encima de la frecuencia límite de 214 hercios para una ampliación súbita" width="100%" />
 
 *La expresión es simétrica: un conducto que se ensancha en un factor refleja lo
 mismo que ese conducto estrechándose en él. Lo que cambia es cuándo.*
@@ -146,11 +148,16 @@ from phonometry import noise_control
 import numpy as np
 
 bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
-step = noise_control.section_change_loss(
-    bands, 0.5, 0.2, shape="rectangular", upstream_size=0.8
-)
+step = noise_control.section_change_loss(bands, 0.5, 0.2)
 print(round(float(step.values[0]), 2))   # 0,88 dB, en todas las bandas
 ```
+
+Un estrechamiento no necesita nada más. La columna de frecuencia de la Figura 26
+pone «sin efecto» para él, así que en la respuesta no entra ninguna frecuencia
+límite y tampoco la forma del conducto ni su tamaño. Un ensanchamiento sí los
+necesita, y a un conducto rectangular hay que darle su lado mayor, que es lo
+único que su área no dice.
+
 Un silenciador de bafles no es uno de estos: su pérdida de inserción viene de
 la medida del fabricante, según la ISO 7235, y la directriz lo dice.
 `splitter_silencer_insertion_loss` es la estimación para cuando no la hay.
@@ -198,7 +205,7 @@ cuanto más corta es la longitud de onda, y la directriz lee $Q$ de una gráfica
 frente a la frecuencia en lugar de suponer un semiespacio. Las dos funciones
 admiten una directividad que varía entre bandas.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_room_step.svg" alt="Dos paneles. A la izquierda, la diferencia entre el nivel de potencia sonora y el de presión sonora frente a la frecuencia para el difusor de techo del ejemplo resuelto: cae de 5,6 decibelios a 63 hercios hasta 3,4 a 8 kilohercios según sube el factor de directividad de la boca, mientras que un semiespacio con factor de directividad 2 daría 5,7 decibelios planos en todas las bandas. A la derecha, la misma diferencia frente a la distancia a la boca para el área de absorción equivalente de 20 metros cuadrados y para las dos constantes de sala en que la convierten un coeficiente medio de absorción de 0,15 y de 0,4, con los 1,5 metros del oyente marcados." width="100%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_room_step_es.svg" alt="Dos paneles. A la izquierda, la diferencia entre el nivel de potencia sonora y el de presión sonora frente a la frecuencia para el difusor de techo del ejemplo resuelto: cae de 5,6 decibelios a 63 hercios hasta 3,4 a 8 kilohercios según sube el factor de directividad de la boca, mientras que un semiespacio con factor de directividad 2 daría 5,7 decibelios planos en todas las bandas. A la derecha, la misma diferencia frente a la distancia a la boca para el área de absorción equivalente de 20 metros cuadrados y para las dos constantes de sala en que la convierten un coeficiente medio de absorción de 0,15 y de 0,4, con los 1,5 metros del oyente marcados." width="100%" />
 
 *Izquierda: los 5,7 dB únicos que la hoja imprime al lado de la fila no son
 ninguno de los ocho valores por banda, porque son la misma sala con la
@@ -223,7 +230,7 @@ elemento a elemento, con todas las magnitudes intermedias impresas. Eso la
 convierte en un oráculo de una clase que el lado ASHRAE del módulo no tiene, y
 para un modelo de verdad distinto, no para una reformulación del mismo.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_chain_cascade.svg" alt="Niveles por bandas de octava en cinco etapas del ejemplo resuelto: en el ventilador, cerca de 90 decibelios y cayendo suavemente; tras el silenciador de bafles, que quita cuarenta decibelios de las bandas medias y deja una meseta cerca de 45 decibelios por encima de 1 kilohercio; tras la ramificación, unos decibelios menos; la potencia sonora que los dos difusores meten en la sala; y el nivel de presión sonora en el oyente, de 48 decibelios a 63 hercios a 29 a 8 kilohercios. La leyenda da el total ponderado A de cada etapa, que baja de 86 a 40 decibelios A." width="100%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_chain_cascade_es.svg" alt="Niveles por bandas de octava en cinco etapas del ejemplo resuelto: en el ventilador, cerca de 90 decibelios y cayendo suavemente; tras el silenciador de bafles, que quita cuarenta decibelios de las bandas medias y deja una meseta cerca de 45 decibelios por encima de 1 kilohercio; tras la ramificación, unos decibelios menos; la potencia sonora que los dos difusores meten en la sala; y el nivel de presión sonora en el oyente, de 48 decibelios a 63 hercios a 29 a 8 kilohercios. La leyenda da el total ponderado A de cada etapa, que baja de 86 a 40 decibelios A." width="100%" />
 
 *El silenciador hace casi todo el trabajo, y lo que deja es una meseta: pasado
 1 kHz el nivel ya no sigue al ventilador, porque lo que se oye ahí es el ruido
@@ -247,7 +254,7 @@ print([round(float(v)) for v in limits.values])
 
 ## 7. Lo que la propia directriz tiene mal
 
-Hay cuatro defectos registrados en [el registro de
+Hay cinco defectos registrados en [el registro de
 erratas](/phonometry/es/reference/errata/), todos verificados contra la página
 impresa.
 
@@ -255,10 +262,14 @@ impresa.
   Ecuación (36), que es donde ya está el lector.
 - La columna inglesa del apartado 6.7.3 llama esférica a una radiación
   hemisférica, y la columna alemana de al lado no.
-- La columna inglesa del apartado 6.4 dice lo contrario que la alemana sobre en
-  qué sentido va con la frecuencia la atenuación de un conducto.
+- La columna inglesa del apartado 6.4 dice que la reducción de nivel de una
+  ramificación depende de la frecuencia; la columna alemana de al lado dice que
+  no depende, y la Figura 27 de esa misma página no tiene eje de frecuencia.
 - La Tabla 1 de la Parte 2 imprime para el elemento 2 un diámetro hidráulico
   que no es el que usa para calcular.
+- La Tabla 1 de la Parte 2 atribuye los coeficientes del silenciador de bafles
+  del elemento 2 al apartado 7.3.2 de la Parte 1, que es el aislamiento a ruido
+  aéreo de un elemento constructivo. Están impresos en el apartado 7.2.3.2.
 
 Las ediciones implementadas aquí son la Parte 1:2001-07 y la Parte 2:2005-05.
 Las dos están sustituidas por las de 2022, y ninguna sucesora está en la
@@ -279,7 +290,8 @@ contra la hoja resuelta de la Tabla 1 de la Parte 2.
 Los capítulos de unidades de tratamiento de aire y de propagación al exterior
 que añadió la revisión de 2019, que están en las ediciones que no hay aquí; la
 acústica de salas que la VDI 2081 deja a la VDI 2569; y el aislamiento de
-vibraciones de la instalación, que es otra directriz distinta.
+vibraciones de la instalación, que el apartado 7.6 del Blatt 1 sí cubre y esta
+biblioteca no.
 </ScopeClaim>
 </Scope>
 

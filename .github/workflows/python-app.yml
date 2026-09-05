@@ -502,6 +502,26 @@ jobs:
     - name: Check the hand-written markdown
       run: python scripts/check_markdown_hazards.py
 
+  # A form feed is one invisible byte, and inside a raw docstring it is the
+  # backslash and the f of the command that follows it: `\frac` was published
+  # as `rac`, with the fraction gone and no error anywhere. Guard the class
+  # rather than the byte. Needs no dependencies, so it runs on its own.
+  control-characters:
+    name: No stray control character
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v7
+      with:
+        python-version: "3.13"
+    - name: Check the tracked text files
+      run: python scripts/check_control_characters.py
+
   # ISO 80000-2 sets a subscript by what it is, and a glyph pair can honestly
   # take both slopes: the z of the ISO 9613-2 barrier screening is a
   # path-length difference, the z of the ISO 2631-5 dose is a direction, and

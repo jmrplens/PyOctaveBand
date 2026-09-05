@@ -2286,6 +2286,8 @@ dos ediciones con las mismas entradas y en el mismo orden.
   [`ground_attenuation`](../src/phonometry/environment/propagation/outdoor_propagation.py)
   implementa $q$ a partir de la nota 2, que es lo que reproduce el 0,23
   impreso.
+- **Estado:** sin notificar.
+
 ## VDI 2081 Blatt 1:2001, apartado 6.7.3 (la lista de símbolos de la ecuación (36) remite A a la propia ecuación (36))
 
 - **Ubicación:** apartado 6.7.3, la lista de símbolos bajo la ecuación (36), la
@@ -4275,6 +4277,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   Anexo E no está modelado, así que ningún número de la biblioteca depende de
   él. Se registra para que un lector futuro que siga la deducción no acabe en
   la ecuación equivocada.
+- **Estado:** sin notificar.
 
 ## ISO 5136:2003, Tabla A.5, fila de 5 000 Hz (falta el primer dígito de $a_3$)
 

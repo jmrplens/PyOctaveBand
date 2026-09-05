@@ -52,6 +52,17 @@ from dataclasses import dataclass
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 REGISTRY = ROOT / "docs" / "ERRATA.md"
+#: The Spanish register, held against the English one for the same records.
+REGISTRY_ES = ROOT / "docs" / "ERRATA.es.md"
+
+#: The bullet that makes a ``## `` section a record rather than prose, in both
+#: languages. Recognising a record by this and not by its Status is what lets
+#: a missing Status be reported: keying on the Status made an entry that lost
+#: one invisible instead, which is how the ISO/TR 17534-3 record went
+#: unchecked, taking its page citation and its ratio claims with it.
+LOCATION_BULLETS = ("- **Location:**", "- **Ubicación:**")
+#: The bullet every record has to close with.
+STATUS_BULLETS = ("- **Status:**", "- **Estado:**")
 
 #: Entries filed before the page rule, or whose evidence is not a reading of a
 #: page at all. Each value is the reason. **This list is meant to shrink**:
@@ -208,9 +219,12 @@ def _number(text: str) -> float:
 def parse_entries(markdown: str) -> list[Entry]:
     """Split the registry into entries.
 
-    An entry is a ``## `` section carrying a ``- **Status:**`` bullet; the
-    preamble and the closing "Related source properties" section are not
-    entries and are skipped.
+    An entry is a ``## `` section carrying either of the two bullets a record
+    is made of, a Location or a Status; the preamble and the closing "Related
+    source properties" section carry neither and are not entries. Recognising
+    on either rather than on the Status alone is what lets a missing Status be
+    reported instead of making the whole record disappear: see
+    :func:`check_records_are_closed`.
     """
     entries: list[Entry] = []
     title: str | None = None
@@ -225,7 +239,26 @@ def parse_entries(markdown: str) -> list[Entry]:
             buffer.append(line)
     if title is not None:
         entries.append(Entry(title, "\n".join(buffer), start))
-    return [e for e in entries if "- **Status:**" in e.body]
+    marks = LOCATION_BULLETS + STATUS_BULLETS
+    return [e for e in entries if any(mark in e.body for mark in marks)]
+
+
+def check_records_are_closed(entries: list[Entry], register: str) -> list[str]:
+    """Every record has to say whether it has been reported to its publisher.
+
+    A record is a permanent public statement that a named body printed
+    something wrong, and the Status bullet is the half of it that says what
+    was done about that. One went missing when two entries were inserted above
+    it, and nothing noticed, because the reader that would have noticed used
+    the Status to recognise a record in the first place.
+    """
+    return [
+        f"{register}:{entry.line}: entry '{entry.title}' has no Status bullet; "
+        "every record says whether it has been reported. See CONTRIBUTING.md, "
+        "'Filing an errata entry'."
+        for entry in entries
+        if not any(bullet in entry.body for bullet in STATUS_BULLETS)
+    ]
 
 
 def _match_named(ratio: float) -> str | None:
@@ -396,11 +429,20 @@ def main(argv: list[str] | None = None) -> int:
         print(f"{len(hits)} ratio signature(s) over {len(entries)} entries.")
         return 0
 
+    spanish = parse_entries(REGISTRY_ES.read_text(encoding="utf-8"))
     problems = (
         check_pages(entries)
         + check_allowlist(entries)
         + check_procedure_is_not_cited(entries)
+        + check_records_are_closed(entries, REGISTRY.name)
+        + check_records_are_closed(spanish, REGISTRY_ES.name)
     )
+    if len(spanish) != len(entries):
+        problems.append(
+            f"{REGISTRY_ES.name} holds {len(spanish)} records and "
+            f"{REGISTRY.name} holds {len(entries)}; the two registers carry "
+            "the same entries in two languages."
+        )
     problems += [
         f"{REGISTRY.name}:{hit.entry.line}: entry '{hit.entry.title}' states "
         f"'{hit.quoted}', a ratio of {hit.ratio:.6g} which is within "

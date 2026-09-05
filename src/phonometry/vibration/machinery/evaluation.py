@@ -59,9 +59,10 @@ agreement between supplier and customer, not an acceptance specification.
 
 from __future__ import annotations
 
+import functools
 import math
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
@@ -81,7 +82,7 @@ if TYPE_CHECKING:
 EvaluationZone = Literal["A", "B", "C", "D"]
 
 #: The ladder of preferred magnitudes Table C.1 is drawn on, in millimetres
-#: per second r.m.s. It is an R10 series over most of its length, which is why
+#: per second r.m.s. It is an R5 series over most of its length, which is why
 #: consecutive boundaries sit about 1,6 apart.
 TYPICAL_BOUNDARY_LADDER_MM_S: tuple[float, ...] = (
     0.28,
@@ -181,14 +182,30 @@ def evaluation_zone(
         input, otherwise an array of them.
     :raises ValueError: If a magnitude is negative or not finite.
     """
+    return _zone_letters(_zone_index(magnitude, boundaries))
+
+
+#: The four grades in order of severity, so that the worse of two gradings is
+#: the larger index. Letters do not compare elementwise in numpy, which is why
+#: the most-restrictive rule of 5.2.3 is applied to indices and the letters are
+#: looked up once at the end.
+_ZONE_LETTERS = np.array(["A", "B", "C", "D"])
+
+
+def _zone_index(magnitude: ArrayLike, boundaries: ZoneBoundaries) -> NDArray[np.intp]:
+    """Which of the four zones a magnitude falls in, as an index into the ladder."""
     values = np.asarray(magnitude, dtype=np.float64)
     if np.any(values < 0.0) or not np.all(np.isfinite(values)):
         msg = "'magnitude' must be non-negative and finite."
         raise ValueError(msg)
     cuts = np.asarray(boundaries.as_tuple, dtype=np.float64)
     # side="left" puts a magnitude exactly on a boundary in the lower zone.
-    index = np.searchsorted(cuts, values, side="left")
-    zones = np.array(["A", "B", "C", "D"])[index]
+    return np.searchsorted(cuts, values, side="left")
+
+
+def _zone_letters(index: NDArray[np.intp]) -> EvaluationZone | NDArray[np.str_]:
+    """The grade or grades an index or array of them stands for."""
+    zones = _ZONE_LETTERS[index]
     # Indexing with a 0-d index yields a numpy string scalar, not a 0-d array,
     # so it is converted rather than indexed.
     return str(zones) if zones.ndim == 0 else zones  # type: ignore[return-value]
@@ -363,8 +380,9 @@ class MachineZoneLimits:
     ISO 10816-3:2009 states each class twice, once in displacement and once
     in velocity, and 5.2.3 says which wins when they disagree: the more
     restrictive zone applies. Both are read on the same non-rotating part,
-    and A.1 says velocity alone is enough in most cases and that a spectrum
-    expected to carry low-frequency components should be judged on both.
+    and Annex A says velocity alone is enough in most cases and that a
+    spectrum expected to carry low-frequency components should be judged on
+    both.
 
     :ivar displacement_um: The three boundaries in r.m.s. displacement,
         micrometres.
@@ -377,14 +395,15 @@ class MachineZoneLimits:
 
 
 #: Tables A.1 and A.2 of ISO 10816-3:2009, keyed by machine group and support
-#: class. Group 1 is large machines above 300 kW and up to 50 MW, and
-#: electrical machines of shaft height 315 mm or more; group 2 is medium-sized
-#: machines above 15 kW up to 300 kW, and electrical machines of shaft height
-#: from 160 mm up to but not including 315 mm. A support system whose lowest
+#: class. Group 1 is large machines above 300 kW and electrical machines of
+#: shaft height 315 mm or more; group 2 is medium-sized machines above 15 kW up
+#: to 300 kW, and electrical machines of shaft height from 160 mm up to but not
+#: including 315 mm. The upper bound of 50 MW on group 1 is printed in the
+#: title of Table A.1 and not in the clause that classifies the machine. A support system whose lowest
 #: natural frequency in the measuring direction is at least 25 % above the
 #: main excitation frequency counts as rigid, and every other one as flexible
 #: (4.3). The boundaries hold for the broad-band r.m.s. value between 10 Hz
-#: and 1 kHz, or from 2 Hz for a machine below 600 r/min (A.1).
+#: and 1 kHz, or from 2 Hz for a machine below 600 r/min (Annex A).
 #:
 #: The edition is superseded, by ISO 20816-3, which is not held. It is the
 #: predecessor of that part rather than a competing document, and the ISO
@@ -421,27 +440,29 @@ def industrial_machine_zone(
     group: str,
     support: str,
     *,
-    displacement_um: float | None = None,
-    velocity_mm_s: float | None = None,
-) -> EvaluationZone:
+    displacement_um: ArrayLike | None = None,
+    velocity_mm_s: ArrayLike | None = None,
+) -> EvaluationZone | NDArray[np.str_]:
     """Grade an industrial machine against Table A.1 or A.2.
 
     Give whichever quantities were measured. With both, 5.2.3 applies and the
     result is the more restrictive of the two gradings, which is the whole
     reason the tables state each class twice.
 
-    :param group: ``"group_1"`` (above 300 kW and not more than 50 MW, or an
-        electrical machine of shaft height 315 mm or more) or ``"group_2"``
-        (above 15 kW up to and including 300 kW, or shaft height from 160 mm
-        up to but not including 315 mm), from 4.2.
+    :param group: ``"group_1"`` (above 300 kW, or an electrical machine of
+        shaft height 315 mm or more) or ``"group_2"`` (above 15 kW up to and
+        including 300 kW, or shaft height from 160 mm up to but not including
+        315 mm), from 4.2. Table A.1 caps group 1 at 50 MW in its title.
     :param support: ``"rigid"`` or ``"flexible"``; rigid means the lowest
         natural frequency of the support in the measuring direction is at
         least 25 % above the main excitation frequency (4.3).
     :param displacement_um: Measured broad-band r.m.s. displacement of the
-        bearing, pedestal or housing, in micrometres.
+        bearing, pedestal or housing, in micrometres (scalar or array).
     :param velocity_mm_s: Measured broad-band r.m.s. velocity, in millimetres
-        per second.
-    :return: ``"A"``, ``"B"``, ``"C"`` or ``"D"``.
+        per second (scalar or array).
+    :return: ``"A"``, ``"B"``, ``"C"`` or ``"D"``; a string when every
+        measurement given is a scalar, otherwise an array of them, broadcast
+        over the two if both are arrays.
     :raises ValueError: If the group or support class is unknown, or neither
         measured quantity is given.
     """
@@ -451,7 +472,7 @@ def industrial_machine_zone(
     )
     limits = INDUSTRIAL_MACHINE_ZONES[key]
     graded = [
-        str(evaluation_zone(value, boundaries))
+        _zone_index(value, boundaries)
         for value, boundaries in (
             (displacement_um, limits.displacement_um),
             (velocity_mm_s, limits.velocity_mm_s),
@@ -464,9 +485,10 @@ def industrial_machine_zone(
             "tables grade a machine on whichever was measured."
         )
         raise ValueError(msg)
-    # "The severity zone which is most restrictive shall apply" (5.2.3), and
-    # the zone letters sort in the order of severity.
-    return cast("EvaluationZone", max(graded))
+    # "The severity zone which is most restrictive shall apply" (5.2.3), which
+    # is the later zone of the two, so the larger index. Reduced pairwise
+    # rather than over the stack, so one scalar broadcasts against one array.
+    return _zone_letters(functools.reduce(np.maximum, graded))
 
 
 def is_significant_change(change: float, zone_b_upper: float) -> bool:
@@ -708,11 +730,15 @@ def gear_housing_velocity_limit(
         for a scalar frequency, otherwise an array.
     :raises ValueError: If a frequency or the rating is not positive.
     """
+    # Validated here rather than in the delegate, so a bad rating is reported
+    # under the name this signature has: allowable_velocity would name its own
+    # 'constant_velocity_mm_s', which no caller of this function can see.
+    value = require_positive(rating, "rating")
     low, high = GEAR_VELOCITY_CORNERS_HZ
     exponent = GEAR_VELOCITY_SLOPE_DB_PER_DECADE / 20.0
     return allowable_velocity(
         frequency,
-        constant_velocity_mm_s=rating,
+        constant_velocity_mm_s=value,
         corner_low_hz=low,
         corner_high_hz=high,
         exponent_low=exponent,

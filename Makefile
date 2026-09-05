@@ -254,6 +254,12 @@ snippets-static:
 hazards:
 	$(PYTHON) scripts/check_markdown_hazards.py
 
+# Catch a C0 control character in a text file. A form feed in a raw docstring
+# is what \frac looks like once the backslash and the f have been eaten, and
+# the published formula then loses its fraction with nothing reporting it.
+control-characters:
+	$(PYTHON) scripts/check_control_characters.py
+
 # Every "we cover X" / "we do not cover Y" the guides declare, one line each,
 # read off the <Scope>/<ScopeClaim> markup. Not a gate: it is the list an audit
 # holds against the library, and its not-covered half is a backlog with the
@@ -384,4 +390,5 @@ check: lint security test
 	figure-annotations figures reports \
 	animations animation-freshness posters brand lighthouse \
 	llms pypi-readme api-docs site-reports conformance install-hooks test test-perf test-gpu coverage check \
-	snippets snippets-static claims subscripts fence-names decimal-comma
+	snippets snippets-static claims subscripts fence-names decimal-comma \
+	control-characters

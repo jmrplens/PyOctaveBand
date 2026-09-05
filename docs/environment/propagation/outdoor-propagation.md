@@ -291,7 +291,7 @@ att = environment.outdoor_propagation_attenuation(
 print(np.round(att.a_div, 1))     # [57. 57. 57. 57. 57. 57. 57. 57.]  divergence
 print(np.round(att.a_gr, 2))      # [-4.65  2.34 13.79  9.76  1.3  -0.   -0.   -0.  ]
 print(np.round(att.a_bar, 2))     # [13.78  8.89  0.    6.69 18.01 20.   20.   20.  ]
-print(np.round(att.a_total, 1))   # [66.2 68.3 71.  73.9 77.1 78.8 82.3 96. ]
+print(np.round(att.a_total, 1))   # [66.2 68.3 71.  73.9 77.1 78.8 82.3 95.8]
 att.plot()                        # the stacked breakdown above (needs matplotlib)
 
 # Predicted receiver level from an octave-band sound power Lw = 95 dB
@@ -305,7 +305,7 @@ lp = environment.predicted_receiver_level(
     atmosphere=environment.AtmosphericConditions(
         temperature=15.0, relative_humidity=70.0),
 )
-print(np.round(lp, 1))            # [28.8 26.7 24.  21.1 17.9 16.2 12.7 -1. ]
+print(np.round(lp, 1))            # [28.8 26.7 24.  21.1 17.9 16.2 12.7 -0.8]
 ```
 
 `predicted_receiver_level` composes $L_{fT}(DW) = L_W + D_\mathrm{c} - A$ with
@@ -479,11 +479,11 @@ additional recommendations of Clause 5 rather than from ISO 9613-2, and they
 are outside what this page implements.
 
 The seven share one geometry: a source 1 m above its local ground, a receiver
-4 m above its own, 195 m apart in ground projection, and a flat 93 dB in every
+4 m above its own, 194.16 m apart in ground projection, and a flat 93 dB in every
 octave so that the shape of the printed spectrum is the propagation and nothing
 else. What changes between them is the ground.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases.svg" alt="Two panels. On the left, the octave-band level at the receiver for the same 195 metre path over three grounds: over reflecting ground it falls smoothly from 40 to 25 decibels, over mixed ground it dips to 33 decibels around 250 and 500 hertz before recovering, and over porous ground the dip reaches 26 decibels; open rings mark the levels the document prints, and they sit on the curves. On the right, a bar per test case from T01 to T07 giving the worst deviation of the computed spectrum from the printed one, between 0.008 and 0.012 decibels, all of them well under the dashed line at the 0.05 decibel envelope the document declares" width="100%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases.svg" alt="Two panels. On the left, the octave-band level at the receiver for the same 194 metre path over three grounds: over reflecting ground it falls smoothly from 40 to 25 decibels, over mixed ground it dips to 33 decibels around 250 and 500 hertz before recovering, and over porous ground the dip reaches 26 decibels; open rings mark the levels the document prints, and they sit on the curves. On the right, a bar per test case from T01 to T07 giving the worst deviation of the computed spectrum from the printed one, between 0.008 and 0.012 decibels, all of them well under the dashed line at the 0.05 decibel envelope the document declares" width="100%"></picture>
 
 *The ground effect is the whole story here: over porous ground the 250 Hz band
 arrives 13 dB quieter than over a reflecting one. Right: every case lands
@@ -697,7 +697,7 @@ against the exact half-plane and coherent-ground models.
 
 - [Spherical ground effect and advanced barriers](ground-barriers.md): the wave acoustics underneath the Table 3 ground fit and the Eq. (14) screening curve.
 - [Atmospheric refraction](atmospheric-refraction.md): what the favourable-condition assumption and $C_\mathrm{met}$ stand in for.
-- [CNOSSOS-EU road emission](../sources/cnossos-road-emission.md) and [CNOSSOS-EU rail emission](../sources/cnossos-rail-emission.md): the source strengths the comparison in section 3 refers to.
+- [CNOSSOS-EU road emission](../sources/cnossos-road-emission.md) and [CNOSSOS-EU rail emission](../sources/cnossos-rail-emission.md): the source strengths the comparison in section 4 refers to.
 - [Environmental noise levels](../assessment/environmental-levels.md): what happens to the predicted level once it becomes an assessed one.
 - API reference: [`environment.propagation.outdoor_propagation`](https://jmrplens.github.io/phonometry/reference/api/environment/outdoor-propagation/) and [`environment.propagation.air_absorption`](https://jmrplens.github.io/phonometry/reference/api/environment/air-absorption/).
 - Theory: [Outdoor propagation](../../reference/theory/environment-transport.md#outdoor-propagation-general-method-iso-9613-2): the ISO 9613-2 attenuation terms derived one by one, and the atmospheric absorption of Part 1.
@@ -725,7 +725,7 @@ against the exact half-plane and coherent-ground models.
   Office of the European Union.
   [doi:10.2788/31776](https://doi.org/10.2788/31776),
   [JRC repository](https://publications.jrc.ec.europa.eu/repository/handle/JRC72550).
-  The common EU framework contrasted with ISO 9613-2 in section 3.
+  The common EU framework contrasted with ISO 9613-2 in section 4.
 - International Organization for Standardization. (1993). *Acoustics —
   Attenuation of sound during propagation outdoors — Part 1: Calculation of
   the absorption of sound by the atmosphere* (ISO 9613-1:1993).

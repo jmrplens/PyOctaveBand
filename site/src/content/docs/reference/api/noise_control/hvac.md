@@ -1057,10 +1057,8 @@ Figure 26 gives the reduction of the internal sound power level in closed
 form, for the area ratio $r = S_1/S_2$:
 
 $$
-\Delta L_{Wi} = 10 \log_{10}
+\Delta L_{Wi} = 10 \log_{10} \frac{(r + 1)^{2}}{4r}
 $$
-
-rac{(r + 1)^{2}}{4r}
 
 and it applies differently on the two sides of unity. A **sudden
 reduction** ($r > 1$) reflects at every frequency; the figure's own
@@ -1092,7 +1090,7 @@ VDI 2081 treats the two as separate elements of the chain.
 | `upstream_area` | Section `S1` the sound arrives through, m². |
 | `downstream_area` | Section `S2` it continues into, m². |
 | `shape` | `"rectangular"` (default) or `"round"`, which decides which limit-frequency equation the upstream duct takes. |
-| `upstream_size` | The largest side of the upstream duct, m, for a rectangular one; its internal diameter for a round one. May be omitted for a round duct, where it follows from the area. |
+| `upstream_size` | The largest side of the upstream duct, m, for a rectangular one; its internal diameter for a round one. Needed only for a sudden increase, which is the only case a limit frequency enters the answer, and only for a rectangular duct, since a round one's diameter follows from its area. Giving a round duct both is allowed while the two agree. |
 | `speed_of_sound` | Speed of sound `c`, m/s. |
 | `cap` | The largest reduction to take, dB (default 5). |
 
@@ -1102,7 +1100,7 @@ VDI 2081 treats the two as separate elements of the chain.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If an area, a size or the speed of sound is not positive, the shape is unknown, or a rectangular duct is given no size. |
+| ValueError | If an area, a size, the speed of sound or the cap is not positive, the shape is unknown, a round duct's size contradicts its area, or a rectangular duct meeting a sudden increase is given no size. |
 
 ## silencer_self_noise
 

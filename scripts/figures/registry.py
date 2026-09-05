@@ -569,6 +569,7 @@ from .vibration import (
     generate_machine_alarm_trip,
     generate_machine_fault_families,
     generate_machine_vector_change,
+    generate_machine_vibration_trend,
     generate_machine_vibration_zones,
     generate_mechanical_mobility,
     generate_mobility_random_error,
@@ -718,6 +719,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # quantities, and the operational limits set from them.
     generate_industrial_machine_zones,
     generate_machine_alarm_trip,
+    generate_machine_vibration_trend,
     # Gear units (ISO 20816-9): the two rating curves of Annex A.
     generate_gear_unit_rating_curves,
     generate_experimental_sea_clf,

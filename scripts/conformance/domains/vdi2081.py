@@ -643,13 +643,14 @@ def _chk_section_change_ratio(ratio: float) -> Outcome:
     printed = 10.0 * math.log10((ratio + 1.0) ** 2 / (4.0 * ratio))
     # A reduction reflects in every band, so the first one carries the value
     # whichever way the section goes; the increase branch is checked below.
+    # The duct is round and its diameter follows from the area, which is what
+    # keeps the 63 Hz octave below the limit frequency at every ratio here.
     computed = float(
         ph.noise_control.section_change_loss(
             np.array(_PRINTED_BANDS),
             ratio,
             1.0,
             shape="round",
-            upstream_size=0.4,
             cap=100.0,
         ).values[0]
     )

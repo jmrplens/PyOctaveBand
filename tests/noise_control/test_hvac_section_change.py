@@ -52,12 +52,8 @@ def test_the_expression_is_symmetric_in_the_ratio() -> None:
     """
     for ratio in (1.5, 2.5, 4.0, 9.0):
         assert printed(ratio) == pytest.approx(printed(1.0 / ratio))
-        narrow = noise_control.section_change_loss(
-            BANDS, ratio, 1.0, shape="round", upstream_size=0.4
-        )
-        wide = noise_control.section_change_loss(
-            BANDS, 1.0, ratio, shape="round", upstream_size=0.4
-        )
+        narrow = noise_control.section_change_loss(BANDS, ratio, 1.0, shape="round")
+        wide = noise_control.section_change_loss(BANDS, 1.0, ratio, shape="round")
         assert narrow.values[0] == pytest.approx(wide.values[0])
 
 
@@ -99,10 +95,46 @@ def test_a_round_duct_takes_its_size_from_its_area() -> None:
     assert derived.values == pytest.approx(explicit.values)
 
 
-def test_a_rectangular_duct_without_a_size_is_refused() -> None:
-    """Its largest side does not follow from its area, and the model needs it."""
+def test_a_rectangular_increase_without_a_size_is_refused() -> None:
+    """Its largest side does not follow from its area, and the limit needs it."""
     with pytest.raises(ValueError, match="largest side of a rectangular duct"):
         noise_control.section_change_loss(BANDS, 0.2, 0.5)
+
+
+def test_a_rectangular_reduction_needs_no_size() -> None:
+    """Figure 26 prints "no effect" in the frequency column of a reduction.
+
+    No limit frequency enters the answer, so nothing about the duct's shape
+    does either, and asking for a side that is then thrown away turns a
+    complete question into an error. The size used to be demanded whatever the
+    ratio, and for a reduction any value at all gave the same spectrum.
+    """
+    without = noise_control.section_change_loss(BANDS, 0.5, 0.2)
+    assert without.values == pytest.approx(np.full(BANDS.size, printed(2.5)))
+    for side in (0.1, 9.0):
+        with_size = noise_control.section_change_loss(
+            BANDS, 0.5, 0.2, upstream_size=side
+        )
+        assert with_size.values == pytest.approx(without.values)
+
+
+def test_a_round_ducts_size_and_area_have_to_agree() -> None:
+    """They are one fact stated twice, and a contradiction changed the answer.
+
+    The area set the ratio and the size the limit frequency, so a diameter ten
+    times the one the area implies moved the limit frequency by a decade and
+    silently returned nothing at all across the band.
+    """
+    implied = noise_control.equivalent_diameter(0.2)
+    with pytest.raises(ValueError, match="implies a diameter of"):
+        noise_control.section_change_loss(
+            BANDS, 0.2, 0.5, shape="round", upstream_size=10.0 * implied
+        )
+    agreeing = noise_control.section_change_loss(
+        BANDS, 0.2, 0.5, shape="round", upstream_size=implied
+    )
+    derived = noise_control.section_change_loss(BANDS, 0.2, 0.5, shape="round")
+    assert agreeing.values == pytest.approx(derived.values)
 
 
 @pytest.mark.parametrize(

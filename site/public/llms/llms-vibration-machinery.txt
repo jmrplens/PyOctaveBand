@@ -567,8 +567,9 @@ all measured in situ on the non-rotating parts.
 Two questions place a machine in one of four classes.
 
 **How big it is** (4.2). *Group 1* is a large machine with rated power above
-300 kW and not more than 50 MW, or an electrical machine of shaft height
-315 mm or more. *Group 2* is a medium-sized machine above 15 kW and up to and
+300 kW, or an electrical machine of shaft height 315 mm or more; the upper
+bound of 50 MW is printed in the title of Table A.1 rather than in the
+clause. *Group 2* is a medium-sized machine above 15 kW and up to and
 including 300 kW, or an electrical machine of shaft height from 160 mm up to
 but not including 315 mm.
 
@@ -602,6 +603,28 @@ print(
     )
 )  # C
 ```
+
+A month of daily readings is one call. Pass the run as an array and each
+reading is graded on its own, which is the series Criterion II is judged on:
+that criterion does not read the zone at all, it reads the change from the
+established baseline, and a machine can be well inside zone B and still owe an
+investigation.
+
+```python
+import numpy as np
+
+from phonometry import vibration
+
+trend = np.array([1.0, 2.0, 3.5, 5.0])
+print(vibration.industrial_machine_zone("group_2", "rigid", velocity_mm_s=trend))
+# ['A' 'B' 'C' 'D']
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/machine_vibration_trend_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/machine_vibration_trend.svg" alt="A line of twelve monthly readings of r.m.s. velocity, rising from about 0.6 to 5.2 millimetres per second, drawn over four horizontal coloured bands: zone A up to 1.4, zone B to 2.8, zone C to 4.5 and zone D above. Each reading carries the letter of the zone it grades to, six A, three B, two C and one D. A dashed line marks the baseline at 0.647 millimetres per second, the mean of the first four months, and a dotted line the ALARM at 1.35. A note points at month seven, where the change from the baseline passes 25 per cent of the upper limit of zone B while the reading is still graded B." width="100%"></picture>
+
+*Criterion II sees it first. The machine is still graded B in month 7, and the
+change from its own baseline has already passed what 5.3 asks to be
+investigated.*
 
 Give whichever quantities were measured. Annex A says velocity alone is enough
 in most cases, and that a machine whose spectrum is expected to carry
@@ -660,11 +683,12 @@ different question: it grades a gear unit against a **rating number**, chosen
 for the unit at the start of negotiation, and the rating indexes a row of
 boundaries.
 
-There are three ratings, one per quantity, and Table 1 fixes the vocabulary of
-each: `DR` for shaft relative peak-to-peak displacement in micrometres, `VR`
-for housing r.m.s. velocity in millimetres per second, and `AR` for housing
-true peak acceleration in metres per second squared. Tables 2, 3 and 4 give
-the boundaries.
+There are three ratings, one per quantity: `DR` for shaft relative
+peak-to-peak displacement, `VR` for housing r.m.s. velocity and `AR` for
+housing true peak acceleration. Table 1 fixes the unit each is stated in,
+micrometres, millimetres per second and metres per second squared; the three
+names are spelled out under Table 5 and defined in Annex A. Tables 2, 3 and 4
+give the boundaries.
 
 Those three tables are one ladder seen three times. Every printed row is three
 consecutive rungs of 2, 3.15, 5, 8, 12.5, 20, 31.5, 50, 80, 125, 200, 315, with
@@ -807,7 +831,7 @@ measurements on non-rotating parts — Part 3: Industrial machines with nominal
 power above 15 kW and nominal speeds between 120 r/min and 15 000 r/min when
 measured in situ*: the machine groups of 4.2, the support classification of
 4.3, the zone boundaries of Tables A.1 and A.2 in both quantities with the
-measurement band of A.1, the most-restrictive rule of 5.2.3, the significant
+measurement band Annex A states, the most-restrictive rule of 5.2.3, the significant
 change of 5.3, and the ALARM and TRIP settings of 5.4.
 
 ISO 20816-9:2020, *Mechanical vibration — Measurement and evaluation of machine

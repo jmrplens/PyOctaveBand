@@ -21848,8 +21848,8 @@ along by its own $c_3$.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_fan_assemblies_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_fan_assemblies.svg" alt="Two panels. On the left, octave-band sound power level against frequency for three fan assemblies at the same duty point: radial with rearwards curved blades falling from 90 to 60 decibels, cylindrical rotor with forwards curved blades about three decibels above it, and axial with a downstream diffuser far above both, peaking near 250 hertz at 99 decibels and reaching 106 decibels overall. On the right, the band correction of Equation 15 as a continuous parabola for each of the three spectral parameters, with the eight octave markers of the sheet sitting on the curves." width="100%"></picture>
 
-*The same air, the same pressure rise, and eight more decibels overall for
-choosing an axial machine.*
+*The same air, the same pressure rise, and twelve more decibels overall for
+choosing an axial machine over a radial one.*
 
 ```python
 from phonometry import noise_control
@@ -21901,8 +21901,10 @@ it.
   value is only reached when the duct is anechoically terminated at both ends,
   and a gradual change through a long tapered adapter reflects nothing worth
   counting.
-- **Branch** (Section 6.4, Equation (35)): the share of the flow the branch
-  takes, through `split_loss`.
+- **Branch** (Section 6.4, Equation (35)): the share of the cross section the
+  branch takes, `10 lg (S1 / sum Si)`, through `split_loss`. It is written on
+  area and not on flow, and the same page says the reduction does not depend
+  on frequency.
 
 ```python
 from phonometry import noise_control
@@ -21925,11 +21927,16 @@ from phonometry import noise_control
 import numpy as np
 
 bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
-step = noise_control.section_change_loss(
-    bands, 0.5, 0.2, shape="rectangular", upstream_size=0.8
-)
+step = noise_control.section_change_loss(bands, 0.5, 0.2)
 print(round(float(step.values[0]), 2))   # 0.88 dB, in every band
 ```
+
+A reduction needs nothing else. The frequency column of Figure 26 reads "no
+effect" for it, so no limit frequency enters the answer and neither does the
+duct's shape or its size. An increase does need them, and a rectangular duct
+has to be given its largest side, because that is the one thing its area does
+not tell you.
+
 A splitter silencer is not one of these: its insertion loss comes from the
 maker's measurement, to ISO 7235, and the guideline says so.
 `splitter_silencer_insertion_loss` is the estimate for when there is none.
@@ -22025,7 +22032,7 @@ print([round(float(v)) for v in limits.values])
 
 ## 7. What the guideline itself gets wrong
 
-Four defects are recorded in [the errata
+Five defects are recorded in [the errata
 register](https://jmrplens.github.io/phonometry/reference/errata/), all verified against the printed
 page.
 
@@ -22033,10 +22040,14 @@ page.
   Equation (36) itself, which is where they already are.
 - The English column of Section 6.7.3 calls a hemispherical radiation
   spherical, and the German column beside it does not.
-- The English column of Section 6.4 says the opposite of the German about
-  which way a duct's attenuation runs with frequency.
+- The English column of Section 6.4 says a junction's level reduction depends
+  on the frequency; the German column beside it says it does not, and Figure 27
+  on the same page has no frequency axis.
 - Table 1 of Part 2 prints a hydraulic diameter for element 2 that is not the
   one it computes with.
+- Table 1 of Part 2 credits the splitter-silencer coefficients of element 2 to
+  Section 7.3.2 of Part 1, which is the airborne sound insulation of a building
+  component. They are printed in Section 7.2.3.2.
 
 The editions implemented here are Part 1:2001-07 and Part 2:2005-05. Both are
 superseded, by the 2022 editions, and neither successor is held; the pair in
@@ -22053,8 +22064,8 @@ curve of Part 2 Section 1.1, all against the worked sheet of Part 2 Table 1.
 
 Not covered: The air-handling unit and the outdoor-propagation chapters the 2019 revision
 added, which are in the editions not held here; the room acoustics VDI 2081
-leaves to VDI 2569; and the vibration isolation of the plant, which is a
-different guideline again.
+leaves to VDI 2569; and the vibration isolation of the plant, which Section 7.6
+of Blatt 1 does cover and this library does not.
 
 ## See also
 
@@ -22071,7 +22082,7 @@ different guideline again.
 - Verein Deutscher Ingenieure. (2001). *Geräuscherzeugung und Lärmminderung in
   Raumlufttechnischen Anlagen* (VDI 2081 Blatt 1:2001-07).
   The method: the fan of Section 4.3 with Equations (13) and (15), the duct
-  attenuation of Section 6 with Tables 5 and 8, the flow noise of Equations
+  attenuation of Section 6 with Tables 5 and 7, the flow noise of Equations
   (16) and (17), the splitter silencer and its self-noise of Equation (49),
   the end reflection of Section 6.6 and the room step of Equation (36).
   Superseded by Blatt 1:2022-04, which is not held here.
@@ -24352,7 +24363,7 @@ att = environment.outdoor_propagation_attenuation(
 print(np.round(att.a_div, 1))     # [57. 57. 57. 57. 57. 57. 57. 57.]  divergence
 print(np.round(att.a_gr, 2))      # [-4.65  2.34 13.79  9.76  1.3  -0.   -0.   -0.  ]
 print(np.round(att.a_bar, 2))     # [13.78  8.89  0.    6.69 18.01 20.   20.   20.  ]
-print(np.round(att.a_total, 1))   # [66.2 68.3 71.  73.9 77.1 78.8 82.3 96. ]
+print(np.round(att.a_total, 1))   # [66.2 68.3 71.  73.9 77.1 78.8 82.3 95.8]
 att.plot()                        # the stacked breakdown above (needs matplotlib)
 
 # Predicted receiver level from an octave-band sound power Lw = 95 dB
@@ -24366,7 +24377,7 @@ lp = environment.predicted_receiver_level(
     atmosphere=environment.AtmosphericConditions(
         temperature=15.0, relative_humidity=70.0),
 )
-print(np.round(lp, 1))            # [28.8 26.7 24.  21.1 17.9 16.2 12.7 -1. ]
+print(np.round(lp, 1))            # [28.8 26.7 24.  21.1 17.9 16.2 12.7 -0.8]
 ```
 
 `predicted_receiver_level` composes $L_{fT}(DW) = L_W + D_\mathrm{c} - A$ with
@@ -24540,11 +24551,11 @@ additional recommendations of Clause 5 rather than from ISO 9613-2, and they
 are outside what this page implements.
 
 The seven share one geometry: a source 1 m above its local ground, a receiver
-4 m above its own, 195 m apart in ground projection, and a flat 93 dB in every
+4 m above its own, 194.16 m apart in ground projection, and a flat 93 dB in every
 octave so that the shape of the printed spectrum is the propagation and nothing
 else. What changes between them is the ground.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases.svg" alt="Two panels. On the left, the octave-band level at the receiver for the same 195 metre path over three grounds: over reflecting ground it falls smoothly from 40 to 25 decibels, over mixed ground it dips to 33 decibels around 250 and 500 hertz before recovering, and over porous ground the dip reaches 26 decibels; open rings mark the levels the document prints, and they sit on the curves. On the right, a bar per test case from T01 to T07 giving the worst deviation of the computed spectrum from the printed one, between 0.008 and 0.012 decibels, all of them well under the dashed line at the 0.05 decibel envelope the document declares" width="100%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases.svg" alt="Two panels. On the left, the octave-band level at the receiver for the same 194 metre path over three grounds: over reflecting ground it falls smoothly from 40 to 25 decibels, over mixed ground it dips to 33 decibels around 250 and 500 hertz before recovering, and over porous ground the dip reaches 26 decibels; open rings mark the levels the document prints, and they sit on the curves. On the right, a bar per test case from T01 to T07 giving the worst deviation of the computed spectrum from the printed one, between 0.008 and 0.012 decibels, all of them well under the dashed line at the 0.05 decibel envelope the document declares" width="100%"></picture>
 
 *The ground effect is the whole story here: over porous ground the 250 Hz band
 arrives 13 dB quieter than over a reflecting one. Right: every case lands
@@ -24758,7 +24769,7 @@ against the exact half-plane and coherent-ground models.
 
 - [Spherical ground effect and advanced barriers](https://jmrplens.github.io/phonometry/environment/propagation/ground-barriers/): the wave acoustics underneath the Table 3 ground fit and the Eq. (14) screening curve.
 - [Atmospheric refraction](https://jmrplens.github.io/phonometry/environment/propagation/atmospheric-refraction/): what the favourable-condition assumption and $C_\mathrm{met}$ stand in for.
-- [CNOSSOS-EU road emission](https://jmrplens.github.io/phonometry/environment/sources/cnossos-road-emission/) and [CNOSSOS-EU rail emission](https://jmrplens.github.io/phonometry/environment/sources/cnossos-rail-emission/): the source strengths the comparison in section 3 refers to.
+- [CNOSSOS-EU road emission](https://jmrplens.github.io/phonometry/environment/sources/cnossos-road-emission/) and [CNOSSOS-EU rail emission](https://jmrplens.github.io/phonometry/environment/sources/cnossos-rail-emission/): the source strengths the comparison in section 4 refers to.
 - [Environmental noise levels](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/): what happens to the predicted level once it becomes an assessed one.
 - API reference: [`environment.propagation.outdoor_propagation`](https://jmrplens.github.io/phonometry/reference/api/environment/outdoor-propagation/) and [`environment.propagation.air_absorption`](https://jmrplens.github.io/phonometry/reference/api/environment/air-absorption/).
 - Theory: [Outdoor propagation](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#outdoor-propagation-general-method-iso-9613-2): the ISO 9613-2 attenuation terms derived one by one, and the atmospheric absorption of Part 1.
@@ -24786,7 +24797,7 @@ against the exact half-plane and coherent-ground models.
   Office of the European Union.
   [doi:10.2788/31776](https://doi.org/10.2788/31776),
   [JRC repository](https://publications.jrc.ec.europa.eu/repository/handle/JRC72550).
-  The common EU framework contrasted with ISO 9613-2 in section 3.
+  The common EU framework contrasted with ISO 9613-2 in section 4.
 - International Organization for Standardization. (1993). *Acoustics —
   Attenuation of sound during propagation outdoors — Part 1: Calculation of
   the absorption of sound by the atmosphere* (ISO 9613-1:1993).
@@ -37758,7 +37769,7 @@ documents, one page per module.
 | `vibration_vector_change` | `function` | **Change in vibration read as a vector (ISO 20816-1 Annex D).**<br>• `initial_magnitude`, `initial_phase_deg`, `final_magnitude`, `final_phase_deg`<br>• `.magnitude` the real change, `.magnitude_change` what a magnitude comparison reports | `vibration.vibration_vector_change(3, 40, 2.5, 180)`<br><br>• 5.17 mm/s against −0.5 |
 | `TYPICAL_BOUNDARY_LADDER_MM_S` / `TYPICAL_ZONE_BOUNDARY_RANGES_MM_S` / `ZONE_LIMIT_FACTORS` | `constant` | **ISO 20816-1 Table C.1 and Annex C.2.**<br>• the ladder of 14 preferred magnitudes, 0.28 to 45 mm/s<br>• the typical range of each boundary: A/B 0.71–4.5, B/C 1.8–9.3, C/D 4.5–14.7 mm/s<br>• the zone factors of Formula (C.1): A 1, B 2.56, C 6.4 | `vibration.TYPICAL_ZONE_BOUNDARY_RANGES_MM_S['B/C']  # (1.8, 9.3)` |
 | `MachineZoneLimits` / `INDUSTRIAL_MACHINE_ZONES` | `dataclass` / `constant` | **Zone boundaries of the industrial-machine tables (ISO 10816-3 Tables A.1 and A.2).**<br>• keyed by `(group, support)`: `'group_1'` above 300 kW to 50 MW, `'group_2'` above 15 kW to 300 kW; `'rigid'` or `'flexible'`<br>• `.displacement_um` and `.velocity_mm_s`, each a `ZoneBoundaries`<br>• broad-band r.m.s. from 10 Hz to 1 kHz, or from 2 Hz below 600 r/min | `vibration.INDUSTRIAL_MACHINE_ZONES['group_2', 'rigid'].velocity_mm_s.b_c  # 2.8` |
-| `industrial_machine_zone` | `function` | **Grade an industrial machine against its table (ISO 10816-3 5.2.3).**<br>• `group`, `support`<br>• `displacement_um` and/or `velocity_mm_s`, whichever was measured<br>• with both, the more restrictive grading applies | `vibration.industrial_machine_zone('group_2', 'rigid', displacement_um=50, velocity_mm_s=2.0)  # 'C'` |
+| `industrial_machine_zone` | `function` | **Grade an industrial machine against its table (ISO 10816-3 5.2.3).**<br>• `group`, `support`<br>• `displacement_um` and/or `velocity_mm_s`, whichever was measured<br>• with both, the more restrictive grading applies<br>• scalar in, letter out; array in, one letter per reading | `vibration.industrial_machine_zone('group_2', 'rigid', displacement_um=50, velocity_mm_s=2.0)  # 'C'` |
 | `is_significant_change` / `alarm_limit` / `trip_limit` | `function` | **Operational limits with numbers (ISO 10816-3 5.3 and 5.4).**<br>• `is_significant_change(change, zone_b_upper)`: more than a quarter of the upper limit of zone B, up or down<br>• `alarm_limit(baseline, zone_b_upper)`: that quarter above the baseline, capped at 1.25 times the limit<br>• `trip_limit(zone_c_upper)`: 1.25 times the upper limit of zone C | `vibration.alarm_limit(0.9, 2.8)  # 1.6`<br>`vibration.trip_limit(4.5)  # 5.625` |
 | `SIGNIFICANT_CHANGE_FRACTION` / `OPERATIONAL_LIMIT_HEADROOM` | `constant` | **The two fractions the operational limits are built from (ISO 10816-3 5.3, 5.4.1 and 5.4.2).**<br>• `SIGNIFICANT_CHANGE_FRACTION` = 0.25, of the upper limit of zone B<br>• `OPERATIONAL_LIMIT_HEADROOM` = 1.25, the multiple neither limit should exceed | `vibration.OPERATIONAL_LIMIT_HEADROOM * 4.5  # 5.625` |
 | `GEAR_UNIT_ZONES` / `gear_unit_zone_boundaries` | `constant` / `function` | **Gear-unit zone boundaries (ISO 20816-9 Tables 2, 3 and 4).**<br>• keyed by quantity, then by rating number: `'displacement'` (shaft relative peak-to-peak, µm), `'velocity'` (housing r.m.s., mm/s), `'acceleration'` (housing true peak, m/s²)<br>• every row is three consecutive rungs of one ladder, with the rating as the B/C boundary<br>• a rating with no printed row is refused, not interpolated | `vibration.gear_unit_zone_boundaries('velocity', 8.0).as_tuple`<br><br>• (5.0, 8.0, 12.5) |
@@ -56673,8 +56684,9 @@ all measured in situ on the non-rotating parts.
 Two questions place a machine in one of four classes.
 
 **How big it is** (4.2). *Group 1* is a large machine with rated power above
-300 kW and not more than 50 MW, or an electrical machine of shaft height
-315 mm or more. *Group 2* is a medium-sized machine above 15 kW and up to and
+300 kW, or an electrical machine of shaft height 315 mm or more; the upper
+bound of 50 MW is printed in the title of Table A.1 rather than in the
+clause. *Group 2* is a medium-sized machine above 15 kW and up to and
 including 300 kW, or an electrical machine of shaft height from 160 mm up to
 but not including 315 mm.
 
@@ -56708,6 +56720,28 @@ print(
     )
 )  # C
 ```
+
+A month of daily readings is one call. Pass the run as an array and each
+reading is graded on its own, which is the series Criterion II is judged on:
+that criterion does not read the zone at all, it reads the change from the
+established baseline, and a machine can be well inside zone B and still owe an
+investigation.
+
+```python
+import numpy as np
+
+from phonometry import vibration
+
+trend = np.array([1.0, 2.0, 3.5, 5.0])
+print(vibration.industrial_machine_zone("group_2", "rigid", velocity_mm_s=trend))
+# ['A' 'B' 'C' 'D']
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/machine_vibration_trend_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/machine_vibration_trend.svg" alt="A line of twelve monthly readings of r.m.s. velocity, rising from about 0.6 to 5.2 millimetres per second, drawn over four horizontal coloured bands: zone A up to 1.4, zone B to 2.8, zone C to 4.5 and zone D above. Each reading carries the letter of the zone it grades to, six A, three B, two C and one D. A dashed line marks the baseline at 0.647 millimetres per second, the mean of the first four months, and a dotted line the ALARM at 1.35. A note points at month seven, where the change from the baseline passes 25 per cent of the upper limit of zone B while the reading is still graded B." width="100%"></picture>
+
+*Criterion II sees it first. The machine is still graded B in month 7, and the
+change from its own baseline has already passed what 5.3 asks to be
+investigated.*
 
 Give whichever quantities were measured. Annex A says velocity alone is enough
 in most cases, and that a machine whose spectrum is expected to carry
@@ -56766,11 +56800,12 @@ different question: it grades a gear unit against a **rating number**, chosen
 for the unit at the start of negotiation, and the rating indexes a row of
 boundaries.
 
-There are three ratings, one per quantity, and Table 1 fixes the vocabulary of
-each: `DR` for shaft relative peak-to-peak displacement in micrometres, `VR`
-for housing r.m.s. velocity in millimetres per second, and `AR` for housing
-true peak acceleration in metres per second squared. Tables 2, 3 and 4 give
-the boundaries.
+There are three ratings, one per quantity: `DR` for shaft relative
+peak-to-peak displacement, `VR` for housing r.m.s. velocity and `AR` for
+housing true peak acceleration. Table 1 fixes the unit each is stated in,
+micrometres, millimetres per second and metres per second squared; the three
+names are spelled out under Table 5 and defined in Annex A. Tables 2, 3 and 4
+give the boundaries.
 
 Those three tables are one ladder seen three times. Every printed row is three
 consecutive rungs of 2, 3.15, 5, 8, 12.5, 20, 31.5, 50, 80, 125, 200, 315, with
@@ -56913,7 +56948,7 @@ measurements on non-rotating parts — Part 3: Industrial machines with nominal
 power above 15 kW and nominal speeds between 120 r/min and 15 000 r/min when
 measured in situ*: the machine groups of 4.2, the support classification of
 4.3, the zone boundaries of Tables A.1 and A.2 in both quantities with the
-measurement band of A.1, the most-restrictive rule of 5.2.3, the significant
+measurement band Annex A states, the most-restrictive rule of 5.2.3, the significant
 change of 5.3, and the ALARM and TRIP settings of 5.4.
 
 ISO 20816-9:2020, *Mechanical vibration — Measurement and evaluation of machine
