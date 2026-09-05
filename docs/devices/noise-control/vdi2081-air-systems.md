@@ -89,13 +89,14 @@ it.
   `unlined_circular_duct_attenuation` with `model="vdi2081"`. A rectangular
   duct of sheet steel takes far more out at 63 Hz than a round one, because
   its walls are the thing that gives.
-- **Bend** (Section 6.2, Table 8): keyed on the bend's own size, through
-  `elbow_insertion_loss`.
+- **Bend** (Section 6.2, Table 7): keyed on the bend's own size, through
+  `elbow_insertion_loss`. The table is printed once, for a 1250 mm side, and
+  carried along the frequency axis for every other size.
 - **Change of section** (Section 6.3): the reduction VDI 3733 gives, capped at
   5 dB, because the printed value is only reached when the duct is anechoically
   terminated at both ends.
-- **Branch** (Section 6.5): the share of the flow the branch takes, through
-  `split_loss`.
+- **Branch** (Section 6.4, Equation (35)): the share of the flow the branch
+  takes, through `split_loss`.
 
 ```python
 from phonometry import noise_control
@@ -117,11 +118,12 @@ maker's measurement, to ISO 7235, and the guideline says so.
 Air moving through a duct makes noise, and past the silencer there is often
 nothing else left to hear. VDI 2081 gives it in closed form.
 
-- **A straight run** (Equation (16)) and **a bend or a branch**
-  (Equation (17)), through `flow_noise_straight_duct` and `flow_noise_bend`.
-  Both are written on a Strouhal number built from the element's own diameter
+- **A straight run** (Section 5.2.1, Equations (16) and (17) with Figure 16)
+  and **a bend or a branch** (Section 5.2.2, Equation (18) with Figures 17 and
+  18), through `flow_noise_straight_duct` and `flow_noise_bend`. The second
+  pair is written on a Strouhal number built from the element's own diameter
   and the flow speed through it, and both figures state that they hold only
-  above $St = 1$, so the library returns nothing below it rather than
+  above $St = 1$, so the library gives no level below it rather than
   extrapolating a curve the guideline does not draw.
 - **A splitter silencer's own noise** (Equation (49)), through
   `silencer_self_noise`, which depends on the speed in the gaps between the

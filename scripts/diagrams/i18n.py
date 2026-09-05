@@ -47,9 +47,9 @@ _ES: dict[str, str] = {
     "takes level out: 2, 3, 5 and 14; puts level back: 2 and 14 make their own flow noise, and 19 is a source in its own right": "quitan nivel: 2, 3, 5 y 14; lo devuelven: 2 y 14 hacen su propio ruido de flujo, y 19 es una fuente por derecho propio",
     "Eq. (13) and (15), from the duty point and the assembly type": "Ec. (13) y (15), del punto de trabajo y el tipo de montaje",
     "insertion loss from the maker; self-noise from Eq. (49)": "pérdida de inserción del fabricante; ruido propio por la Ec. (49)",
-    "the area ratio of the branch; flow noise from Eq. (17)": "la razón de áreas de la ramificación; ruido de flujo por la Ec. (17)",
+    "Eq. (35), the area ratio of the branch; flow noise from Eq. (18)": "Ec. (35), la razón de áreas de la ramificación; ruido de flujo por la Ec. (18)",
     "Table 5, dB per metre by duct size": "Tabla 5, dB por metro según el tamaño del conducto",
-    "Table 8 by bend diameter; flow noise from Eq. (17)": "Tabla 8 según el diámetro del codo; ruido de flujo por la Ec. (17)",
+    "Table 7 by bend size; flow noise from Eq. (18)": "Tabla 7 según el tamaño del codo; ruido de flujo por la Ec. (18)",
     "Eq. (36), from $A$ and the outlet's own $Q$": "Ec. (36), a partir de $A$ y del $Q$ propio de la boca",
     # ISO 9613-2 ground regions (environment/propagation/outdoor-propagation).
     "ISO 9613-2 ground regions and the ground factor G": "Regiones de suelo y factor de suelo G (ISO 9613-2)",

@@ -110,13 +110,14 @@ directriz detrás.
   `unlined_circular_duct_attenuation` y `model="vdi2081"`. Un conducto
   rectangular de chapa quita mucho más a 63 Hz que uno circular, porque lo que
   cede son sus paredes.
-- **Codo** (apartado 6.2, Tabla 8): según el tamaño del propio codo, con
-  `elbow_insertion_loss`.
+- **Codo** (apartado 6.2, Tabla 7): según el tamaño del propio codo, con
+  `elbow_insertion_loss`. La tabla está impresa una sola vez, para un lado de
+  1250 mm, y se desplaza por el eje de frecuencia para cualquier otro tamaño.
 - **Cambio de sección** (apartado 6.3): la reducción que da la VDI 3733,
   limitada a 5 dB, porque el valor impreso solo se alcanza con el conducto
   terminado anecoicamente por los dos extremos.
-- **Ramificación** (apartado 6.5): la parte del caudal que se lleva la rama,
-  con `split_loss`.
+- **Ramificación** (apartado 6.4, Ecuación (35)): la parte del caudal que se
+  lleva la rama, con `split_loss`.
 
 ```python
 from phonometry import noise_control
@@ -138,12 +139,14 @@ la medida del fabricante, según la ISO 7235, y la directriz lo dice.
 El aire que se mueve por un conducto hace ruido, y pasado el silenciador a
 menudo no queda otra cosa que oír. La VDI 2081 lo da en forma cerrada.
 
-- **Un tramo recto** (Ecuación (16)) y **un codo o una ramificación**
-  (Ecuación (17)), con `flow_noise_straight_duct` y `flow_noise_bend`. Ambas
-  están escritas sobre un número de Strouhal construido con el diámetro del
-  propio elemento y la velocidad que lo atraviesa, y las dos figuras declaran
-  que solo valen por encima de $St = 1$, así que la biblioteca no devuelve nada
-  por debajo en lugar de extrapolar una curva que la directriz no dibuja.
+- **Un tramo recto** (apartado 5.2.1, Ecuaciones (16) y (17) con la Figura 16)
+  y **un codo o una ramificación** (apartado 5.2.2, Ecuación (18) con las
+  Figuras 17 y 18), con `flow_noise_straight_duct` y `flow_noise_bend`. El
+  segundo par está escrito sobre un número de Strouhal construido con el
+  diámetro del propio elemento y la velocidad que lo atraviesa, y las dos
+  figuras declaran que solo valen por encima de $St = 1$, así que la biblioteca
+  no da nivel por debajo en lugar de extrapolar una curva que la directriz no
+  dibuja.
 - **El ruido propio de un silenciador de bafles** (Ecuación (49)), con
   `silencer_self_noise`, que depende de la velocidad en los huecos entre bafles
   y de la pérdida de carga. Es la razón de que un silenciador tenga un tamaño
