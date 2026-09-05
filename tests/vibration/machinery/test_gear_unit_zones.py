@@ -99,11 +99,8 @@ def test_every_row_is_three_consecutive_rungs_of_one_ladder() -> None:
     for table in vibration.GEAR_UNIT_ZONES.values():
         for rating, boundaries in table.items():
             index = ladder.index(rating)
-            assert boundaries.as_tuple == (
-                ladder[index - 1],
-                ladder[index],
-                ladder[index + 1],
-            )
+            expected = (ladder[index - 1], ladder[index], ladder[index + 1])
+            assert boundaries.as_tuple == expected
 
 
 @pytest.mark.parametrize(("key", "printed"), sorted(PRINTED_CLASSES.items()))
