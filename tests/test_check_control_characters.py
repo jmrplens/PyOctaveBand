@@ -23,8 +23,14 @@ import check_control_characters as ccc
 
 
 def _write(tmp_path: pathlib.Path, text: str) -> pathlib.Path:
+    """Write the bytes asked for, on every platform.
+
+    ``newline=""`` turns off the translation Windows would otherwise apply,
+    which would put a carriage return in front of every newline and make a
+    fixture about one control character a fixture about two.
+    """
     path = tmp_path / "module.py"
-    path.write_text(text, encoding="utf-8")
+    path.write_text(text, encoding="utf-8", newline="")
     return path
 
 
