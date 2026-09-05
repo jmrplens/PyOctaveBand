@@ -13,6 +13,7 @@ corpus is written with and must keep.
 from __future__ import annotations
 
 import pathlib
+import subprocess
 import sys
 
 _SCRIPTS = str(pathlib.Path(__file__).resolve().parent.parent / "scripts")
@@ -94,8 +95,51 @@ def test_every_exemption_names_a_file_the_scan_reads() -> None:
     assert set(ccc.AS_DELIVERED) <= read
 
 
-def test_only_prose_and_code_are_read() -> None:
-    """Figures and binaries are out of scope, by suffix and nothing else."""
-    paths = ccc.tracked_files()
-    assert paths, "the checkout tracks text files"
-    assert {p.suffix for p in paths} <= ccc.SUFFIXES
+def _is_binary(path: pathlib.Path) -> bool:
+    """Whether a file's first 64 kB are bytes rather than text.
+
+    A NUL is the usual tell and is what git itself uses, but it is not enough
+    here: a PDF opens with several kilobytes of ASCII before its first
+    compressed stream. What every binary in this tree does have is a byte
+    sequence that is not UTF-8.
+    """
+    head = path.read_bytes()[:65536]
+    if b"\x00" in head:
+        return True
+    try:
+        head.decode("utf-8")
+    except UnicodeDecodeError:
+        return True
+    return False
+
+
+def test_nothing_the_scan_skips_is_text() -> None:
+    """The partition has to be total, and its skipped half has to be earned.
+
+    Naming the text suffixes and reading those is the version that shipped
+    first, and its scope test asserted that every scanned file had a scanned
+    suffix, which is true by construction and could never fail. It hid
+    twenty-nine tracked files, seven of them CSV oracles carrying the very
+    character the check is for. So the list names what to skip, and this
+    asserts that everything skipped really is binary: a NUL byte in the first
+    four kilobytes, or an SVG, which is text nobody reads as prose.
+    """
+    root = ccc.ROOT
+    listed = subprocess.run(  # noqa: S603 - a fixed argument vector
+        ["git", "-C", str(root), "ls-files", "-z"],  # noqa: S607 - git is on PATH
+        capture_output=True,
+        check=True,
+        text=True,
+    ).stdout
+    tracked = [root / name for name in listed.split("\0") if name]
+    scanned = set(ccc.tracked_files())
+    assert scanned, "the checkout tracks text files"
+
+    skipped = [path for path in tracked if path not in scanned]
+    assert skipped, "the checkout tracks figures and media"
+    prose_in_the_skipped_half = [
+        path.relative_to(root).as_posix()
+        for path in skipped
+        if path.suffix.lower() != ".svg" and not _is_binary(path)
+    ]
+    assert prose_in_the_skipped_half == []

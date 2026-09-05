@@ -23,10 +23,11 @@ oracle, and their line ending is not this project's to choose. It is a ratchet
 like the rest -- an entry whose file is gone, or whose carriage returns have
 been taken out, fails too, so the list cannot outlive its reason.
 
-The scan is over the tracked files whose content is prose or code, listed by
-:data:`SUFFIXES`. Figures and other generated artefacts are out: an SVG may
-legitimately carry anything inside a path, nobody reads it as text, and
-scanning 2 400 of them would cost more than the check is worth.
+The scan is over every tracked file except the suffixes :data:`NOT_TEXT`
+names, which are the binary ones plus SVG. Naming what to skip rather than
+what to read is deliberate: the first version named the text suffixes and so
+never opened twenty-nine tracked files, among them seven CSV oracles that
+carry exactly the character it looks for.
 
 Usage::
 
@@ -45,38 +46,55 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-#: What counts as prose or code here. Everything else a checkout holds is
-#: either generated, binary, or a figure.
-SUFFIXES = frozenset(
+#: Suffixes whose bytes are not text anybody reads: figures, media, archives
+#: and the binary oracles. Everything else tracked is scanned, which is the
+#: safe way round -- a text format nobody thought of is read by default, and
+#: only a new *binary* one has to be declared. The first version of this list
+#: went the other way, naming the text suffixes, and silently skipped
+#: twenty-nine tracked files, seven of which carry the very character the
+#: check exists for.
+#:
+#: SVG is here for a different reason than the rest: it is text, but it is
+#: generated, there are two thousand four hundred of them, and nothing in one
+#: is read as prose.
+NOT_TEXT = frozenset(
     {
-        ".astro",
-        ".cff",
-        ".css",
-        ".js",
-        ".json",
-        ".md",
-        ".mdx",
-        ".mjs",
-        ".py",
-        ".toml",
-        ".ts",
-        ".txt",
-        ".yaml",
-        ".yml",
+        ".gif",
+        ".ico",
+        ".jpg",
+        ".npz",
+        ".pdf",
+        ".png",
+        ".svg",
+        ".ttf",
+        ".wav",
+        ".webm",
+        ".webp",
+        ".zip",
     }
 )
 
 #: Carriage return, named once because it is the only exemptible character.
 CARRIAGE_RETURN = 0x0D
 
-#: Files that are copies of somebody else's, kept byte for byte, and why. The
-#: exemption is the carriage return and nothing else: rewriting either file
-#: would alter a licence text, or make a test's input no longer the file the
-#: standard ships.
+#: Files whose line endings are not this project's to choose, and why. The
+#: exemption is the carriage return and nothing else. Rewriting the first two
+#: would alter a licence text or make a test's input no longer the file the
+#: standard ships; the CNOSSOS-EU tables are extracts of a published workbook
+#: and of the Official Journal, and a re-extraction to check them against the
+#: source produces the same CRLF, so normalising them here would put a diff
+#: between the oracle and the thing it was taken from.
 AS_DELIVERED: dict[str, str] = {
     ".github/brand/fonts/LICENSE-IBMPlex.txt": (
         "the IBM Plex licence, as the foundry publishes it"
     ),
+    "tests/data/cnossos/rail_emission_cases.csv": "as extracted from the workbook",
+    "tests/data/cnossos/rail_frequency_tables_2015.csv": "as extracted from the catalogues",
+    "tests/data/cnossos/rail_vehicles_2015.csv": "as extracted from the catalogue",
+    "tests/data/cnossos/rail_wavelength_tables_2015.csv": "as extracted from the catalogues",
+    "tests/data/cnossos/road_coefficients_2015.csv": "as extracted from the Official Journal",
+    "tests/data/cnossos/road_emission_cases.csv": "as extracted from the workbook",
+    "tests/data/cnossos/road_surfaces_2015.csv": "as extracted from the Official Journal",
     "tests/data/iso532_1/iso532_1_test_signal_1_levels.txt": (
         "the ISO 532-1 reference levels, as the standard delivers them"
     ),
@@ -130,7 +148,7 @@ def tracked_files() -> list[pathlib.Path]:
     return [
         ROOT / name
         for name in listed.split("\0")
-        if name and pathlib.PurePath(name).suffix in SUFFIXES
+        if name and pathlib.PurePath(name).suffix.lower() not in NOT_TEXT
     ]
 
 

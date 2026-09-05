@@ -4316,6 +4316,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   Anexo E no está modelado, así que ningún número de la biblioteca depende de
   él. Se registra para que un lector futuro que siga la deducción no acabe en
   la ecuación equivocada.
+- **Estado:** sin notificar.
 
 ## ISO 5136:2003, Tabla A.5, fila de 5 000 Hz (falta el primer dígito de $a_3$)
 
