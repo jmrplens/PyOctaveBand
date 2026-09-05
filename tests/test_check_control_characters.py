@@ -44,7 +44,7 @@ def test_the_report_names_file_line_and_character(tmp_path: pathlib.Path) -> Non
     """What CI prints, for a file outside the tree as well as inside it."""
     path = _write(tmp_path, "a\x0bb\n")
     reports, _stale = ccc.check([path])
-    assert reports == [f"{path}:1:2: vertical tab"]
+    assert reports == [f"{path.as_posix()}:1:2: vertical tab"]
 
 
 def test_tab_and_newline_are_what_the_corpus_is_written_with(
@@ -82,10 +82,16 @@ def test_an_exemption_whose_file_is_gone_is_stale(tmp_path: pathlib.Path) -> Non
     assert stale == sorted(ccc.AS_DELIVERED)
 
 
-def test_the_delivered_files_are_the_ones_that_still_need_it() -> None:
-    """Every exemption in the tree is earned, which is what the ratchet asks."""
-    _reports, stale = ccc.check(ccc.tracked_files())
-    assert stale == []
+def test_every_exemption_names_a_file_the_scan_reads() -> None:
+    """The hatch cannot point at something the check never opens.
+
+    Whether those files still carry a carriage return is the gate's own
+    question at run time, and it is answered on a checkout whose line endings
+    are the repository's; asserting it here would make the test depend on how
+    the checkout was made rather than on what the tree holds.
+    """
+    read = {ccc._named(path) for path in ccc.tracked_files()}
+    assert set(ccc.AS_DELIVERED) <= read
 
 
 def test_only_prose_and_code_are_read() -> None:

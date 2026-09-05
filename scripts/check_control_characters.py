@@ -163,12 +163,18 @@ def offences(
     return found
 
 
-def _named(path: pathlib.Path) -> pathlib.Path:
-    """The path as a report should print it: relative to the tree when it is in it."""
+def _named(path: pathlib.Path) -> str:
+    """The path as a report prints it and as :data:`AS_DELIVERED` keys it.
+
+    Relative to the tree when it is inside it, and always with forward
+    slashes: ``str()`` on a Windows path gives backslashes, which match no key
+    in the hatch, so the two exempt files would be reported there and their
+    entries called stale in the same run.
+    """
     try:
-        return path.relative_to(ROOT)
+        return path.relative_to(ROOT).as_posix()
     except ValueError:
-        return path
+        return path.as_posix()
 
 
 def check(paths: list[pathlib.Path]) -> tuple[list[str], list[str]]:
@@ -183,7 +189,7 @@ def check(paths: list[pathlib.Path]) -> tuple[list[str], list[str]]:
     reports: list[str] = []
     still_delivered: set[str] = set()
     for path in paths:
-        name = str(_named(path))
+        name = _named(path)
         exempt = name in AS_DELIVERED
         for line, column, character in offences(path, allow_carriage_return=exempt):
             reports.append(f"{name}:{line}:{column}: {character}")
