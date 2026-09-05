@@ -525,6 +525,28 @@ jobs:
     - name: Check that no file sets one subscript both ways
       run: python scripts/check_subscript_slope.py
 
+  # A private module-level constant is a number lifted out of a standard so the
+  # code that uses it can say where it came from, and one nothing reads is
+  # either a leftover or the trace of a check the docstring above it still
+  # promises. The sweep this came from found both: a recommended specimen
+  # velocity carried and never checked, and a docstring promising a default the
+  # code did not take. Static and dependency-free, so it runs on its own.
+  dead-constants:
+    name: No private constant goes unread
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v7
+      with:
+        python-version: "3.13"
+    - name: Check that every private constant is read somewhere
+      run: python scripts/check_dead_constants.py
+
   # The committed example .report() fiches (.github/reports) must match a fresh
   # `make reports` run. Same drift gate as the figures, one layer further down
   # the pipeline: the fiches are what the documentation links to as worked

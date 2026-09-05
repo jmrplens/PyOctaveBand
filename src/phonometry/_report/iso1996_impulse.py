@@ -70,11 +70,6 @@ if TYPE_CHECKING:
     from ..environment.assessment.impulsive_sound import ImpulseProminenceResult
     from .metadata import ReportMetadata
 
-#: Minimum onset rate, in dB/s, for a level rise to qualify as an impulse
-#: (NT ACOU 112:2002, clause 4.5). Kept here so the renderer does not import
-#: the domain module at module level (the render-leaf import rule).
-_ONSET_RATE_LIMIT = 10.0
-
 #: Maximum number of impulse rows the per-impulse table shows. A large valid
 #: impulse set is capped to the highest-prominence impulses (the governing one
 #: always included) so the table cannot push the plot, result and footer off the

@@ -96,7 +96,6 @@ _RC_OCTAVE_STEPS: np.ndarray = np.array(
 _RC_LOW_FREQUENCY_FLOOR = 55.0  # dB, the 31.5 Hz floor (Annex D).
 
 _N_BANDS = OCTAVE_BANDS.size
-_F1000_INDEX = 6  # index of the 1000 Hz band in OCTAVE_BANDS.
 
 #: Indices of the four speech-interference bands 500/1000/2000/4000 Hz
 #: (clause 3.2: SIL is their arithmetic average).

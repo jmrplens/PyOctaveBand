@@ -141,7 +141,12 @@ normative Annex A, compute the heat-conduction-corrected `kappa'` with
 Annex A.3 example gives $\kappa' = 1.370$).
 
 Emits [`AirflowResistanceWarning`](/phonometry/reference/api/materials/airflow-resistance/#airflowresistancewarning) when the piston frequency is outside
-1-4 Hz or when the Formula (3)/(4) validity criteria are not met.
+1-4 Hz or when the Formula (3)/(4) validity criteria are not met. Clause 6.2
+recommends a specimen flow velocity between 0,5 mm/s and 4 mm/s as well,
+and that recommendation is not checked here: the velocity follows from the
+piston area and the specimen area, and this function is handed neither. Compute it
+with [`piston_volume_flow_rate`](/phonometry/reference/api/materials/airflow-resistance/#piston_volume_flow_rate) and [`linear_airflow_velocity`](/phonometry/reference/api/materials/airflow-resistance/#linear_airflow_velocity) if
+the rig is near either end of the range.
 
 ## ANNEX_A_AIR
 

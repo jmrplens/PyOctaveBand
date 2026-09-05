@@ -148,6 +148,12 @@ decimal-comma:
 fence-names:
 	$(PYTHON) scripts/check_fence_names.py
 
+# A private constant nothing reads is either a leftover or the trace of a check
+# that was planned and never written; the sweep that added this found one of
+# each. Stdlib only.
+dead-constants:
+	$(PYTHON) scripts/check_dead_constants.py
+
 # The Spanish variant of a figure is the English one with its strings looked
 # up in a table at save time, so a string nobody added to the table ships in
 # English inside `X_es.svg` and every other gate stays green: the page is

@@ -72,9 +72,6 @@ if TYPE_CHECKING:
 #: Reference coupling length ``l0`` in Formula (28a), in metres (Clause 4.4.1).
 _L0 = 1.0
 
-#: Reference frequency ``fref`` of Annex E, in hertz (Formula E.1).
-_FREF = 1000.0
-
 #: Frequency (Hz) at which the single-number ``Kij`` is read for the simplified
 #: model (Clause 4.4.2): the 500 Hz value.
 _K_FREQUENCY = 500.0

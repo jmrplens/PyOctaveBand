@@ -349,10 +349,6 @@ _VDI2081_END_REFLECTION_CAP = 15.0
 VDI2081_SPECTRAL_CORRECTION: NDArray[np.float64] = np.array(
     [21, 11, 4, -2, -5, -6, -6, -4], dtype=float
 )
-#: The level increase Section 1.1 assumes for the sum of eight octave bands,
-#: dB. A flat spectrum would earn 9 dB; the guideline takes 5, because the
-#: noise of an air-conditioning system does not follow the inverse A curve.
-_VDI2081_BAND_SUM_ALLOWANCE = 5.0
 
 #: Section 6.3 -- VDI 3733's recommendation that no more than 5 dB be taken
 #: from a change of cross-section, since the printed reduction is only reached

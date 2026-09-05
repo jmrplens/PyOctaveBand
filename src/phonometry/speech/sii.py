@@ -258,7 +258,6 @@ REFERENCE_INTERNAL_NOISE: np.ndarray = np.array(
     dtype=np.float64,
 )
 
-_N_BANDS = BAND_CENTERS.size
 VOCAL_EFFORTS: tuple[str, ...] = ("normal", "raised", "loud", "shout")
 
 # ---------------------------------------------------------------------------

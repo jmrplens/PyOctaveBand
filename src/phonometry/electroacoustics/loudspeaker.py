@@ -84,15 +84,6 @@ _EFFECTIVE_DROP_DB = 10.0
 #: curve must have to constitute a curve at all.
 _MIN_CURVE_POINTS = 2
 
-#: Narrowest frequency span a response curve may cover, as a ratio of its
-#: highest centre to its lowest: one-third of an octave, the narrowest band
-#: this library works in. The fiche scales its response panel by the decades
-#: the curve spans, so a span approaching one leaves an empty panel under a
-#: printed range whose two ends read as the same frequency. Two points a
-#: hair apart pass every other check in this validator and produce exactly
-#: that document.
-_MIN_CURVE_SPAN = 2.0 ** (1.0 / 3.0)
-
 
 def _as_curve(
     frequencies: ArrayLike, values: ArrayLike, name: str

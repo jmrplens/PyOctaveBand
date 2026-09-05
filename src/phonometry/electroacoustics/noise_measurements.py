@@ -52,13 +52,6 @@ if TYPE_CHECKING:
 #: tabulates the result (for example -5,6 dB at 1 kHz, 0 dB at 2 kHz).
 _CCIR_RMS_OFFSET_DB = -5.63
 
-#: AES17-2015 6.4.1 dynamic-range test level: a 997 Hz sine 60 dB below the
-#: maximum input level.
-_AES17_DYNAMIC_RANGE_LEVEL_DBFS = -60.0
-
-#: AES17-2015 6.4.1 dynamic-range test frequency, in hertz.
-_AES17_DYNAMIC_RANGE_FREQ_HZ = 997.0
-
 
 def _ccir_rms_weighted_rms(
     x: NDArray[np.float64], fs: float, bandwidth: float | None
@@ -141,8 +134,10 @@ def dynamic_range(
     :param fs: Sample rate, in Hz. Required for a bare array; a
         :class:`~phonometry.io.Signal` brings its own, and an explicit value
         that disagrees with it raises instead of silently winning.
-    :param fundamental: Test frequency, in Hz; ``None`` uses the 997 Hz of the
-        standard.
+    :param fundamental: Test frequency, in Hz. ``None`` reads it off the
+        captured signal's own spectrum rather than assuming the 997 Hz the
+        standard prescribes, so a capture that drifted is still notched where
+        its fundamental actually is.
     :param notch_q: Effective notch quality factor (AES17 5.2.8: 1.2..3;
         default 2.0).
     :param bandwidth: AES17 measurement bandwidth, in Hz (default 20 kHz;

@@ -65,7 +65,7 @@ known as the signal-to-noise ratio (6.4.1 note).
 | :--- | :--- |
 | `signal` | Captured output of the device under test (1-D), scaled so that `full_scale` is the digital full-scale peak amplitude. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) for the rate, but a calibration factor it carries is deliberately **not** applied: this quantity is referenced to digital full scale, not to 20 uPa, so scaling the samples to pascals would move the reading by `20 lg(factor)` under a full-scale name. |
 | `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
-| `fundamental` | Test frequency, in Hz; `None` uses the 997 Hz of the standard. |
+| `fundamental` | Test frequency, in Hz. `None` reads it off the captured signal's own spectrum rather than assuming the 997 Hz the standard prescribes, so a capture that drifted is still notched where its fundamental actually is. |
 | `notch_q` | Effective notch quality factor (AES17 5.2.8: 1.2..3; default 2.0). |
 | `bandwidth` | AES17 measurement bandwidth, in Hz (default 20 kHz; `None` measures the full Nyquist band). |
 | `full_scale` | Digital full-scale peak amplitude (default 1.0). |

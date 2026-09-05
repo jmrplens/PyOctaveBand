@@ -25,8 +25,6 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
 
-#: Models that take a depth directly rather than a pressure.
-_DEPTH_MODELS = ("mackenzie", "medwin")
 #: The minimum number of nodes a depth polyline can have.
 _MIN_POLYLINE_NODES = 2
 

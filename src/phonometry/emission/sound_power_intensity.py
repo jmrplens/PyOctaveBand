@@ -765,7 +765,6 @@ _FS_RATIO_HIGH = 1.2  #: Criterion 5 upper bound on FS(1)/FS(2) (Eq. C.5).
 #: Fewest samples a Bessel-corrected (N-1) sample standard deviation needs:
 #: segments for FS (Eq. B.8) and time windows for FT (Eq. B.1).
 _MIN_STDDEV_SAMPLES = 2
-_ABS_ZERO_C = -273.15  #: Absolute zero, deg C: validity floor for theta (Eq. 10).
 
 
 @dataclass(frozen=True)
