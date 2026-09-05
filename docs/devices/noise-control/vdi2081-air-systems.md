@@ -280,7 +280,7 @@ and every cross-reference in its tables resolves there.
 
 Covered: The fan of Section 4.3 through `fan_sound_power(model="vdi2081")`, the duct,
 bend, section-change and branch attenuation of Section 6, the flow noise of
-Equations (16) and (17), the splitter silencer and its self-noise, the end
+Equations (16), (17) and (18), the splitter silencer and its self-noise, the end
 reflection of Section 6.6, the room step of Equation (36) and the assessment
 curve of Part 2 Section 1.1, all against the worked sheet of Part 2 Table 1.
 
@@ -305,7 +305,7 @@ of Blatt 1 does cover and this library does not.
   Raumlufttechnischen Anlagen* (VDI 2081 Blatt 1:2001-07).
   The method: the fan of Section 4.3 with Equations (13) and (15), the duct
   attenuation of Section 6 with Tables 5 and 7, the flow noise of Equations
-  (16) and (17), the splitter silencer and its self-noise of Equation (49),
+  (16), (17) and (18), the splitter silencer and its self-noise of Equation (49),
   the end reflection of Section 6.6 and the room step of Equation (36).
   Superseded by Blatt 1:2022-04, which is not held here.
 - Verein Deutscher Ingenieure. (2005). *Geräuscherzeugung und Lärmminderung in
@@ -319,7 +319,7 @@ of Blatt 1 does cover and this library does not.
 VDI 2081 Blatt 1:2001-07, *Geräuscherzeugung und Lärmminderung in
 Raumlufttechnischen Anlagen*: the fan of Section 4.3, the duct, bend,
 section-change and branch attenuation of Section 6, the flow noise of
-Equations (16) and (17), the splitter silencer and its self-noise of Equation
+Equations (16), (17) and (18), the splitter silencer and its self-noise of Equation
 (49), the end reflection of Section 6.6 and the room step of Equation (36).
 
 VDI 2081 Blatt 2:2005-05, *Geräuscherzeugung und Lärmminderung in
