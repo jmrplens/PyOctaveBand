@@ -2915,7 +2915,7 @@ def _d_vdi2081_sheet(s: SVG, th: Theme) -> None:
     sources = (
         ("1", "Eq. (13) and (15), from the duty point and the assembly type"),
         ("2", "insertion loss from the maker; self-noise from Eq. (49)"),
-        ("3", "Eq. (35), the area ratio of the branch; flow noise from Eq. (18)"),
+        ("3", "Eq. (35), the branch's area ratio; flow noise from Eq. (18)"),
         ("5", "Table 5, dB per metre by duct size"),
         ("14", "Table 7 by bend size; flow noise from Eq. (18)"),
         ("20", "Eq. (36), from $A$ and the outlet's own $Q$"),
