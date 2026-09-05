@@ -1066,11 +1066,10 @@ def flow_noise_straight_duct_overall(
     moves through how large a section, and the fifth power of the speed in the
     unweighted form is why halving the duct velocity is worth fifteen decibels.
 
-    The two are not one number weighted: the A-weighted form carries a
-    seventieth-power dependence on the speed rather than a fiftieth, because
-    raising the speed also moves the spectrum up into the part of the curve
-    the weighting stops attenuating. Faster air is worse than the unweighted
-    number says.
+    The two are not one number weighted: fifty times the logarithm is a fifth
+    power of the speed, and seventy is a seventh, because raising the speed
+    also moves the spectrum up into the part of the curve the weighting stops
+    attenuating. Faster air is worse than the unweighted number says.
 
     :func:`flow_noise_straight_duct` is the same law spread over the octaves,
     Equation (16) with the relative spectrum of Figure 16; the band levels do
