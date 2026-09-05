@@ -530,3 +530,191 @@ def trip_limit(zone_c_upper: float) -> float:
     :raises ValueError: If the limit is not positive.
     """
     return OPERATIONAL_LIMIT_HEADROOM * require_positive(zone_c_upper, "zone_c_upper")
+
+
+# --------------------------------------------------------------------------- #
+# Gear units: the rating system Part 9 grades them by
+# --------------------------------------------------------------------------- #
+#: Tables 2, 3 and 4 of ISO 20816-9:2020, keyed by quantity and then by the
+#: rating number. Every row is three consecutive rungs of one ladder with the
+#: rating in the middle, so a rating *is* the B/C boundary of its own row, and
+#: the tables are transcribed rather than generated from that observation.
+#:
+#: Displacement is shaft relative peak-to-peak in micrometres (Table 2),
+#: velocity is housing r.m.s. in millimetres per second (Table 3), and
+#: acceleration is housing true peak in metres per second squared (Table 4),
+#: which is the vocabulary Table 1 fixes.
+GEAR_UNIT_ZONES: dict[str, dict[float, ZoneBoundaries]] = {
+    "displacement": {
+        31.5: ZoneBoundaries(20.0, 31.5, 50.0),
+        50.0: ZoneBoundaries(31.5, 50.0, 80.0),
+        80.0: ZoneBoundaries(50.0, 80.0, 125.0),
+        125.0: ZoneBoundaries(80.0, 125.0, 200.0),
+        200.0: ZoneBoundaries(125.0, 200.0, 315.0),
+    },
+    "velocity": {
+        3.15: ZoneBoundaries(2.0, 3.15, 5.0),
+        5.0: ZoneBoundaries(3.15, 5.0, 8.0),
+        8.0: ZoneBoundaries(5.0, 8.0, 12.5),
+        12.5: ZoneBoundaries(8.0, 12.5, 20.0),
+        20.0: ZoneBoundaries(12.5, 20.0, 31.5),
+    },
+    "acceleration": {
+        5.0: ZoneBoundaries(3.15, 5.0, 8.0),
+        8.0: ZoneBoundaries(5.0, 8.0, 12.5),
+        12.5: ZoneBoundaries(8.0, 12.5, 20.0),
+        20.0: ZoneBoundaries(12.5, 20.0, 31.5),
+        31.5: ZoneBoundaries(20.0, 31.5, 50.0),
+        50.0: ZoneBoundaries(31.5, 50.0, 80.0),
+        80.0: ZoneBoundaries(50.0, 80.0, 125.0),
+        125.0: ZoneBoundaries(80.0, 125.0, 200.0),
+        200.0: ZoneBoundaries(125.0, 200.0, 315.0),
+    },
+}
+
+#: Figure A.1: the displacement rating curve is flat up to this corner and
+#: falls above it, in hertz, and the rate it falls at, in decibels per decade.
+GEAR_DISPLACEMENT_CORNER_HZ = 50.0
+GEAR_DISPLACEMENT_SLOPE_DB_PER_DECADE = 10.0
+#: Figure A.2: the velocity rating curve is flat between these two corners, in
+#: hertz, and falls outside them at this rate, in decibels per decade.
+GEAR_VELOCITY_CORNERS_HZ = (45.0, 1590.0)
+GEAR_VELOCITY_SLOPE_DB_PER_DECADE = 14.0
+
+
+@dataclass(frozen=True)
+class GearUnitRatings:
+    """The three rating numbers Table 5 gives one class of gear unit.
+
+    :ivar displacement: The displacement rating ``DR``, which indexes Table 2.
+    :ivar velocity: The velocity rating ``VR``, which indexes Table 3.
+    :ivar acceleration: The acceleration rating ``AR``, which indexes Table 4,
+        or ``None`` where the table prints "no information available at this
+        time", which it does for every subclass b) row.
+    """
+
+    displacement: float
+    velocity: float
+    acceleration: float | None
+
+
+#: Table 5 of ISO 20816-9:2020, keyed by class and subclass. A subclass a) row
+#: covers any power; a subclass b) row is split by power, and the table sends
+#: the reader to Figure A.3 for where the split falls, so the two are keyed
+#: ``"b_low"`` and ``"b_high"`` rather than computed.
+#:
+#: Class I is special-purpose precision parallel-shaft units, class II
+#: general-purpose parallel-shaft, helical and spiral-bevel units, class III
+#: epicyclic units, and class IV straight-cut units.
+GEAR_UNIT_CLASSES: dict[tuple[str, str], GearUnitRatings] = {
+    ("I", "a"): GearUnitRatings(31.5, 3.15, 50.0),
+    ("I", "b_low"): GearUnitRatings(31.5, 3.15, None),
+    ("I", "b_high"): GearUnitRatings(50.0, 5.0, None),
+    ("II", "a"): GearUnitRatings(50.0, 5.0, 80.0),
+    ("II", "b_low"): GearUnitRatings(50.0, 5.0, None),
+    ("II", "b_high"): GearUnitRatings(80.0, 8.0, None),
+    ("III", "a"): GearUnitRatings(80.0, 8.0, 125.0),
+    ("III", "b_low"): GearUnitRatings(80.0, 8.0, None),
+    ("III", "b_high"): GearUnitRatings(125.0, 12.5, None),
+    ("IV", "a"): GearUnitRatings(125.0, 20.0, 125.0),
+    ("IV", "b_low"): GearUnitRatings(125.0, 12.5, None),
+    ("IV", "b_high"): GearUnitRatings(200.0, 20.0, None),
+}
+
+#: 8.3: an acceptance criterion for a new unit is normally agreed inside zone
+#: A or B, and normally not above this multiple of the A/B boundary.
+GEAR_ACCEPTANCE_HEADROOM = 1.25
+
+
+def gear_unit_zone_boundaries(quantity: str, rating: float) -> ZoneBoundaries:
+    """The three boundaries Table 2, 3 or 4 prints for one rating.
+
+    The tables are printed for the rating numbers they list and for no others,
+    so a rating between two rows is refused rather than interpolated: the
+    ladder is a choice made with the manufacturer, not a continuum. The
+    comparison is a relative one to a part in a thousand million, so a rating
+    that arrived through a computation and carries floating-point noise still
+    finds its row; nothing a reader would call a different rating does.
+
+    :param quantity: ``"displacement"`` (Table 2, shaft relative peak-to-peak,
+        µm), ``"velocity"`` (Table 3, housing r.m.s., mm/s) or
+        ``"acceleration"`` (Table 4, housing true peak, m/s²).
+    :param rating: The rating number, ``DR``, ``VR`` or ``AR``.
+    :return: The A/B, B/C and C/D boundaries of that row.
+    :raises ValueError: If the quantity is unknown or the table prints no row
+        for that rating.
+    """
+    table = GEAR_UNIT_ZONES[
+        require_choice(quantity, "quantity", tuple(GEAR_UNIT_ZONES))
+    ]
+    value = require_positive(rating, "rating")
+    for printed, boundaries in table.items():
+        if math.isclose(printed, value, rel_tol=1e-9):
+            return boundaries
+    listed = ", ".join(f"{printed:g}" for printed in table)
+    msg = (
+        f"ISO 20816-9 prints no {quantity} row for a rating of {value:g}; "
+        f"the table lists {listed}."
+    )
+    raise ValueError(msg)
+
+
+def gear_shaft_displacement_limit(
+    frequency: ArrayLike, *, rating: float
+) -> float | NDArray[np.float64]:
+    r"""The shaft displacement rating curve of Figure A.1.
+
+    .. math::
+
+       d(f) = \mathrm{DR} \qquad f \leq 50\ \mathrm{Hz}
+
+       d(f) = \mathrm{DR}\,(f/50)^{-1/2} \qquad f > 50\ \mathrm{Hz}
+
+    The note under the figure states both halves: the rating number is the
+    displacement of the curve up to 50 Hz, and above 50 Hz the curves decrease
+    by 10 dB per decade, which on an amplitude is an exponent of one half.
+
+    :param frequency: Frequency ``f``, in hertz (scalar or array).
+    :param rating: The displacement rating ``DR``, in micrometres.
+    :return: The allowable peak-to-peak displacement, in micrometres; a float
+        for a scalar frequency, otherwise an array.
+    :raises ValueError: If a frequency or the rating is not positive.
+    """
+    value = require_positive(rating, "rating")
+    freq = np.asarray(frequency, dtype=np.float64)
+    if np.any(freq <= 0.0) or not np.all(np.isfinite(freq)):
+        msg = "'frequency' must be positive and finite."
+        raise ValueError(msg)
+    exponent = GEAR_DISPLACEMENT_SLOPE_DB_PER_DECADE / 20.0
+    corner = GEAR_DISPLACEMENT_CORNER_HZ
+    limit = value * (corner / np.maximum(freq, corner)) ** exponent
+    return float(limit) if limit.ndim == 0 else limit
+
+
+def gear_housing_velocity_limit(
+    frequency: ArrayLike, *, rating: float
+) -> float | NDArray[np.float64]:
+    r"""The housing velocity rating curve of Figure A.2.
+
+    Flat between 45 Hz and 1590 Hz and falling outside both corners at 14 dB
+    per decade, which is the shape :func:`allowable_velocity` already draws
+    for ISO 20816-1 Formula (C.1); this is that formula with the corners and
+    the exponents Part 9 states, so the two parts of the series share one
+    curve rather than two implementations of it.
+
+    :param frequency: Frequency ``f``, in hertz (scalar or array).
+    :param rating: The velocity rating ``VR``, in millimetres per second.
+    :return: The allowable r.m.s. velocity, in millimetres per second; a float
+        for a scalar frequency, otherwise an array.
+    :raises ValueError: If a frequency or the rating is not positive.
+    """
+    low, high = GEAR_VELOCITY_CORNERS_HZ
+    exponent = GEAR_VELOCITY_SLOPE_DB_PER_DECADE / 20.0
+    return allowable_velocity(
+        frequency,
+        constant_velocity_mm_s=rating,
+        corner_low_hz=low,
+        corner_high_hz=high,
+        exponent_low=exponent,
+        exponent_high=exponent,
+    )

@@ -16,6 +16,12 @@ references:
     title: "Mechanical vibration \u2014 Evaluation of machine vibration by measurements on non-rotating parts \u2014 Part 3: Industrial machines with nominal power above 15 kW and nominal speeds between 120 r/min and 15 000 r/min when measured in situ"
     designation: "ISO 10816-3:2009"
     note: "Los grupos de máquinas del 4.2 y la clasificación de soportes del 4.3, las fronteras de zona de las Tablas A.1 y A.2 en las dos magnitudes con la banda de medida del A.1, la regla de la más restrictiva del 5.2.3, el cambio significativo del 5.3 y los ajustes de ALARMA y DISPARO del 5.4. Esta edición está sustituida por la ISO 20816-3:2022, que no está en la biblioteca; las fronteras se toman de la edición que sí lo está."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2020
+    title: "Mechanical vibration \u2014 Measurement and evaluation of machine vibration \u2014 Part 9: Gear units"
+    designation: "ISO 20816-9:2020"
+    note: "El sistema de calificación: las unidades de la Tabla 1, las medidas de eje y carcasa del capítulo 6, las zonas de evaluación del 8.2, el techo de aceptación del 8.3, las tablas de fronteras 2, 3 y 4, la clasificación de la Tabla 5 y las curvas de calificación del Anexo A."
 ---
 
 import Scope from '../../../../../components/Scope.astro';
@@ -305,6 +311,95 @@ print(round(vibration.alarm_limit(2.9, limits.b_c), 3))   # 3.5, en el tope
 print(round(vibration.trip_limit(limits.c_d), 3))         # 5.625
 ```
 
+## 8. Reductores, y una calificación en lugar de una clase de máquina
+
+La Parte 3 pregunta qué es la máquina y sobre qué se apoya. La **Parte 9**
+pregunta otra cosa: califica un reductor contra un **número de calificación**,
+elegido para la unidad al principio de la negociación, y esa calificación
+indexa una fila de fronteras.
+
+Hay tres calificaciones, una por magnitud, y la Tabla 1 fija el vocabulario de
+cada una: `DR` para el desplazamiento relativo del eje pico a pico en
+micrómetros, `VR` para la velocidad eficaz de la carcasa en milímetros por
+segundo y `AR` para la aceleración de pico verdadero de la carcasa en metros
+por segundo al cuadrado. Las Tablas 2, 3 y 4 dan las fronteras.
+
+Esas tres tablas son una sola escalera vista tres veces. Cada fila impresa son
+tres peldaños consecutivos de 2, 3,15, 5, 8, 12,5, 20, 31,5, 50, 80, 125, 200,
+315, con la propia calificación como frontera B/C y sus vecinos como las otras
+dos. Elegir una calificación es elegir un peldaño, y la biblioteca rechaza una
+calificación entre dos filas en lugar de interpolarla: la escalera es un
+acuerdo, no un continuo.
+
+La Tabla 5 es donde una unidad recibe sus calificaciones. La clase I son
+unidades de precisión de eje paralelo para un uso específico, la clase II
+unidades de uso general de eje paralelo, helicoidales y cónicas espirales, la
+clase III unidades epicicloidales y la clase IV unidades de dentado recto; la
+subclase a) cubre cualquier potencia y la subclase b) se parte por ella.
+
+```python
+from phonometry import vibration
+
+ratings = vibration.GEAR_UNIT_CLASSES["III", "a"]
+print(ratings.displacement, ratings.velocity, ratings.acceleration)
+# 80.0 8.0 125.0
+
+boundaries = vibration.gear_unit_zone_boundaries("velocity", ratings.velocity)
+print(boundaries.as_tuple)                          # (5.0, 8.0, 12.5)
+print(vibration.evaluation_zone(6.0, boundaries))   # B
+```
+
+Solo las filas de la subclase a) llevan calificación de aceleración. Todas las
+de la b) imprimen «no information available at this time», y la biblioteca lo
+lleva como `None` en lugar de rellenar el hueco con un número verosímil.
+
+### Las curvas de calificación, y dónde reaparece la Parte 1
+
+Una calificación no es solo un juego de tres fronteras: el Anexo A la dibuja
+como una curva frente a la frecuencia, de modo que una medida filtrada se puede
+juzgar línea a línea y no como un único valor de banda ancha. La calificación de
+un eje o de una posición es entonces la curva más baja que envuelve todo su
+espectro.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/gear_unit_rating_curves_es.svg" alt="Dos paneles log-log. A la izquierda, cinco curvas de calificación de desplazamiento del eje, una por cada calificación de 31,5 a 200 micrómetros: cada una es plana en su número de calificación hasta una línea discontinua en 50 hercios y luego cae a 10 decibelios por década. A la derecha, cinco curvas de calificación de velocidad de la carcasa, de 3,15 a 20 milímetros por segundo: cada una sube hasta su calificación en una línea discontinua en 45 hercios, se mantiene plana hasta una segunda línea discontinua en 1590 hercios y cae más allá, las dos pendientes a 14 decibelios por década" width="100%" />
+
+*Izquierda, Figura A.1; derecha, Figura A.2. La familia de la derecha es otra
+vez el criterio del apartado 3, con las esquinas y la pendiente que enuncia la
+Parte 9.*
+
+```python
+from phonometry import vibration
+
+print(round(float(vibration.gear_housing_velocity_limit(3000.0, rating=8.0)), 2))
+# 5.13 mm/s: una línea de engrane a 3 kHz se juzga contra menos que la calificación
+print(round(float(vibration.gear_shaft_displacement_limit(500.0, rating=80.0)), 1))
+# 25.3 µm
+```
+
+La curva de velocidad merece una segunda mirada. Plana entre dos esquinas y
+cayendo fuera de ellas a un mismo ritmo es exactamente la Fórmula (C.1) de la
+Parte 1, y esta es esa fórmula con $f_x$ = 45 Hz, $f_y$ = 1590 Hz y
+$k = m = 0{,}7$, que son 14 dB por década. La biblioteca la calcula llamando a
+`allowable_velocity`, así que las dos partes de la serie comparten una curva en
+lugar de dos implementaciones de ella.
+
+### Lo que la Parte 9 no repite
+
+La ALARMA y el DISPARO: el 8.2 manda al lector a la Parte 1, que es el apartado
+7 de esta página. Los criterios de aceptación: el 8.3 dice que se acuerdan entre
+fabricante y cliente, que históricamente se han especificado dentro de la zona A
+o la B y que normalmente no pasarían de 1,25 veces la frontera A/B, que para una
+unidad de clase II juzgada en velocidad son 3,94 mm/s.
+
+La medida es el capítulo 6. El desplazamiento del eje se lee relativo a la
+carcasa con sondas sin contacto en pares ortogonales a través del alojamiento del
+cojinete, y la excentricidad combinada mecánica y eléctrica no debería pasar de
+la cuarta parte del desplazamiento admisible a la frecuencia de giro, o de 6 µm,
+lo que sea mayor. La vibración de la carcasa se lee sobre una sección rígida como
+un bloque de cojinete, en hasta tres direcciones ortogonales, dos de ellas
+perpendiculares al eje de los engranajes; un panel de carcasa que no soporta
+ningún cojinete no da una indicación verdadera de la unidad.
+
 <Scope>
 <ScopeClaim status="covered" label="Cubierto">
 Las cuatro zonas de evaluación y la calificación del 6.3.2.3, el criterio
@@ -316,11 +411,15 @@ máquinas industriales, las fronteras de las Tablas A.1 y A.2 en las dos
 magnitudes, la regla de la más restrictiva del 5.2.3, el cambio significativo
 del 5.3 y los ajustes de ALARMA y DISPARO del 5.4, mediante
 `INDUSTRIAL_MACHINE_ZONES`, `industrial_machine_zone`,
-`is_significant_change`, `alarm_limit` y `trip_limit`.
+`is_significant_change`, `alarm_limit` y `trip_limit`. Para reductores, las
+tres tablas de calificación y la clasificación de la ISO 20816-9, y las dos
+curvas de calificación de su Anexo A, mediante `GEAR_UNIT_ZONES`,
+`GEAR_UNIT_CLASSES`, `gear_unit_zone_boundaries`,
+`gear_shaft_displacement_limit` y `gear_housing_velocity_limit`.
 </ScopeClaim>
 <ScopeClaim status="not-covered" label="No cubierto">
-Las fronteras de zona de las demás partes específicas, que esta página toma
-como datos de entrada; el criterio de eje de la Figura 10, cuyos valores el
+Las fronteras de zona de las partes específicas que esta página no nombra, que
+toma como datos de entrada; el criterio de eje de la Figura 10, cuyos valores el
 Anexo C.1 se niega a dar para máquinas que ninguna parte cubre, por entender
 que esas máquinas no suelen llevar transductores de eje; y la tercera edición
 vigente de la Parte 3, la ISO 20816-3:2022, que no está en la biblioteca, así

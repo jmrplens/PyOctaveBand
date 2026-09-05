@@ -2711,3 +2711,111 @@ def generate_machine_alarm_trip(output_dir: str) -> None:
     plt.tight_layout()
     save_figure(output_dir, "machine_alarm_trip.svg")
     plt.close()
+
+
+def generate_gear_unit_rating_curves(output_dir: str) -> None:
+    """The two rating curves of ISO 20816-9 Annex A, one family each."""
+    print("Generating gear_unit_rating_curves...")
+    from phonometry import vibration
+
+    palette = (
+        COLOR_PRIMARY,
+        COLOR_SECONDARY,
+        COLOR_TERTIARY,
+        COLOR_QUATERNARY,
+        COLOR_MUTED,
+    )
+    styles = ("-", "--", "-.", ":", "-")
+    _fig, (ax, ax2) = plt.subplots(1, 2, figsize=(11.6, 5.8))
+
+    freq = np.logspace(np.log10(1.0), np.log10(2000.0), 500)
+    for rating, colour, style in zip(
+        sorted(vibration.GEAR_UNIT_ZONES["displacement"]), palette, styles, strict=True
+    ):
+        ax.loglog(
+            freq,
+            np.asarray(vibration.gear_shaft_displacement_limit(freq, rating=rating)),
+            style,
+            color=colour,
+            lw=1.8,
+            label=f"DR = {rating:g} µm",
+        )
+    corner = vibration.GEAR_DISPLACEMENT_CORNER_HZ
+    ax.axvline(corner, color=COLOR_FG, linestyle="--", linewidth=1.0, alpha=0.55)
+    ax.annotate(
+        "50 Hz",
+        xy=(corner, 0.06),
+        xycoords=("data", "axes fraction"),
+        ha="center",
+        va="bottom",
+        fontsize=9,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.25",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Peak-to-peak displacement (µm)")
+    ax.set_title("Shaft Displacement: Flat, Then 10 dB per Decade", pad=10)
+    format_frequency_axis(ax)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize=8)
+
+    freq2 = np.logspace(np.log10(3.0), np.log10(20000.0), 600)
+    for rating, colour, style in zip(
+        sorted(vibration.GEAR_UNIT_ZONES["velocity"]), palette, styles, strict=True
+    ):
+        ax2.loglog(
+            freq2,
+            np.asarray(vibration.gear_housing_velocity_limit(freq2, rating=rating)),
+            style,
+            color=colour,
+            lw=1.8,
+            label=f"VR = {rating:g} mm/s",
+        )
+    for corner in vibration.GEAR_VELOCITY_CORNERS_HZ:
+        ax2.axvline(corner, color=COLOR_FG, linestyle="--", linewidth=1.0, alpha=0.55)
+        ax2.annotate(
+            f"{corner:g} Hz",
+            xy=(corner, 0.06),
+            xycoords=("data", "axes fraction"),
+            ha="center",
+            va="bottom",
+            fontsize=9,
+            color=COLOR_FG,
+            bbox={
+                "boxstyle": "round,pad=0.25",
+                "facecolor": COLOR_PANEL,
+                "edgecolor": COLOR_GRID,
+            },
+        )
+    ax2.set_xlabel(LABEL_FREQ_HZ)
+    ax2.set_ylabel("R.m.s. velocity (mm/s)")
+    ax2.set_title("Housing Velocity: Formula (C.1) With Part 9's Corners", pad=10)
+    ax2.set_ylim(0.4, 46.0)
+    format_frequency_axis(ax2)
+    ax2.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+    ax2.set_axisbelow(True)
+    ax2.legend(loc="lower left", fontsize=8)
+    ax2.text(
+        0.985,
+        0.965,
+        "14 dB per decade outside both corners,\n"
+        "which is $k = m = 0.7$ in Formula (C.1)",
+        transform=ax2.transAxes,
+        va="top",
+        ha="right",
+        fontsize=8.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.32",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "gear_unit_rating_curves.svg")
+    plt.close()

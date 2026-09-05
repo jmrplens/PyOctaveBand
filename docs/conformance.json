@@ -3,13 +3,13 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 742,
-    "passing": 742,
+    "checks": 778,
+    "passing": 778,
     "failing": 0,
     "domains": 66,
-    "standards": 390,
-    "citations": 599,
-    "designations": 124,
+    "standards": 391,
+    "citations": 606,
+    "designations": 125,
     "sources": 84
   },
   "units": [
@@ -185,8 +185,8 @@
     {
       "id": "machine-vibration-evaluation-iso-20816",
       "title": "Machine vibration evaluation (ISO 20816)",
-      "checks": 28,
-      "passing": 28
+      "checks": 64,
+      "passing": 64
     },
     {
       "id": "speech-intelligibility-ansi-s3-5-1997",
@@ -9780,6 +9780,1038 @@
         "value": 5.55e-17
       },
       "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-2/gear-unit-displacement-zone-boundaries-at-a-rating-of-31-5-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 2",
+        "cite": "ISO 20816-9:2020 Table 2"
+      },
+      "quantity": "Gear-unit displacement zone boundaries at a rating of 31.5, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "µm",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-2/gear-unit-displacement-zone-boundaries-at-a-rating-of-50-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 2",
+        "cite": "ISO 20816-9:2020 Table 2"
+      },
+      "quantity": "Gear-unit displacement zone boundaries at a rating of 50, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "µm",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-2/gear-unit-displacement-zone-boundaries-at-a-rating-of-80-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 2",
+        "cite": "ISO 20816-9:2020 Table 2"
+      },
+      "quantity": "Gear-unit displacement zone boundaries at a rating of 80, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "µm",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-2/gear-unit-displacement-zone-boundaries-at-a-rating-of-125-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 2",
+        "cite": "ISO 20816-9:2020 Table 2"
+      },
+      "quantity": "Gear-unit displacement zone boundaries at a rating of 125, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "µm",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-2/gear-unit-displacement-zone-boundaries-at-a-rating-of-200-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 2",
+        "cite": "ISO 20816-9:2020 Table 2"
+      },
+      "quantity": "Gear-unit displacement zone boundaries at a rating of 200, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "µm",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-3/gear-unit-velocity-zone-boundaries-at-a-rating-of-3-15-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 3",
+        "cite": "ISO 20816-9:2020 Table 3"
+      },
+      "quantity": "Gear-unit velocity zone boundaries at a rating of 3.15, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-3/gear-unit-velocity-zone-boundaries-at-a-rating-of-5-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 3",
+        "cite": "ISO 20816-9:2020 Table 3"
+      },
+      "quantity": "Gear-unit velocity zone boundaries at a rating of 5, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-3/gear-unit-velocity-zone-boundaries-at-a-rating-of-8-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 3",
+        "cite": "ISO 20816-9:2020 Table 3"
+      },
+      "quantity": "Gear-unit velocity zone boundaries at a rating of 8, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-3/gear-unit-velocity-zone-boundaries-at-a-rating-of-12-5-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 3",
+        "cite": "ISO 20816-9:2020 Table 3"
+      },
+      "quantity": "Gear-unit velocity zone boundaries at a rating of 12.5, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-3/gear-unit-velocity-zone-boundaries-at-a-rating-of-20-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 3",
+        "cite": "ISO 20816-9:2020 Table 3"
+      },
+      "quantity": "Gear-unit velocity zone boundaries at a rating of 20, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-4/gear-unit-acceleration-zone-boundaries-at-a-rating-of-5-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 4",
+        "cite": "ISO 20816-9:2020 Table 4"
+      },
+      "quantity": "Gear-unit acceleration zone boundaries at a rating of 5, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "m/s²",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-4/gear-unit-acceleration-zone-boundaries-at-a-rating-of-8-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 4",
+        "cite": "ISO 20816-9:2020 Table 4"
+      },
+      "quantity": "Gear-unit acceleration zone boundaries at a rating of 8, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "m/s²",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-4/gear-unit-acceleration-zone-boundaries-at-a-rating-of-12-5-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 4",
+        "cite": "ISO 20816-9:2020 Table 4"
+      },
+      "quantity": "Gear-unit acceleration zone boundaries at a rating of 12.5, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "m/s²",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-4/gear-unit-acceleration-zone-boundaries-at-a-rating-of-20-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 4",
+        "cite": "ISO 20816-9:2020 Table 4"
+      },
+      "quantity": "Gear-unit acceleration zone boundaries at a rating of 20, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "m/s²",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-4/gear-unit-acceleration-zone-boundaries-at-a-rating-of-31-5-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 4",
+        "cite": "ISO 20816-9:2020 Table 4"
+      },
+      "quantity": "Gear-unit acceleration zone boundaries at a rating of 31.5, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "m/s²",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-4/gear-unit-acceleration-zone-boundaries-at-a-rating-of-50-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 4",
+        "cite": "ISO 20816-9:2020 Table 4"
+      },
+      "quantity": "Gear-unit acceleration zone boundaries at a rating of 50, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "m/s²",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-4/gear-unit-acceleration-zone-boundaries-at-a-rating-of-80-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 4",
+        "cite": "ISO 20816-9:2020 Table 4"
+      },
+      "quantity": "Gear-unit acceleration zone boundaries at a rating of 80, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "m/s²",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-4/gear-unit-acceleration-zone-boundaries-at-a-rating-of-125-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 4",
+        "cite": "ISO 20816-9:2020 Table 4"
+      },
+      "quantity": "Gear-unit acceleration zone boundaries at a rating of 125, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "m/s²",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-4/gear-unit-acceleration-zone-boundaries-at-a-rating-of-200-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 4",
+        "cite": "ISO 20816-9:2020 Table 4"
+      },
+      "quantity": "Gear-unit acceleration zone boundaries at a rating of 200, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "m/s²",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-5/gear-unit-ratings-for-class-i-subclass-a-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 5",
+        "cite": "ISO 20816-9:2020 Table 5"
+      },
+      "quantity": "Gear-unit ratings for class I, subclass a, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-5/gear-unit-ratings-for-class-i-subclass-b-low-power-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 5",
+        "cite": "ISO 20816-9:2020 Table 5"
+      },
+      "quantity": "Gear-unit ratings for class I, subclass b, low power, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-5/gear-unit-ratings-for-class-i-subclass-b-high-power-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 5",
+        "cite": "ISO 20816-9:2020 Table 5"
+      },
+      "quantity": "Gear-unit ratings for class I, subclass b, high power, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-5/gear-unit-ratings-for-class-ii-subclass-a-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 5",
+        "cite": "ISO 20816-9:2020 Table 5"
+      },
+      "quantity": "Gear-unit ratings for class II, subclass a, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-5/gear-unit-ratings-for-class-ii-subclass-b-low-power-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 5",
+        "cite": "ISO 20816-9:2020 Table 5"
+      },
+      "quantity": "Gear-unit ratings for class II, subclass b, low power, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-5/gear-unit-ratings-for-class-ii-subclass-b-high-power-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 5",
+        "cite": "ISO 20816-9:2020 Table 5"
+      },
+      "quantity": "Gear-unit ratings for class II, subclass b, high power, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-5/gear-unit-ratings-for-class-iii-subclass-a-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 5",
+        "cite": "ISO 20816-9:2020 Table 5"
+      },
+      "quantity": "Gear-unit ratings for class III, subclass a, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-5/gear-unit-ratings-for-class-iii-subclass-b-low-power-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 5",
+        "cite": "ISO 20816-9:2020 Table 5"
+      },
+      "quantity": "Gear-unit ratings for class III, subclass b, low power, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-5/gear-unit-ratings-for-class-iii-subclass-b-high-power-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 5",
+        "cite": "ISO 20816-9:2020 Table 5"
+      },
+      "quantity": "Gear-unit ratings for class III, subclass b, high power, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-5/gear-unit-ratings-for-class-iv-subclass-a-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 5",
+        "cite": "ISO 20816-9:2020 Table 5"
+      },
+      "quantity": "Gear-unit ratings for class IV, subclass a, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-5/gear-unit-ratings-for-class-iv-subclass-b-low-power-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 5",
+        "cite": "ISO 20816-9:2020 Table 5"
+      },
+      "quantity": "Gear-unit ratings for class IV, subclass b, low power, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-5/gear-unit-ratings-for-class-iv-subclass-b-high-power-worst-deviation",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 5",
+        "cite": "ISO 20816-9:2020 Table 5"
+      },
+      "quantity": "Gear-unit ratings for class IV, subclass b, high power, worst deviation",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-figure-a-1/fall-of-the-displacement-rating-curve-a-decade-above-its-corner-db",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Figure A.1",
+        "cite": "ISO 20816-9:2020 Figure A.1"
+      },
+      "quantity": "Fall of the displacement rating curve a decade above its corner, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 10.0
+      },
+      "computed": {
+        "value": 10.0
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-figure-a-1/displacement-rating-curve-below-its-corner-worst-deviation-from-dr-m",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Figure A.1",
+        "cite": "ISO 20816-9:2020 Figure A.1"
+      },
+      "quantity": "Displacement rating curve below its corner, worst deviation from DR, µm",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "µm",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-figure-a-2/fall-of-the-velocity-rating-curve-a-decade-outside-each-corner-db",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Figure A.2",
+        "cite": "ISO 20816-9:2020 Figure A.2"
+      },
+      "quantity": "Fall of the velocity rating curve a decade outside each corner, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 14.0
+      },
+      "computed": {
+        "value": 14.0
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-figure-a-2/velocity-rating-curve-between-its-corners-worst-deviation-from-vr-mm-s",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Figure A.2",
+        "cite": "ISO 20816-9:2020 Figure A.2"
+      },
+      "quantity": "Velocity rating curve between its corners, worst deviation from VR, mm/s",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-4-note/velocity-rungs-carried-onto-acceleration-rungs-at-280-hz-worst-error",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 4, note",
+        "cite": "ISO 20816-9:2020 Table 4, note"
+      },
+      "quantity": "Velocity rungs carried onto acceleration rungs at 280 Hz, worst error, %",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 2.034
+      },
+      "unit": "%",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 3.0
+      },
+      "deviation": {
+        "value": 2.034
+      },
+      "precision": 3,
       "verdict": "pass"
     },
     {

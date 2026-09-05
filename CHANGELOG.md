@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Gear units, by ISO 20816-9:2020, which grades them against a **rating**
+  rather than against a machine class. `GEAR_UNIT_ZONES` carries the three
+  boundary tables, one per quantity, keyed by the rating number that indexes
+  them: shaft relative peak-to-peak displacement in micrometres, housing r.m.s.
+  velocity in millimetres per second and housing true peak acceleration in
+  metres per second squared, which is the vocabulary Table 1 fixes. The three
+  tables are one ladder seen three times, with the rating itself as the B/C
+  boundary and its neighbours as the other two, and a rating between two
+  printed rows is refused rather than interpolated. `GEAR_UNIT_CLASSES` is the
+  classification of Table 5, and it carries `None` for the acceleration of
+  every subclass b) row, which is what the table prints there.
+
+  `gear_shaft_displacement_limit` and `gear_housing_velocity_limit` are the
+  rating curves of Annex A, so a filtered measurement can be judged line by
+  line instead of as one broad-band value. The velocity curve turns out to be
+  Formula (C.1) of Part 1 with the corners and the slope Part 9 states, 45 Hz
+  and 1590 Hz at 14 dB per decade, so it calls `allowable_velocity` rather than
+  drawing the same shape twice.
 - `noise_control.section_change_loss`, the element of the VDI 2081 chain that
   was described in the guide and missing from the library. Section 6.3 gives
   the reflection at a sudden step in closed form, `10 lg (r+1)²/(4r)` in the

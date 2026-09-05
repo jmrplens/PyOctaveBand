@@ -443,6 +443,14 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     "INDUSTRIAL_MACHINE_ZONES": "phonometry.vibration.machinery.evaluation",
     "SIGNIFICANT_CHANGE_FRACTION": "phonometry.vibration.machinery.evaluation",
     "OPERATIONAL_LIMIT_HEADROOM": "phonometry.vibration.machinery.evaluation",
+    # And the ISO 20816-9 rating tables, curve corners and slopes.
+    "GEAR_UNIT_ZONES": "phonometry.vibration.machinery.evaluation",
+    "GEAR_UNIT_CLASSES": "phonometry.vibration.machinery.evaluation",
+    "GEAR_ACCEPTANCE_HEADROOM": "phonometry.vibration.machinery.evaluation",
+    "GEAR_DISPLACEMENT_CORNER_HZ": "phonometry.vibration.machinery.evaluation",
+    "GEAR_DISPLACEMENT_SLOPE_DB_PER_DECADE": "phonometry.vibration.machinery.evaluation",
+    "GEAR_VELOCITY_CORNERS_HZ": "phonometry.vibration.machinery.evaluation",
+    "GEAR_VELOCITY_SLOPE_DB_PER_DECADE": "phonometry.vibration.machinery.evaluation",
     # Defined in phonometry._internal.warnings, exported at the top level.
     "PhonometryWarning": "phonometry",
     # The io subpackage keeps its implementation modules private and
