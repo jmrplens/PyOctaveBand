@@ -1313,7 +1313,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | VDI 2081 Blatt 2:2005 Table 1, element 1 | Supply fan A-weighted sound power level, dB | 84.5 dB (+/-0.05 dB) | 84.511 dB | 0.011 dB | 22 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2:2005 Table 1, element 5 | Rectangular duct 500 x 400 mm over 4 m, worst octave deviation, dB | 0 dB (+/-0 dB) | 0 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2:2005 Table 1, element 13 | Round duct 160 mm over 1 m, worst octave deviation, dB | 0 dB (+/-0 dB) | 0 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
-| VDI 2081 Blatt 1:2001 Eq. (34) | Limit frequency of a 160 mm round duct, Hz | 1245 Hz (+/-0.5 Hz) | 1245.2 Hz | 0.25 Hz | 50 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1:2001 Eq. (34) | Limit frequency of a 160 mm round duct, Hz | 1245 Hz (+/-0.5 Hz) | 1245.4 Hz | 0.403 Hz | 81 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2:2005 Table 1, element 14 | Round bend 160 mm, Table 7 shifted onto its limit frequency, worst octave deviation, dB | 0 dB (+/-0 dB) | 0 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2:2005 Table 1, element 3 | Junction into 0.3 m2 of 1.08 m2 total, dB | 5.6 dB (+/-0.05 dB) | 5.563 dB | -0.037 dB | 74 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2:2005 Table 1, element 7 | Junction into 0.049 m2 of 0.147 m2 total, dB | 4.8 dB (+/-0.05 dB) | 4.771 dB | -0.029 dB | 58 % | ![Pass][cv-pass] Pass |
