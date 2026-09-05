@@ -6077,3 +6077,139 @@ def generate_vdi2081_section_change(output_dir: str) -> None:
     plt.tight_layout()
     save_figure(output_dir, "vdi2081_section_change.svg")
     plt.close()
+
+
+def generate_vdi2081_flow_noise(output_dir: str) -> None:
+    """Equations (16) and (17), and the spectrum Figure 16 spreads them over."""
+    print("Generating vdi2081_flow_noise...")
+    from phonometry import noise_control
+
+    # Element 5 of the worked example: a 500 x 400 mm supply run carrying
+    # 4200 m3/h, which is 5,83 m/s.
+    area = 0.5 * 0.4
+    duty = (4200.0 / 3600.0) / area
+    speeds = np.linspace(1.0, 15.0, 300)
+    overall = np.array(
+        [noise_control.flow_noise_straight_duct_overall(v, area) for v in speeds]
+    )
+    weighted = np.array(
+        [
+            noise_control.flow_noise_straight_duct_overall(v, area, weighting="A")
+            for v in speeds
+        ]
+    )
+
+    _fig, (ax, ax2) = plt.subplots(1, 2, figsize=(11.4, 5.6))
+    ax.plot(
+        speeds,
+        overall,
+        "-",
+        color=COLOR_PRIMARY,
+        lw=2.0,
+        label=r"Eq. (16): $7 + 50\,\lg v + 10\,\lg S$",
+    )
+    ax.plot(
+        speeds,
+        weighted,
+        "--",
+        color=COLOR_SECONDARY,
+        lw=2.0,
+        label=r"Eq. (17): $-25 + 70\,\lg v + 10\,\lg S$",
+    )
+    ax.axvline(duty, color=COLOR_FG, linestyle=":", linewidth=1.2, alpha=0.7)
+    for level, colour, offset in (
+        (noise_control.flow_noise_straight_duct_overall(duty, area), COLOR_PRIMARY, 8),
+        (
+            noise_control.flow_noise_straight_duct_overall(duty, area, weighting="A"),
+            COLOR_SECONDARY,
+            -14,
+        ),
+    ):
+        ax.plot(duty, level, marker="o", ms=6, color=colour, zorder=5)
+        # Chipped: the readout sits on the curve it reads off.
+        ax.annotate(
+            f"{level:.0f} dB",
+            xy=(duty, level),
+            xytext=(15, offset),
+            textcoords="offset points",
+            fontsize=9,
+            color=colour,
+            bbox={
+                "boxstyle": "round,pad=0.3",
+                "facecolor": COLOR_PANEL,
+                "edgecolor": COLOR_GRID,
+            },
+            zorder=6,
+        )
+    # The two forms cross where 32 = 20 lg v, which is 39,8 m/s in any duct:
+    # far outside a ventilation system, so the A-weighted overall stays the
+    # lower of the two throughout and closes on the other as the air speeds up.
+    ax.annotate(
+        f"the worked example runs at {duty:.2f} m/s;\n"
+        "halving that is worth 15 dB unweighted\nand 21 dB A-weighted",
+        xy=(duty, 20.0),
+        xytext=(0.52, 0.16),
+        textcoords="axes fraction",
+        ha="left",
+        va="bottom",
+        fontsize=8.5,
+        color=COLOR_FG,
+        arrowprops={"arrowstyle": "->", "color": COLOR_FG, "linewidth": 1.0},
+        bbox={
+            "boxstyle": "round,pad=0.32",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    ax.set_xlim(1.0, 15.0)
+    ax.set_xlabel("Duct velocity $v$ (m/s)")
+    ax.set_ylabel("Overall sound power level (dB)")
+    ax.set_title("How Fast the Air May Go, in a 0.2 m$^2$ Duct", pad=10)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=8.5)
+
+    bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+    for velocity, colour, style, marker in (
+        (3.0, COLOR_TERTIARY, ":", "^"),
+        (duty, COLOR_PRIMARY, "-", "o"),
+        (10.0, COLOR_SECONDARY, "--", "s"),
+    ):
+        spectrum = noise_control.flow_noise_straight_duct(bands, velocity, area)
+        ax2.semilogx(
+            bands,
+            np.asarray(spectrum.values),
+            style,
+            color=colour,
+            lw=2.0,
+            marker=marker,
+            ms=4,
+            label=f"$v$ = {velocity:.2f} m/s".replace(".00", ""),
+        )
+    ax2.set_xlabel(LABEL_FREQ_HZ)
+    ax2.set_ylabel("Band sound power level (dB)")
+    ax2.set_title("Faster Air Is Louder, and Flatter", pad=10)
+    format_frequency_axis(ax2)
+    ax2.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+    ax2.set_axisbelow(True)
+    ax2.legend(loc="lower left", fontsize=8.5)
+    ax2.text(
+        0.985,
+        0.955,
+        "the bands do not sum back to the overall:\n"
+        "Figure 16 is a shape, not a partition",
+        transform=ax2.transAxes,
+        ha="right",
+        va="top",
+        fontsize=8.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.32",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+
+    plt.tight_layout()
+    save_figure(output_dir, "vdi2081_flow_noise.svg")
+    plt.close()

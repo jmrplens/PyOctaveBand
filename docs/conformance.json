@@ -20917,7 +20917,7 @@
         "value": 1245.0
       },
       "computed": {
-        "value": 1245.2
+        "value": 1245.4
       },
       "unit": "Hz",
       "tolerance": {
@@ -20925,7 +20925,7 @@
         "value": 0.5
       },
       "deviation": {
-        "value": 0.25
+        "value": 0.403
       },
       "precision": 1,
       "verdict": "pass"

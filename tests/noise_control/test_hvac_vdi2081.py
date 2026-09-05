@@ -479,13 +479,9 @@ def test_the_straight_run_flow_noise_is_equations_16_and_17() -> None:
     too: reading 5,8 m/s off the table instead of the 5,8333 the duty gives
     would move the level by a tenth.
     """
-    overall = (
-        7.0 + 50.0 * math.log10(STRAIGHT_VELOCITY) + 10.0 * math.log10(STRAIGHT_AREA_M2)
-    )
-    weighted = (
-        -25.0
-        + 70.0 * math.log10(STRAIGHT_VELOCITY)
-        + 10.0 * math.log10(STRAIGHT_AREA_M2)
+    overall = hvac.flow_noise_straight_duct_overall(STRAIGHT_VELOCITY, STRAIGHT_AREA_M2)
+    weighted = hvac.flow_noise_straight_duct_overall(
+        STRAIGHT_VELOCITY, STRAIGHT_AREA_M2, weighting="A"
     )
     assert round(overall) == PRINTED_STRAIGHT_OVERALL_DB
     assert round(weighted) == PRINTED_STRAIGHT_OVERALL_A_DB
@@ -493,12 +489,82 @@ def test_the_straight_run_flow_noise_is_equations_16_and_17() -> None:
     round_area = math.pi * 0.08**2
     round_velocity = (280.0 / 3600.0) / round_area
     assert (
-        round(7.0 + 50.0 * math.log10(round_velocity) + 10.0 * math.log10(round_area))
-        == 19
+        round(hvac.flow_noise_straight_duct_overall(round_velocity, round_area)) == 19
     )
     assert (
-        round(-25.0 + 70.0 * math.log10(round_velocity) + 10.0 * math.log10(round_area))
+        round(
+            hvac.flow_noise_straight_duct_overall(
+                round_velocity, round_area, weighting="A"
+            )
+        )
         == -1
+    )
+
+
+def test_the_two_overall_forms_are_the_printed_closed_forms() -> None:
+    """Equation (16) and Equation (17), each against its own expression.
+
+    They are not one number weighted: fifty times the logarithm is a fifth
+    power of the speed and seventy is a seventh, because raising the speed
+    also moves the spectrum into the part of the curve the weighting stops
+    attenuating. Doubling the speed is worth 15,05 dB unweighted and 21,07 dB
+    A-weighted, and the two forms meet where 20 lg v reaches 32, at 39,8 m/s,
+    which is far outside any ventilation duct.
+    """
+    for velocity, area in ((2.0, 0.1), (5.8333333, 0.2), (12.0, 1.5)):
+        assert hvac.flow_noise_straight_duct_overall(velocity, area) == pytest.approx(
+            7.0 + 50.0 * math.log10(velocity) + 10.0 * math.log10(area)
+        )
+        assert hvac.flow_noise_straight_duct_overall(
+            velocity, area, weighting="A"
+        ) == pytest.approx(
+            -25.0 + 70.0 * math.log10(velocity) + 10.0 * math.log10(area)
+        )
+    doubled = hvac.flow_noise_straight_duct_overall(
+        4.0, 1.0
+    ) - hvac.flow_noise_straight_duct_overall(2.0, 1.0)
+    assert doubled == pytest.approx(50.0 * math.log10(2.0))
+    doubled_a = hvac.flow_noise_straight_duct_overall(
+        4.0, 1.0, weighting="A"
+    ) - hvac.flow_noise_straight_duct_overall(2.0, 1.0, weighting="A")
+    assert doubled_a == pytest.approx(70.0 * math.log10(2.0))
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "match"),
+    [
+        ({"flow_velocity": 0.0}, "flow_velocity"),
+        ({"area": -1.0}, "area"),
+        ({"weighting": "C"}, "'weighting' must be one of"),
+    ],
+)
+def test_the_overall_forms_refuse_what_the_guideline_does_not_print(
+    kwargs: dict[str, object], match: str
+) -> None:
+    call: dict[str, object] = {"flow_velocity": 5.0, "area": 0.2}
+    call.update(kwargs)
+    with pytest.raises(ValueError, match=match):
+        hvac.flow_noise_straight_duct_overall(**call)  # type: ignore[arg-type]
+
+
+def test_the_limit_frequency_is_the_ducts_own_first_cut_on() -> None:
+    """Equations (33) and (34) are the first cut-on, and are called as such.
+
+    The rectangular form is exactly ``c / (2 a)``, and the round one is the
+    guideline's rounding of the first circular mode: ``0,586`` for
+    ``1,8412 / pi``, which the guideline prints to three figures. Written
+    twice, the two could drift; called once, they cannot.
+    """
+    from phonometry import noise_control as nc
+
+    assert hvac._vdi2081_limit_frequency("rectangular", 1.25, 343.0) == pytest.approx(
+        343.0 / (2.0 * 1.25)
+    )
+    assert hvac._vdi2081_limit_frequency("round", 0.16, 340.0) == pytest.approx(
+        0.586 * 340.0 / 0.16, rel=2e-4
+    )
+    assert hvac._vdi2081_limit_frequency("round", 0.16, 340.0) == pytest.approx(
+        nc.plane_wave_limit(diameter=0.16, speed_of_sound=340.0)
     )
 
 
