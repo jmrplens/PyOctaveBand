@@ -107,5 +107,6 @@ def test_a_cartesian_axes_is_refused() -> None:
     import matplotlib.pyplot as plt
 
     _fig, ax = plt.subplots()
+    result = _annex_d()
     with pytest.raises(ValueError, match="must be a polar axes"):
-        _annex_d().plot(ax=ax)
+        result.plot(ax=ax)
