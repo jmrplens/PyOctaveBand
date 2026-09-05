@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**766/766 conformance checks pass** across 66 domains and 391 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**767/767 conformance checks pass** across 66 domains and 391 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -513,7 +513,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>Machine vibration evaluation (ISO 20816)</b>: 100% (63/63)</summary>
+<summary><b>Machine vibration evaluation (ISO 20816)</b>: 100% (64/64)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -580,6 +580,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 20816-9:2020 Figure A.1 | Displacement rating curve below its corner, worst deviation from DR, µm | 0 µm (+/-0.0005 µm) | 0 µm | 0 µm | 0 % | ![Pass][cv-pass] Pass |
 | ISO 20816-9:2020 Figure A.2 | Fall of the velocity rating curve a decade outside each corner, dB | 14 dB (+/-0.0005 dB) | 14 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 20816-9:2020 Figure A.2 | Velocity rating curve between its corners, worst deviation from VR, mm/s | 0 mm/s (+/-0.0005 mm/s) | 0 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-9:2020 Table 4, note | Velocity rungs carried onto acceleration rungs at 280 Hz, worst error, % | 0 % (+/-3 %) | 2.034 % | 2.034 % | 68 % | ![Pass][cv-pass] Pass |
 
 </details>
 

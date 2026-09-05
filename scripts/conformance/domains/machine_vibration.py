@@ -553,3 +553,32 @@ def _chk_gear_velocity_plateau() -> Outcome:
         unit="mm/s",
         places=4,
     )
+
+
+#: The note under Table 4: the acceleration ratings were derived from the
+#: velocity rating curves "at a conversion point of 280 Hz".
+_GEAR_CONVERSION_HZ = 280.0
+
+
+@register(
+    _MACHINE_VIB,
+    "ISO 20816-9:2020 Table 4, note",
+    "Velocity rungs carried onto acceleration rungs at 280 Hz, worst error, %",
+)
+def _chk_gear_acceleration_conversion() -> Outcome:
+    r"""The two ladders against the conversion the note says produced one of them.
+
+    A true peak acceleration is :math:`\\sqrt{2}\\,\\omega` times an r.m.s.
+    velocity, so each velocity rung lands on an acceleration rung to within
+    the rounding of a preferred number. It checks the two tables against each
+    other rather than against a third source, which is what makes it worth a
+    row: a transcription slip in either ladder breaks it.
+    """
+    factor = math.sqrt(2.0) * 2.0 * math.pi * _GEAR_CONVERSION_HZ / 1000.0
+    rungs = sorted(ph.vibration.GEAR_UNIT_ZONES["acceleration"])
+    worst = 0.0
+    for velocity in sorted(ph.vibration.GEAR_UNIT_ZONES["velocity"]):
+        converted = factor * velocity
+        nearest = min(rungs, key=lambda rung: abs(rung - converted))
+        worst = max(worst, abs(converted - nearest) / nearest)
+    return numeric(0.0, 100.0 * worst, 3.0, unit="%", places=3)

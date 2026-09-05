@@ -3,12 +3,12 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 766,
-    "passing": 766,
+    "checks": 767,
+    "passing": 767,
     "failing": 0,
     "domains": 66,
     "standards": 391,
-    "citations": 603,
+    "citations": 604,
     "designations": 125,
     "sources": 84
   },
@@ -185,8 +185,8 @@
     {
       "id": "machine-vibration-evaluation-iso-20816",
       "title": "Machine vibration evaluation (ISO 20816)",
-      "checks": 63,
-      "passing": 63
+      "checks": 64,
+      "passing": 64
     },
     {
       "id": "speech-intelligibility-ansi-s3-5-1997",
@@ -10783,6 +10783,35 @@
         "value": 0.0
       },
       "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-9-2020-table-4-note/velocity-rungs-carried-onto-acceleration-rungs-at-280-hz-worst-error",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-9",
+        "edition": "2020",
+        "clause": "Table 4, note",
+        "cite": "ISO 20816-9:2020 Table 4, note"
+      },
+      "quantity": "Velocity rungs carried onto acceleration rungs at 280 Hz, worst error, %",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 2.034
+      },
+      "unit": "%",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 3.0
+      },
+      "deviation": {
+        "value": 2.034
+      },
+      "precision": 3,
       "verdict": "pass"
     },
     {
