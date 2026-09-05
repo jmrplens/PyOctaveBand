@@ -219,10 +219,12 @@ def _number(text: str) -> float:
 def parse_entries(markdown: str) -> list[Entry]:
     """Split the registry into entries.
 
-    An entry is a ``## `` section carrying a Location bullet; the preamble and
-    the closing "Related source properties" section carry none and are not
-    entries. Whether the entry also closes with a Status is checked, not
-    assumed: see :func:`check_records_are_closed`.
+    An entry is a ``## `` section carrying either of the two bullets a record
+    is made of, a Location or a Status; the preamble and the closing "Related
+    source properties" section carry neither and are not entries. Recognising
+    on either rather than on the Status alone is what lets a missing Status be
+    reported instead of making the whole record disappear: see
+    :func:`check_records_are_closed`.
     """
     entries: list[Entry] = []
     title: str | None = None
@@ -237,7 +239,8 @@ def parse_entries(markdown: str) -> list[Entry]:
             buffer.append(line)
     if title is not None:
         entries.append(Entry(title, "\n".join(buffer), start))
-    return [e for e in entries if any(b in e.body for b in LOCATION_BULLETS)]
+    marks = LOCATION_BULLETS + STATUS_BULLETS
+    return [e for e in entries if any(mark in e.body for mark in marks)]
 
 
 def check_records_are_closed(entries: list[Entry], register: str) -> list[str]:
