@@ -29,3 +29,9 @@ overrides:
   # against it (verified by running the pa11y audit); the pin only matters at
   # install time, so this can go once pa11y ships on puppeteer 25.
   "@puppeteer/browsers@<3": ^3.1.0
+  # satori pins fflate at exactly 0.7.3, whose unzipSync can be walked into
+  # an infinite loop by a malformed ZIP64 archive. The site never unzips
+  # anything, so this is reachable by nothing here, but the patch release is
+  # a drop-in and the tree already carries 0.7.5 for another parent. Goes
+  # once satori floats past the pin.
+  "fflate@0.7.3": ^0.7.5
