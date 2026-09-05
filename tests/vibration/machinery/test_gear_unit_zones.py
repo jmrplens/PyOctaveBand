@@ -108,7 +108,8 @@ def test_every_row_of_the_classification(
     key: tuple[str, str], printed: tuple[float, float, float | None]
 ) -> None:
     ratings = vibration.GEAR_UNIT_CLASSES[key]
-    assert (ratings.displacement, ratings.velocity, ratings.acceleration) == printed
+    actual = (ratings.displacement, ratings.velocity, ratings.acceleration)
+    assert actual == printed
 
 
 def test_every_class_rating_indexes_a_row_of_its_table() -> None:
