@@ -16,6 +16,14 @@
 Annex II 2.3.2, formula (2.3.12)	standard	Directive 2002/49/EC	-	Annex II 2.3.2, formula (2.3.12)
 Annex II 2.3.2, formulae (2.3.13) and (2.3.14)	standard	Directive 2002/49/EC	-	Annex II 2.3.2, formulae (2.3.13) and (2.3.14)
 Annex II 2.3.2, formula (2.3.15)	standard	Directive 2002/49/EC	-	Annex II 2.3.2, formula (2.3.15)
+# The railway coefficient tables are the appendices of that same Annex II, and
+# each row spans tables the two directives own between them: G-1a is the 2015
+# text and G-1b the 2021 replacement, G-5 and G-6 are 2015 and G-4 and G-7 are
+# 2021. No one directive is the document, so the citation names the directive
+# the Annex belongs to, as the three lines above do.
+Appendix G Tables G-1a and G-1b (roughness)	standard	Directive 2002/49/EC	-	Appendix G Tables G-1a and G-1b (roughness)
+Appendix G Table G-3 (transfer functions)	standard	Directive 2002/49/EC	-	Appendix G Table G-3 (transfer functions)
+Appendix G Tables G-4 to G-7	standard	Directive 2002/49/EC	-	Appendix G Tables G-4 to G-7
 # The NORAH2 guidance is a published report whose title carries no clause word
 # the parser recognises, so the split falls to the whole string.
 NORAH2 guidance mean ground plane (Eq. 36-40)	report	NORAH2 guidance	-	mean ground plane (Eq. 36-40)

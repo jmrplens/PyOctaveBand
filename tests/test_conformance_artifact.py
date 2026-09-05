@@ -193,6 +193,82 @@ def test_the_override_ratchet_carries_no_dead_lines(committed: dict) -> None:
     assert gate._ratchet_problems(committed) == []
 
 
+def test_no_designation_stops_before_the_document_number(committed: dict) -> None:
+    """A designation that names the series but not the document files two
+    documents under one name. ECAC Doc 29 is the airport-noise method and Doc
+    32 the rotorcraft one, and both were "ECAC Doc" until the parser learned
+    the series prefixes; the bibliography then joined eighteen checks of two
+    different documents onto one row.
+
+    The tell is that a standard's number carries a digit and always follows the
+    body, so a designation with no digit whose clause opens with one has lost
+    it. Books and articles are cited the other way round -- "Hopkins (2007)
+    3.6.3.1" is one work and a section of it -- which is why only the
+    documents issued by a body are asked.
+    """
+    truncated = [
+        (reference["designation"], reference["cite"])
+        for check in committed["checks"]
+        for reference in [check["reference"]]
+        if reference["kind"] in {"standard", "report"}
+        and not any(char.isdigit() for char in reference["designation"])
+        and any(char.isdigit() for char in (reference.get("clause") or " ").split()[0])
+    ]
+    assert truncated == []
+
+
+def test_a_document_series_is_part_of_the_designation() -> None:
+    """ "Doc 29" and "Doc 32" are two documents, not two clauses of one."""
+    for cite, designation in (
+        ("ECAC Doc 29 NPD interpolation", "ECAC Doc 29"),
+        ("ECAC Doc 32 Table 4", "ECAC Doc 32"),
+        ("SAE ARP 5534 pure-tone coefficient (ISO 9613-1)", "SAE ARP 5534"),
+        ("ICAO Annex 16 Vol. I App. 2 Table A2-3", "ICAO Annex 16"),
+        ("ICAO Doc 9501 ETM Vol. I Table 3-7", "ICAO Doc 9501"),
+        ("ISO/IEC Guide 98-3 Annex G.4", "ISO/IEC Guide 98-3"),
+        ("ISO/PAS 20065:2016 Clause 5.3.8", "ISO/PAS 20065"),
+        ("ASA WG S3-79 CB.TST", "ASA WG S3-79"),
+        ("EBU Tech 3341:2023 Table 1 case 1", "EBU Tech 3341"),
+        (
+            "Directive (EU) 2015/996 Appendix F, Tables F-2 and F-3",
+            "Directive (EU) 2015/996",
+        ),
+    ):
+        assert references.parse(cite, overrides={}).designation == designation, cite
+
+
+def test_an_amended_edition_is_still_an_edition() -> None:
+    """``ISO 10140-5:2010+A1`` matched no year, so the whole of the number fell
+    into the clause and the document became the bare body "ISO".
+    """
+    reference = references.parse("ISO 10140-5:2010+A1 Annex B, Table B.1", overrides={})
+    assert (reference.designation, reference.edition, reference.clause) == (
+        "ISO 10140-5",
+        "2010+A1",
+        "Annex B, Table B.1",
+    )
+
+
+def test_a_series_prefix_does_not_swallow_a_plain_designation() -> None:
+    """The series entries sit before the bodies they extend, so the longest
+    match wins; a citation of the body alone must be unaffected.
+    """
+    for cite, designation in (
+        ("ISO 9613-2:1996 Table 3", "ISO 9613-2"),
+        ("IEC 61672-1:2013 (Leq)", "IEC 61672-1"),
+        ("Directive 2002/49/EC Annex II", "Directive 2002/49/EC"),
+        ("ISO/TR 17534-3:2015 Table 1", "ISO/TR 17534-3"),
+    ):
+        assert references.parse(cite, overrides={}).designation == designation, cite
+
+
+def test_a_series_designation_keeps_its_body_kind() -> None:
+    """ECAC publishes reports, and "ECAC Doc 29" is still an ECAC document."""
+    assert references.parse("ECAC Doc 29 NPD interpolation", overrides={}).kind is (
+        references.ReferenceKind.REPORT
+    )
+
+
 def test_a_standard_splits_into_designation_edition_and_clause() -> None:
     reference = references.parse("IEC 61260-1:2014 Table 1", overrides={})
     assert reference.kind is references.ReferenceKind.STANDARD

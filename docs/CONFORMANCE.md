@@ -238,10 +238,10 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Vorlander Auralization 2e, Eq. (11.38)-(11.39) | Image-source direct-sound amplitude 1/(4πr) and delay r/c (r = 4 m) | 0.0198944 (+/-0) | 0.0198944 | 0 | 0 % | ![Pass][cv-pass] Pass |
 | Kuttruff Room Acoustics 6e, Eq. (9.23) | Audible shoebox image count up to order 10 (= 1560) | 156 (+/-0) | 156 | 0 | 0 % | ![Pass][cv-pass] Pass |
 | Kuttruff Room Acoustics 6e, Eq. (4.6) | Temporal reflection density dN/dt = 4πc³t²/V (t = 0.1 s, V = 120 m³) | 42258.2 1/s (+/-0 1/s) | 42258.2 1/s | 0 1/s | 0 % | ![Pass][cv-pass] Pass |
-| Bies Engineering Noise Control 5e, Eq. (6.44) | Room constant R = Sᾱ/(1-ᾱ)  (S = 100 m², ᾱ = 0.2 → 25 m²) | 25 m² (+/-0 m²) | 25 m² | 0 m² | 0 % | ![Pass][cv-pass] Pass |
-| Bies Engineering Noise Control 5e, Eq. (6.43) | Critical distance rc: direct field = reverberant field (R = 25, Q = 1) | 0.160000 (= reverberant term) | 0.16 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| Bies 5e Eq. (6.44) | Room constant R = Sᾱ/(1-ᾱ)  (S = 100 m², ᾱ = 0.2 → 25 m²) | 25 m² (+/-0 m²) | 25 m² | 0 m² | 0 % | ![Pass][cv-pass] Pass |
+| Bies 5e Eq. (6.43) | Critical distance rc: direct field = reverberant field (R = 25, Q = 1) | 0.160000 (= reverberant term) | 0.16 | 0 | 0 % | ![Pass][cv-pass] Pass |
 | Kuttruff Room Acoustics 6e, Eq. (3.44) | Schroeder frequency f_s = 2000√(T/V)  (V = 200 m³, T = 1 s) | 141.421 Hz (+/-0 Hz) | 141.421 Hz | 0 Hz | 0 % | ![Pass][cv-pass] Pass |
-| Bies Engineering Noise Control 5e, Eq. (6.43) | Steady-state SPL Lp = Lw + 10lg(Q/4πr² + 4/R)  (Lw=90, r=1, R=25, Q=1) | 83.7945 dB (+/-0 dB) | 83.7945 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| Bies 5e Eq. (6.43) | Steady-state SPL Lp = Lw + 10lg(Q/4πr² + 4/R)  (Lw=90, r=1, R=25, Q=1) | 83.7945 dB (+/-0 dB) | 83.7945 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 
 </details>
 

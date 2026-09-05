@@ -68,8 +68,18 @@ class Reference:
 # with one of these is a standard, a regulation or an official report; the list
 # is explicit rather than a pattern because "AS" and "RD" are also English and
 # Spanish words, and a guess here silently changes what `counts` counts.
+#
+# Some entries name a body and the series it publishes in, "ECAC Doc" or
+# "SAE ARP", because the number alone does not identify the document: Doc 29 is
+# the airport-noise method and Doc 32 the rotorcraft one, and reading the body
+# as the designation filed both under "ECAC Doc" as though they were one book.
+# The rule for the ones that follow is the same as for the bodies: a fixed
+# prefix that every citation of that series is written with. Longest first,
+# since the alternation takes the first branch that matches.
 _BODIES = (
+    "ISO/IEC Guide",
     "ISO/IEC",
+    "ISO/PAS",
     "ISO/TR",
     "ISO/TS",
     "ISO",
@@ -81,14 +91,19 @@ _BODIES = (
     "ANSI/ASA",
     "ANSI",
     "ASTM",
+    "ASA WG",
     "ASA",
     "AES",
+    "EBU Tech",
     "EBU",
     "ITU-R",
     "ITU-T",
     "ECMA",
+    "SAE ARP",
     "SAE",
     "ARP",
+    "ICAO Annex",
+    "ICAO Doc",
     "ICAO",
     "SMPTE",
     "IEEE",
@@ -103,6 +118,7 @@ _BODIES = (
     "UNE",
     "JIS",
     "NASA",
+    "ECAC Doc",
     "ECAC",
     "FAA",
     "EASA",
@@ -112,6 +128,7 @@ _BODIES = (
     "MIL",
     "CTE",
     "RD",
+    "Directive (EU)",
     "Directive",
     "Regulation",
     "Reglamento",
@@ -128,10 +145,13 @@ _BODY_ALTERNATION = "|".join(re.escape(body) for body in _BODIES)
 #: ``IEC 61260-1:2014 Table 1`` - body, designation, optional edition, clause.
 #: The designation stops at the first space that is followed by something that
 #: is not part of a designation token, which the non-greedy run plus the
-#: optional edition group achieves.
+#: optional edition group achieves. The edition takes an amendment marker,
+#: because ``ISO 10140-5:2010+A1`` otherwise matches no year at all and the
+#: whole of ``10140-5:2010+A1`` falls into the clause, leaving the bare body as
+#: the document.
 _STANDARD = re.compile(
     rf"^(?P<designation>(?:{_BODY_ALTERNATION})[ ]?[A-Za-z]?[\w./()-]*?)"
-    r"(?:(?P<sep>[:-])(?P<edition>\d{4}))?"
+    r"(?:(?P<sep>[:-])(?P<edition>\d{4}(?:\+A\d+)?))?"
     r"(?:\s+(?P<clause>\S.*))?$"
 )
 

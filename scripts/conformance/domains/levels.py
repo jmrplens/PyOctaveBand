@@ -459,7 +459,7 @@ def _chk_reflection_density() -> Outcome:
 
 @register(
     "Room acoustics",
-    "Bies Engineering Noise Control 5e, Eq. (6.44)",
+    "Bies 5e Eq. (6.44)",
     "Room constant R = Sᾱ/(1-ᾱ)  (S = 100 m², ᾱ = 0.2 → 25 m²)",
 )
 def _chk_room_constant() -> Outcome:
@@ -470,7 +470,7 @@ def _chk_room_constant() -> Outcome:
 
 @register(
     "Room acoustics",
-    "Bies Engineering Noise Control 5e, Eq. (6.43)",
+    "Bies 5e Eq. (6.43)",
     "Critical distance rc: direct field = reverberant field (R = 25, Q = 1)",
 )
 def _chk_critical_distance_crossover() -> Outcome:
@@ -498,7 +498,7 @@ def _chk_schroeder_frequency() -> Outcome:
 
 @register(
     "Room acoustics",
-    "Bies Engineering Noise Control 5e, Eq. (6.43)",
+    "Bies 5e Eq. (6.43)",
     "Steady-state SPL Lp = Lw + 10lg(Q/4πr² + 4/R)  (Lw=90, r=1, R=25, Q=1)",
 )
 def _chk_steady_state_spl() -> Outcome:
