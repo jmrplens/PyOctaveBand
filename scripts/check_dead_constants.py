@@ -4,10 +4,10 @@
 A constant with a leading underscore and an upper-case name is a number or a
 table lifted out of a standard so that the code that uses it can say where it
 came from. One that nothing reads is either a leftover, or the trace of a
-check that was planned and never written, and the second is the reason this
-guard exists rather than a periodic sweep: the last audit turned up a
-frequency-range warning that was never added and a docstring that promised a
-default the code did not take.
+check the docstring above it still promises, and the second is the reason this
+guard exists rather than a periodic sweep: the sweep it came from turned up a
+recommended specimen velocity the code carried and never checked, and a
+docstring that promised a default the code did not take.
 
 The scan is one AST pass over ``src``, ``tests`` and ``scripts``. A name
 counts as read when it appears as a loaded :class:`ast.Name`, as an attribute,

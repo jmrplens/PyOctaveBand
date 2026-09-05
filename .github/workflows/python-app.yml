@@ -527,10 +527,10 @@ jobs:
 
   # A private module-level constant is a number lifted out of a standard so the
   # code that uses it can say where it came from, and one nothing reads is
-  # either a leftover or the trace of a check that was planned and never
-  # written. The last sweep found both: a validator whose narrowest-span rule
-  # existed only as a comment, and a docstring promising a default the code did
-  # not take. Static and dependency-free, so it runs on its own.
+  # either a leftover or the trace of a check the docstring above it still
+  # promises. The sweep this came from found both: a recommended specimen
+  # velocity carried and never checked, and a docstring promising a default the
+  # code did not take. Static and dependency-free, so it runs on its own.
   dead-constants:
     name: No private constant goes unread
     runs-on: ubuntu-latest
