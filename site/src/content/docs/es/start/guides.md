@@ -737,6 +737,9 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 y EBU R 128.
 - [Ruido por conductos: del ventilador a la sala](/phonometry/es/devices/noise-control/duct-path/):
   el cálculo completo del ventilador a la sala frente a un criterio de ruido de
   fondo, y el corte de modos superiores que limita todo método de onda plana.
+- [Ruido de climatización a la alemana (VDI 2081)](/phonometry/es/devices/noise-control/vdi2081-air-systems/):
+  la misma cadena por la directriz alemana, del modelo de ventilador por tipo
+  de montaje al paso a la sala, contra la hoja resuelta de su propia Parte 2.
 - [Entre recintos: partición, receptor y criterio](/phonometry/es/devices/noise-control/room-to-room/):
   la cadena compuesta del recinto emisor al recinto receptor y la pérdida por
   transmisión que necesita una partición o un cerramiento para cumplir un

@@ -1,0 +1,274 @@
+---
+title: "Ruido de climatización a la alemana (VDI 2081)"
+description: "El camino de la VDI 2081 desde el punto de trabajo de un ventilador hasta el nivel en la sala: el modelo de ventilador por tipo de montaje de la Ecuación (13), la atenuación y el ruido de flujo de cada elemento del conducto, el silenciador de bafles y su ruido propio, y el paso a la sala de la Ecuación (36), todo contra la hoja resuelta de la Tabla 1 de la Parte 2."
+references:
+  - type: standard
+    organization: "Verein Deutscher Ingenieure"
+    year: 2001
+    title: "Geräuscherzeugung und Lärmminderung in Raumlufttechnischen Anlagen"
+    designation: "VDI 2081 Blatt 1:2001-07"
+    primary: true
+    note: "El método: el ventilador del apartado 4.3 con las Ecuaciones (13) y (15), la atenuación de conducto del apartado 6 con las Tablas 5 y 8, el ruido de flujo de las Ecuaciones (16) y (17), el silenciador de bafles y su ruido propio de la Ecuación (49), la reflexión de boca del apartado 6.6 y el paso a la sala de la Ecuación (36). Sustituida por Blatt 1:2022-04, que no está en la biblioteca."
+  - type: standard
+    organization: "Verein Deutscher Ingenieure"
+    year: 2005
+    title: "Geräuscherzeugung und Lärmminderung in Raumlufttechnischen Anlagen — Beispiele"
+    designation: "VDI 2081 Blatt 2:2005-05"
+    primary: true
+    note: "El oráculo: una red de impulsión resuelta elemento a elemento en la Tabla 1, con todos los espectros intermedios impresos, y la curva de valoración del apartado 1.1. Sustituida por Blatt 2:2022-10, que no está en la biblioteca."
+---
+
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import SeeAlso from '../../../../../components/SeeAlso.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+[Ruido transmitido por conductos](/phonometry/es/devices/noise-control/duct-path/)
+responde a la misma pregunta que esta página, y la responde de otra manera.
+Aquella es la vía angloamericana, construida sobre la Tabla 14.9 de Long y la
+ley de escalado de ASHRAE. Esta es la **VDI 2081**, la directriz alemana, que
+llega al nivel en la sala con otro conjunto de modelos y los ancla en un
+ejemplo resuelto propio.
+
+Dos métodos para una pregunta no es duplicar. Cada uno lleva sus propios
+argumentos, sus propias tablas y su propia hoja resuelta, y donde discrepan
+conviene saberlo. La biblioteca los mantiene separados con `model=`, así que un
+cálculo no puede acabar medio en uno y medio en el otro.
+
+## 1. La instalación, y de dónde sale cada número
+
+La Parte 2 es una tabla de veinte elementos numerados. Se lee mejor como un
+lugar.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vdi2081_sheet.svg" alt="Sección de una sala de máquinas y una oficina. En la sala de máquinas, un ventilador de impulsión, el elemento 1, que da 16 000 metros cúbicos por hora contra 600 pascales. De él sale un conducto que recorre de izquierda a derecha cuatro cajas: el elemento 2, un silenciador de bafles de cinco bafles; el elemento 3, una ramificación que toma 0,30 de 1,08 metros cuadrados; el elemento 5, cuatro metros de conducto recto de 0,5 por 0,4 metros; y el elemento 14, un codo circular de 160 milímetros. Termina en el elemento 19, dos difusores, y baja por el techo de la sala 102, donde un oyente de pie está a 1,5 metros de la boca. Una franja inferior nombra la ecuación o la tabla de la que sale el número de cada elemento." width="100%" />
+
+*Cada caja es una fila de la Tabla 1. La franja bajo el dibujo es lo que una
+tabla de resultados no puede enseñar: de qué ecuación, tabla o medida sale cada
+número.*
+
+La forma del cálculo es la de cualquier hoja de ruido de conductos: una fuente,
+un recorrido que quita nivel y devuelve algo, y una sala que convierte potencia
+sonora en presión sonora. Lo que cambia es cada modelo de dentro.
+
+## 2. La fuente: un ventilador descrito por su montaje
+
+ASHRAE describe un ventilador por su **tipo** y le lee una fila de constantes
+por banda. La VDI 2081 lo describe por su **montaje**, y saca el espectro de
+una fórmula. El apartado 4.3 da el nivel global como
+
+$$
+L_{W4} = L_\mathrm{WSM} + 10 \lg \dot{V} + 20 \lg \Delta p_\mathrm{t}
+$$
+
+la Ecuación (13), con el nivel específico de potencia sonora representativo
+$L_\mathrm{WSM}$ del montaje: 34 dB para un ventilador radial con álabes
+curvados hacia atrás, 36 dB para un rotor cilíndrico con álabes curvados hacia
+delante y 42 dB para un axial con difusor aguas abajo. La forma sale luego de
+la Ecuación (15), una parábola en el logaritmo del número de Strouhal que cada
+montaje desplaza con su propio $c_3$.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_fan_assemblies.svg" alt="Dos paneles. A la izquierda, el nivel de potencia sonora por bandas de octava frente a la frecuencia para tres montajes de ventilador en el mismo punto de trabajo: el radial con álabes hacia atrás cae de 90 a 60 decibelios, el rotor cilíndrico con álabes hacia delante va unos tres decibelios por encima, y el axial con difusor aguas abajo está muy por encima de ambos, con un máximo cerca de 250 hercios en 99 decibelios y 106 decibelios globales. A la derecha, la corrección por banda de la Ecuación 15 como parábola continua para cada uno de los tres parámetros espectrales, con los marcadores de las ocho octavas de la hoja sobre las curvas." width="100%" />
+
+*El mismo aire, el mismo aumento de presión, y ocho decibelios globales más por
+elegir una máquina axial.*
+
+```python
+from phonometry import noise_control
+
+for assembly in ("rr", "t", "am"):
+    fan = noise_control.fan_sound_power(
+        16000 / 3600,
+        model="vdi2081",
+        fan_total_pressure_pa=600.0,
+        assembly=assembly,
+        fan_speed_rpm=1250.0,
+    )
+    print(assembly, [round(float(v), 1) for v in fan.values[:3]])
+```
+
+En esa llamada viven dos trampas.
+
+**La presión es el aumento de presión total, no la presión estática.** La ley
+de ASHRAE escala la estática; la VDI 2081, la total. Son magnitudes distintas,
+y confundirlas cuesta veinte veces el logaritmo de su cociente. Por eso cada
+modelo toma solo el argumento sobre el que está escrita su propia norma,
+declarado con `typing.overload`, de modo que no se puedan intercambiar por
+descuido.
+
+**El número de Strouhal no lleva diámetro de rodete.** Se cancela entre la
+velocidad de punta y la circunferencia del rodete, así que
+$St = 60 f / (\pi n)$ depende solo de la velocidad de giro. Un nomograma que
+pida el tamaño del rodete está respondiendo a otra pregunta.
+
+## 3. Lo que el recorrido quita
+
+Cuatro modelos, uno por clase de elemento, cada uno con su tabla de la propia
+directriz detrás.
+
+- **Conducto recto** (apartado 6.1, Tabla 5): decibelios por metro según el
+  tamaño del conducto, con `unlined_rectangular_duct_attenuation` y
+  `unlined_circular_duct_attenuation` y `model="vdi2081"`. Un conducto
+  rectangular de chapa quita mucho más a 63 Hz que uno circular, porque lo que
+  cede son sus paredes.
+- **Codo** (apartado 6.2, Tabla 8): según el tamaño del propio codo, con
+  `elbow_insertion_loss`.
+- **Cambio de sección** (apartado 6.3): la reducción que da la VDI 3733,
+  limitada a 5 dB, porque el valor impreso solo se alcanza con el conducto
+  terminado anecoicamente por los dos extremos.
+- **Ramificación** (apartado 6.5): la parte del caudal que se lleva la rama,
+  con `split_loss`.
+
+```python
+from phonometry import noise_control
+import numpy as np
+
+bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+run = noise_control.unlined_rectangular_duct_attenuation(
+    bands, 0.500, 0.400, 4.000, model="vdi2081"
+)
+print([round(float(v), 2) for v in run.values])
+```
+
+Un silenciador de bafles no es uno de estos: su pérdida de inserción viene de
+la medida del fabricante, según la ISO 7235, y la directriz lo dice.
+`splitter_silencer_insertion_loss` es la estimación para cuando no la hay.
+
+## 4. Lo que el recorrido devuelve
+
+El aire que se mueve por un conducto hace ruido, y pasado el silenciador a
+menudo no queda otra cosa que oír. La VDI 2081 lo da en forma cerrada.
+
+- **Un tramo recto** (Ecuación (16)) y **un codo o una ramificación**
+  (Ecuación (17)), con `flow_noise_straight_duct` y `flow_noise_bend`. Ambas
+  están escritas sobre un número de Strouhal construido con el diámetro del
+  propio elemento y la velocidad que lo atraviesa, y las dos figuras declaran
+  que solo valen por encima de $St = 1$, así que la biblioteca no devuelve nada
+  por debajo en lugar de extrapolar una curva que la directriz no dibuja.
+- **El ruido propio de un silenciador de bafles** (Ecuación (49)), con
+  `silencer_self_noise`, que depende de la velocidad en los huecos entre bafles
+  y de la pérdida de carga. Es la razón de que un silenciador tenga un tamaño
+  óptimo: si se estrechan los huecos sube la pérdida de inserción, pero también
+  la velocidad, y pasado un punto el silenciador suena más que lo que quitaba.
+- **La propia boca**, con `diffuser_sound_power`.
+
+## 5. El paso a la sala, y las dos áreas que no son el mismo número
+
+La Ecuación (36) convierte la potencia sonora que llega a la boca en el nivel
+que oye una persona:
+
+$$
+L_W - L_p = -10 \lg \left( \frac{Q}{4 \pi r^{2}} + \frac{4}{A} \right)
+$$
+
+Dos cosas de ella se confunden con facilidad.
+
+**$A$ es el área de absorción equivalente, no la constante de sala.** La
+constante de sala es $R = A/(1 - \bar\alpha)$, y las dos son áreas en metros
+cuadrados y las dos son positivas, así que poner una donde va la otra es un
+error silencioso: el número sale verosímil y mal. Por eso `room_effect` y
+`room.steady_state_spl` toman `absorption_area=` y `room_constant=` como
+argumentos distintos, y solo se puede dar exactamente uno.
+
+**$Q$ cambia con la frecuencia.** Un difusor de techo es tanto más direccional
+cuanto más corta es la longitud de onda, y la directriz lee $Q$ de una gráfica
+frente a la frecuencia en lugar de suponer un semiespacio. Las dos funciones
+admiten una directividad que varía entre bandas.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_room_step.svg" alt="Dos paneles. A la izquierda, la diferencia entre el nivel de potencia sonora y el de presión sonora frente a la frecuencia para el difusor de techo del ejemplo resuelto: cae de 5,6 decibelios a 63 hercios hasta 3,4 a 8 kilohercios según sube el factor de directividad de la boca, mientras que un semiespacio con factor de directividad 2 daría 5,7 decibelios planos en todas las bandas. A la derecha, la misma diferencia frente a la distancia a la boca para el área de absorción equivalente de 20 metros cuadrados y para las dos constantes de sala en que la convierten un coeficiente medio de absorción de 0,15 y de 0,4, con los 1,5 metros del oyente marcados." width="100%" />
+
+*Izquierda: los 5,7 dB únicos que la hoja imprime al lado de la fila no son
+ninguno de los ocho valores por banda, porque son la misma sala con la
+directividad de un semiespacio. Derecha: meter la constante de sala en el
+argumento del área de absorción cuesta cerca de un decibelio en esta sala, y
+más en una más viva.*
+
+```python
+from phonometry import noise_control
+import numpy as np
+
+directivity = np.array([2.1, 2.4, 3.0, 4.0, 5.5, 6.7, 7.0, 7.2])
+shaped = noise_control.room_effect(1.5, absorption_area=20.0, directivity=directivity)
+print([round(float(v), 1) for v in np.asarray(shaped)])
+print(round(float(noise_control.room_effect(1.5, absorption_area=20.0)), 1))
+```
+
+## 6. La hoja, de principio a fin
+
+La Parte 2 existe para anclar a la Parte 1: una red de impulsión resuelta
+elemento a elemento, con todas las magnitudes intermedias impresas. Eso la
+convierte en un oráculo de una clase que el lado ASHRAE del módulo no tiene, y
+para un modelo de verdad distinto, no para una reformulación del mismo.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_chain_cascade.svg" alt="Niveles por bandas de octava en cinco etapas del ejemplo resuelto: en el ventilador, cerca de 90 decibelios y cayendo suavemente; tras el silenciador de bafles, que quita cuarenta decibelios de las bandas medias y deja una meseta cerca de 45 decibelios por encima de 1 kilohercio; tras la ramificación, unos decibelios menos; la potencia sonora que los dos difusores meten en la sala; y el nivel de presión sonora en el oyente, de 48 decibelios a 63 hercios a 29 a 8 kilohercios. La leyenda da el total ponderado A de cada etapa, que baja de 86 a 40 decibelios A." width="100%" />
+
+*El silenciador hace casi todo el trabajo, y lo que deja es una meseta: pasado
+1 kHz el nivel ya no sigue al ventilador, porque lo que se oye ahí es el ruido
+que hace el propio aire al pasar.*
+
+El nivel ponderado A en la sala 102 sale 40,0 dB(A) frente a los 40,0 que
+imprime la hoja, y el total sin ponderar 51,4 frente a 51,4. Cuarenta y seis
+filas de conformidad sujetan cada elemento de la cadena a la décima de
+decibelio a la que está impresa la tabla, banda a banda y no por la suma: una
+suma es ciega a la forma, y cualquier par de errores que se compensen la pasa.
+
+Si la sala está lo bastante silenciosa lo decide entonces el apartado 1.1 de la
+Parte 2, que convierte una exigencia ponderada A en un límite por octava:
+
+```python
+from phonometry import noise_control
+
+limits = noise_control.octave_band_limits(35.0)
+print([round(float(v)) for v in limits.values])
+```
+
+## 7. Lo que la propia directriz tiene mal
+
+Hay cuatro defectos registrados en [el registro de
+erratas](/phonometry/es/reference/errata/), todos verificados contra la página
+impresa.
+
+- La lista de símbolos bajo la Ecuación (36) manda a buscar $A$ en la propia
+  Ecuación (36), que es donde ya está el lector.
+- La columna inglesa del apartado 6.7.3 llama esférica a una radiación
+  hemisférica, y la columna alemana de al lado no.
+- La columna inglesa del apartado 6.4 dice lo contrario que la alemana sobre en
+  qué sentido va con la frecuencia la atenuación de un conducto.
+- La Tabla 1 de la Parte 2 imprime para el elemento 2 un diámetro hidráulico
+  que no es el que usa para calcular.
+
+Las ediciones implementadas aquí son la Parte 1:2001-07 y la Parte 2:2005-05.
+Las dos están sustituidas por las de 2022, y ninguna sucesora está en la
+biblioteca; el par que sí lo está es coherente, porque la Parte 2:2005 se
+escribió contra la Parte 1:2001 y todas las referencias cruzadas de sus tablas
+resuelven ahí.
+
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El ventilador del apartado 4.3 mediante `fan_sound_power(model="vdi2081")`, la
+atenuación de conducto, codo, cambio de sección y ramificación del apartado 6,
+el ruido de flujo de las Ecuaciones (16) y (17), el silenciador de bafles y su
+ruido propio, la reflexión de boca del apartado 6.6, el paso a la sala de la
+Ecuación (36) y la curva de valoración del apartado 1.1 de la Parte 2, todo
+contra la hoja resuelta de la Tabla 1 de la Parte 2.
+</ScopeClaim>
+<ScopeClaim status="not-covered" label="No cubierto">
+Los capítulos de unidades de tratamiento de aire y de propagación al exterior
+que añadió la revisión de 2019, que están en las ediciones que no hay aquí; la
+acústica de salas que la VDI 2081 deja a la VDI 2569; y el aislamiento de
+vibraciones de la instalación, que es otra directriz distinta.
+</ScopeClaim>
+</Scope>
+
+<SeeAlso>
+
+## Véase también
+
+- [Ruido transmitido por conductos: del ventilador a la sala](/phonometry/es/devices/noise-control/duct-path/):
+  la misma pregunta por la vía angloamericana, y el límite de onda plana que
+  acota a las dos.
+- [Silenciadores](/phonometry/es/devices/noise-control/silencers/): qué está
+  haciendo un silenciador de bafles y cómo se mide su pérdida de inserción.
+- [Ruido entre salas](/phonometry/es/devices/noise-control/room-to-room/): el
+  camino que no va por un conducto.
+
+</SeeAlso>

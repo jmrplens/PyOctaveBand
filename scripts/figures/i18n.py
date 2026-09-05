@@ -45,6 +45,44 @@ _LANG = "en"
 _LANG_SUFFIX = ""
 
 _ES_EXACT = {
+    # HVAC noise by the German method (VDI 2081): the fan its assembly type
+    # describes, the worked sheet element by element, and the room step.
+    "The Same Duty Point, Three Assemblies": "El mismo punto de trabajo, tres montajes",
+    "Sound power level (dB)": "Nivel de potencia sonora (dB)",
+    "radial, blades curved backwards (94 dB overall)": "radial con álabes curvados hacia atrás (94 dB globales)",
+    "cylindrical rotor, blades curved forwards (98 dB overall)": "rotor cilíndrico con álabes curvados hacia delante (98 dB globales)",
+    "axial, with a diffuser downstream (106 dB overall)": "axial con difusor aguas abajo (106 dB globales)",
+    "16 000 m³/h against 600 Pa of total pressure rise, at 1250 min⁻¹": "16 000 m³/h contra 600 Pa de aumento de presión total, a 1250 min⁻¹",
+    "Correction on the overall level (dB)": "Corrección sobre el nivel global (dB)",
+    "One Parabola, Moved Along by $c_3$": "Una parábola, desplazada por $c_3$",
+    "radial, $c_3$ = 0.4": "radial, $c_3$ = 0,4",
+    "cylindrical rotor, $c_3$ = 0.15": "rotor cilíndrico, $c_3$ = 0,15",
+    "axial, $c_3$ = -0.6": "axial, $c_3$ = -0,6",
+    "$\\Delta L_{W,\\mathrm{oct}} = -5 - 5(\\lg St + c_3)^2$,\n"
+    "$St = 60 f/(\\pi n)$: no impeller diameter, it cancels\n"
+    "markers: the eight octaves the sheet is written in": "$\\Delta L_{W,\\mathrm{oct}} = -5 - 5(\\lg St + c_3)^2$,\n"
+    "$St = 60 f/(\\pi n)$: sin diámetro de rodete, se cancela\n"
+    "marcadores: las ocho octavas en que está escrita la hoja",
+    "One Supply Duct, Element by Element": "Un conducto de impulsión, elemento a elemento",
+    "Level (dB)": "Nivel (dB)",
+    "at the fan (element 1): 86 dB(A)": "en el ventilador (elemento 1): 86 dB(A)",
+    "past the silencer (element 2): 63 dB(A)": "tras el silenciador (elemento 2): 63 dB(A)",
+    "past the branch (element 3): 57 dB(A)": "tras la ramificación (elemento 3): 57 dB(A)",
+    "into the room (element 19): 45 dB(A)": "hacia la sala (elemento 19): 45 dB(A)",
+    "at the listener (element 20): 40 dB(A)": "en el oyente (elemento 20): 40 dB(A)",
+    "the first four rows are sound power, the last is sound pressure:\n"
+    "the room step is where the quantity changes": "las cuatro primeras filas son potencia sonora y la última es presión sonora:\n"
+    "el paso a la sala es donde cambia la magnitud",
+    "A Directivity That Moves With Frequency": "Una directividad que cambia con la frecuencia",
+    "$L_W - L_p$ (dB)": "$L_W - L_p$ (dB)",
+    "the outlet's own $Q$, band by band": "el $Q$ propio de la boca, banda a banda",
+    "a half space, $Q$ = 2: 5.7 dB in every band": "un semiespacio, $Q$ = 2: 5,7 dB en todas las bandas",
+    "Two Areas That Are Not the Same Number": "Dos áreas que no son el mismo número",
+    "$R = A/(1-\\bar\\alpha)$ = 24 m², $\\bar\\alpha$ = 0.15": "$R = A/(1-\\bar\\alpha)$ = 24 m², $\\bar\\alpha$ = 0,15",
+    "$R = A/(1-\\bar\\alpha)$ = 33 m², $\\bar\\alpha$ = 0.4": "$R = A/(1-\\bar\\alpha)$ = 33 m², $\\bar\\alpha$ = 0,4",
+    "$A$ = 20 m², the guideline's own argument": "$A$ = 20 m², el argumento de la propia directriz",
+    "the listener, 1.5 m out": "el oyente, a 1,5 m",
+    "Distance from the outlet (m)": "Distancia a la boca (m)",
     # Materials: diffusers, resilient layers and in-situ surfaces (B11b)
     r"$s^{\prime}_\mathrm{t}$, frame (Formula 4)": r"$s^{\prime}_\mathrm{t}$, esqueleto (Fórmula 4)",
     r"$s^{\prime}_\mathrm{a}$, enclosed gas (Formula 7, $\varepsilon = 0.9$)": r"$s^{\prime}_\mathrm{a}$, aire encerrado (Fórmula 7, $\varepsilon = 0{,}9$)",

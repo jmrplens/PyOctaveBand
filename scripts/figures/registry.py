@@ -183,6 +183,9 @@ from .devices import (
     generate_swept_sine_methods,
     generate_swept_sine_thd,
     generate_true_peak_intersample,
+    generate_vdi2081_chain_cascade,
+    generate_vdi2081_fan_assemblies,
+    generate_vdi2081_room_step,
     generate_vibration_sound_power,
 )
 from .environment import (
@@ -1167,6 +1170,11 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_duct_regenerated_noise,
     generate_duct_sheet_verification,
     generate_duct_path_cascade,
+    # The German method beside it (VDI 2081): the fan its assembly type
+    # describes, the worked sheet element by element, and the room step.
+    generate_vdi2081_fan_assemblies,
+    generate_vdi2081_chain_cascade,
+    generate_vdi2081_room_step,
     generate_room_to_room_chain,
     generate_room_to_room_partitions,
     generate_duct_mode_cut_on,

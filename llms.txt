@@ -303,6 +303,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Room to room: partition, receiving room, criterion](https://jmrplens.github.io/phonometry/devices/noise-control/room-to-room/)
 - [Silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/)
 - [Industrial noise control: HVAC and enclosures](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/)
+- [HVAC noise the German way (VDI 2081)](https://jmrplens.github.io/phonometry/devices/noise-control/vdi2081-air-systems/)
 
 ## Wave simulation
 

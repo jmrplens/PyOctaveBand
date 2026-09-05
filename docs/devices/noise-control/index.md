@@ -68,6 +68,9 @@ occupational limit applies, in [Occupational exposure
 - [Duct-Borne Noise: Fan to Room](duct-path.md): the
   end-to-end fan-to-room calculation against a room criterion, and the
   higher-order-mode cut-on that limits every plane-wave method.
+- [HVAC Noise the German Way (VDI 2081)](vdi2081-air-systems.md):
+  the same chain by the German guideline, against the worked sheet of its own
+  Part 2.
 - [Room to Room: Partition, Receiving Room, Criterion](room-to-room.md):
   the composed source-room to receiving-room chain and the transmission loss a
   partition or an enclosure needs to meet a noise criterion.

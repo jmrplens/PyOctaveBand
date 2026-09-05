@@ -2825,3 +2825,104 @@ def _d_microphone_references(s: SVG, th: Theme) -> None:
         14,
         th.muted,
     )
+
+
+def _d_vdi2081_sheet(s: SVG, th: Theme) -> None:
+    """The VDI 2081 Part 2 worked sheet as a place, and where each number comes from.
+
+    Table 1 is twenty numbered elements in a column; this is the same twenty
+    as an installation, so a reader can see which of them takes level out,
+    which puts it back, and which does both. The strip along the bottom names
+    the equation or the measurement each row is obtained from, which is the
+    part a table of results cannot show.
+    """
+    plant_x, room_x = 40.0, 552.0
+    plant_top, ceil_y, floor_y = 108.0, 314.0, 452.0
+
+    # --- the two spaces ----------------------------------------------------
+    s.ground(floor_y, 24.0, 876.0)
+    s.rect(plant_x, plant_top, 210.0, floor_y - plant_top, th.panel, th.fg, sw=2.4)
+    s.rect(room_x, ceil_y, 312.0, floor_y - ceil_y, th.panel, th.fg, sw=2.4)
+    s.text(
+        plant_x + 10, plant_top + 22, "Plant room", 14, th.fg, bold=True, anchor="start"
+    )
+    s.line(room_x, ceil_y, room_x + 312.0, ceil_y, th.fg, 2.4)
+
+    # --- element 1: the fan, at the head of the run ------------------------
+    fan_cx, fan_cy = plant_x + 118.0, 232.0
+    s.rect(fan_cx - 60, fan_cy - 46, 120, 92, th.bg, th.fg, rx=6, sw=2.4)
+    s.circle(fan_cx, fan_cy, 27, "none", th.primary, sw=2.6)
+    s.circle(fan_cx, fan_cy, 7, th.primary)
+    s.text(fan_cx, fan_cy - 58, "1 · Supply fan", 12, th.primary, bold=True)
+    s.text(fan_cx, fan_cy + 64, "16 000 m³/h, 600 Pa", 10, th.muted, mono=True)
+    s.text(fan_cx, fan_cy + 82, "radial, backward blades", 10, th.muted)
+
+    # --- the run, plant room to room 102 -----------------------------------
+    run = (
+        ("2", "splitter silencer", "5 baffles, 0.6 m", 268.0, 96.0, th.secondary),
+        ("3", "branch", "0.30 of 1.08 m²", 390.0, 74.0, th.accent),
+        ("5", "straight duct", "0.5 × 0.4 m, 4 m", 488.0, 82.0, th.primary),
+        ("14", "bend", "160 mm round", 596.0, 66.0, th.accent),
+        ("19", "two diffusers", "into the room", 686.0, 86.0, th.secondary),
+    )
+    y = fan_cy - 17.0
+    s.line(fan_cx + 60, fan_cy, 268.0, fan_cy, th.fg, 2.2)
+    for code, name, size, x, w, colour in run:
+        s.rect(x, y, w, 34.0, th.bg, colour, rx=3, sw=2.0)
+        s.text(x + w / 2, y + 23, code, 13, colour, bold=True)
+        s.text(x + w / 2, y - 8, name, 10, th.fg)
+        s.text(x + w / 2, y + 50, size, 10, th.muted, mono=True)
+    for a, b in ((364.0, 390.0), (464.0, 488.0), (570.0, 596.0), (662.0, 686.0)):
+        s.line(a, fan_cy, b, fan_cy, th.fg, 2.2)
+    s.line(772.0, fan_cy, 838.0, fan_cy, th.fg, 2.2)
+    s.line(838.0, fan_cy, 838.0, ceil_y - 8, th.fg, 2.2)
+    s.rect(814.0, ceil_y - 8, 48.0, 12.0, th.bg, th.secondary, sw=2.0)
+
+    # --- element 20: the room, and the listener 1,5 m from the outlet ------
+    s.text(room_x + 14, ceil_y + 26, "Room 102", 14, th.fg, bold=True, anchor="start")
+    s.text(room_x + 14, ceil_y + 46, "$A$ = 20 m²", 11, th.muted, anchor="start")
+    s.text(
+        room_x + 14,
+        ceil_y + 66,
+        "20 · $Q$ = 2.1 at 63 Hz",
+        11,
+        th.muted,
+        anchor="start",
+    )
+    s.text(
+        room_x + 14,
+        ceil_y + 84,
+        "to 7.2 at 8 kHz (Figure 30)",
+        11,
+        th.muted,
+        anchor="start",
+    )
+    s.person(room_x + 190, floor_y, 84)
+    s.dim(room_x + 190, ceil_y + 36, 838.0, ceil_y + 36, "$r$ = 1.5 m", size=11)
+
+    # --- what each element does to the level -------------------------------
+    s.text(
+        40,
+        floor_y + 46,
+        "takes level out: 2, 3, 5 and 14; puts level back: 2 and 14 make "
+        "their own flow noise, and 19 is a source in its own right",
+        12,
+        th.fg,
+        anchor="start",
+    )
+
+    # --- where each number comes from --------------------------------------
+    sources = (
+        ("1", "Eq. (13) and (15), from the duty point and the assembly type"),
+        ("2", "insertion loss from the maker; self-noise from Eq. (49)"),
+        ("3", "the area ratio of the branch; flow noise from Eq. (17)"),
+        ("5", "Table 5, dB per metre by duct size"),
+        ("14", "Table 8 by bend diameter; flow noise from Eq. (17)"),
+        ("20", "Eq. (36), from $A$ and the outlet's own $Q$"),
+    )
+    for index, (code, source) in enumerate(sources):
+        row, column = divmod(index, 2)
+        x = 40.0 + column * 436.0
+        yy = floor_y + 76.0 + row * 22.0
+        s.text(x, yy, code, 11, th.primary, bold=True, anchor="start")
+        s.text(x + 26, yy, source, 11, th.muted, anchor="start")

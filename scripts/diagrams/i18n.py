@@ -25,6 +25,32 @@ import figure_language_audit as _audit
 # Spanish variants of every user-visible string. Strings not in the table
 # (numbers, unit-only labels, code identifiers) are shared between languages.
 _ES: dict[str, str] = {
+    # The VDI 2081 worked sheet as a place (devices/noise-control).
+    "The VDI 2081 worked sheet as a place, and where each number comes from": "La hoja resuelta de la VDI 2081 como lugar, y de dónde sale cada número",
+    "Room 102": "Sala 102",
+    "1 · Supply fan": "1 · Ventilador de impulsión",
+    "16 000 m³/h, 600 Pa": "16 000 m³/h, 600 Pa",
+    "radial, backward blades": "radial, álabes hacia atrás",
+    "splitter silencer": "silenciador de bafles",
+    "5 baffles, 0.6 m": "5 bafles, 0,6 m",
+    "bend": "codo",
+    "160 mm round": "circular de 160 mm",
+    "straight duct": "conducto recto",
+    "0.5 × 0.4 m, 4 m": "0,5 × 0,4 m, 4 m",
+    "0.30 of 1.08 m²": "0,30 de 1,08 m²",
+    "two diffusers": "dos difusores",
+    "into the room": "hacia la sala",
+    "$A$ = 20 m²": "$A$ = 20 m²",
+    "20 · $Q$ = 2.1 at 63 Hz": "20 · $Q$ = 2,1 a 63 Hz",
+    "to 7.2 at 8 kHz (Figure 30)": "hasta 7,2 a 8 kHz (Figura 30)",
+    "$r$ = 1.5 m": "$r$ = 1,5 m",
+    "takes level out: 2, 3, 5 and 14; puts level back: 2 and 14 make their own flow noise, and 19 is a source in its own right": "quitan nivel: 2, 3, 5 y 14; lo devuelven: 2 y 14 hacen su propio ruido de flujo, y 19 es una fuente por derecho propio",
+    "Eq. (13) and (15), from the duty point and the assembly type": "Ec. (13) y (15), del punto de trabajo y el tipo de montaje",
+    "insertion loss from the maker; self-noise from Eq. (49)": "pérdida de inserción del fabricante; ruido propio por la Ec. (49)",
+    "the area ratio of the branch; flow noise from Eq. (17)": "la razón de áreas de la ramificación; ruido de flujo por la Ec. (17)",
+    "Table 5, dB per metre by duct size": "Tabla 5, dB por metro según el tamaño del conducto",
+    "Table 8 by bend diameter; flow noise from Eq. (17)": "Tabla 8 según el diámetro del codo; ruido de flujo por la Ec. (17)",
+    "Eq. (36), from $A$ and the outlet's own $Q$": "Ec. (36), a partir de $A$ y del $Q$ propio de la boca",
     # ISO 9613-2 ground regions (environment/propagation/outdoor-propagation).
     "ISO 9613-2 ground regions and the ground factor G": "Regiones de suelo y factor de suelo G (ISO 9613-2)",
     "$G$ is the porous fraction of its region": "$G$ es la fracción porosa de su región",

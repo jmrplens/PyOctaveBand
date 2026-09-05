@@ -76,6 +76,7 @@ from .devices import (
     _d_surfaces,
     _d_sweep_bench,
     _d_swept_sine,
+    _d_vdi2081_sheet,
     _d_vibration_sound_power,
 )
 from .environment import (
@@ -895,6 +896,11 @@ DIAGRAMS = {
         _d_duct_path,
         "Long's Table 14.9 installation: every row of the sheet as a place",
         566,
+    ),
+    "diagram_vdi2081_sheet": (
+        _d_vdi2081_sheet,
+        "The VDI 2081 worked sheet as a place, and where each number comes from",
+        596,
     ),
     "diagram_slm_pipeline": (
         _d_slm_pipeline,
