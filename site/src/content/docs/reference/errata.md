@@ -2145,6 +2145,51 @@ in the same order.
   cross-reference, not in a number, and
   [`ground_attenuation`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/environment/propagation/outdoor_propagation.py)
   implements $q$ from footnote 2, which is what reproduces the printed 0,23.
+## VDI 2081 Blatt 1:2001, Section 6.7.3 (the symbol list of Equation (36) sends A back to Equation (36))
+
+- **Location:** Section 6.7.3, the symbol list under Equation (36), the entry
+  for the equivalent absorption area ``A``.
+- **The print:** "A  äquivalente Absorptionsfläche; in m², Gleichung (36)" /
+  "A  is the equivalent absorption area; in m², Equation (36)".
+- **The problem:** Equation (36) is the level equation the list belongs to,
+  $L_P = L_W + 10\lg[Q/(4\pi r^2) + 4/A]$, in which ``A`` is an input. It
+  does not define ``A``. The guideline defines it twice further down the same
+  section: Equation (37), $A = 0{,}163\,V/T$, and Equation (39),
+  $A = \sum \alpha_i S_n + \sum A_n$. The reference is a self-reference, and
+  it stands in both language columns, so it is a typesetting slip in the
+  original rather than a translation one.
+- **Evidence:** verified on PDF page 43 (printed p. 43) of VDI 2081
+  Blatt 1:2001-07, with Equations (37) and (39) on PDF pages 44 and 44
+  (printed pp. 44 and 44) of the same print.
+- **Library behaviour:** unaffected. The slip is in a cross-reference, not in a
+  number;
+  [`room_effect`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/noise_control/hvac.py) takes ``A`` as an
+  argument and
+  [`sabine_absorption_area`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/room/steady_field.py)
+  implements Equation (37).
+- **Status:** unreported.
+
+## VDI 2081 Blatt 1:2001, Section 6.7.3 (the English column calls a hemispherical propagation spherical)
+
+- **Location:** Section 6.7.3, the sentence stating where the reverberation
+  field begins, immediately after Equation (36b).
+- **The print:** German, "Der Nachhallbereich beginnt bei **halbkugelförmiger**
+  Schallausbreitung in einer Entfernung, die größer ist als
+  $r_H = 0{,}2\sqrt{A}$"; English, "The reverberation area begins as a
+  **spherical** sound propagation at a distance which is greater than
+  $r_H = 0.2\sqrt{A}$".
+- **The problem:** *halbkugelförmig* is hemispherical, not spherical, and the
+  printed constant sides with the German. The reverberation radius is
+  $r_H = \sqrt{Q A / 16\pi}$, which is $0{,}199\sqrt{A}$ at the $Q = 2$ of a
+  half space and $0{,}141\sqrt{A}$ at the $Q = 1$ of a full one. Only the
+  first rounds to the printed $0{,}2$. A reader following the English column
+  would take $0{,}2\sqrt{A}$ for the spherical radius and place the
+  reverberation field 41 % too far out.
+- **Evidence:** verified on PDF page 44 (printed p. 44) of VDI 2081
+  Blatt 1:2001-07, both columns of the same sentence read side by side.
+- **Library behaviour:** unaffected.
+  [`critical_distance`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/room/steady_field.py) takes ``Q`` as
+  an argument and states the hemispherical reading in its own text.
 - **Status:** unreported.
 
 ## ANSI S3.5-1997, Annex C worked examples (official WG S3-79 errata)

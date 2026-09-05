@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**698/698 conformance checks pass** across 65 domains and 388 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**703/703 conformance checks pass** across 65 domains and 388 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -38,11 +38,11 @@
 | IEC 60268-16 Annex M | Step 2 printed intermediates: the measurement condition, row by row | worst row: amf in dB, 0.99 of its last printed place | 0.993 | 99 % |
 | VDI 2081 Blatt 2:2005 Table 1, element 14 | Bend flow noise, worst octave deviation, dB | 0.0496 dB | 0.0496 dB | 99 % |
 | IEC 60268-16 Annex M | Step 3 printed intermediates: the operational condition, row by row | worst row: amf in dB, 0.99 of its last printed place | 0.987 | 99 % |
+| VDI 2081 Blatt 2:2005 Table 1, element 20 | Sound pressure level in room 102, worst octave deviation, dB | 0.4913 dB | 0.4913 dB | 98 % |
 | ISO 5136:2003 Table D.1 | C3,4 of the sampling tube for d = 0,5 m at U = +/-5, +/-15, +/-30 m/s, 27 bands | max absolute deviation 0.049 dB | 0.049 dB | 98 % |
 | ISO 9053-2:2020 Annex A.3 | Thermal boundary-layer thickness b | 0.00183 m | 0 m | 97 % |
 | Long, Architectural Acoustics 2e, Table 8.1 | Room modes of a 7 x 5 x 3 m room: the six printed frequencies, Hz | 42.27 Hz | -0.126 Hz | 97 % |
 | IEC 61094-2:2009 Table F.1 | Set B (20 C, 80 000 Pa, 65 % RH): rho, c0, kappa, eta and alpha_t, as a fraction of the rounding of the last printed figure | 0.96 | 0.96 | 96 % |
-| ISO 12354-2:2017 Annex C / Annex G Table G.4 | Floating floor: fo = 160 sqrt(s'/m') = 52,8 Hz, DeltaL = 30 lg(f/fo) over 21 bands, DeltaLw = 32,2 dB | 0.048 dB | 0.048 dB | 96 % |
 
 <details>
 <summary><b>Numerical validation - filters &amp; weightings</b>: class showcase (IEC 61260-1 · IEC 61672-1 · ISO 7196)</summary>
@@ -1224,7 +1224,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>HVAC noise (VDI 2081)</b>: 100% (41/41)</summary>
+<summary><b>HVAC noise (VDI 2081)</b>: 100% (46/46)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -1269,6 +1269,11 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | VDI 2081 Blatt 2:2005 Table 2, element 18 | End reflection of a 200 mm nozzle in a ceiling, worst octave deviation, dB | 0 dB (+/-0.05 dB) | 0.0449 dB | 0.0449 dB | 90 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2:2005 Section 1.1 | Spectral assessment correction K_A, worst octave deviation, dB | 0 dB (+/-0 dB) | 0 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | VDI 2081 Blatt 2:2005 Table 1, elements 1 to 3 | Chained level after fan, silencer and junction, worst octave deviation, dB | 0 dB (+/-0.1 dB) | 0.0719 dB | 0.0719 dB | 72 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 20 | Room attenuation of a ceiling diffuser, worst octave deviation, dB | 0 dB (+/-0.05 dB) | 0.0467 dB | 0.0467 dB | 93 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 1:2001 Eq. (36) | Room attenuation of a hemispherical outlet, dB | 5.7 dB (+/-0.05 dB) | 5.675 dB | -0.025 dB | 50 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 20 | Sound pressure level in room 102, worst octave deviation, dB | 0 dB (+/-0.5 dB) | 0.4913 dB | 0.4913 dB | 98 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 20 | Total sound pressure level in room 102, dB | 51.4 dB (+/-0.05 dB) | 51.384 dB | -0.016 dB | 32 % | ![Pass][cv-pass] Pass |
+| VDI 2081 Blatt 2:2005 Table 1, element 20 | A-weighted sound pressure level in room 102, dB | 40 dB (+/-0.05 dB) | 40.037 dB | 0.037 dB | 74 % | ![Pass][cv-pass] Pass |
 
 </details>
 

@@ -2544,11 +2544,59 @@ def air_terminal_damper_correction(
 # ---------------------------------------------------------------------------
 # Room effect
 # ---------------------------------------------------------------------------
+def _room_measure(
+    room_constant: ArrayLike | None, absorption_area: ArrayLike | None
+) -> NDArray[np.float64]:
+    """The reverberant-field denominator, from whichever measure was given.
+
+    :raises ValueError: unless exactly one of the two was given, or if it is
+        not a positive, finite scalar or 1-D spectrum.
+    """
+    if room_constant is not None and absorption_area is None:
+        name, value = "room_constant", room_constant
+    elif absorption_area is not None and room_constant is None:
+        name, value = "absorption_area", absorption_area
+    else:
+        got = "both" if room_constant is not None else "neither"
+        msg = (
+            "Give exactly one of 'room_constant' (R = S alpha / (1 - alpha)) "
+            f"and 'absorption_area' (A = S alpha); got {got}."
+        )
+        raise ValueError(msg)
+    arr = np.asarray(value, dtype=np.float64)
+    if arr.ndim > 1 or arr.size == 0:
+        msg = f"'{name}' must be a scalar or a non-empty 1-D array."
+        raise ValueError(msg)
+    if np.any(arr <= 0.0) or not np.all(np.isfinite(arr)):
+        msg = f"'{name}' must be positive and finite."
+        raise ValueError(msg)
+    return arr
+
+
+@overload
 def room_effect(
     distance: float,
     room_constant: ArrayLike,
     *,
-    directivity: float = 2.0,
+    directivity: ArrayLike = ...,
+) -> np.ndarray | float: ...
+
+
+@overload
+def room_effect(
+    distance: float,
+    *,
+    absorption_area: ArrayLike,
+    directivity: ArrayLike = ...,
+) -> np.ndarray | float: ...
+
+
+def room_effect(
+    distance: float,
+    room_constant: ArrayLike | None = None,
+    *,
+    absorption_area: ArrayLike | None = None,
+    directivity: ArrayLike = 2.0,
 ) -> np.ndarray | float:
     r"""Room effect: the drop from the terminal sound power to the room level.
 
@@ -2563,22 +2611,35 @@ def room_effect(
     negative level change. A ceiling diffuser radiates into a half space,
     hence the default :math:`Q = 2`.
 
+    VDI 2081 Blatt 1 Section 6.7.3 closes its own chain with the same
+    expression, written in the equivalent absorption area ``A`` rather than
+    the room constant ``R`` (Equation (36)), and prints the result as the
+    *Raumdämpfung* :math:`L_W - L_p`, which is what this returns. The two
+    measures are not interchangeable, so each has its own argument; and the
+    guideline's directivity comes from a chart against frequency, which is why
+    ``Q`` may be given one value per band.
+
     :param distance: Terminal-to-listener distance ``r``, m.
     :param room_constant: Room constant :math:`R = S \alpha / (1 - \alpha)`, m2
-        (scalar or per-band; from :func:`phonometry.room.room_constant`).
+        (scalar or per-band; from :func:`phonometry.room.room_constant`). Give
+        this or ``absorption_area``, not both.
+    :param absorption_area: Equivalent absorption area :math:`A = S \alpha`, m2
+        (scalar or per-band; from
+        :func:`phonometry.room.equivalent_absorption_area`). Give this or
+        ``room_constant``, not both.
     :param directivity: Directivity factor ``Q`` of the terminal device
-        (``2`` flush in a ceiling or wall, ``4`` at an edge, ``8`` in a corner).
-    :return: The room effect as a positive attenuation, dB (a float for a
-        scalar room constant, otherwise a per-band array).
+        (``2`` flush in a ceiling or wall, ``4`` at an edge, ``8`` in a
+        corner), scalar or per-band.
+    :return: The room effect as a positive attenuation, dB (a float when every
+        input is scalar, otherwise a per-band array).
+    :raises ValueError: unless exactly one absorption measure is given, or if
+        an argument is not positive and finite.
     """
     r = require_positive(distance, "distance")
-    q = require_positive(directivity, "directivity")
-    r_const = np.asarray(room_constant, dtype=np.float64)
-    if r_const.ndim > 1 or r_const.size == 0:
-        msg = "'room_constant' must be a scalar or a non-empty 1-D array."
+    measure = _room_measure(room_constant, absorption_area)
+    q = np.asarray(directivity, dtype=np.float64)
+    if np.any(q <= 0.0) or not np.all(np.isfinite(q)):
+        msg = "'directivity' must be positive and finite."
         raise ValueError(msg)
-    if np.any(r_const <= 0.0) or not np.all(np.isfinite(r_const)):
-        msg = "'room_constant' must be positive and finite."
-        raise ValueError(msg)
-    values = -10.0 * np.log10(q / (4.0 * np.pi * r**2) + 4.0 / r_const)
+    values = -10.0 * np.log10(q / (4.0 * np.pi * r**2) + 4.0 / measure)
     return float(values) if values.ndim == 0 else values

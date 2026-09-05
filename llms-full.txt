@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 698 numerical conformance checks against 388 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 703 numerical conformance checks against 388 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 698 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 65 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 703 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 65 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -19925,6 +19925,43 @@ band-by-band verdict a design sheet applies, and `rating` is the full
 `NCResult` or `RCResult` derived by the ANSI/ASA S12.2-2019 procedure,
 which is a different question and can differ from the tangency verdict.
 
+### The same step by VDI 2081
+
+VDI 2081 Blatt 1 closes its own chain with the same relation, Equation (36),
+written in the equivalent absorption area $A$ rather than the room constant
+$R$. The two are not the same number, $R = A/(1-\bar\alpha)$, so each has its
+own argument and neither stands in for the other. The guideline also reads
+the directivity off a chart against frequency, so $Q$ may be given one value
+per band; a diffuser is more directional the shorter the wavelength.
+
+```python
+import numpy as np
+from phonometry import noise_control, room
+
+# Room 102 of the guideline's worked example: A = 20 m2, listener 1.5 m away,
+# and the directivity its Figure 30 gives for the ceiling diffuser.
+q = np.array([2.1, 2.4, 3.0, 4.0, 5.5, 6.7, 7.0, 7.2])
+print(np.round(noise_control.room_effect(1.5, absorption_area=20.0, directivity=q), 1))
+# [5.6 5.5 5.1 4.7 4.  3.6 3.5 3.4]
+
+# Where the reverberant field takes over, Equation (36a): rH = 0,2 sqrt(A).
+print(round(float(room.critical_distance(absorption_area=20.0, directivity=2.0)), 2))  # 0.89
+# And the absorption a measured reverberation time implies, Equation (37).
+print(round(float(room.sabine_absorption_area(54.4, 0.44, speed_of_sound=339.0)), 1))  # 20.2
+```
+
+`sabine_absorption_area` is the familiar Sabine relation read the other way
+about, from the time to the area, which is the direction a room survey
+actually delivers. Its leading constant follows the speed of sound: $0{,}161$
+at 343 m/s, and the $0{,}163$ the guideline prints, which is the same
+expression at 339 m/s.
+
+Figure 30 itself is not implemented. It is a chart of $Q$ against the product
+of frequency and the square root of the outlet area, for two radiation angles
+and four positions in the room, and the copy in hand does not resolve it to
+better than about a tenth of the quantity it carries. Read it, or take $Q$
+from the diffuser's own data, and pass the eight values.
+
 ## 6. The worked example: Long's Table 14.9
 
 Long's Chapter 14 closes with a complete sheet: a 5000 cfm forward-curved
@@ -20328,6 +20365,12 @@ its band and so understates how a pure tone will be judged.
   Noise and vibration control. ASHRAE. The air terminal velocity limits
   (Table 9) and the volume-damper corrections (Table 10), and the guidance
   that fan sound power is best taken from manufacturer test data.
+- Verein Deutscher Ingenieure. (2001). *Geräuscherzeugung und Lärmminderung
+  in Raumlufttechnischen Anlagen* (VDI 2081 Blatt 1:2001-07). Section 6.7.3:
+  the level an air outlet produces in a room (Equation (36)), the equivalent
+  absorption area a reverberation time implies (Equation (37)) and the
+  reverberation radius $r_H = 0{,}2\sqrt{A}$. Element 20 of the worked example in its
+  Part 2:2005-05 is the case checked here.
 - Air-Conditioning, Heating and Refrigeration Institute. *AHRI Standard
   885: Procedure for estimating occupied space sound levels in the
   application of air terminals and air outlets*. The industry row
@@ -36563,7 +36606,7 @@ documents, one page per module.
 | `audible_image_count` / `reflection_density` | `function` | **Shoebox image count (Kuttruff Eq. 9.23) and reflection density (Eq. 4.6).**<br>• `audible_image_count(order)`: `(2/3)(2i³+3i²+4i)`<br>• `reflection_density(t, volume, c=343)`: `4πc³t²/V` | `audible_image_count(10)  # 1560`<br>`reflection_density(0.1, 120.0)` |
 | `steady_state_field` | `function` | **Steady-state room field (Bies 6.4).**<br>• `sound_power_level` `Lw` [dB]<br>• `surface_area` `S` [m²], `mean_absorption` `ᾱ` (0, 1)<br>• `distances` [m] (Default: 0.1–10 rc)<br>• `directivity` `Q` (Default: 1)<br>• `characteristic_impedance` [Pa·s/m] for the ρc term | `f = room.steady_state_field(90.0, 100.0, 0.2)`<br><br>• `SteadyFieldResult` |
 | `SteadyFieldResult` | `dataclass` | **SPL vs distance, direct/reverberant/total.**<br>• `distances` [m]<br>• `direct`/`reverberant`/`total` [dB]<br>• `critical_distance` [m], `room_constant` [m²]<br>• `.plot()` | `f.total, f.critical_distance`<br>`f.plot()` |
-| `room_constant` / `critical_distance` / `schroeder_frequency` / `steady_state_spl` / `SOURCE_POWER_MODELS` | `function` | **Steady-field building blocks (Bies 6.43/6.44, Kuttruff 3.44/5.44).**<br>• `room_constant(S, ᾱ)` = `Sᾱ/(1-ᾱ)` [m²]<br>• `critical_distance(R, directivity=1)` = `√(QR/16π)` [m]<br>• `schroeder_frequency(T, V)` = `2000√(T/V)` [Hz]<br>• `steady_state_spl(Lw, r, R, directivity=1, source_model='constant_power')` [dB]; `r=None` gives the reverberant field alone `Lw + 10 lg(4/R)`<br>• `SOURCE_POWER_MODELS`: `'constant_power'` / `'constant_volume'` (Π₀Q, conservative) / `'constant_pressure'` (Π₀/Q), Norton Table 4.5 | `R = room.room_constant(100, 0.2)`<br>`critical_distance(R)`<br>`steady_state_spl(90, None, R)` |
+| `room_constant` / `sabine_absorption_area` / `critical_distance` / `schroeder_frequency` / `steady_state_spl` / `SOURCE_POWER_MODELS` | `function` | **Steady-field building blocks (Bies 6.43/6.44, Kuttruff 3.44/5.44, VDI 2081-1 Eq. 36/37).**<br>• `room_constant(S, ᾱ)` = `Sᾱ/(1-ᾱ)` [m²]<br>• `sabine_absorption_area(V, T, speed_of_sound=343)` = `24 ln10/c₀ · V/T` [m²]<br>• `critical_distance(R \| absorption_area=A, directivity=1)` = `√(QR/16π)`, or `√(QA/16π)` from the absorption area [m]<br>• `schroeder_frequency(T, V)` = `2000√(T/V)` [Hz]<br>• `steady_state_spl(Lw, r, R \| absorption_area=A, directivity=1, source_model='constant_power')` = `Lw + 10 lg(Q/4πr² + 4/R)`, with `4/A` in place of `4/R` from the absorption area [dB]; `r=None` gives the reverberant field alone; exactly one absorption measure, `directivity` scalar or per band<br>• `SOURCE_POWER_MODELS`: `'constant_power'` / `'constant_volume'` (Π₀Q, conservative) / `'constant_pressure'` (Π₀/Q), Norton Table 4.5 | `R = room.room_constant(100, 0.2)`<br>`critical_distance(R)`<br>`steady_state_spl(90, None, R)` |
 | `room_modes` | `function` | **Normal modes of a rectangular room (Long, Architectural Acoustics 2e, Eq. 8.43).**<br>• `dimensions`: `(lx, ly, lz)` [m]<br>• `max_frequency` [Hz] (Default: 200)<br>• `speed_of_sound` [m/s] (Default: 343)<br>• `reverberation_time` [s] (optional, adds the Schroeder frequency) | `m = room.room_modes((7, 5, 3), max_frequency=100.0)`<br><br>• `RoomModesResult` |
 | `RoomModesResult` | `dataclass` | **Sorted mode list of a shoebox.**<br>• `orders`: `(N, 3)` `(nx, ny, nz)`<br>• `frequencies` [Hz], ascending<br>• `kinds`: 'axial'/'tangential'/'oblique'<br>• `volume`, `surface_area`, `edge_length`, `schroeder_frequency`<br>• `count_by_kind()`, `density(f)`<br>• `.plot()`: mode ladder by family + modal density | `m.frequencies[0], m.count_by_kind()`<br>`m.plot()` |
 | `room_mode_frequency` / `room_mode_count` / `room_modal_density` | `function` | **Mode building blocks (Long Eqs. 8.43, 8.45, 8.46).**<br>• `room_mode_frequency(orders, dimensions)` = `(c0/2)√((nx/lx)²+(ny/ly)²+(nz/lz)²)` [Hz]<br>• `room_mode_count(f, dimensions)`: Morse/Pierce smooth count<br>• `room_modal_density(f, dimensions)` [modes/Hz] | `room_mode_frequency((1, 0, 0), (7, 5, 3))`<br>`room_modal_density(1000.0, (7, 5, 3))` |
@@ -37044,7 +37087,7 @@ documents, one page per module.
 | `end_reflection_loss_closed_form` / `equivalent_diameter` | `function` | **Reynolds' closed-form duct end reflection (Long Eqs. 14.14-14.16); the alternative to the `end_reflection_loss` table look-up (`method='long'`).**<br>• `frequencies`, `diameter`, `termination` 'flush'/'free'<br>• `equivalent_diameter(area)` = √(4S/π) for a rectangular duct | `end_reflection_loss(bands, 0.3, method='long')` |
 | `diffuser_sound_power` | `function` | **Regenerated (self) noise of a grille, register or diffuser (Long Eqs. 13.27-13.33, Reynolds 1990).**<br>• `frequencies`, `face_area` S_G [m²], `volume_flow` Q [m³/s], `pressure_drop` ΔP [Pa]<br>• `shape` 'rectangular'/'round', `count` n (adds 10·lg n)<br>• 18 dB per doubling of approach velocity; peak band at f_P = 48.8·U_G | `diffuser_sound_power(None, 0.372, 0.147, 12.4)` |
 | `air_terminal_velocity_limit` / `air_terminal_damper_correction` | `function` | **Screening checks for grilles, registers and diffusers (ASHRAE 2019 Ch. 49 Tables 9/10); a measured device spectrum to ASHRAE Standard 70 beats both.**<br>• `air_terminal_velocity_limit(design_criterion, opening='supply'/'return')` [m/s]<br>• `air_terminal_damper_correction(pressure_ratio, location='diffuser_neck'/'plenum_inlet'/'supply_duct')` [dB] | `air_terminal_velocity_limit(30)  # 2.2 m/s` |
-| `room_effect` | `function` | **Room effect: the drop from the sound power at the terminal device to the level in the room (Long Eq. 14.40), as a positive attenuation.**<br>• `distance` r [m], `room_constant` R [m²] (scalar or per band)<br>• `directivity` Q (Default: 2, flush in a ceiling) | `room_effect(3.0, room.room_constant(S, alpha))` |
+| `room_effect` | `function` | **Room effect: the drop from the sound power at the terminal device to the level in the room (Long Eq. 14.40, VDI 2081-1 Eq. 36), as a positive attenuation.**<br>• `distance` r [m]<br>• `room_constant` R [m²] or `absorption_area` A [m²], exactly one, scalar or per band<br>• `directivity` Q (Default: 2, flush in a ceiling), scalar or per band | `room_effect(3.0, room.room_constant(S, alpha))`<br>`room_effect(1.5, absorption_area=20.0, directivity=q_per_band)` |
 | `duct_path` | `function` | **End-to-end duct-borne cascade, fan to room (Long Table 14.9; AHRI 885 Table 8).**<br>• `frequencies`, `source_level` L_W, `elements` (`DuctElement` list)<br>• `room_effect`, `criterion` 'NC'/'RC', `target`, `self_noise_floor` (Default: 0 dB)<br>• `section`/`flow_velocity` → plane-wave validity warning | `duct_path(bands, lw, elements, room_effect=6.0, target=30)`<br><br>• `DuctPathResult` |
 | `DuctElement` / `DuctPathStage` | `dataclass` | **One path element and its computed rows.**<br>• `DuctElement`: `label`, `attenuation` (positive loss; scalar, array or `HvacSpectrumResult`), `self_noise` L_W, `code`<br>• `DuctPathStage`: `attenuation`, `attenuated` (the *Sum* row), `self_noise`, `level` (the *Combined* row) | `DuctElement('Silencer', il, sn, code='3')` |
 | `DuctPathResult` | `dataclass` | **Duct-borne noise path result.**<br>• `received_level`, `stages`, `room_effect`, `criterion`, `target`, `contributions`<br>• `.rating` (NC/RC), `.criterion_curve`, `.exceedance`, `.meets_target`<br>• `.table()`: the printed sheet, row by row<br>• `.plot()`: the cascade vs the criterion curve; `.report()`: one-page sheet | `res.meets_target` |
@@ -51998,7 +52041,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 698 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 703 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -52366,7 +52409,7 @@ sample from the metrology core:
 | IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()`; IEC 61252:2025 has since superseded this print, and the transcription still targets the 1993+A2 text | `tests/signals/test_levels.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-698 numerical conformance checks across 65 domains and 388 standards, covering
+703 numerical conformance checks across 65 domains and 388 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise

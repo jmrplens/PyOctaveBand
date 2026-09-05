@@ -9,6 +9,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The last step of the VDI 2081 chain, the level the air finally makes in the
+  room. `noise_control.room_effect` and `room.steady_state_spl` already carried
+  the relation the guideline's Equation (36) states, but written in the room
+  constant `R`; the guideline writes it in the equivalent absorption area `A`,
+  and the two are not the same number, `R = A/(1 - alpha_bar)`. Each now has
+  its own argument and exactly one may be given, so neither can stand in for
+  the other by accident. Both also take a directivity factor that varies across
+  the bands, because a diffuser is more directional the shorter the wavelength
+  and the guideline reads `Q` off a chart against frequency.
+
+  `room.critical_distance` follows, and with `A` and the hemispherical `Q = 2`
+  it is the `rH = 0,2 sqrt(A)` that Section 6.7.3 prints for where the
+  reverberant field of a ventilation opening begins.
+
+  New `room.sabine_absorption_area`, the familiar Sabine relation read from the
+  time to the area rather than the other way about, which is the direction a
+  room survey delivers. Its constant follows the speed of sound: 0,161 at
+  343 m/s, and the 0,163 of Equation (37), which is the same expression at
+  339 m/s.
+
+  Element 20 of the guideline's worked example now comes out of the library:
+  five conformance rows, its eight room attenuations, its band levels and both
+  of its sums. Figure 30, the chart the directivity comes from, is not
+  implemented; the copy in hand does not resolve it to better than about a
+  tenth of what it carries, so `Q` stays an input, which is what a caller does
+  with a diffuser's own data.
+
+  Two errata, in both languages. The symbol list under Equation (36) sends the
+  reader to Equation (36) for the absorption area it is an input to; it is
+  Equation (37) or (39). And the English column of the reverberation-radius
+  sentence calls a *halbkugelförmig* propagation spherical, where the printed
+  0,2 is the hemispherical constant and the spherical one would be 0,141.
+
+
 - `noise_control.fan_sound_power` takes `model="vdi2081"`, the German method of
   VDI 2081 Part 1:2001-07 Section 4.3, beside the ASHRAE scaling law it has
   always had. The two answer the same question and disagree on how: ASHRAE
