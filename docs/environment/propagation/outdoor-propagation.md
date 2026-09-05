@@ -487,7 +487,7 @@ else. What changes between them is the ground.
 
 *The ground effect is the whole story here: over porous ground the 250 Hz band
 arrives 13 dB quieter than over a reflecting one. Right: every case lands
-within a fifth of the envelope the document allows.*
+within a quarter of the envelope the document allows.*
 
 T01 to T03 vary one ground factor from reflecting to porous. T04 and T06 split
 the path into three areas of different ground and answer by the general method
