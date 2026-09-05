@@ -56,8 +56,6 @@ _KGCM2_PER_BAR = 1.019716
 _MIN_POLYLINE_NODES = 2
 
 _MODELS = ("unesco", "del_grosso", "mackenzie", "medwin")
-#: Models that take a depth directly instead of a pressure.
-_DEPTH_MODELS = ("mackenzie", "medwin")
 
 
 def _positive(value: float, name: str) -> float:

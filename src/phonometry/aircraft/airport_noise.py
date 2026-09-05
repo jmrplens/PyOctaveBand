@@ -50,9 +50,6 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 
-#: NPD reference speed (160 kn) in ft/s, used by the noise-fraction scaled
-#: distance (ECAC Doc 29 §4.5.6).
-_VREF_FTS = 270.05
 #: Engine-installation coefficients (a, b, c) by mounting (Eq. 4-15).
 _INSTALLATION = {
     "wing": (0.0039, 0.062, 0.8786),
@@ -64,8 +61,6 @@ _ELL_SAT_M = 914.0
 #: Elevation angle β above which the air-to-ground attenuation Λ(β) is zero
 #: (Eq. 4-18/4-19).
 _BETA_CUTOFF_DEG = 50.0
-#: Absolute zero in °C, the lower validity bound of the aerodrome air temperature.
-_ABS_ZERO_C = -273.15
 #: Azimuth ψ from which the rearward start-of-roll directivity ΔSOR applies
 #: (90° ≤ ψ ≤ 180°, §4.5.7); ahead of the aircraft it is zero.
 _SOR_PSI_MIN_DEG = 90.0

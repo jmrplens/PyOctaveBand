@@ -124,18 +124,13 @@ _ANNEX_A_HEAT_RATIO = 1.4007573  # kappa, adiabatic, Table F.1
 _ANNEX_A_THERMAL_CONDUCTIVITY = 0.0254341377186358  # k_a (J/(s*m*K)), Clause F.6
 _ANNEX_A_SPECIFIC_HEAT_CP = 1013.738121253794  # C_P (J/(kg*K)), Clause F.6
 
-#: The five values ISO 9053-2:2020 Annex A.3 actually prints, on printed folios 13 and
-#: 14. The worked example of that annex is computed from these, so the conformance rows
-#: that reproduce it pass them explicitly rather than relying on the defaults above.
-_ANNEX_A_PRINTED_SPEED_OF_SOUND = 345.9  # c0 (m/s)
-_ANNEX_A_PRINTED_AIR_DENSITY = 1.186  # rho0 (kg/m3)
-_ANNEX_A_PRINTED_HEAT_RATIO = 1.4008  # kappa, adiabatic
-_ANNEX_A_PRINTED_THERMAL_CONDUCTIVITY = 0.02355  # k_a (J/(s*m*K))
-_ANNEX_A_PRINTED_SPECIFIC_HEAT_CP = 938.7  # C_P (J/(kg*K))
 #: The air the two Annex A helpers default to, as a :class:`~phonometry.fluids.Fluid`:
-#: the five constants above, transcribed rather than recomputed, so the numbers the
-#: conformance rows pin do not move. Pass a computed one to work in the air of the
-#: laboratory instead of the air of the annex.
+#: the five values above, which are IEC 61094-2:2009's own at that state and not the
+#: rounded five ISO 9053-2 Annex A.3 prints beside them. Two of those five are not air
+#: (``docs/ERRATA.md`` shows the specific heat capacity is below the diatomic floor),
+#: so the annex is reproduced from the source it credits rather than from its own
+#: print, and the conformance rows that pin the annex transcribe the printed pair
+#: themselves. Pass a computed fluid to work in the air of the laboratory instead.
 ANNEX_A_AIR = Fluid(
     temperature_c=23.0,
     static_pressure_pa=_STANDARD_STATIC_PRESSURE,
@@ -165,8 +160,6 @@ _STATIC_MAX_VELOCITY = 15.0e-3
 #: ISO 9053-1:2018 clause 7.5: the through-origin fit dp = a*u + b*u**2 has two free
 #: coefficients, so two steps are the least that determine it.
 _MIN_MEASUREMENT_STEPS = 2
-#: Recommended specimen flow-velocity range, ISO 9053-2:2020 clause 6.2 (m/s).
-_ALT_VELOCITY_RANGE = (0.5e-3, 4.0e-3)
 #: Piston frequency range, ISO 9053-2:2020 clause 6.2 (Hz).
 _ALT_FREQUENCY_RANGE = (1.0, 4.0)
 #: Upper bound of the validity criterion, ISO 9053-2:2020 Formula (3).
@@ -696,7 +689,12 @@ def alternating_airflow_resistance(
     Annex A.3 example gives :math:`\kappa' = 1.370`).
 
     Emits :class:`AirflowResistanceWarning` when the piston frequency is outside
-    1-4 Hz or when the Formula (3)/(4) validity criteria are not met.
+    1-4 Hz or when the Formula (3)/(4) validity criteria are not met. Clause 6.2
+    recommends a specimen flow velocity between 0,5 mm/s and 4 mm/s as well, and
+    that half of it is not checked here: the velocity follows from the piston
+    area and the specimen area, and this function is handed neither. Compute it
+    with :func:`piston_volume_flow_rate` and :func:`linear_airflow_velocity` if
+    the rig is near either end of the range.
     """
     if frequency <= 0.0:
         raise ValueError(_FREQUENCY_POSITIVE_MSG)

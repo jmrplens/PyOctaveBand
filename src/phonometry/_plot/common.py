@@ -563,10 +563,6 @@ def _line_weight(
 #: Axis label of every frequency abscissa these shared renderers draw.
 _LABEL_FREQUENCY_HZ: Final = "Frequency [Hz]"
 
-#: Common axis labels reused across the underwater-propagation plots.
-_LABEL_DEPTH_M: Final = "Depth [m]"
-_LABEL_RANGE_KM: Final = "Range [km]"
-
 #: Spanish translations of the handful of fixed strings these *shared*
 #: renderers set directly (axis labels, generic legend entries). Each
 #: ``_plot/<domain>.py`` module carries its own richer ``_STRINGS``/``_t`` for
