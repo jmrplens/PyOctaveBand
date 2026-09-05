@@ -154,6 +154,14 @@ fence-names:
 dead-constants:
 	$(PYTHON) scripts/check_dead_constants.py
 
+# A conformance row that computes the expected value itself is comparing a
+# formula with a second copy of it, and reports Pass whatever the library does.
+# This resolves what each row reaches, through its helpers and whatever name
+# the module's imports gave the library, and fails on one that reaches nothing
+# and does not say why in ORACLE_ONLY. Stdlib only.
+conformance-rows:
+	$(PYTHON) scripts/check_conformance_rows.py
+
 # The Spanish variant of a figure is the English one with its strings looked
 # up in a table at save time, so a string nobody added to the table ships in
 # English inside `X_es.svg` and every other gate stays green: the page is
@@ -391,4 +399,4 @@ check: lint security test
 	animations animation-freshness posters brand lighthouse \
 	llms pypi-readme api-docs site-reports conformance install-hooks test test-perf test-gpu coverage check \
 	snippets snippets-static claims subscripts fence-names decimal-comma \
-	control-characters
+	control-characters hazards dead-constants conformance-rows

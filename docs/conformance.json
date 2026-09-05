@@ -3,12 +3,12 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 778,
-    "passing": 778,
+    "checks": 779,
+    "passing": 779,
     "failing": 0,
     "domains": 66,
-    "standards": 391,
-    "citations": 606,
+    "standards": 392,
+    "citations": 607,
     "designations": 125,
     "sources": 84
   },
@@ -359,8 +359,8 @@
     {
       "id": "aircraft-noise-icao-annex-16-iec-61265",
       "title": "Aircraft noise (ICAO Annex 16 / IEC 61265)",
-      "checks": 17,
-      "passing": 17
+      "checks": 18,
+      "passing": 18
     },
     {
       "id": "rotorcraft-noise-ecac-doc-32-norah2",
@@ -15975,15 +15975,15 @@
       "verdict": "pass"
     },
     {
-      "id": "aircraft-noise-icao-annex-16-iec-61265/sae-arp-5534-band-attenuation-continuity/sae-method-b-at-the-150-db-branch-split-eq-7-vs-eq-8-db",
+      "id": "aircraft-noise-icao-annex-16-iec-61265/sae-arp-5534-low-branch-at-the-split-eq-7/sae-method-b-just-below-t-150-db-vs-the-printed-eq-8-value-there-db",
       "domain": "aircraft-noise-icao-annex-16-iec-61265",
       "reference": {
         "kind": "standard",
         "designation": "SAE ARP",
-        "clause": "5534 band-attenuation continuity",
-        "cite": "SAE ARP 5534 band-attenuation continuity"
+        "clause": "5534 low branch at the split (Eq. 7)",
+        "cite": "SAE ARP 5534 low branch at the split (Eq. 7)"
       },
-      "quantity": "SAE-Method δ_B at the 150 dB branch split (Eq. 7 vs Eq. 8), dB",
+      "quantity": "SAE-Method δ_B just below δ_t = 150 dB vs the printed Eq. 8 value there, dB",
       "kind": "scalar",
       "expected": {
         "value": 123.95
@@ -15998,6 +15998,34 @@
       },
       "deviation": {
         "value": 0.003
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "aircraft-noise-icao-annex-16-iec-61265/sae-arp-5534-high-branch-at-the-split-eq-8/sae-method-b-just-above-t-150-db-vs-the-printed-eq-7-value-there-db",
+      "domain": "aircraft-noise-icao-annex-16-iec-61265",
+      "reference": {
+        "kind": "standard",
+        "designation": "SAE ARP",
+        "clause": "5534 high branch at the split (Eq. 8)",
+        "cite": "SAE ARP 5534 high branch at the split (Eq. 8)"
+      },
+      "quantity": "SAE-Method δ_B just above δ_t = 150 dB vs the printed Eq. 7 value there, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 123.95332902154328
+      },
+      "computed": {
+        "value": 123.95
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.01
+      },
+      "deviation": {
+        "value": -0.003
       },
       "precision": 3,
       "verdict": "pass"
