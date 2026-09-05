@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `noise_control.section_change_loss`, the element of the VDI 2081 chain that
+  was described in the guide and missing from the library. Section 6.3 gives
+  the reflection at a sudden step in closed form, `10 lg (r+1)²/(4r)` in the
+  area ratio, with two rules about when it applies: a sudden reduction
+  reflects in every band, a sudden increase only below the limit frequency of
+  the duct the sound arrives through. VDI 3733 recommends taking no more than
+  5 dB from it, which is the default `cap`, and it binds from an area ratio of
+  about 10,5 upwards. A gradual change through a long tapered adapter reflects
+  nothing worth counting, and 6.3 says so.
+
+  There is no `model=` here: Long folds the reflection from a change of total
+  section into the junction itself, which is what `split_loss` does for
+  `model="ashrae"`, while VDI 2081 treats the two as separate elements.
+
 - The numbers behind the machine-vibration grading, for industrial machines.
   ISO 20816-1 fixes the shape of the judgement and leaves the boundaries to the
   machine-specific parts; `INDUSTRIAL_MACHINE_ZONES` carries the four classes

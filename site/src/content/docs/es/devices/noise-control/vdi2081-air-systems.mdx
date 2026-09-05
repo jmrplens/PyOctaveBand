@@ -113,9 +113,15 @@ directriz detrás.
 - **Codo** (apartado 6.2, Tabla 7): según el tamaño del propio codo, con
   `elbow_insertion_loss`. La tabla está impresa una sola vez, para un lado de
   1250 mm, y se desplaza por el eje de frecuencia para cualquier otro tamaño.
-- **Cambio de sección** (apartado 6.3): la reducción que da la VDI 3733,
-  limitada a 5 dB, porque el valor impreso solo se alcanza con el conducto
-  terminado anecoicamente por los dos extremos.
+- **Cambio de sección** (apartado 6.3, Figura 26): la reflexión en un salto
+  súbito, con `section_change_loss`. Es una sola expresión,
+  $10 \lg (r+1)^2/(4r)$ en la razón de áreas $r = S_1/S_2$, y dos reglas sobre
+  cuándo se aplica: un estrechamiento súbito refleja en todas las bandas y una
+  ampliación súbita solo por debajo de la frecuencia límite del conducto por el
+  que llega. La VDI 3733 recomienda no tomar de ahí más de 5 dB, porque el
+  valor impreso solo se alcanza con el conducto terminado anecoicamente por los
+  dos extremos, y un cambio gradual con un cono largo no refleja nada que
+  merezca contarse.
 - **Ramificación** (apartado 6.4, Ecuación (35)): la parte del caudal que se
   lleva la rama, con `split_loss`.
 
@@ -130,6 +136,21 @@ run = noise_control.unlined_rectangular_duct_attenuation(
 print([round(float(v), 2) for v in run.values])
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_section_change.svg" alt="Dos paneles. A la izquierda, la pérdida por reflexión frente a la razón de secciones: una curva discontinua gris es la expresión impresa, simétrica en torno a una razón de uno donde vale cero y subiendo hasta 9 decibelios en los extremos, y una curva azul continua es lo mismo sujeto al techo de 5 decibelios, que alcanza en una razón de 10,55 y otra vez en 0,095. A la derecha, la misma pérdida de 0,88 decibelios con las dos reglas de frecuencia: una línea continua plana en las ocho octavas para un estrechamiento súbito, y una discontinua que mantiene el valor en 63 y 125 hercios y cae a cero por encima de la frecuencia límite de 214 hercios para una ampliación súbita" width="100%" />
+
+*La expresión es simétrica: un conducto que se ensancha en un factor refleja lo
+mismo que ese conducto estrechándose en él. Lo que cambia es cuándo.*
+
+```python
+from phonometry import noise_control
+import numpy as np
+
+bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+step = noise_control.section_change_loss(
+    bands, 0.5, 0.2, shape="rectangular", upstream_size=0.8
+)
+print(round(float(step.values[0]), 2))   # 0,88 dB, en todas las bandas
+```
 Un silenciador de bafles no es uno de estos: su pérdida de inserción viene de
 la medida del fabricante, según la ISO 7235, y la directriz lo dice.
 `splitter_silencer_insertion_loss` es la estimación para cuando no la hay.

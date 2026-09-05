@@ -113,9 +113,15 @@ it.
 - **Bend** (Section 6.2, Table 7): keyed on the bend's own size, through
   `elbow_insertion_loss`. The table is printed once, for a 1250 mm side, and
   carried along the frequency axis for every other size.
-- **Change of section** (Section 6.3): the reduction VDI 3733 gives, capped at
-  5 dB, because the printed value is only reached when the duct is anechoically
-  terminated at both ends.
+- **Change of section** (Section 6.3, Figure 26): the reflection at a sudden
+  step, through `section_change_loss`. It is one expression,
+  $10 \lg (r+1)^2/(4r)$ in the area ratio $r = S_1/S_2$, and two rules about
+  when it applies: a sudden reduction reflects in every band, a sudden
+  increase only below the limit frequency of the duct it arrives through.
+  VDI 3733 recommends taking no more than 5 dB from it, because the printed
+  value is only reached when the duct is anechoically terminated at both ends,
+  and a gradual change through a long tapered adapter reflects nothing worth
+  counting.
 - **Branch** (Section 6.4, Equation (35)): the share of the flow the branch
   takes, through `split_loss`.
 
@@ -130,6 +136,21 @@ run = noise_control.unlined_rectangular_duct_attenuation(
 print([round(float(v), 2) for v in run.values])
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_section_change.svg" alt="Two panels. On the left, the reflection loss against the section ratio: a dashed grey curve is the printed expression, symmetric about a ratio of one where it is zero and rising to 9 decibels at the ends, and a solid blue curve is the same thing held at the 5 decibel ceiling, which it reaches at a ratio of 10.55 and again at 0.095. On the right, the same 0.88 decibel loss under the two frequency rules: a solid line flat across all eight octaves for a sudden reduction, and a dashed line that holds the value at 63 and 125 hertz and drops to zero above the limit frequency of 214 hertz for a sudden increase" width="100%" />
+
+*The expression is symmetric: a duct that widens by a factor reflects what the
+same duct narrowing by it does. What differs is when.*
+
+```python
+from phonometry import noise_control
+import numpy as np
+
+bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+step = noise_control.section_change_loss(
+    bands, 0.5, 0.2, shape="rectangular", upstream_size=0.8
+)
+print(round(float(step.values[0]), 2))   # 0.88 dB, in every band
+```
 A splitter silencer is not one of these: its insertion loss comes from the
 maker's measurement, to ISO 7235, and the guideline says so.
 `splitter_silencer_insertion_loss` is the estimate for when there is none.

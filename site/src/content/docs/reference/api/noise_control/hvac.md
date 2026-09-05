@@ -1036,6 +1036,74 @@ guideline's directivity comes from a chart against frequency, which is why
 | :--- | :--- |
 | ValueError | unless exactly one absorption measure is given, or if an argument is not positive and finite. |
 
+## section_change_loss
+
+```python
+section_change_loss(
+    frequencies: ArrayLike,
+    upstream_area: float,
+    downstream_area: float,
+    *,
+    shape: str = 'rectangular',
+    upstream_size: float | None = None,
+    speed_of_sound: float = 343.0,
+    cap: float = 5.0,
+) -> HvacSpectrumResult
+```
+
+Reflection at a sudden change of duct section (VDI 2081 Part 1, 6.3).
+
+Figure 26 gives the reduction of the internal sound power level in closed
+form, for the area ratio $r = S_1/S_2$:
+
+$$
+\Delta L_{Wi} = 10 \log_{10}
+$$
+
+rac{(r + 1)^{2}}{4r}
+
+and it applies differently on the two sides of unity. A **sudden
+reduction** ($r > 1$) reflects at every frequency; the figure's own
+column says the frequency has no effect. A **sudden increase**
+($r < 1$) reflects only below the limit frequency of the upstream
+duct, Equation (33) or (34), and above it the figure gives nought: past
+that frequency the duct carries more than plane waves and the mismatch
+stops behaving as one.
+
+A gradual change is not this: 6.3 says that where the transition is
+smooth, through a tapered adapter long compared with the wavelength, the
+reduction is negligibly small.
+
+The reduction is reached only with the duct anechoically terminated at
+both ends, which practice rarely is, so VDI 3733 recommends taking no more
+than 5 dB from it. That is the default `cap`, and it binds from an area
+ratio of about 10,5 upwards, or 0,095 downwards.
+
+There is no ASHRAE counterpart to call through `model=`: Long folds the
+reflection from a change of total section into the junction itself, which
+is what [`split_loss`](/phonometry/reference/api/noise_control/hvac/#split_loss) implements for `model="ashrae"`, while
+VDI 2081 treats the two as separate elements of the chain.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `frequencies` | Frequencies `f`, Hz (1-D array). |
+| `upstream_area` | Section `S1` the sound arrives through, m². |
+| `downstream_area` | Section `S2` it continues into, m². |
+| `shape` | `"rectangular"` (default) or `"round"`, which decides which limit-frequency equation the upstream duct takes. |
+| `upstream_size` | The largest side of the upstream duct, m, for a rectangular one; its internal diameter for a round one. May be omitted for a round duct, where it follows from the area. |
+| `speed_of_sound` | Speed of sound `c`, m/s. |
+| `cap` | The largest reduction to take, dB (default 5). |
+
+**Returns:** An [`HvacSpectrumResult`](/phonometry/reference/api/noise_control/hvac/#hvacspectrumresult) of the reflection loss, dB.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If an area, a size or the speed of sound is not positive, the shape is unknown, or a rectangular duct is given no size. |
+
 ## silencer_self_noise
 
 ```python
