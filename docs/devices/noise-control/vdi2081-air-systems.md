@@ -166,8 +166,9 @@ nothing else left to hear. VDI 2081 gives it in closed form.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_flow_noise_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_flow_noise.svg" alt="Two panels. On the left, the overall sound power level of a straight run against duct velocity from 1 to 15 metres per second, for a 0.2 square metre section: a solid curve for Equation 16 rising from 0 to 59 decibels and a dashed one for the A-weighted Equation 17 rising from minus 32 to 50, the second steeper because it carries a seventh power of the speed where the first carries a fifth. A dotted vertical line marks the worked example at 5.83 metres per second, where markers read 38 and 22 decibels. On the right, the octave spectrum of the same duct at 3, 5.83 and 10 metres per second, three curves falling from 63 hertz to 8 kilohertz, the fastest one both the highest and the flattest." width="100%"></picture>
 
-*The fifth power of the speed is the whole design rule: a duct sized for half the
-velocity is fifteen decibels quieter, and twenty-one on the A-weighted number.*
+*Fifty times the logarithm of the speed, and seventy for the A-weighted number:
+a duct sized for half the velocity is fifteen decibels quieter unweighted, and
+twenty-one as the ear weights it.*
 
 ```python
 from phonometry import noise_control
