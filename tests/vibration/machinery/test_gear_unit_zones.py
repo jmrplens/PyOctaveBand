@@ -9,6 +9,8 @@ under Figures A.1 and A.2 on printed folios 12 and 13.
 
 from __future__ import annotations
 
+import math
+
 import numpy as np
 import pytest
 
@@ -85,6 +87,22 @@ def test_an_unknown_quantity_is_refused() -> None:
 def test_a_rating_that_is_not_positive_is_refused() -> None:
     with pytest.raises(ValueError, match="'rating'"):
         vibration.gear_unit_zone_boundaries("velocity", 0.0)
+
+
+@pytest.mark.parametrize("bad", [0.0, -3.0, math.nan])
+def test_both_curves_report_a_bad_rating_under_the_name_they_take(bad: float) -> None:
+    """The message has to name a keyword the caller can see.
+
+    ``gear_housing_velocity_limit`` used to pass the rating straight through
+    to ``allowable_velocity``, so the failure surfaced as
+    ``'constant_velocity_mm_s' must be positive`` -- a parameter that appears
+    in neither the signature nor the documentation, and that no
+    ``pytest.raises(match=)`` written against this API could match.
+    """
+    with pytest.raises(ValueError, match="'rating'"):
+        vibration.gear_housing_velocity_limit(100.0, rating=bad)
+    with pytest.raises(ValueError, match="'rating'"):
+        vibration.gear_shaft_displacement_limit(100.0, rating=bad)
 
 
 def test_every_row_is_three_consecutive_rungs_of_one_ladder() -> None:

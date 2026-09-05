@@ -368,7 +368,7 @@ reason the tables state each class twice.
 
 | Name | Description |
 | :--- | :--- |
-| `group` | `"group_1"` (above 300 kW and not more than 50 MW, or an electrical machine of shaft height 315 mm or more) or `"group_2"` (above 15 kW up to and including 300 kW, or shaft height from 160 mm up to but not including 315 mm), from 4.2. |
+| `group` | `"group_1"` (above 300 kW, or an electrical machine of shaft height 315 mm or more) or `"group_2"` (above 15 kW up to and including 300 kW, or shaft height from 160 mm up to but not including 315 mm), from 4.2. Table A.1 caps group 1 at 50 MW in its title. |
 | `support` | `"rigid"` or `"flexible"`; rigid means the lowest natural frequency of the support in the measuring direction is at least 25 % above the main excitation frequency (4.3). |
 | `displacement_um` | Measured broad-band r.m.s. displacement of the bearing, pedestal or housing, in micrometres (scalar or array). |
 | `velocity_mm_s` | Measured broad-band r.m.s. velocity, in millimetres per second (scalar or array). |
@@ -432,8 +432,9 @@ The two boundary sets one machine class is judged on at once.
 ISO 10816-3:2009 states each class twice, once in displacement and once
 in velocity, and 5.2.3 says which wins when they disagree: the more
 restrictive zone applies. Both are read on the same non-rotating part,
-and A.1 says velocity alone is enough in most cases and that a spectrum
-expected to carry low-frequency components should be judged on both.
+and Annex A says velocity alone is enough in most cases and that a
+spectrum expected to carry low-frequency components should be judged on
+both.
 
 **Attributes**
 

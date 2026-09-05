@@ -593,11 +593,11 @@ additional recommendations of Clause 5 rather than from ISO 9613-2, and they
 are outside what this page implements.
 
 The seven share one geometry: a source 1 m above its local ground, a receiver
-4 m above its own, 195 m apart in ground projection, and a flat 93 dB in every
+4 m above its own, 194.16 m apart in ground projection, and a flat 93 dB in every
 octave so that the shape of the printed spectrum is the propagation and nothing
 else. What changes between them is the ground.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases.svg" alt="Two panels. On the left, the octave-band level at the receiver for the same 195 metre path over three grounds: over reflecting ground it falls smoothly from 40 to 25 decibels, over mixed ground it dips to 33 decibels around 250 and 500 hertz before recovering, and over porous ground the dip reaches 26 decibels; open rings mark the levels the document prints, and they sit on the curves. On the right, a bar per test case from T01 to T07 giving the worst deviation of the computed spectrum from the printed one, between 0.008 and 0.012 decibels, all of them well under the dashed line at the 0.05 decibel envelope the document declares" width="100%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases.svg" alt="Two panels. On the left, the octave-band level at the receiver for the same 194 metre path over three grounds: over reflecting ground it falls smoothly from 40 to 25 decibels, over mixed ground it dips to 33 decibels around 250 and 500 hertz before recovering, and over porous ground the dip reaches 26 decibels; open rings mark the levels the document prints, and they sit on the curves. On the right, a bar per test case from T01 to T07 giving the worst deviation of the computed spectrum from the printed one, between 0.008 and 0.012 decibels, all of them well under the dashed line at the 0.05 decibel envelope the document declares" width="100%"></picture>
 
 *The ground effect is the whole story here: over porous ground the 250 Hz band
 arrives 13 dB quieter than over a reflecting one. Right: every case lands

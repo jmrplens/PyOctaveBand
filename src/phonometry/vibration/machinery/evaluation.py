@@ -730,11 +730,15 @@ def gear_housing_velocity_limit(
         for a scalar frequency, otherwise an array.
     :raises ValueError: If a frequency or the rating is not positive.
     """
+    # Validated here rather than in the delegate, so a bad rating is reported
+    # under the name this signature has: allowable_velocity would name its own
+    # 'constant_velocity_mm_s', which no caller of this function can see.
+    value = require_positive(rating, "rating")
     low, high = GEAR_VELOCITY_CORNERS_HZ
     exponent = GEAR_VELOCITY_SLOPE_DB_PER_DECADE / 20.0
     return allowable_velocity(
         frequency,
-        constant_velocity_mm_s=rating,
+        constant_velocity_mm_s=value,
         corner_low_hz=low,
         corner_high_hz=high,
         exponent_low=exponent,
