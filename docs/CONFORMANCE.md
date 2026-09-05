@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**703/703 conformance checks pass** across 65 domains and 388 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**718/718 conformance checks pass** across 66 domains and 389 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -509,6 +509,29 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 5349-2:2001 Example E.3 | Forestry three-task A(8) | 3.6 m/s² (+/-0.05 m/s²) | 3.61 m/s² | 0.01 m/s² | 20 % | ![Pass][cv-pass] Pass |
 | ISO 5349-1:2001 Eq. (C.1) | VWF 10 % lifetime Dy at A(8)=7 | 4 yr (+/-0.1 yr) | 4.04 yr | 0.042 yr | 42 % | ![Pass][cv-pass] Pass |
 | Directive 2002/44/EC Art. 3 | HAV/WBV action & limit values | HAV 2.5/5.0, WBV 0.5/1.15 m/s^2 | HAV 2.5/5.0, WBV 0.5/1.15 m/s^2 | 0 | - | ![Pass][cv-pass] Pass |
+
+</details>
+
+<details>
+<summary><b>Machine vibration evaluation (ISO 20816)</b>: 100% (15/15)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
+|:---|:---|:---|:---|:---|:---:|:---:|
+| ISO 20816-1:2016 Annex D.2 | Vector change between two steady states, mm/s | 5.2 mm/s (+/-0.05 mm/s) | 5.171 mm/s | -0.029 mm/s | 58 % | ![Pass][cv-pass] Pass |
+| ISO 20816-1:2016 Annex D.2 | Change a magnitude comparison would report, mm/s | -0.5 mm/s (+/-0.05 mm/s) | -0.5 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-1:2016 Annex C.2 | Zone A limit factor Zbound of Formula (C.1) | 1 (+/-0.005) | 1 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-1:2016 Annex C.2 | Zone B limit factor Zbound of Formula (C.1) | 2.56 (+/-0.005) | 2.56 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-1:2016 Annex C.2 | Zone C limit factor Zbound of Formula (C.1) | 6.4 (+/-0.005) | 6.4 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-1:2016 Table C.1 | Typical zone A/B boundary, low end of the range, mm/s | 0.71 mm/s (+/-0.0005 mm/s) | 0.71 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-1:2016 Table C.1 | Typical zone A/B boundary, high end of the range, mm/s | 4.5 mm/s (+/-0.0005 mm/s) | 4.5 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-1:2016 Table C.1 | Typical zone B/C boundary, low end of the range, mm/s | 1.8 mm/s (+/-0.0005 mm/s) | 1.8 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-1:2016 Table C.1 | Typical zone B/C boundary, high end of the range, mm/s | 9.3 mm/s (+/-0.0005 mm/s) | 9.3 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-1:2016 Table C.1 | Typical zone C/D boundary, low end of the range, mm/s | 4.5 mm/s (+/-0.0005 mm/s) | 4.5 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-1:2016 Table C.1 | Typical zone C/D boundary, high end of the range, mm/s | 14.7 mm/s (+/-0.0005 mm/s) | 14.7 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-1:2016 Table C.1 | Every range end is a rung of the printed ladder | 0 (+/-0.5) | 0 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-1:2016 Figure 9 | Criterion is flat between the corner frequencies, worst deviation, mm/s | 0 mm/s (+/-0.000000001 mm/s) | 0 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-1:2016 Figure 9 | Constant-displacement slope below the lower corner, dB per octave | 6.0206 dB (+/-0.001 dB) | 6.0206 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 20816-1:2016 Figure 9 | Constant-acceleration slope above the upper corner, dB per octave | 6.0206 dB (+/-0.001 dB) | 6.0206 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 
 </details>
 

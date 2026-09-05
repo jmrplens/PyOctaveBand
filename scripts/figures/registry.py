@@ -560,6 +560,8 @@ from .vibration import (
     generate_junction_plate_geometry,
     generate_junction_transmission,
     generate_machine_fault_families,
+    generate_machine_vector_change,
+    generate_machine_vibration_zones,
     generate_mechanical_mobility,
     generate_mobility_random_error,
     generate_mobility_result_lines,
@@ -700,6 +702,10 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # families as patterns, and the three steps of the envelope route.
     generate_machine_fault_families,
     generate_envelope_chain_steps,
+    # Machine vibration evaluation (ISO 20816-1): the zone criterion as a
+    # curve, and the vector change a broad-band magnitude cannot express.
+    generate_machine_vibration_zones,
+    generate_machine_vector_change,
     generate_experimental_sea_clf,
     generate_plateau_transmission_loss,
     generate_orthotropic_transmission_loss,

@@ -1601,6 +1601,21 @@ _ES: dict[str, str] = {
     "gearbox": "reductora",
     "coupling": "acoplamiento",
     "axial": "axial",
+    # Where machine vibration is measured (ISO 20816-1, 4.4)
+    "Where machine vibration is measured (ISO 20816-1)": "Dónde se mide la vibración de una máquina (ISO 20816-1)",
+    "driven machine": "máquina arrastrada",
+    "shaft": "eje",
+    "vertical": "vertical",
+    "horizontal": "horizontal",
+    "two probes": "dos sondas",
+    "90° ± 5°": "90° ± 5°",
+    "on non-rotating parts": "en partes no rotativas",
+    "axial only on a thrust bearing": "axial sólo en un cojinete axial",
+    "on the rotating shaft": "en el eje que gira",
+    "both probes on one bearing half": "las dos sondas en la misma mitad del cojinete",
+    "transducer": "transductor",
+    "conditioning": "acondicionamiento",
+    "processing": "procesado",
     "radial, in the load zone, on the housing itself: no joint between "
     "bearing and sensor": "radial, en la zona de carga y sobre el soporte: sin junta entre "
     "rodamiento y sensor",

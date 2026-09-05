@@ -322,6 +322,7 @@ export const topics = [
         items: [
           { slug: 'vibration/machinery', label: 'Overview', translations: { es: 'Resumen' } },
           'vibration/machinery/machine-diagnostics',
+          'vibration/machinery/machine-vibration-evaluation',
         ],
       },
       apiGroup('vibration'),

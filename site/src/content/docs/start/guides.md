@@ -1,6 +1,6 @@
 ---
 title: "Guides"
-description: "The 113 guides of phonometry, grouped into the twelve topics the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
+description: "The 114 guides of phonometry, grouped into the twelve topics the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
 head:
   - tag: script
     attrs:
@@ -110,7 +110,7 @@ makes, then runnable code and the figure it draws. Nothing here is a survey of
 the field; each page is the working documentation of a module, written so that
 a result can be defended clause by clause rather than trusted.
 
-This page is the map. A hundred and thirteen guides sit in twelve topics, and each topic has its
+This page is the map. A hundred and fourteen guides sit in twelve topics, and each topic has its
 own overview page with the longer story of how its pieces fit together. If you
 are arriving without a specific question, read
 [Getting Started](/phonometry/start/getting-started/) first: it runs one signal
@@ -520,6 +520,10 @@ ISO 2631-1/-2/-4/-5, ISO 5349-1/-2 and ISO 8041-1.
 
 **[Machinery](/phonometry/vibration/machinery/)**
 
+- [Evaluating machine vibration](/phonometry/vibration/machinery/machine-vibration-evaluation/):
+  grading a machine from one broad-band measurement into the four evaluation
+  zones of ISO 20816-1, with the frequency-shaped velocity criterion and the
+  vector reading of a change that a magnitude comparison misses.
 - [Machine fault frequencies](/phonometry/vibration/machinery/machine-diagnostics/):
   the characteristic bearing, gear and shaft frequencies and the envelope
   analysis that finds them under the broadband noise of a running machine.

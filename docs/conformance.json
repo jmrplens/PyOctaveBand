@@ -3,13 +3,13 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 703,
-    "passing": 703,
+    "checks": 718,
+    "passing": 718,
     "failing": 0,
-    "domains": 65,
-    "standards": 388,
-    "citations": 587,
-    "designations": 122,
+    "domains": 66,
+    "standards": 389,
+    "citations": 591,
+    "designations": 123,
     "sources": 84
   },
   "units": [
@@ -53,6 +53,7 @@
     "m/s",
     "m/s per °C",
     "m/s²",
+    "mm/s",
     "modes/Hz",
     "ms",
     "m²",
@@ -177,6 +178,12 @@
     {
       "id": "human-vibration-iso-8041-2631-5349",
       "title": "Human vibration (ISO 8041 / 2631 / 5349)",
+      "checks": 15,
+      "passing": 15
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816",
+      "title": "Machine vibration evaluation (ISO 20816)",
       "checks": 15,
       "passing": 15
     },
@@ -8967,6 +8974,437 @@
       "deviation": {
         "value": 0.0,
         "label": "0"
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-1-2016-annex-d-2/vector-change-between-two-steady-states-mm-s",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-1",
+        "edition": "2016",
+        "clause": "Annex D.2",
+        "cite": "ISO 20816-1:2016 Annex D.2"
+      },
+      "quantity": "Vector change between two steady states, mm/s",
+      "kind": "scalar",
+      "expected": {
+        "value": 5.2
+      },
+      "computed": {
+        "value": 5.171
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.029
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-1-2016-annex-d-2/change-a-magnitude-comparison-would-report-mm-s",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-1",
+        "edition": "2016",
+        "clause": "Annex D.2",
+        "cite": "ISO 20816-1:2016 Annex D.2"
+      },
+      "quantity": "Change a magnitude comparison would report, mm/s",
+      "kind": "scalar",
+      "expected": {
+        "value": -0.5
+      },
+      "computed": {
+        "value": -0.5
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-1-2016-annex-c-2/zone-a-limit-factor-zbound-of-formula-c-1",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-1",
+        "edition": "2016",
+        "clause": "Annex C.2",
+        "cite": "ISO 20816-1:2016 Annex C.2"
+      },
+      "quantity": "Zone A limit factor Zbound of Formula (C.1)",
+      "kind": "scalar",
+      "expected": {
+        "value": 1.0
+      },
+      "computed": {
+        "value": 1.0
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-1-2016-annex-c-2/zone-b-limit-factor-zbound-of-formula-c-1",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-1",
+        "edition": "2016",
+        "clause": "Annex C.2",
+        "cite": "ISO 20816-1:2016 Annex C.2"
+      },
+      "quantity": "Zone B limit factor Zbound of Formula (C.1)",
+      "kind": "scalar",
+      "expected": {
+        "value": 2.56
+      },
+      "computed": {
+        "value": 2.56
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-1-2016-annex-c-2/zone-c-limit-factor-zbound-of-formula-c-1",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-1",
+        "edition": "2016",
+        "clause": "Annex C.2",
+        "cite": "ISO 20816-1:2016 Annex C.2"
+      },
+      "quantity": "Zone C limit factor Zbound of Formula (C.1)",
+      "kind": "scalar",
+      "expected": {
+        "value": 6.4
+      },
+      "computed": {
+        "value": 6.4
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-1-2016-table-c-1/typical-zone-a-b-boundary-low-end-of-the-range-mm-s",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-1",
+        "edition": "2016",
+        "clause": "Table C.1",
+        "cite": "ISO 20816-1:2016 Table C.1"
+      },
+      "quantity": "Typical zone A/B boundary, low end of the range, mm/s",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.71
+      },
+      "computed": {
+        "value": 0.71
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-1-2016-table-c-1/typical-zone-a-b-boundary-high-end-of-the-range-mm-s",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-1",
+        "edition": "2016",
+        "clause": "Table C.1",
+        "cite": "ISO 20816-1:2016 Table C.1"
+      },
+      "quantity": "Typical zone A/B boundary, high end of the range, mm/s",
+      "kind": "scalar",
+      "expected": {
+        "value": 4.5
+      },
+      "computed": {
+        "value": 4.5
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-1-2016-table-c-1/typical-zone-b-c-boundary-low-end-of-the-range-mm-s",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-1",
+        "edition": "2016",
+        "clause": "Table C.1",
+        "cite": "ISO 20816-1:2016 Table C.1"
+      },
+      "quantity": "Typical zone B/C boundary, low end of the range, mm/s",
+      "kind": "scalar",
+      "expected": {
+        "value": 1.8
+      },
+      "computed": {
+        "value": 1.8
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-1-2016-table-c-1/typical-zone-b-c-boundary-high-end-of-the-range-mm-s",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-1",
+        "edition": "2016",
+        "clause": "Table C.1",
+        "cite": "ISO 20816-1:2016 Table C.1"
+      },
+      "quantity": "Typical zone B/C boundary, high end of the range, mm/s",
+      "kind": "scalar",
+      "expected": {
+        "value": 9.3
+      },
+      "computed": {
+        "value": 9.3
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-1-2016-table-c-1/typical-zone-c-d-boundary-low-end-of-the-range-mm-s",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-1",
+        "edition": "2016",
+        "clause": "Table C.1",
+        "cite": "ISO 20816-1:2016 Table C.1"
+      },
+      "quantity": "Typical zone C/D boundary, low end of the range, mm/s",
+      "kind": "scalar",
+      "expected": {
+        "value": 4.5
+      },
+      "computed": {
+        "value": 4.5
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-1-2016-table-c-1/typical-zone-c-d-boundary-high-end-of-the-range-mm-s",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-1",
+        "edition": "2016",
+        "clause": "Table C.1",
+        "cite": "ISO 20816-1:2016 Table C.1"
+      },
+      "quantity": "Typical zone C/D boundary, high end of the range, mm/s",
+      "kind": "scalar",
+      "expected": {
+        "value": 14.7
+      },
+      "computed": {
+        "value": 14.7
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-1-2016-table-c-1/every-range-end-is-a-rung-of-the-printed-ladder",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-1",
+        "edition": "2016",
+        "clause": "Table C.1",
+        "cite": "ISO 20816-1:2016 Table C.1"
+      },
+      "quantity": "Every range end is a rung of the printed ladder",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.5
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 1,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-1-2016-figure-9/criterion-is-flat-between-the-corner-frequencies-worst-deviation-mm-s",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-1",
+        "edition": "2016",
+        "clause": "Figure 9",
+        "cite": "ISO 20816-1:2016 Figure 9"
+      },
+      "quantity": "Criterion is flat between the corner frequencies, worst deviation, mm/s",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0
+      },
+      "computed": {
+        "value": 0.0
+      },
+      "unit": "mm/s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 12,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-1-2016-figure-9/constant-displacement-slope-below-the-lower-corner-db-per-octave",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-1",
+        "edition": "2016",
+        "clause": "Figure 9",
+        "cite": "ISO 20816-1:2016 Figure 9"
+      },
+      "quantity": "Constant-displacement slope below the lower corner, dB per octave",
+      "kind": "scalar",
+      "expected": {
+        "value": 6.0206
+      },
+      "computed": {
+        "value": 6.0206
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.001
+      },
+      "deviation": {
+        "value": -8.67e-08
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "machine-vibration-evaluation-iso-20816/iso-20816-1-2016-figure-9/constant-acceleration-slope-above-the-upper-corner-db-per-octave",
+      "domain": "machine-vibration-evaluation-iso-20816",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 20816-1",
+        "edition": "2016",
+        "clause": "Figure 9",
+        "cite": "ISO 20816-1:2016 Figure 9"
+      },
+      "quantity": "Constant-acceleration slope above the upper corner, dB per octave",
+      "kind": "scalar",
+      "expected": {
+        "value": 6.0206
+      },
+      "computed": {
+        "value": 6.0206
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.001
+      },
+      "deviation": {
+        "value": -8.67e-08
       },
       "precision": 4,
       "verdict": "pass"

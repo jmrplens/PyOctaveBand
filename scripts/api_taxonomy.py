@@ -236,6 +236,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.vibration.structural.junction_transmission",
             "phonometry.vibration.structural.experimental_sea",
             "phonometry.vibration.machinery.diagnostics",
+            "phonometry.vibration.machinery.evaluation",
             "phonometry.vibration.structural.transfer_stiffness",
             "phonometry.vibration.human.exposure",
             "phonometry.vibration.human.multiple_shock",
@@ -431,6 +432,12 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     # 0,5 kg as the source mass of Formula (D.9b), so a plain scan sees it in
     # both modules.
     "TAPPING_HAMMER_MASS": "phonometry.building.prediction.resilient_layers",
+    # The ISO 20816-1 tables and factors are plain containers, so a scan
+    # by module finds no owner for them; they belong to the evaluation
+    # module that publishes them.
+    "TYPICAL_BOUNDARY_LADDER_MM_S": "phonometry.vibration.machinery.evaluation",
+    "TYPICAL_ZONE_BOUNDARY_RANGES_MM_S": "phonometry.vibration.machinery.evaluation",
+    "ZONE_LIMIT_FACTORS": "phonometry.vibration.machinery.evaluation",
     # Defined in phonometry._internal.warnings, exported at the top level.
     "PhonometryWarning": "phonometry",
     # The io subpackage keeps its implementation modules private and

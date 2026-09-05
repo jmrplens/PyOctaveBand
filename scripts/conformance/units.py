@@ -80,6 +80,7 @@ UNITS: frozenset[str] = frozenset(
         "m/(N·s)",
         "m/N",
         "m/s",
+        "mm/s",
         "m/s per °C",
         "m/s²",
         "m²",

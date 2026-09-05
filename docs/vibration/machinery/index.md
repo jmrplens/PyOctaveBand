@@ -29,10 +29,19 @@ separated before their sidebands can be read, [Time synchronous
 averaging](../../signals/spectra/synchronous-averaging.md) does it first.
 
 [Machine fault frequencies](machine-diagnostics.md)
-computes the families and draws them on a measured envelope spectrum.
+computes the families and draws them on a measured envelope spectrum, and
+[Evaluating machine vibration](machine-vibration-evaluation.md)
+answers the question that comes before any of it: whether the machine is
+acceptable at all, graded from one broad-band measurement into the four zones
+of ISO 20816-1.
 
 ## Pages in this section
 
+- [Evaluating machine vibration (ISO 20816-1)](machine-vibration-evaluation.md):
+  the four evaluation zones, the frequency-shaped velocity criterion of
+  Figure 9 with the zone factors of Annex C.2, the typical boundary ranges of
+  Table C.1, and the vector reading of a change that a magnitude comparison
+  misses (ISO 20816-1:2016).
 - [Machine fault frequencies](machine-diagnostics.md):
   the rolling-contact bearing frequencies, the gear-mesh frequency and its
   sidebands, the induction-motor supply, slip, pole-pass and rotor-slot
@@ -62,9 +71,13 @@ expectations to read a measured spectrum against, and the reading is yours. A
 loaded bearing slips a little, so expect the measured peak within a per cent
 or two of the prediction rather than exactly on it.
 
-Nor is there a severity verdict. The amplitude criteria that turn a present
+The severity verdict is a page of its own now:
+[Evaluating machine vibration](machine-vibration-evaluation.md)
+carries the ISO 20816-1 zones and criteria. What is still absent is the
+trending that feeds them. The amplitude criteria that turn a present
 line into an assessment — crest-factor and kurtosis trending, and the velocity
-severity bands of ISO 10816 / ISO 20816 — are outside this module, and rotor
+severity bands the machine-specific parts of ISO 20816 print — are outside
+this module, and rotor
 balancing (ISO 21940) and order tracking are absent from the library
 altogether. One published convention differs between sources and is flagged on
 the guide rather than hidden: the pole-pass frequency is standard

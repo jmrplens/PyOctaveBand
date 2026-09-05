@@ -280,6 +280,32 @@ _ES_EXACT = {
     "height (left axis)": "altura (eje izquierdo)",
     "thrust (right axis)": "empuje (eje derecho)",
     "Bearing Fault Lines on a Measured Envelope Spectrum": "Líneas de fallo del rodamiento sobre un espectro de envolvente medido",
+    "Evaluation Zones as a Frequency-Shaped Velocity Criterion": "Zonas de evaluación como criterio de velocidad conformado en frecuencia",
+    "Allowable r.m.s. velocity (mm/s)": "Velocidad eficaz admisible (mm/s)",
+    "limit of zone A ($Z$ = 1)": "límite de la zona A ($Z$ = 1)",
+    "limit of zone B ($Z$ = 2.56)": "límite de la zona B ($Z$ = 2,56)",
+    "limit of zone C ($Z$ = 6.4)": "límite de la zona C ($Z$ = 6,4)",
+    # machine_vector_change: the library renderer already translates the
+    # three vector labels, and this one comes out the same word in Spanish.
+    # Written here as its own translation rather than left to
+    # ENGLISH_BY_DESIGN, which would say "do not translate" instead of
+    # "looked at, and it is the same".
+    "final $A_2$": "final $A_2$",
+    "zone A: newly commissioned": "zona A: recién puesta en servicio",
+    "zone B: unrestricted operation": "zona B: operación sin restricción",
+    "zone C: limited operation": "zona C: operación limitada",
+    "zone D: damage": "zona D: daño",
+    "$v_\\mathrm{rms} = v_A Z (f_z/f_x)^k (f_y/f_w)^m$, $v_A$ = 1.12 mm/s, "
+    "$k = m = 1$\n"
+    "flat between the corners; constant displacement below, constant "
+    "acceleration above\n"
+    "the B and C limits fall within 3 % of the 2.8 and 7.1 rungs of "
+    "the Table C.1 ladder": "$v_\\mathrm{rms} = v_A Z (f_z/f_x)^k (f_y/f_w)^m$, "
+    "$v_A$ = 1,12 mm/s, $k = m = 1$\n"
+    "plana entre las esquinas; desplazamiento constante por debajo, "
+    "aceleración constante por encima\n"
+    "los límites B y C quedan a menos del 3 % de los escalones 2,8 y 7,1 "
+    "de la escala de la Tabla C.1",
     "envelope spectrum of the 2-4 kHz band": "espectro de envolvente de la banda 2-4 kHz",
     "predicted BPFO and harmonics": "BPFO previsto y sus armónicos",
     "predicted BPFI": "BPFI previsto",
