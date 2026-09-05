@@ -320,7 +320,6 @@ predecessor supplies the industrial boundaries.
   parts — Part 3: Industrial machines with nominal power above 15 kW and
   nominal speeds between 120 r/min and 15 000 r/min when measured in situ*
   (ISO 10816-3:2009).
-  [iso.org catalogue](https://www.iso.org/standard/50528.html).
   The machine groups (4.2), the support classification (4.3), the zone
   boundaries of Tables A.1 and A.2, the most-restrictive rule (5.2.3), the
   significant change (5.3) and the ALARM and TRIP settings (5.4). Superseded

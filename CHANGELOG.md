@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The numbers behind the machine-vibration grading, for industrial machines.
+  ISO 20816-1 fixes the shape of the judgement and leaves the boundaries to the
+  machine-specific parts; `INDUSTRIAL_MACHINE_ZONES` carries the four classes
+  of ISO 10816-3 Tables A.1 and A.2, keyed by machine group and support class,
+  and `industrial_machine_zone` grades against them. The tables state each
+  class twice, once in displacement and once in velocity, and 5.2.3 says the
+  more restrictive of the two gradings applies: a group 2 machine on a rigid
+  support reading 2,0 mm/s and 50 um is zone B on one and zone C on the other,
+  and it is a C.
+
+  `is_significant_change`, `alarm_limit` and `trip_limit` are the operational
+  limits of 5.3 and 5.4 with their numbers. An ALARM is set from the
+  established baseline for that position, a quarter of the upper limit of zone
+  B above it and never more than 1,25 times that limit, so a quiet machine gets
+  an alarm well inside zone B and a machine whose baseline has crept up cannot
+  drag its alarm along behind it. A TRIP is about the mechanical integrity of
+  the machine, so it comes from the zone and not from the baseline.
+
+  The edition is ISO 10816-3:2009. Part 3 is the one part of the series not
+  held here, so the boundaries come from the direct predecessor of the current
+  ISO 20816-3:2022, and the guide says so.
+
 - `phonometry.vibration` grades a machine from one broad-band measurement, the
   way ISO 20816-1:2016 asks for it. `evaluation_zone` places a magnitude in
   zone A, B, C or D against the three boundaries of whichever part of the
