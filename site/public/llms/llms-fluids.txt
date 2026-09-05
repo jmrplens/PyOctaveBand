@@ -317,4 +317,14 @@ ISO 17497-1 stay in their own modules with their own clauses, and why the
 Johnson-Champoux-Allard Prandtl number of 0,71 stays frozen at 0,71 even
 though the air at that state has 0,728.
 
+Two states of that air are published as constants, because a caller has no
+business writing them out twice. `materials.ANNEX_A_AIR` is the reference state
+ISO 9053-2:2020 Annex A.3 fixes for an airflow-resistance measurement, 23 °C
+and 50 % relative humidity at one standard atmosphere, evaluated through the
+same CIPM-2007 model as any other air. `simulation.SIMULATION_AIR` is the
+solver's default medium, and it is deliberately not that: 343 m/s and
+1,2 kg/m³ flat, the round pair a finite-difference grid is set up with, carried
+as a `Fluid` so that a run says which air it was made in rather than leaving
+two floats standing side by side in a call.
+
 ---

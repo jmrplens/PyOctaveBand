@@ -1,6 +1,6 @@
 ---
 title: "Guides"
-description: "The 114 guides of phonometry, grouped into the twelve topics the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
+description: "The 115 guides of phonometry, grouped into the twelve topics the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
 head:
   - tag: script
     attrs:
@@ -110,7 +110,7 @@ makes, then runnable code and the figure it draws. Nothing here is a survey of
 the field; each page is the working documentation of a module, written so that
 a result can be defended clause by clause rather than trusted.
 
-This page is the map. A hundred and fourteen guides sit in twelve topics, and each topic has its
+This page is the map. A hundred and fifteen guides sit in twelve topics, and each topic has its
 own overview page with the longer story of how its pieces fit together. If you
 are arriving without a specific question, read
 [Getting Started](/phonometry/start/getting-started/) first: it runs one signal
@@ -522,8 +522,10 @@ ISO 2631-1/-2/-4/-5, ISO 5349-1/-2 and ISO 8041-1.
 
 - [Evaluating machine vibration](/phonometry/vibration/machinery/machine-vibration-evaluation/):
   grading a machine from one broad-band measurement into the four evaluation
-  zones of ISO 20816-1, with the frequency-shaped velocity criterion and the
-  vector reading of a change that a magnitude comparison misses.
+  zones of ISO 20816-1, with the frequency-shaped velocity criterion, the
+  vector reading of a change that a magnitude comparison misses, and the
+  printed boundaries and ALARM and TRIP settings ISO 10816-3 gives for
+  industrial machines.
 - [Machine fault frequencies](/phonometry/vibration/machinery/machine-diagnostics/):
   the characteristic bearing, gear and shaft frequencies and the envelope
   analysis that finds them under the broadband noise of a running machine.
@@ -698,6 +700,9 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 and EBU R 128.
 - [Duct-Borne Noise: Fan to Room](/phonometry/devices/noise-control/duct-path/): the
   end-to-end fan-to-room calculation against a room criterion, and the
   higher-order-mode cut-on that limits every plane-wave method.
+- [HVAC Noise the German Way (VDI 2081)](/phonometry/devices/noise-control/vdi2081-air-systems/):
+  the same chain by the German guideline, from the assembly-type fan model to
+  the room step, against the worked sheet of its own Part 2.
 - [Room to Room: Partition, Receiving Room, Criterion](/phonometry/devices/noise-control/room-to-room/):
   the source-room level through a partition into the receiving room, the noise
   criterion verdict and the transmission loss a partition or an enclosure needs.

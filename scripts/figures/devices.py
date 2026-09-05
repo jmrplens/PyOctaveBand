@@ -5599,3 +5599,350 @@ def generate_in_situ_sound_power(output_dir: str) -> None:
     fig.tight_layout()
     save_figure(output_dir, "in_situ_sound_power.svg")
     plt.close()
+
+
+#: VDI 2081 Part 2:2005 Table 1: the octave bands the worked sheet is written
+#: in, and the A-weighting column it carries beside them.
+_VDI_BANDS = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+_VDI_A_WEIGHTING = np.array([-26.2, -16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1])
+
+
+def _vdi_fan(assembly: str) -> NDArray[np.float64]:
+    """Element 1 of the worked sheet, for one assembly type."""
+    from phonometry import noise_control
+
+    return np.asarray(
+        noise_control.fan_sound_power(
+            16000.0 / 3600.0,
+            model="vdi2081",
+            fan_total_pressure_pa=600.0,
+            assembly=assembly,
+            fan_speed_rpm=1250.0,
+        ).values
+    )
+
+
+def generate_vdi2081_fan_assemblies(output_dir: str) -> None:
+    """One duty point, three assemblies: what the German method asks first."""
+    print("Generating vdi2081_fan_assemblies...")
+
+    assemblies = (
+        ("rr", "radial, blades curved backwards", COLOR_PRIMARY, "-"),
+        ("t", "cylindrical rotor, blades curved forwards", COLOR_TERTIARY, "--"),
+        ("am", "axial, with a diffuser downstream", COLOR_SECONDARY, "-."),
+    )
+    _fig, (ax, ax2) = plt.subplots(
+        1, 2, figsize=(11.4, 5.6), gridspec_kw={"width_ratios": [1.35, 1.0]}
+    )
+    for assembly, label, colour, style in assemblies:
+        values = _vdi_fan(assembly)
+        total = 10.0 * np.log10(float(np.sum(10.0 ** (values / 10.0))))
+        ax.semilogx(
+            _VDI_BANDS,
+            values,
+            style,
+            color=colour,
+            lw=1.9,
+            marker="o",
+            ms=4,
+            label=f"{label} ({total:.0f} dB overall)",
+        )
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Sound power level (dB)")
+    ax.set_title("The Same Duty Point, Three Assemblies", pad=10)
+    ax.set_ylim(56.0, 107.0)
+    format_frequency_axis(ax)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize=8)
+    ax.text(
+        0.015,
+        0.975,
+        "16 000 m³/h against 600 Pa of total pressure rise, at 1250 min⁻¹",
+        transform=ax.transAxes,
+        va="top",
+        ha="left",
+        fontsize=8.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.32",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+
+    # Equation (15) is where the three shapes come from: one parabola in the
+    # logarithm of the Strouhal number, moved along it by c3 alone.
+    speed = 1250.0
+    fine = np.logspace(np.log10(45.0), np.log10(11000.0), 400)
+    strouhal = fine * 60.0 / (np.pi * speed)
+    band_strouhal = _VDI_BANDS * 60.0 / (np.pi * speed)
+    for (assembly, label, colour, style), c3 in zip(
+        assemblies, (0.4, 0.15, -0.6), strict=True
+    ):
+        ax2.semilogx(
+            fine,
+            -5.0 - 5.0 * (np.log10(strouhal) + c3) ** 2,
+            style,
+            color=colour,
+            lw=1.8,
+            label=f"{label.split(',')[0]}, $c_3$ = {c3:g}",
+        )
+        # Equation (13) gives the overall level the correction is applied to,
+        # which is not the energy sum of the eight bands it produces; recover
+        # it from the first band so the markers land where the curve says.
+        values = _vdi_fan(assembly)
+        overall = values[0] + 5.0 + 5.0 * (np.log10(band_strouhal[0]) + c3) ** 2
+        ax2.semilogx(
+            _VDI_BANDS,
+            values - overall,
+            "none",
+            color=colour,
+            marker="o",
+            ms=4,
+        )
+    ax2.set_xlabel(LABEL_FREQ_HZ)
+    ax2.set_ylabel("Correction on the overall level (dB)")
+    ax2.set_title("One Parabola, Moved Along by $c_3$", pad=10)
+    ax2.set_xlim(45.0, 11000.0)
+    ax2.set_ylim(-32.0, 1.0)
+    format_frequency_axis(ax2)
+    ax2.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+    ax2.set_axisbelow(True)
+    ax2.legend(loc="lower center", fontsize=8)
+    ax2.text(
+        0.03,
+        0.955,
+        "$\\Delta L_{W,\\mathrm{oct}} = -5 - 5(\\lg St + c_3)^2$,\n"
+        "$St = 60 f/(\\pi n)$: no impeller diameter, it cancels\n"
+        "markers: the eight octaves the sheet is written in",
+        transform=ax2.transAxes,
+        va="top",
+        ha="left",
+        fontsize=8.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.32",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "vdi2081_fan_assemblies.svg")
+    plt.close()
+
+
+def generate_vdi2081_chain_cascade(output_dir: str) -> None:
+    """The worked sheet end to end: 90 dB at the fan, 48 dB at the ear."""
+    print("Generating vdi2081_chain_cascade...")
+    from phonometry import noise_control
+
+    # Element 1, brought onto the 96 dB overall the sheet works from.
+    fan = _vdi_fan("rr")
+    fan = fan + (96.0 - 10.0 * np.log10(float(np.sum(10.0 ** (fan / 10.0)))))
+
+    # Element 2: the splitter silencer takes out its insertion loss and puts
+    # back the noise its own gaps make.
+    attenuation = np.array([6.0, 17.0, 42.0, 41.0, 47.0, 33.0, 20.0, 18.0])
+    self_noise = np.asarray(
+        noise_control.silencer_self_noise(
+            _VDI_BANDS,
+            14.81,
+            5,
+            0.6,
+            model="vdi2081",
+            pressure_drop_pa=145.0,
+            approach_area=1.5 * 0.6,
+            airway_width=0.100,
+        ).values
+    )
+    after_silencer = 10.0 * np.log10(
+        10.0 ** ((fan - attenuation) / 10.0) + 10.0 ** (self_noise / 10.0)
+    )
+
+    # Element 3: the branch takes its share of the flow and makes its own noise.
+    split = noise_control.split_loss(
+        0.30 + 0.36 + 0.42, [0.30, 0.36, 0.42], branch=0, model="vdi2081"
+    )
+    junction = np.asarray(
+        noise_control.flow_noise_bend(
+            _VDI_BANDS,
+            (4200.0 / 3600.0) / 0.30,
+            0.30,
+            0.6,
+            model="vdi2081",
+            branch_diameter=0.62,
+            approach_velocity=(16000.0 / 3600.0) / 0.90,
+            rounding_ratio=0.025,
+        ).values
+    )
+    after_junction = 10.0 * np.log10(
+        10.0 ** ((after_silencer - split) / 10.0) + 10.0 ** (junction / 10.0)
+    )
+
+    # Element 19: what the two swirl diffusers finally put into the room, and
+    # element 20: what a listener 1,5 m away hears of it.
+    entering = np.array([53.4, 51.4, 50.1, 41.2, 29.9, 27.8, 33.0, 32.6])
+    room = np.asarray(
+        noise_control.room_effect(
+            1.5,
+            absorption_area=20.0,
+            directivity=np.array([2.1, 2.4, 3.0, 4.0, 5.5, 6.7, 7.0, 7.2]),
+        )
+    )
+    at_the_ear = entering - room
+
+    stages = (
+        (fan, "at the fan (element 1)", COLOR_MUTED, ":", "o"),
+        (after_silencer, "past the silencer (element 2)", COLOR_PRIMARY, "-", "o"),
+        (after_junction, "past the branch (element 3)", COLOR_TERTIARY, "--", "s"),
+        (entering, "into the room (element 19)", COLOR_QUATERNARY, "-", "^"),
+        (at_the_ear, "at the listener (element 20)", COLOR_SECONDARY, "-", "D"),
+    )
+    _fig, ax = plt.subplots(figsize=(10.4, 6.4))
+    for values, label, colour, style, marker in stages:
+        weighted = values + _VDI_A_WEIGHTING
+        total = 10.0 * np.log10(float(np.sum(10.0 ** (weighted / 10.0))))
+        ax.semilogx(
+            _VDI_BANDS,
+            values,
+            style,
+            color=colour,
+            lw=2.0 if marker == "D" else 1.7,
+            marker=marker,
+            ms=4,
+            label=f"{label}: {total:.0f} dB(A)",
+        )
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Level (dB)")
+    ax.set_title("One Supply Duct, Element by Element", pad=12)
+    format_frequency_axis(ax)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize=8.5)
+    ax.text(
+        0.985,
+        0.965,
+        "the first four rows are sound power, the last is sound pressure:\n"
+        "the room step is where the quantity changes",
+        transform=ax.transAxes,
+        va="top",
+        ha="right",
+        fontsize=8.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.32",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "vdi2081_chain_cascade.svg")
+    plt.close()
+
+
+def generate_vdi2081_room_step(output_dir: str) -> None:
+    """Equation (36): the step from sound power to the level in the room."""
+    print("Generating vdi2081_room_step...")
+    from phonometry import noise_control
+
+    directivity = np.array([2.1, 2.4, 3.0, 4.0, 5.5, 6.7, 7.0, 7.2])
+    absorption_area, distance = 20.0, 1.5
+    shaped = np.asarray(
+        noise_control.room_effect(
+            distance, absorption_area=absorption_area, directivity=directivity
+        )
+    )
+    hemisphere = float(
+        noise_control.room_effect(distance, absorption_area=absorption_area)
+    )
+
+    _fig, (ax, ax2) = plt.subplots(1, 2, figsize=(11.4, 5.6))
+    ax.semilogx(
+        _VDI_BANDS,
+        shaped,
+        "-",
+        color=COLOR_PRIMARY,
+        lw=2.0,
+        marker="o",
+        ms=4,
+        label="the outlet's own $Q$, band by band",
+    )
+    ax.axhline(
+        hemisphere,
+        color=COLOR_SECONDARY,
+        ls="--",
+        lw=1.6,
+        label=f"a half space, $Q$ = 2: {hemisphere:.1f} dB in every band",
+    )
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("$L_W - L_p$ (dB)")
+    ax.set_title("A Directivity That Moves With Frequency", pad=10)
+    ax.set_ylim(3.1, 6.1)
+    format_frequency_axis(ax)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize=8)
+
+    # The same room written the two ways it can be written, against distance.
+    radius = np.logspace(np.log10(0.4), np.log10(8.0), 240)
+    for mean_alpha, colour, style in (
+        (0.15, COLOR_TERTIARY, "-"),
+        (0.4, COLOR_QUATERNARY, "--"),
+    ):
+        constant = absorption_area / (1.0 - mean_alpha)
+        ax2.semilogx(
+            radius,
+            [
+                float(noise_control.room_effect(r, room_constant=constant))
+                for r in radius
+            ],
+            style,
+            color=colour,
+            lw=1.8,
+            label=f"$R = A/(1-\\bar\\alpha)$ = {constant:.0f} m², "
+            f"$\\bar\\alpha$ = {mean_alpha:g}",
+        )
+    ax2.semilogx(
+        radius,
+        [
+            float(noise_control.room_effect(r, absorption_area=absorption_area))
+            for r in radius
+        ],
+        "-",
+        color=COLOR_PRIMARY,
+        lw=2.0,
+        label=f"$A$ = {absorption_area:.0f} m², the guideline's own argument",
+    )
+    ax2.axvline(distance, color=COLOR_FG, ls=":", lw=1.2, alpha=0.6)
+    ax2.annotate(
+        "the listener, 1.5 m out",
+        xy=(distance, 0.06),
+        xycoords=("data", "axes fraction"),
+        xytext=(6.0, 0.06),
+        textcoords=("data", "axes fraction"),
+        ha="right",
+        va="bottom",
+        fontsize=8.5,
+        color=COLOR_FG,
+        arrowprops={"arrowstyle": "->", "color": COLOR_FG, "linewidth": 1.0},
+        bbox={
+            "boxstyle": "round,pad=0.28",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+    # A distance axis reads in metres, not in powers of ten.
+    ax2.set_xticks([0.5, 1.0, 1.5, 2.0, 3.0, 5.0, 8.0])
+    ax2.set_xticklabels(["0.5", "1", "1.5", "2", "3", "5", "8"])
+    ax2.minorticks_off()
+    ax2.set_xlim(0.4, 8.0)
+    ax2.set_xlabel("Distance from the outlet (m)")
+    ax2.set_ylabel("$L_W - L_p$ (dB)")
+    ax2.set_title("Two Areas That Are Not the Same Number", pad=10)
+    ax2.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+    ax2.set_axisbelow(True)
+    ax2.legend(loc="upper left", fontsize=8)
+    plt.tight_layout()
+    save_figure(output_dir, "vdi2081_room_step.svg")
+    plt.close()

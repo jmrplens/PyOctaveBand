@@ -239,3 +239,13 @@ Por eso las fórmulas de aire simplificadas de ISO 10534-2, ASTM E2611 e
 ISO 17497-1 se quedan en sus módulos con sus cláusulas, y por eso el número de
 Prandtl 0,71 de Johnson-Champoux-Allard sigue siendo 0,71 aunque el aire en ese
 estado tenga 0,728.
+
+Dos estados de ese aire se publican como constantes, porque no tiene sentido
+que quien llama los escriba dos veces. `materials.ANNEX_A_AIR` es el estado de
+referencia que fija el anexo A.3 de la ISO 9053-2:2020 para una medida de
+resistencia al flujo, 23 °C y 50 % de humedad relativa a una atmósfera
+estándar, evaluado con el mismo modelo CIPM-2007 que cualquier otro aire.
+`simulation.SIMULATION_AIR` es el medio por defecto del solver, y a propósito no
+es eso: 343 m/s y 1,2 kg/m³ planos, el par redondo con el que se monta una
+malla de diferencias finitas, llevado como `Fluid` para que una simulación diga
+en qué aire se hizo en lugar de dejar dos floats sueltos en una llamada.

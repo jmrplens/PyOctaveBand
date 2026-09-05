@@ -463,7 +463,61 @@ stacked per-band breakdown with the total overlaid (the figure above).
 | `lateral` | bool | — | `False` | `True` ⇒ vertical-edge diffraction (Eq. (13)) |
 | `line_of_sight_clear` | bool | — | `False` | `True` ⇒ the sight line passes above the top edge: the path difference takes a negative sign and $K_\mathrm{met} = 1$ (text after Eq. (16)) |
 
-## 3. Scope, assumptions and pitfalls
+## 3. Checking an implementation against the printed cases
+
+ISO 17534-1 asks software that implements an outdoor propagation method to
+declare conformity against a published set of test cases. **ISO/TR 17534-3**
+carries that set for ISO 9613-2: nineteen scenarios, each with its geometry and
+a step-by-step table of every intermediate quantity, and an envelope a result
+has to stay inside to count as correct, which the document puts at 0,05 dB per
+band and on the total.
+
+Seven of the nineteen are answerable by ISO 9613-2 on its own: "Test cases T01
+up to T07 can be solved by applying ISO 9613-2 exclusively" (6.1). T08 to T19
+add barriers, buildings and reflections whose ray paths come from the
+additional recommendations of Clause 5 rather than from ISO 9613-2, and they
+are outside what this page implements.
+
+The seven share one geometry: a source 1 m above its local ground, a receiver
+4 m above its own, 195 m apart in ground projection, and a flat 93 dB in every
+octave so that the shape of the printed spectrum is the propagation and nothing
+else. What changes between them is the ground.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases.svg" alt="Two panels. On the left, the octave-band level at the receiver for the same 195 metre path over three grounds: over reflecting ground it falls smoothly from 40 to 25 decibels, over mixed ground it dips to 33 decibels around 250 and 500 hertz before recovering, and over porous ground the dip reaches 26 decibels; open rings mark the levels the document prints, and they sit on the curves. On the right, a bar per test case from T01 to T07 giving the worst deviation of the computed spectrum from the printed one, between 0.008 and 0.012 decibels, all of them well under the dashed line at the 0.05 decibel envelope the document declares" width="100%"></picture>
+
+*The ground effect is the whole story here: over porous ground the 250 Hz band
+arrives 13 dB quieter than over a reflecting one. Right: every case lands
+within a quarter of the envelope the document allows.*
+
+T01 to T03 vary one ground factor from reflecting to porous. T04 and T06 split
+the path into three areas of different ground and answer by the general method
+of 7.3.1; T05 and T07 answer the same two scenarios by the alternative method
+of 7.3.2, which replaces the three factors with the mean height of the ray
+above the ground. Two helpers do the bookkeeping those four need:
+
+```python
+import math
+
+from phonometry import environment
+
+d_p = math.hypot(190.0, 40.0)
+regions = environment.region_ground_factors(
+    (40.88, 102.19, 51.10), (0.2, 0.5, 0.9), 1.0, 4.0
+)
+print(round(regions.source, 2), round(regions.middle, 2), round(regions.receiver, 2))
+print(round(environment.mean_path_height((0.0, d_p), (0.0, 0.0), 1.0, 4.0), 2))
+```
+
+The first is the length-weighted mean of $G$ over each of the three regions
+ISO 9613-2 divides a path into, which is 0,20, 0,43 and 0,67 for the areas of
+Table 7; the second is $F/d$ of Figure 3, which is 2,50 m over flat ground and
+4,99 m once the ground rises 10 m under the receiver.
+
+Thirty-four conformance rows hold the seven cases to the document's own
+envelope, band by band and on both totals. The worst deviation over all of them
+is 0,012 dB, a quarter of what the report allows.
+
+## 4. Scope, assumptions and pitfalls
 
 ### What "favourable propagation conditions" means
 
@@ -564,7 +618,7 @@ See the [Theory](../../reference/theory/environment-transport.md) page for the f
 ISO 354, and the [Occupational Noise Exposure guide](../../perception/hearing/occupational-exposure.md) for the ISO 9612 occupational
 exposure that consumes A-weighted levels.
 
-## 4. Prediction reports (`.report()`)
+## 5. Prediction reports (`.report()`)
 
 Both outdoor-propagation results render a one-page PDF **prediction** fiche.
 They are clearly labelled predictions, not measurements: the sheet states the

@@ -183,6 +183,9 @@ from .devices import (
     generate_swept_sine_methods,
     generate_swept_sine_thd,
     generate_true_peak_intersample,
+    generate_vdi2081_chain_cascade,
+    generate_vdi2081_fan_assemblies,
+    generate_vdi2081_room_step,
     generate_vibration_sound_power,
 )
 from .environment import (
@@ -209,6 +212,7 @@ from .environment import (
     generate_impulse_prominence,
     generate_impulsive_sound_onsets,
     generate_iso9613_screening_anatomy,
+    generate_iso17534_qa_cases,
     generate_lden_profile,
     generate_outdoor_attenuation_breakdown,
     generate_outdoor_level_cascade,
@@ -742,6 +746,8 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_barrier_thickness_gain,
     generate_iso9613_screening_anatomy,
     generate_outdoor_level_cascade,
+    # The quality-assurance cases ISO/TR 17534-3 prints for ISO 9613-2.
+    generate_iso17534_qa_cases,
     generate_atmospheric_refraction,
     generate_shadow_zone_map,
     generate_refraction_homogeneous_check,
@@ -1167,6 +1173,11 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_duct_regenerated_noise,
     generate_duct_sheet_verification,
     generate_duct_path_cascade,
+    # The German method beside it (VDI 2081): the fan its assembly type
+    # describes, the worked sheet element by element, and the room step.
+    generate_vdi2081_fan_assemblies,
+    generate_vdi2081_chain_cascade,
+    generate_vdi2081_room_step,
     generate_room_to_room_chain,
     generate_room_to_room_partitions,
     generate_duct_mode_cut_on,
