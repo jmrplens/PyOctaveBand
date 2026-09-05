@@ -372,7 +372,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   that is in neither its signature nor its documentation, and that nothing
   written against this API could match. Its sibling already validated locally.
 
-- Nine figures on the Spanish pages pointed at the English artwork. `ThemeImage`
+- Nine figures on the Spanish pages of this batch pointed at the English artwork. `ThemeImage`
   derives the dark twin of the URL it is given and nothing else, so a Spanish
   page has to name its own `_es` variant, and these did not: the caption was in
   Spanish and the axis labels underneath it were in English.

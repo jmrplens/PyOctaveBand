@@ -262,10 +262,10 @@ Equations (16) and (17), the splitter silencer and its self-noise, the end
 reflection of Section 6.6, the room step of Equation (36) and the assessment
 curve of Part 2 Section 1.1, all against the worked sheet of Part 2 Table 1.
 
-Not covered: The air-handling unit and the outdoor-propagation chapters the
-superseding editions added, which are not held here; the room acoustics VDI
-2081 leaves to VDI 2569; and the vibration isolation of the plant, which
-Section 7.6 of Blatt 1 does cover and this library does not.
+Not covered: The air-handling unit and the outdoor-propagation chapters the 2019 revision
+added, which are in the editions not held here; the room acoustics VDI 2081
+leaves to VDI 2569; and the vibration isolation of the plant, which Section 7.6
+of Blatt 1 does cover and this library does not.
 
 ## See also
 
