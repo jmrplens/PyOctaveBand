@@ -522,8 +522,10 @@ ISO 2631-1/-2/-4/-5, ISO 5349-1/-2 and ISO 8041-1.
 
 - [Evaluating machine vibration](/phonometry/vibration/machinery/machine-vibration-evaluation/):
   grading a machine from one broad-band measurement into the four evaluation
-  zones of ISO 20816-1, with the frequency-shaped velocity criterion and the
-  vector reading of a change that a magnitude comparison misses.
+  zones of ISO 20816-1, with the frequency-shaped velocity criterion, the
+  vector reading of a change that a magnitude comparison misses, and the
+  printed boundaries and ALARM and TRIP settings ISO 10816-3 gives for
+  industrial machines.
 - [Machine fault frequencies](/phonometry/vibration/machinery/machine-diagnostics/):
   the characteristic bearing, gear and shaft frequencies and the envelope
   analysis that finds them under the broadband noise of a running machine.

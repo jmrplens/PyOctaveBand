@@ -548,8 +548,9 @@ EN 12354-5, ISO 2631-1/-2/-4/-5, ISO 5349-1/-2 e ISO 8041-1.
 - [Evaluar la vibración de una máquina](/phonometry/es/vibration/machinery/machine-vibration-evaluation/):
   calificar una máquina desde una sola medida de banda ancha en las cuatro zonas
   de evaluación de la ISO 20816-1, con el criterio de velocidad conformado en
-  frecuencia y la lectura vectorial de un cambio que una comparación de
-  magnitudes no ve.
+  frecuencia, la lectura vectorial de un cambio que una comparación de
+  magnitudes no ve, y las fronteras impresas y los ajustes de ALARMA y DISPARO
+  que la ISO 10816-3 da para máquinas industriales.
 - [Frecuencias de fallo de máquinas](/phonometry/es/vibration/machinery/machine-diagnostics/):
   las frecuencias características de rodamientos, engranajes y ejes y el análisis
   de envolvente que las encuentra bajo el ruido de banda ancha de una máquina en
