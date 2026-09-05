@@ -80,7 +80,6 @@ _SABINE = 55.3
 _TEN_LG_E = 10.0 * math.log10(math.e)
 #: Validity range of the speed-of-sound Eq. (6), in degrees Celsius.
 _EQ6_TEMPERATURE_RANGE = (15.0, 30.0)
-#: Absolute zero in degrees Celsius, the hard floor of any air temperature.
 #: Full-scale relative humidity (saturation), in percent.
 _MAX_RELATIVE_HUMIDITY_PERCENT = 100.0
 #: Minimum reverberation-room volume, ISO 354:2003 clause 6.1.1 (m3).

@@ -51,9 +51,6 @@ if TYPE_CHECKING:
 _BAR_PER_MPA = 10.0
 #: kg/cm² per bar (100 kPa = 1.019716 kg/cm²; 1 bar = 100 kPa).
 _KGCM2_PER_BAR = 1.019716
-#: Minimum depth samples in a profile: two points are the floor for a
-#: piecewise-linear profile and for ``np.gradient``'s finite differences.
-
 _MODELS = ("unesco", "del_grosso", "mackenzie", "medwin")
 
 

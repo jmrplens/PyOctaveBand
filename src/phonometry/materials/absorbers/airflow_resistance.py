@@ -112,9 +112,10 @@ _ADIABATIC_KAPPA = 1.4
 #: IEC 61094-2:2009. Three of them are Table F.1 cells rounded to four figures and are
 #: reproduced below. The other two are not: Table F.1 tabulates the thermal
 #: *diffusivity*, not its two constituents, and the pair Annex A.3 prints for them is
-#: 1,0800 times smaller than Annex F gives at that state. That pair is kept separately
-#: as ``_ANNEX_A_PRINTED_*`` because the standard's own worked example is computed from
-#: it, but it is not what a caller who asks for air should be handed: its
+#: 1,0800 times smaller than Annex F gives at that state. The annex's own worked
+#: example is computed from the pair it prints, so the conformance rows that pin that
+#: example transcribe it themselves; it is not what a caller who asks for air should
+#: be handed, because its
 #: ``C_P = 938,7 J/(kg K)`` is 27,19 J/(mol K), below the rigid-rotor diatomic floor of
 #: ``(7/2)R = 29,10``, so it is not air at any temperature, in any unit. See
 #: ``docs/ERRATA.md``.

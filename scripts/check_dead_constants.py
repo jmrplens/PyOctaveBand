@@ -26,16 +26,23 @@ import ast
 import collections
 import pathlib
 import sys
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 #: Where a constant may be defined, and everything that may read one.
 SOURCE = ROOT / "src" / "phonometry"
 SEARCHED = ("src", "tests", "scripts")
 
-#: Private constants that stay although nothing reads them, and why. Nothing
-#: belongs here that could instead be used: a constant kept for documentation
-#: is documentation, and belongs in a docstring where a reader will find it.
-KEPT: dict[str, str] = {}
+#: Private constants that stay although nothing reads them, and why. Keyed by
+#: module and name, like every other mapping here: a bare name would silence
+#: the check in every module that defines it, and this tree has four modules
+#: defining ``_MIN_POLYLINE_NODES``. Nothing belongs here that could instead be
+#: used: a constant kept for documentation is documentation, and belongs in a
+#: docstring where a reader will find it.
+KEPT: dict[tuple[str, str], str] = {}
 
 
 def _module_of(path: pathlib.Path) -> str | None:
@@ -48,6 +55,52 @@ def _module_of(path: pathlib.Path) -> str | None:
     if parts[-1] == "__init__":
         parts.pop()
     return ".".join(parts)
+
+
+def _package_of(path: pathlib.Path, module: str | None) -> str:
+    """The package a relative import in that file climbs from.
+
+    An ``__init__.py`` *is* its package, so its module name is already the
+    answer; every other file is a module inside its package and one component
+    has to come off. Stripping unconditionally puts every relative import
+    written in an ``__init__.py`` one package too high, which both raises a
+    false alarm on the constant it reads and clears a genuinely dead one in
+    whatever module the wrong target names.
+    """
+    if module is None:
+        return ""
+    if path.name == "__init__.py":
+        return module
+    return module.rsplit(".", 1)[0] if "." in module else ""
+
+
+#: Statements that hold module-level code without leaving module scope. A
+#: constant under ``if TYPE_CHECKING`` or in the fallback arm of a ``try`` is a
+#: module-level constant, and reading only ``tree.body`` never sees it.
+_NESTING = (ast.If, ast.Try, ast.With)
+
+
+def _module_level(body: list[ast.stmt]) -> Iterator[ast.stmt]:
+    """Every statement that runs at module scope, through if, try and with."""
+    for node in body:
+        if isinstance(node, _NESTING):
+            branches = [node.body, getattr(node, "orelse", [])]
+            if isinstance(node, ast.Try):
+                branches += [handler.body for handler in node.handlers]
+                branches.append(node.finalbody)
+            for branch in branches:
+                yield from _module_level(branch)
+        else:
+            yield node
+
+
+def _assigned_names(target: ast.expr) -> Iterator[ast.Name]:
+    """The names one assignment target binds, unpacking tuples and lists."""
+    if isinstance(target, ast.Name):
+        yield target
+    elif isinstance(target, ast.Tuple | ast.List):
+        for element in target.elts:
+            yield from _assigned_names(element)
 
 
 def defined_constants() -> dict[tuple[str, str], tuple[pathlib.Path, int]]:
@@ -64,10 +117,14 @@ def defined_constants() -> dict[tuple[str, str], tuple[pathlib.Path, int]]:
         if module is None:  # pragma: no cover - SOURCE is inside src
             continue
         tree = ast.parse(path.read_text(encoding="utf-8"))
-        for node in tree.body:
+        for node in _module_level(tree.body):
             targets: list[ast.Name] = []
             if isinstance(node, ast.Assign):
-                targets = [t for t in node.targets if isinstance(t, ast.Name)]
+                targets = [
+                    element
+                    for target in node.targets
+                    for element in _assigned_names(target)
+                ]
             elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
                 targets = [node.target]
             for target in targets:
@@ -78,10 +135,9 @@ def defined_constants() -> dict[tuple[str, str], tuple[pathlib.Path, int]]:
     return found
 
 
-def _imported_from(tree: ast.AST, module: str | None) -> set[tuple[str, str]]:
+def _imported_from(tree: ast.AST, package: str) -> set[tuple[str, str]]:
     """``(module, name)`` pairs a file imports by name, relative ones resolved."""
     pairs: set[tuple[str, str]] = set()
-    package = module.rsplit(".", 1)[0] if module and "." in module else (module or "")
     for node in ast.walk(tree):
         if not isinstance(node, ast.ImportFrom):
             continue
@@ -116,8 +172,7 @@ def names_read() -> tuple[dict[str, set[str]], set[tuple[str, str]], set[str]]:
                 tree = ast.parse(path.read_text(encoding="utf-8"))
             except SyntaxError:  # pragma: no cover - a file being edited
                 continue
-            module = _module_of(path)
-            imported |= _imported_from(tree, module)
+            imported |= _imported_from(tree, _package_of(path, _module_of(path)))
             for node in ast.walk(tree):
                 if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load):
                     bare[str(path)].add(node.id)
@@ -131,7 +186,7 @@ def names_read() -> tuple[dict[str, set[str]], set[tuple[str, str]], set[str]]:
 def classify(
     defined: dict[tuple[str, str], tuple[pathlib.Path, int]],
     read: tuple[dict[str, set[str]], set[tuple[str, str]], set[str]],
-    kept: dict[str, str],
+    kept: dict[tuple[str, str], str],
 ) -> tuple[dict[tuple[str, str], tuple[pathlib.Path, int]], list[str]]:
     """Split the defined constants into the dead ones and the stale ``kept`` entries.
 
@@ -155,9 +210,10 @@ def classify(
         and (module, name) not in imported
         and name not in loose
     }
-    dead = {key: place for key, place in unread.items() if key[1] not in kept}
-    still_unread = {name for _module, name in unread}
-    return dead, sorted(name for name in kept if name not in still_unread)
+    dead = {key: place for key, place in unread.items() if key not in kept}
+    return dead, sorted(
+        f"{module}.{name}" for module, name in kept if (module, name) not in unread
+    )
 
 
 def main() -> int:
@@ -177,7 +233,8 @@ def main() -> int:
             print(f"  {name}  <- {path.relative_to(ROOT)}:{line}")
         print(
             "  -> use it, delete it, or, if it must stay, add it to KEPT at the "
-            "top of scripts/check_dead_constants.py with the reason."
+            "top of scripts/check_dead_constants.py, keyed by (module, name), "
+            "with the reason."
         )
     for name in stale:
         print(f"::error::KEPT lists {name}, which is now read or no longer exists")
