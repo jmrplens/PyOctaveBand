@@ -603,6 +603,18 @@ print(
 )  # C
 ```
 
+A month of daily readings is one call. Pass the run as an array and each
+reading is graded on its own, which is the shape Criterion II is watched in:
+what matters there is not the reading but the walk from one zone to the next.
+
+```python
+import numpy as np
+
+trend = np.array([1.0, 2.0, 3.5, 5.0])
+print(vibration.industrial_machine_zone("group_2", "rigid", velocity_mm_s=trend))
+# ['A' 'B' 'C' 'D']
+```
+
 Give whichever quantities were measured. Annex A says velocity alone is enough
 in most cases, and that a machine whose spectrum is expected to carry
 low-frequency components should be judged on both. The limits are broad-band

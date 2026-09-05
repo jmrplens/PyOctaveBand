@@ -22071,7 +22071,7 @@ different guideline again.
 - Verein Deutscher Ingenieure. (2001). *Geräuscherzeugung und Lärmminderung in
   Raumlufttechnischen Anlagen* (VDI 2081 Blatt 1:2001-07).
   The method: the fan of Section 4.3 with Equations (13) and (15), the duct
-  attenuation of Section 6 with Tables 5 and 8, the flow noise of Equations
+  attenuation of Section 6 with Tables 5 and 7, the flow noise of Equations
   (16) and (17), the splitter silencer and its self-noise of Equation (49),
   the end reflection of Section 6.6 and the room step of Equation (36).
   Superseded by Blatt 1:2022-04, which is not held here.
@@ -37758,7 +37758,7 @@ documents, one page per module.
 | `vibration_vector_change` | `function` | **Change in vibration read as a vector (ISO 20816-1 Annex D).**<br>• `initial_magnitude`, `initial_phase_deg`, `final_magnitude`, `final_phase_deg`<br>• `.magnitude` the real change, `.magnitude_change` what a magnitude comparison reports | `vibration.vibration_vector_change(3, 40, 2.5, 180)`<br><br>• 5.17 mm/s against −0.5 |
 | `TYPICAL_BOUNDARY_LADDER_MM_S` / `TYPICAL_ZONE_BOUNDARY_RANGES_MM_S` / `ZONE_LIMIT_FACTORS` | `constant` | **ISO 20816-1 Table C.1 and Annex C.2.**<br>• the ladder of 14 preferred magnitudes, 0.28 to 45 mm/s<br>• the typical range of each boundary: A/B 0.71–4.5, B/C 1.8–9.3, C/D 4.5–14.7 mm/s<br>• the zone factors of Formula (C.1): A 1, B 2.56, C 6.4 | `vibration.TYPICAL_ZONE_BOUNDARY_RANGES_MM_S['B/C']  # (1.8, 9.3)` |
 | `MachineZoneLimits` / `INDUSTRIAL_MACHINE_ZONES` | `dataclass` / `constant` | **Zone boundaries of the industrial-machine tables (ISO 10816-3 Tables A.1 and A.2).**<br>• keyed by `(group, support)`: `'group_1'` above 300 kW to 50 MW, `'group_2'` above 15 kW to 300 kW; `'rigid'` or `'flexible'`<br>• `.displacement_um` and `.velocity_mm_s`, each a `ZoneBoundaries`<br>• broad-band r.m.s. from 10 Hz to 1 kHz, or from 2 Hz below 600 r/min | `vibration.INDUSTRIAL_MACHINE_ZONES['group_2', 'rigid'].velocity_mm_s.b_c  # 2.8` |
-| `industrial_machine_zone` | `function` | **Grade an industrial machine against its table (ISO 10816-3 5.2.3).**<br>• `group`, `support`<br>• `displacement_um` and/or `velocity_mm_s`, whichever was measured<br>• with both, the more restrictive grading applies | `vibration.industrial_machine_zone('group_2', 'rigid', displacement_um=50, velocity_mm_s=2.0)  # 'C'` |
+| `industrial_machine_zone` | `function` | **Grade an industrial machine against its table (ISO 10816-3 5.2.3).**<br>• `group`, `support`<br>• `displacement_um` and/or `velocity_mm_s`, whichever was measured<br>• with both, the more restrictive grading applies<br>• scalar in, letter out; array in, one letter per reading | `vibration.industrial_machine_zone('group_2', 'rigid', displacement_um=50, velocity_mm_s=2.0)  # 'C'` |
 | `is_significant_change` / `alarm_limit` / `trip_limit` | `function` | **Operational limits with numbers (ISO 10816-3 5.3 and 5.4).**<br>• `is_significant_change(change, zone_b_upper)`: more than a quarter of the upper limit of zone B, up or down<br>• `alarm_limit(baseline, zone_b_upper)`: that quarter above the baseline, capped at 1.25 times the limit<br>• `trip_limit(zone_c_upper)`: 1.25 times the upper limit of zone C | `vibration.alarm_limit(0.9, 2.8)  # 1.6`<br>`vibration.trip_limit(4.5)  # 5.625` |
 | `SIGNIFICANT_CHANGE_FRACTION` / `OPERATIONAL_LIMIT_HEADROOM` | `constant` | **The two fractions the operational limits are built from (ISO 10816-3 5.3, 5.4.1 and 5.4.2).**<br>• `SIGNIFICANT_CHANGE_FRACTION` = 0.25, of the upper limit of zone B<br>• `OPERATIONAL_LIMIT_HEADROOM` = 1.25, the multiple neither limit should exceed | `vibration.OPERATIONAL_LIMIT_HEADROOM * 4.5  # 5.625` |
 | `GEAR_UNIT_ZONES` / `gear_unit_zone_boundaries` | `constant` / `function` | **Gear-unit zone boundaries (ISO 20816-9 Tables 2, 3 and 4).**<br>• keyed by quantity, then by rating number: `'displacement'` (shaft relative peak-to-peak, µm), `'velocity'` (housing r.m.s., mm/s), `'acceleration'` (housing true peak, m/s²)<br>• every row is three consecutive rungs of one ladder, with the rating as the B/C boundary<br>• a rating with no printed row is refused, not interpolated | `vibration.gear_unit_zone_boundaries('velocity', 8.0).as_tuple`<br><br>• (5.0, 8.0, 12.5) |
@@ -56707,6 +56707,18 @@ print(
         "group_2", "rigid", displacement_um=50.0, velocity_mm_s=2.0
     )
 )  # C
+```
+
+A month of daily readings is one call. Pass the run as an array and each
+reading is graded on its own, which is the shape Criterion II is watched in:
+what matters there is not the reading but the walk from one zone to the next.
+
+```python
+import numpy as np
+
+trend = np.array([1.0, 2.0, 3.5, 5.0])
+print(vibration.industrial_machine_zone("group_2", "rigid", velocity_mm_s=trend))
+# ['A' 'B' 'C' 'D']
 ```
 
 Give whichever quantities were measured. Annex A says velocity alone is enough

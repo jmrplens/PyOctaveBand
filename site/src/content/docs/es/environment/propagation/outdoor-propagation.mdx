@@ -729,7 +729,7 @@ La ISO 17534-1 pide que un programa que implemente un método de propagación en
 exteriores declare su conformidad contra un conjunto publicado de casos de
 prueba. La **ISO/TR 17534-3** lleva ese conjunto para la ISO 9613-2: diecinueve
 escenarios, cada uno con su geometría y una tabla paso a paso de todas las
-magnitudes intermedias, y un sobre dentro del cual tiene que quedar un
+magnitudes intermedias, y un margen dentro del cual tiene que quedar un
 resultado para contar como correcto, que el documento fija en 0,05 dB por banda
 y en el total.
 
@@ -740,15 +740,15 @@ las recomendaciones adicionales del capítulo 5 y no de la ISO 9613-2, y quedan
 fuera de lo que implementa esta página.
 
 Los siete comparten una geometría: una fuente a 1 m sobre su suelo local, un
-receptor a 4 m sobre el suyo, 195 m de separación en proyección sobre el suelo,
+receptor a 4 m sobre el suyo, 194,16 m de separación en proyección sobre el suelo,
 y 93 dB planos en todas las octavas para que la forma del espectro impreso sea
 la propagación y nada más. Lo que cambia entre ellos es el suelo.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases.svg" alt="Dos paneles. A la izquierda, el nivel por bandas de octava en el receptor para el mismo camino de 195 metros sobre tres suelos: sobre suelo reflectante cae suavemente de 40 a 25 decibelios, sobre suelo mixto baja hasta 33 decibelios en torno a 250 y 500 hercios y luego se recupera, y sobre suelo poroso el valle llega a 26 decibelios; los anillos marcan los niveles que imprime el documento y caen sobre las curvas. A la derecha, una barra por caso de prueba, de T01 a T07, con la peor desviación del espectro calculado frente al impreso, entre 0,008 y 0,012 decibelios, todas muy por debajo de la línea discontinua del sobre de 0,05 decibelios que declara el documento" width="100%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases_es.svg" alt="Dos paneles. A la izquierda, el nivel por bandas de octava en el receptor para el mismo camino de 194 metros sobre tres suelos: sobre suelo reflectante cae suavemente de 40 a 25 decibelios, sobre suelo mixto baja hasta 33 decibelios en torno a 250 y 500 hercios y luego se recupera, y sobre suelo poroso el valle llega a 26 decibelios; los anillos marcan los niveles que imprime el documento y caen sobre las curvas. A la derecha, una barra por caso de prueba, de T01 a T07, con la peor desviación del espectro calculado frente al impreso, entre 0,008 y 0,012 decibelios, todas muy por debajo de la línea discontinua del margen de 0,05 decibelios que declara el documento" width="100%" />
 
 *Aquí el efecto de suelo lo es todo: sobre suelo poroso la banda de 250 Hz
 llega 13 dB más baja que sobre uno reflectante. A la derecha, todos los casos
-caen dentro de una cuarta parte del sobre que permite el documento.*
+caen dentro de una cuarta parte del margen que permite el documento.*
 
 Del T01 al T03 cambia un único factor de suelo, de reflectante a poroso. El T04
 y el T06 parten el camino en tres áreas de suelo distinto y responden por el
@@ -775,7 +775,7 @@ regiones en que la ISO 9613-2 divide un camino, que da 0,20, 0,43 y 0,67 para
 las áreas de la Tabla 7; el segundo es el $F/d$ de la Figura 3, que vale 2,50 m
 sobre suelo plano y 4,99 m en cuanto el suelo sube 10 m bajo el receptor.
 
-Treinta y cuatro filas de conformidad sujetan los siete casos al sobre del
+Treinta y cuatro filas de conformidad sujetan los siete casos al margen del
 propio documento, banda a banda y en los dos totales. La peor desviación de
 todas es de 0,012 dB, la cuarta parte de lo que el informe permite.
 

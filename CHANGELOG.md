@@ -337,6 +337,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- `vibration.industrial_machine_zone` grades a run of measurements one reading
+  at a time. It wrapped `evaluation_zone`, which has always taken an array, and
+  then applied the most-restrictive rule of 5.2.3 by comparing the two gradings
+  as text: with an array in, that text was the array's own repr, so a month of
+  daily readings came back as the eighteen-character string `"['A' 'C' 'D']"`.
+  The rule is applied to the zone indices now and the letters looked up once at
+  the end, so an array in gives one letter per reading and a scalar still gives
+  a letter. A scalar and an array together broadcast, which is the shape of
+  judging a run of velocities against one displacement.
+
+- The change-of-section formula is published with its fraction. A form feed had
+  reached the docstring, and in a raw string it is exactly the backslash and the
+  `f` of the command that follows it, so `\frac` became `rac` and the API
+  reference printed `10 log10` with the ratio dropped underneath it as prose.
+  A new gate, `scripts/check_control_characters.py`, refuses the whole class:
+  no C0 control character other than tab and newline anywhere in the tracked
+  text corpus.
+
+- `noise_control.section_change_loss` asks for a duct size only when it uses
+  one. Figure 26 prints "no effect" in the frequency column of a sudden
+  reduction, so no limit frequency and no duct dimension enter that answer; the
+  function demanded `upstream_size` for a rectangular duct whatever the ratio,
+  and for a reduction any value at all gave the same spectrum. It is required
+  now only for the sudden increase, which is the case that has a limit
+  frequency. A round duct's diameter and its area are one fact stated twice,
+  and giving both now has to give the same duct: the area set the ratio and the
+  size set the limit frequency, so a contradictory pair silently returned a
+  different spectrum instead of being refused.
+
+- Nine figures on the Spanish pages pointed at the English artwork. `ThemeImage`
+  derives the dark twin of the URL it is given and nothing else, so a Spanish
+  page has to name its own `_es` variant, and these did not: the caption was in
+  Spanish and the axis labels underneath it were in English.
+
+- Seven statements in the guides and the module comments said something the
+  printed page does not. The VDI 2081 fan caption claimed eight decibels
+  between a radial machine and an axial one where its own figure prints 94 and
+  106; the errata summary counted four VDI defects where the register holds
+  five, and described the Section 6.4 mistranslation as being about a duct's
+  attenuation when it is about whether a junction's reduction depends on
+  frequency at all; the ISO/TR 17534-3 geometry was given as 195 m where the
+  report prints 194,16; the 50 MW cap on ISO 10816-3 group 1 was credited to
+  clause 4.2, which states no upper bound, instead of to the title of Table
+  A.1; `hvac.py` credited the spectral parameter and the blade-frequency
+  allowance to VDI 2081 Section 4.3.3, and both are printed in 4.3.4; and the
+  note about the three `L_WSM` values being inside their stated tolerance holds
+  for two of the three, assembly T being inside the English tolerance and
+  outside the normative German one, which the comment now says.
+
+- The ISO/TR 17534-3 errata entry got its Status line back, in both languages.
+  Inserting the two VDI 2081 entries above it took the closing line with them,
+  so the entry ran straight into the next heading.
+
+- One term, one word, on the Spanish pages: the tolerance band of ISO/TR
+  17534-3 is `margen` throughout rather than `sobre` in one section and
+  `margen` in another, and the established baseline of ISO 20816-1 is
+  `referencia` throughout rather than `línea base` where the criterion is
+  introduced and `referencia` where the alarm is set from it.
+
+- Two citations in the machine-vibration module named clauses that do not
+  exist. The measurement bandwidth of ISO 10816-3 is stated in its Annex A,
+  which has no subclause A.1, and the ladder ISO 20816-1 Table C.1 is drawn on
+  is an R5 series, which is what a step of about 1,6 is; R10 steps by 1,26. The
+  VDI 2081 reference note named Tables 5 and 8 for the duct attenuation, and
+  Table 8 is the sound reduction index of building components: the duct tables
+  are 5 and 7.
+
 - `phonometry.environment` publishes all six digits of the CNOSSOS-EU track
   descriptor. `TrackMeasure` (digit 4, the additional measure: rail damper, low
   barrier, absorber plate, embedded rail) and `RailJoints` (digit 5) were

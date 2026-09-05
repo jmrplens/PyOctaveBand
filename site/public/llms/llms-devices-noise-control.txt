@@ -2523,7 +2523,7 @@ different guideline again.
 - Verein Deutscher Ingenieure. (2001). *Geräuscherzeugung und Lärmminderung in
   Raumlufttechnischen Anlagen* (VDI 2081 Blatt 1:2001-07).
   The method: the fan of Section 4.3 with Equations (13) and (15), the duct
-  attenuation of Section 6 with Tables 5 and 8, the flow noise of Equations
+  attenuation of Section 6 with Tables 5 and 7, the flow noise of Equations
   (16) and (17), the splitter silencer and its self-noise of Equation (49),
   the end reflection of Section 6.6 and the room step of Equation (36).
   Superseded by Blatt 1:2022-04, which is not held here.

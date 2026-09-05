@@ -15,7 +15,7 @@ references:
     year: 2009
     title: "Mechanical vibration \u2014 Evaluation of machine vibration by measurements on non-rotating parts \u2014 Part 3: Industrial machines with nominal power above 15 kW and nominal speeds between 120 r/min and 15 000 r/min when measured in situ"
     designation: "ISO 10816-3:2009"
-    note: "Los grupos de máquinas del 4.2 y la clasificación de soportes del 4.3, las fronteras de zona de las Tablas A.1 y A.2 en las dos magnitudes con la banda de medida del A.1, la regla de la más restrictiva del 5.2.3, el cambio significativo del 5.3 y los ajustes de ALARMA y DISPARO del 5.4. Esta edición está sustituida por la ISO 20816-3:2022, que no está en la biblioteca; las fronteras se toman de la edición que sí lo está."
+    note: "Los grupos de máquinas del 4.2 y la clasificación de soportes del 4.3, las fronteras de zona de las Tablas A.1 y A.2 en las dos magnitudes con la banda de medida que fija el Anexo A, la regla de la más restrictiva del 5.2.3, el cambio significativo del 5.3 y los ajustes de ALARMA y DISPARO del 5.4. Esta edición está sustituida por la ISO 20816-3:2022, que no está en la biblioteca; las fronteras se toman de la edición que sí lo está."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2020
@@ -167,7 +167,7 @@ mismo ritmo. La curva queda baja en los dos extremos y plana en medio.
 ## 4. Un cambio es un vector
 
 El criterio I juzga una magnitud. El **criterio II** (6.3.3) juzga un *cambio*
-respecto de una línea base establecida, y existe porque una máquina puede
+respecto de una referencia establecida, y existe porque una máquina puede
 estropearse dentro de la zona B: puede darse un aumento o una disminución
 significativos, y exigir actuación, mucho antes de llegar a la zona C.
 
@@ -225,8 +225,9 @@ partes no rotativas.
 Dos preguntas colocan a una máquina en una de cuatro clases.
 
 **Cómo de grande es** (4.2). El *grupo 1* es una máquina grande de potencia
-nominal superior a 300 kW y no mayor de 50 MW, o una máquina eléctrica de
-altura de eje de 315 mm o más. El *grupo 2* es una máquina mediana de más de
+nominal superior a 300 kW, o una máquina eléctrica de altura de eje de 315 mm
+o más; el tope de 50 MW está impreso en el título de la Tabla A.1 y no en el
+apartado. El *grupo 2* es una máquina mediana de más de
 15 kW y hasta 300 kW inclusive, o una máquina eléctrica de altura de eje desde
 160 mm hasta 315 mm sin incluirlo.
 
@@ -242,7 +243,7 @@ Cada una de las cuatro clases se enuncia entonces **dos veces**, una en
 desplazamiento y otra en velocidad, y el 5.2.3 resuelve el desacuerdo: se
 aplica la zona de severidad más restrictiva.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/industrial_machine_zones.svg" alt="Dos paneles de barras, la velocidad en milímetros por segundo a la izquierda y el desplazamiento en micrómetros a la derecha. Cada panel muestra cuatro barras apiladas, una por clase de máquina: grupo 1 rígido, grupo 1 flexible, grupo 2 rígido y grupo 2 flexible. Cada barra se divide en cuatro bandas de color, la zona A abajo y la zona D arriba, con el valor de cada frontera impreso al lado. Una línea discontinua con un marcador cruza la barra del grupo 2 rígido en 2,0 milímetros por segundo en el panel izquierdo, dentro de la zona B, y en 50 micrómetros en el panel derecho, dentro de la zona C." width="100%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/industrial_machine_zones_es.svg" alt="Dos paneles de barras, la velocidad en milímetros por segundo a la izquierda y el desplazamiento en micrómetros a la derecha. Cada panel muestra cuatro barras apiladas, una por clase de máquina: grupo 1 rígido, grupo 1 flexible, grupo 2 rígido y grupo 2 flexible. Cada barra se divide en cuatro bandas de color, la zona A abajo y la zona D arriba, con el valor de cada frontera impreso al lado. Una línea discontinua con un marcador cruza la barra del grupo 2 rígido en 2,0 milímetros por segundo en el panel izquierdo, dentro de la zona B, y en 50 micrómetros en el panel derecho, dentro de la zona C." width="100%" />
 
 *La misma máquina, leída de dos maneras. La velocidad dice zona B; el
 desplazamiento dice zona C; la calificación es C.*
@@ -260,6 +261,25 @@ print(
     )
 )  # C
 ```
+
+Un mes de lecturas diarias es una sola llamada. Se pasa la serie como vector y
+cada lectura se califica por su cuenta, que es la forma en la que se vigila el
+Criterio II: allí lo que importa no es la lectura sino el paso de una zona a la
+siguiente.
+
+```python
+import numpy as np
+
+trend = np.array([1.0, 2.0, 3.5, 5.0])
+print(vibration.industrial_machine_zone("group_2", "rigid", velocity_mm_s=trend))
+# ['A' 'B' 'C' 'D']
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/machine_vibration_trend_es.svg" alt="Una línea de doce lecturas mensuales de velocidad eficaz, que sube de unos 0,6 a 5,2 milímetros por segundo, dibujada sobre cuatro bandas horizontales de color: zona A hasta 1,4, zona B hasta 2,8, zona C hasta 4,5 y zona D por encima. Cada lectura lleva la letra de la zona a la que califica, cuatro A, tres B, dos C y una D. Una línea discontinua marca la referencia en 0,647 milímetros por segundo, la media de los primeros cuatro meses, y una línea de puntos la ALARMA en 1,35. Una nota señala el mes siete, donde el cambio respecto de la referencia supera el 25 por ciento del límite superior de la zona B mientras la lectura sigue calificada como B." width="100%" />
+
+*El Criterio II lo ve primero. En el mes 7 la máquina sigue calificada como B, y
+el cambio respecto de su propia referencia ya ha superado lo que el apartado 5.3
+pide investigar.*
 
 Se pasan las magnitudes que se hayan medido. El Anexo A dice que la velocidad
 sola basta en la mayoría de los casos, y que una máquina cuyo espectro se
@@ -294,7 +314,7 @@ así que suele ser el mismo para todas las máquinas de un diseño y *no* se ata
 la referencia. Normalmente caerá dentro de la zona C o de la D, y no debería
 superar 1,25 veces el límite superior de la zona C.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/machine_alarm_trip.svg" alt="Un eje de velocidad en milímetros por segundo dividido en bandas por las cuatro zonas de evaluación. Dos barras marcan sendas referencias, una en 0,9 milímetros por segundo dentro de la zona A y otra en 2,9 dentro de la zona C, con una flecha que sube desde cada una hasta su ALARMA: 1,6 para la primera y 3,5 para la segunda. Una línea de puntos en 3,5 marca el tope de 1,25 veces el límite superior de la zona B, con el que la segunda ALARMA ha chocado, y una línea de trazo y punto en 5,62 marca el DISPARO de 1,25 veces el límite superior de la zona C." width="100%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/machine_alarm_trip_es.svg" alt="Un eje de velocidad en milímetros por segundo dividido en bandas por las cuatro zonas de evaluación. Dos barras marcan sendas referencias, una en 0,9 milímetros por segundo dentro de la zona A y otra en 2,9 dentro de la zona C, con una flecha que sube desde cada una hasta su ALARMA: 1,6 para la primera y 3,5 para la segunda. Una línea de puntos en 3,5 marca el tope de 1,25 veces el límite superior de la zona B, con el que la segunda ALARMA ha chocado, y una línea de trazo y punto en 5,62 marca el DISPARO de 1,25 veces el límite superior de la zona C." width="100%" />
 
 *La máquina silenciosa recibe una alarma dentro de la zona B. La que ha
 derivado choca con el tope.*
