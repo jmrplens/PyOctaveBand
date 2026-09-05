@@ -250,6 +250,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`emission.intensity`](/phonometry/reference/api/power/intensity/) | Two-microphone (p-p) sound intensity per IEC 61043:1993 and the ISO 9614-1:1993 field indicators. |
 | [`emission.intensity_compliance`](/phonometry/reference/api/power/intensity-compliance/) | IEC 61043:1993 sound-intensity instrument class verification. |
 | [`emission.vibration_sound_power`](/phonometry/reference/api/power/vibration-sound-power/) | Airborne sound power from surface vibration (ISO/TS 7849-1/-2:2009). |
+| [`emission.workstation`](/phonometry/reference/api/power/workstation/) | What the ISO 11200 group shares: the emission sound pressure level at a work station, its two corrections and its uncertainty. |
 | [`emission.declaration`](/phonometry/reference/api/power/declaration/) | ISO 4871:1996 declaration of noise emission values of machinery and equipment. |
 
 ## Electroacoustics

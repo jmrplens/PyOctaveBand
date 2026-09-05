@@ -4601,6 +4601,53 @@ dos ediciones con las mismas entradas y en el mismo orden.
   7.2.3.2.
 - **Estado:** sin comunicar.
 
+## ISO 11200:2014, anexo B (los dos casos calculan la misma desviación típica de dos maneras distintas)
+
+- **Ubicación:** anexo B, tabla B.1 en el folio impreso 27 (página 33 del PDF) y
+  tabla B.3 en el folio impreso 30 (página 36 del PDF). Las dos llevan una fila
+  rotulada igual, «Standard deviation of the three values measured,
+  $\sigma_{omc}$».
+- **Lo impreso:** la tabla B.1 lista las tres lecturas 94,5 dB; 94,3 dB;
+  93,8 dB y da $\sigma_{omc} = 0{,}3$ dB. La tabla B.3 lista 79,0 dB; 80,2 dB;
+  82,9 dB y da $\sigma_{omc} = 2$ dB.
+- **El problema:** usan estimadores distintos. La Ecuación (C.1), impresa
+  idéntica en ISO 11201:2010, ISO 11202:2010 e ISO 11204:2010, es la desviación
+  típica **muestral**,
+
+  $$
+  \sigma_\mathrm{omc} = \sqrt{\frac{1}{N-1}
+  \sum_{j=1}^{N} \left( L'_{p,j} - \overline{L'_p} \right)^2}
+  $$
+
+  Con $1/(N-1)$ la primera terna da 0,3606 dB, que redondea a **0,4** y no a
+  los 0,3 que imprime la tabla; la segunda da 1,9975 dB, que redondea al
+  **2,0** que sí imprime. Con $1/N$ la primera da 0,2944 → **0,3**, el valor
+  impreso, y la segunda 1,6310 → 1,6, que no está impreso. La tabla B.1 divide
+  por tanto entre $N$ y la B.3 entre $N-1$, en el mismo anexo, bajo el mismo
+  rótulo y para la misma magnitud.
+- **Consecuencia:** no es cosmético, porque el valor se propaga. La tabla B.1
+  sigue imprimiendo $\sigma_\mathrm{tot} = 1{,}5$ dB y $U = 2{,}4$ dB a partir
+  de $\sigma_{R0} = 1{,}5$ dB. Con los 0,4 dB que da la Ecuación (C.1),
+  $\sigma_\mathrm{tot} = \sqrt{1{,}5^2 + 0{,}4^2} = 1{,}55 \to 1{,}6$ dB y
+  $U = 1{,}6 \times 1{,}6 = 2{,}5$ dB. Quien reproduzca el ejemplo desde las
+  ecuaciones no obtiene la incertidumbre que el ejemplo publica.
+- **Mecanismo probable:** tres lecturas son la muestra más pequeña que la
+  ecuación admite, y es justo donde los dos divisores más se separan:
+  $\sqrt{3/2}$ es un 22 % de diferencia. La función de desviación típica
+  poblacional de una hoja de cálculo toma $1/N$ por defecto, y con tres puntos
+  el desliz basta para cambiar el decibelio redondeado.
+- **Evidencia:** las dos tablas leídas en la página impresa, no en el texto
+  extraído. Verificado en las páginas 33 y 36 del PDF (folios impresos 27 y 30)
+  de ISO 11200:2014, contra la Ecuación (C.1) en la página 32 del PDF (folio
+  impreso 26) de ISO 11201:2010.
+- **Comportamiento de la biblioteca:**
+  [`operating_standard_deviation`](../src/phonometry/emission/workstation.py)
+  implementa la Ecuación (C.1) tal como se imprime, con $1/(N-1)$. Reproduce la
+  tabla B.3 y deliberadamente no reproduce los 0,3 dB de la tabla B.1;
+  `tests/emission/test_workstation.py` fija las dos mitades para que la
+  elección no se mueva.
+- **Estado:** sin comunicar.
+
 ## Propiedades de las fuentes, relacionadas, que no son erratas
 
 Registradas aquí para prevenir futuros «arreglos» que romperían la

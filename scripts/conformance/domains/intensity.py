@@ -1025,3 +1025,97 @@ def _chk_iso5136_table_c1() -> Outcome:
         expected_label=f"{len(ref.ISO5136_TABLE_C1)} tabulated values of C_j reproduced",
         computed_label=f"max absolute deviation {worst:.1e} dB",
     )
+
+
+# ---------------------------------------------------------------------------
+# ISO 11200 group: the emission sound pressure level at a work station.
+#
+# The oracle is ISO 11200:2014 Annex B, four case studies that print every
+# intermediate value. Each row below reproduces one printed line through the
+# library, so a defect anywhere in the chain fails against the page.
+# ---------------------------------------------------------------------------
+
+_WORKSTATION = "Emission sound pressure level (ISO 11200 group)"
+
+
+def _annex_b_example_2_k3() -> float:
+    """K_3 of Table B.2: a work station 1,6 m from the dominating source."""
+    surface = 2.0 * math.pi * 1.6**2
+    absorption = 0.16 * (11.0 * 8.0 * 4.0) / 1.2
+    ratio = ph.emission.environmental_ratio_from_absorption(absorption, surface)
+    return float(ph.emission.local_environmental_correction(ratio))
+
+
+@register(
+    _WORKSTATION,
+    "ISO 11200:2014 Table B.2 local environmental correction",
+    "K_3A at a work station 1,6 m from the dominating source, dB",
+)
+def _chk_workstation_k3() -> Outcome:
+    return numeric(3.7, _annex_b_example_2_k3(), 0.05, unit="dB", places=3)
+
+
+@register(
+    _WORKSTATION,
+    "ISO 11200:2014 Table B.2 emission sound pressure level",
+    "L_pA at the work station, the energy mean less K_3A, dB",
+)
+def _chk_workstation_level() -> Outcome:
+    readings = np.array([77.5, 76.0, 77.2, 77.7, 75.9])
+    mean = float(10.0 * np.log10(np.mean(np.power(10.0, readings / 10.0))))
+    level = ph.emission.emission_sound_pressure_level(
+        mean, local_correction_db=_annex_b_example_2_k3()
+    )
+    return numeric(73.2, float(level), 0.05, unit="dB", places=3)
+
+
+@register(
+    _WORKSTATION,
+    "ISO 11200:2014 Table B.2 expanded uncertainty",
+    "U from sigma_R0 = 1,5 dB and sigma_omc = 1,0 dB at k = 1,6, dB",
+)
+def _chk_workstation_uncertainty() -> Outcome:
+    sigma = ph.emission.total_standard_deviation(1.5, 1.0)
+    return numeric(
+        2.9, ph.emission.emission_expanded_uncertainty(sigma), 0.05, unit="dB", places=3
+    )
+
+
+@register(
+    _WORKSTATION,
+    "ISO 11200:2014 Table B.3 background-noise correction",
+    "K_1A for a 9 dB margin over the background, dB",
+)
+def _chk_workstation_background() -> Outcome:
+    k1, _ = ph.emission.background_noise_correction_at_workstation(79.0, 70.0)
+    return numeric(0.6, float(k1), 0.05, unit="dB", places=3)
+
+
+@register(
+    _WORKSTATION,
+    "ISO 11200:2014 Table B.3 operating standard deviation",
+    "sigma_omc of three readings by Equation (C.1), dB",
+)
+def _chk_workstation_operating_deviation() -> Outcome:
+    # Table B.1 of the same annex divides by N instead and is not reproduced;
+    # docs/ERRATA.md records that the two tables disagree.
+    got = ph.emission.operating_standard_deviation([79.0, 80.2, 82.9])
+    return numeric(2.0, got, 0.05, unit="dB", places=3)
+
+
+@register(
+    _WORKSTATION,
+    "ISO 11204:2010 A.1.2 the two routes to the ratio z",
+    "z from K_2 against z from the absorption area, dimensionless",
+)
+def _chk_workstation_ratio_routes() -> Outcome:
+    # A.1.2 states the two rest on the same assumptions; under the ISO 3744
+    # definition of K_2 they are identically equal, and this is that identity.
+    absorption, surface = 47.0, 16.0
+    k2 = 10.0 * math.log10(1.0 + 4.0 * surface / absorption)
+    return numeric(
+        float(ph.emission.environmental_ratio_from_absorption(absorption, surface)),
+        float(ph.emission.environmental_ratio_from_k2(k2)),
+        1e-12,
+        places=9,
+    )

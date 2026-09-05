@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**779/779 conformance checks pass** across 66 domains and 392 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**785/785 conformance checks pass** across 67 domains and 394 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -40,9 +40,9 @@
 | IEC 60268-16 Annex M | Step 3 printed intermediates: the operational condition, row by row | worst row: amf in dB, 0.99 of its last printed place | 0.987 | 99 % |
 | VDI 2081 Blatt 2:2005 Table 1, element 20 | Sound pressure level in room 102, worst octave deviation, dB | 0.4913 dB | 0.4913 dB | 98 % |
 | ISO 5136:2003 Table D.1 | C3,4 of the sampling tube for d = 0,5 m at U = +/-5, +/-15, +/-30 m/s, 27 bands | max absolute deviation 0.049 dB | 0.049 dB | 98 % |
+| ISO 11200:2014 Table B.2 local environmental correction | K_3A at a work station 1,6 m from the dominating source, dB | 3.749 dB | 0.049 dB | 98 % |
 | ISO 9053-2:2020 Annex A.3 | Thermal boundary-layer thickness b | 0.00183 m | 0 m | 97 % |
 | Long, Architectural Acoustics 2e, Table 8.1 | Room modes of a 7 x 5 x 3 m room: the six printed frequencies, Hz | 42.27 Hz | -0.126 Hz | 97 % |
-| IEC 61094-2:2009 Table F.1 | Set B (20 C, 80 000 Pa, 65 % RH): rho, c0, kappa, eta and alpha_t, as a fraction of the rounding of the last printed figure | 0.96 | 0.96 | 96 % |
 
 <details>
 <summary><b>Numerical validation - filters &amp; weightings</b>: class showcase (IEC 61260-1 · IEC 61672-1 · ISO 7196)</summary>
@@ -344,6 +344,20 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 5136:2003 Eq. (12) | Plane-wave relation LW - Lp = 10 lg(S/S0) - 10 lg(rho c/400), d = 0,5 m | -7.2113 dB (+/-0 dB) | -7.2113 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 5136:2003 Table 2 / Table 3 | Reproducibility sigma_R per band, 50 Hz to 10 kHz, and the extrapolated 12,5 to 20 kHz | 27 tabulated values of sigma_R reproduced | max absolute deviation 0.000 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 5136:2003 Annex C Table C.1 | A-weighting C_j of the 27 bands, read back as LWA - LW of one band at a time | 27 tabulated values of C_j reproduced | max absolute deviation 5.8e-15 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+
+</details>
+
+<details>
+<summary><b>Emission sound pressure level (ISO 11200 group)</b>: 100% (6/6)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
+|:---|:---|:---|:---|:---|:---:|:---:|
+| ISO 11200:2014 Table B.2 local environmental correction | K_3A at a work station 1,6 m from the dominating source, dB | 3.7 dB (+/-0.05 dB) | 3.749 dB | 0.049 dB | 98 % | ![Pass][cv-pass] Pass |
+| ISO 11200:2014 Table B.2 emission sound pressure level | L_pA at the work station, the energy mean less K_3A, dB | 73.2 dB (+/-0.05 dB) | 73.176 dB | -0.024 dB | 48 % | ![Pass][cv-pass] Pass |
+| ISO 11200:2014 Table B.2 expanded uncertainty | U from sigma_R0 = 1,5 dB and sigma_omc = 1,0 dB at k = 1,6, dB | 2.9 dB (+/-0.05 dB) | 2.884 dB | -0.016 dB | 32 % | ![Pass][cv-pass] Pass |
+| ISO 11200:2014 Table B.3 background-noise correction | K_1A for a 9 dB margin over the background, dB | 0.6 dB (+/-0.05 dB) | 0.584 dB | -0.016 dB | 32 % | ![Pass][cv-pass] Pass |
+| ISO 11200:2014 Table B.3 operating standard deviation | sigma_omc of three readings by Equation (C.1), dB | 2 dB (+/-0.05 dB) | 1.997 dB | -0.003 dB | 6 % | ![Pass][cv-pass] Pass |
+| ISO 11204:2010 A.1.2 the two routes to the ratio z | z from K_2 against z from the absorption area, dimensionless | 0.423423423 (+/-0) | 0.423423423 | 0 | 0 % | ![Pass][cv-pass] Pass |
 
 </details>
 

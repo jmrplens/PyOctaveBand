@@ -203,10 +203,10 @@ def test_combined_uncertainty_g2() -> None:
 def test_expanded_uncertainty_g2() -> None:
     """k = 2 (95 %) expansion of the G.2 uncertainty -> 4.36 dB."""
     u = environment.combined_standard_uncertainty(ref.ISO1996_2_G2_CONTRIBUTIONS)
-    assert environment.expanded_uncertainty(u) == pytest.approx(
+    assert environment.environmental_expanded_uncertainty(u) == pytest.approx(
         ref.ISO1996_2_G2_EXPANDED, abs=0.01
     )
-    assert environment.expanded_uncertainty(u, confidence=0.80) == pytest.approx(
+    assert environment.environmental_expanded_uncertainty(u, confidence=0.80) == pytest.approx(
         1.3 * u
     )
 
@@ -221,7 +221,7 @@ def test_combined_uncertainty_accepts_pairs() -> None:
 
 def test_expanded_uncertainty_bad_confidence() -> None:
     with pytest.raises(ValueError, match=r"'confidence' must be one of"):
-        environment.expanded_uncertainty(1.0, confidence=0.90)
+        environment.environmental_expanded_uncertainty(1.0, confidence=0.90)
 
 
 def test_residual_correction_uncertainty_f9() -> None:

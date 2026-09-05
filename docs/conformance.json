@@ -3,13 +3,13 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 779,
-    "passing": 779,
+    "checks": 785,
+    "passing": 785,
     "failing": 0,
-    "domains": 66,
-    "standards": 392,
-    "citations": 607,
-    "designations": 130,
+    "domains": 67,
+    "standards": 394,
+    "citations": 613,
+    "designations": 132,
     "sources": 83
   },
   "units": [
@@ -133,6 +133,12 @@
       "title": "Intensity & sound power",
       "checks": 37,
       "passing": 37
+    },
+    {
+      "id": "emission-sound-pressure-level-iso-11200-group",
+      "title": "Emission sound pressure level (ISO 11200 group)",
+      "checks": 6,
+      "passing": 6
     },
     {
       "id": "building-prediction-uncertainty",
@@ -3975,6 +3981,179 @@
       },
       "deviation": {
         "value": 5.77e-15
+      },
+      "precision": 9,
+      "verdict": "pass"
+    },
+    {
+      "id": "emission-sound-pressure-level-iso-11200-group/iso-11200-2014-table-b-2-local-environmental-correction/k-3a-at-a-work-station-1-6-m-from-the-dominating-source-db",
+      "domain": "emission-sound-pressure-level-iso-11200-group",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 11200",
+        "edition": "2014",
+        "clause": "Table B.2 local environmental correction",
+        "cite": "ISO 11200:2014 Table B.2 local environmental correction"
+      },
+      "quantity": "K_3A at a work station 1,6 m from the dominating source, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 3.7
+      },
+      "computed": {
+        "value": 3.749
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": 0.049
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "emission-sound-pressure-level-iso-11200-group/iso-11200-2014-table-b-2-emission-sound-pressure-level/l-pa-at-the-work-station-the-energy-mean-less-k-3a-db",
+      "domain": "emission-sound-pressure-level-iso-11200-group",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 11200",
+        "edition": "2014",
+        "clause": "Table B.2 emission sound pressure level",
+        "cite": "ISO 11200:2014 Table B.2 emission sound pressure level"
+      },
+      "quantity": "L_pA at the work station, the energy mean less K_3A, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 73.2
+      },
+      "computed": {
+        "value": 73.176
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.024
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "emission-sound-pressure-level-iso-11200-group/iso-11200-2014-table-b-2-expanded-uncertainty/u-from-sigma-r0-1-5-db-and-sigma-omc-1-0-db-at-k-1-6-db",
+      "domain": "emission-sound-pressure-level-iso-11200-group",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 11200",
+        "edition": "2014",
+        "clause": "Table B.2 expanded uncertainty",
+        "cite": "ISO 11200:2014 Table B.2 expanded uncertainty"
+      },
+      "quantity": "U from sigma_R0 = 1,5 dB and sigma_omc = 1,0 dB at k = 1,6, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 2.9
+      },
+      "computed": {
+        "value": 2.884
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.016
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "emission-sound-pressure-level-iso-11200-group/iso-11200-2014-table-b-3-background-noise-correction/k-1a-for-a-9-db-margin-over-the-background-db",
+      "domain": "emission-sound-pressure-level-iso-11200-group",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 11200",
+        "edition": "2014",
+        "clause": "Table B.3 background-noise correction",
+        "cite": "ISO 11200:2014 Table B.3 background-noise correction"
+      },
+      "quantity": "K_1A for a 9 dB margin over the background, dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.6
+      },
+      "computed": {
+        "value": 0.584
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.016
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "emission-sound-pressure-level-iso-11200-group/iso-11200-2014-table-b-3-operating-standard-deviation/sigma-omc-of-three-readings-by-equation-c-1-db",
+      "domain": "emission-sound-pressure-level-iso-11200-group",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 11200",
+        "edition": "2014",
+        "clause": "Table B.3 operating standard deviation",
+        "cite": "ISO 11200:2014 Table B.3 operating standard deviation"
+      },
+      "quantity": "sigma_omc of three readings by Equation (C.1), dB",
+      "kind": "scalar",
+      "expected": {
+        "value": 2.0
+      },
+      "computed": {
+        "value": 1.997
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.05
+      },
+      "deviation": {
+        "value": -0.003
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "emission-sound-pressure-level-iso-11200-group/iso-11204-2010-a-1-2-the-two-routes-to-the-ratio-z/z-from-k-2-against-z-from-the-absorption-area-dimensionless",
+      "domain": "emission-sound-pressure-level-iso-11200-group",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 11204",
+        "edition": "2010",
+        "clause": "A.1.2 the two routes to the ratio z",
+        "cite": "ISO 11204:2010 A.1.2 the two routes to the ratio z"
+      },
+      "quantity": "z from K_2 against z from the absorption area, dimensionless",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.42342342342342343
+      },
+      "computed": {
+        "value": 0.423423423
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": -1.11e-16
       },
       "precision": 9,
       "verdict": "pass"

@@ -56,6 +56,7 @@ _REMOVED_FUNCTIONS = [
     ("phonometry.metrology.calibration", "calculate_sensitivity"),
     ("phonometry.building.measurement.uncertainty", "coverage_factor"),
     ("phonometry.building.measurement.uncertainty", "expanded_uncertainty"),
+    ("phonometry.environment.assessment.measurement", "expanded_uncertainty"),
 ]
 
 _REMOVED_CONSTANTS = [
@@ -105,6 +106,8 @@ def test_the_canonical_names_the_3_1_aliases_pointed_at_are_all_here() -> None:
         ("metrology", "sensitivity"),
         ("building", "insulation_coverage_factor"),
         ("building", "insulation_expanded_uncertainty"),
+        ("environment", "environmental_expanded_uncertainty"),
+        ("emission", "emission_expanded_uncertainty"),
         ("materials", "OCTAVE_BANDS"),
         ("materials", "THIRD_OCTAVE_BANDS"),
         ("materials", "BASE_PLATE_BANDS"),

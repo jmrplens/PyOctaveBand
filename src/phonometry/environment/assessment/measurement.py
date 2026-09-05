@@ -505,7 +505,7 @@ def combined_standard_uncertainty(
     return float(np.sqrt(np.sum(arr**2)))
 
 
-def expanded_uncertainty(
+def environmental_expanded_uncertainty(
     standard_uncertainty: float, *, confidence: float = 0.95
 ) -> float:
     r"""Expanded uncertainty :math:`U = k \cdot u` (Clause 4).
@@ -514,13 +514,18 @@ def expanded_uncertainty(
 
     .. note::
 
-       Three domains define an expanded uncertainty over their own coverage
-       factors, and each is reached through its own package: this one is
-       ``environment.expanded_uncertainty``, the building one is
-       :func:`~phonometry.building.insulation_expanded_uncertainty`. Until 4.0
-       the flat top level had to rename this one to
-       ``environmental_expanded_uncertainty`` to tell them apart, which is the
-       clearest thing the flat namespace cost.
+       Several domains define an expanded uncertainty over their own coverage
+       factors, and each says in its name what it is the uncertainty *of*:
+       this one is
+       :func:`~phonometry.environment.environmental_expanded_uncertainty`,
+       the building one is
+       :func:`~phonometry.building.insulation_expanded_uncertainty`, and the
+       work-station one is
+       :func:`~phonometry.emission.emission_expanded_uncertainty`, whose factor
+       is the 1,6 the ISO 11200 group prints. This one carried the bare name
+       until the work-station one needed it too, and one package holding the
+       unqualified spelling of a quantity three of them define was the reason
+       the other two had to be qualified.
 
     :param standard_uncertainty: Combined standard uncertainty ``u``, in dB.
     :param confidence: Coverage probability (0.95 or 0.80).
