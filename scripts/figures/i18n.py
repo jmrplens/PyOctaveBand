@@ -69,8 +69,8 @@ _ES_EXACT = {
     "reflecting ground, $G$ = 0": "suelo reflectante, $G$ = 0",
     "mixed ground, $G$ = 0.5": "suelo mixto, $G$ = 0,5",
     "porous ground, $G$ = 1": "suelo poroso, $G$ = 1",
-    "93 dB in every band, 195 m out, 1 m up and 4 m down;\n"
-    "rings: the levels the document prints": "93 dB en todas las bandas, a 195 m, 1 m arriba y 4 m abajo;\n"
+    "93 dB in every band, 194.16 m out, 1 m up and 4 m down;\n"
+    "rings: the levels the document prints": "93 dB en todas las bandas, a 194,16 m, 1 m arriba y 4 m abajo;\n"
     "anillos: los niveles que imprime el documento",
     "Every Case, Against Its Printed Table": "Cada caso, contra su tabla impresa",
     "Worst band deviation (dB)": "Peor desviación por banda (dB)",

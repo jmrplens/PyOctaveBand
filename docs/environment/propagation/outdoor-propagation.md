@@ -291,7 +291,7 @@ att = environment.outdoor_propagation_attenuation(
 print(np.round(att.a_div, 1))     # [57. 57. 57. 57. 57. 57. 57. 57.]  divergence
 print(np.round(att.a_gr, 2))      # [-4.65  2.34 13.79  9.76  1.3  -0.   -0.   -0.  ]
 print(np.round(att.a_bar, 2))     # [13.78  8.89  0.    6.69 18.01 20.   20.   20.  ]
-print(np.round(att.a_total, 1))   # [66.2 68.3 71.  73.9 77.1 78.8 82.3 96. ]
+print(np.round(att.a_total, 1))   # [66.2 68.3 71.  73.9 77.1 78.8 82.3 95.8]
 att.plot()                        # the stacked breakdown above (needs matplotlib)
 
 # Predicted receiver level from an octave-band sound power Lw = 95 dB
@@ -305,7 +305,7 @@ lp = environment.predicted_receiver_level(
     atmosphere=environment.AtmosphericConditions(
         temperature=15.0, relative_humidity=70.0),
 )
-print(np.round(lp, 1))            # [28.8 26.7 24.  21.1 17.9 16.2 12.7 -1. ]
+print(np.round(lp, 1))            # [28.8 26.7 24.  21.1 17.9 16.2 12.7 -0.8]
 ```
 
 `predicted_receiver_level` composes $L_{fT}(DW) = L_W + D_\mathrm{c} - A$ with

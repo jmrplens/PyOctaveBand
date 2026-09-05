@@ -2725,7 +2725,7 @@ def generate_iso17534_qa_cases(output_dir: str) -> None:
     ax.text(
         0.985,
         0.965,
-        "93 dB in every band, 195 m out, 1 m up and 4 m down;\n"
+        "93 dB in every band, 194.16 m out, 1 m up and 4 m down;\n"
         "rings: the levels the document prints",
         transform=ax.transAxes,
         va="top",

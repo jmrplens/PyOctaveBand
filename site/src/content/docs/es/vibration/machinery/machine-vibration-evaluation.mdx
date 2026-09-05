@@ -270,6 +270,8 @@ siguiente.
 ```python
 import numpy as np
 
+from phonometry import vibration
+
 trend = np.array([1.0, 2.0, 3.5, 5.0])
 print(vibration.industrial_machine_zone("group_2", "rigid", velocity_mm_s=trend))
 # ['A' 'B' 'C' 'D']

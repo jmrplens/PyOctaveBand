@@ -21934,6 +21934,7 @@ effect" for it, so no limit frequency enters the answer and neither does the
 duct's shape or its size. An increase does need them, and a rectangular duct
 has to be given its largest side, because that is the one thing its area does
 not tell you.
+
 A splitter silencer is not one of these: its insertion loss comes from the
 maker's measurement, to ISO 7235, and the guideline says so.
 `splitter_silencer_insertion_loss` is the estimate for when there is none.
@@ -24360,7 +24361,7 @@ att = environment.outdoor_propagation_attenuation(
 print(np.round(att.a_div, 1))     # [57. 57. 57. 57. 57. 57. 57. 57.]  divergence
 print(np.round(att.a_gr, 2))      # [-4.65  2.34 13.79  9.76  1.3  -0.   -0.   -0.  ]
 print(np.round(att.a_bar, 2))     # [13.78  8.89  0.    6.69 18.01 20.   20.   20.  ]
-print(np.round(att.a_total, 1))   # [66.2 68.3 71.  73.9 77.1 78.8 82.3 96. ]
+print(np.round(att.a_total, 1))   # [66.2 68.3 71.  73.9 77.1 78.8 82.3 95.8]
 att.plot()                        # the stacked breakdown above (needs matplotlib)
 
 # Predicted receiver level from an octave-band sound power Lw = 95 dB
@@ -24374,7 +24375,7 @@ lp = environment.predicted_receiver_level(
     atmosphere=environment.AtmosphericConditions(
         temperature=15.0, relative_humidity=70.0),
 )
-print(np.round(lp, 1))            # [28.8 26.7 24.  21.1 17.9 16.2 12.7 -1. ]
+print(np.round(lp, 1))            # [28.8 26.7 24.  21.1 17.9 16.2 12.7 -0.8]
 ```
 
 `predicted_receiver_level` composes $L_{fT}(DW) = L_W + D_\mathrm{c} - A$ with
@@ -56724,6 +56725,8 @@ what matters there is not the reading but the walk from one zone to the next.
 
 ```python
 import numpy as np
+
+from phonometry import vibration
 
 trend = np.array([1.0, 2.0, 3.5, 5.0])
 print(vibration.industrial_machine_zone("group_2", "rigid", velocity_mm_s=trend))
