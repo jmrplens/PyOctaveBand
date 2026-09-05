@@ -73,8 +73,6 @@ if TYPE_CHECKING:
 #: Default reference speed of sound ``c`` in air at the ground, in m/s (matches
 #: the environmental domain).
 _C_SOUND = 343.0
-#: Default air density ``rho``, in kg/m3 (matches the environmental domain).
-_AIR_DENSITY = 1.205
 #: Fewest samples of a piecewise-linear profile: two nodes define its segment.
 _MIN_POLYLINE_NODES = 2
 #: Slack, in metres, within which the first profile height counts as the ground

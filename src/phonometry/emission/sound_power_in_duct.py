@@ -189,9 +189,6 @@ _TABLE_C1: dict[int, float] = {
     16000: -6.6,
     20000: -9.3,
 }
-#: The band axis of the standard, in the order Table C.1 numbers it.
-_NOMINAL_BANDS: tuple[int, ...] = tuple(_TABLE_C1)
-
 #: Table 2: standard deviation of reproducibility sigma_R of the sampling tube
 #: per one-third-octave band, dB (clause 4). "80 to 100" and "125 to 4 000"
 #: are printed as ranges; they are unrolled here band by band.

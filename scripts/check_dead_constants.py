@@ -38,10 +38,31 @@ SEARCHED = ("src", "tests", "scripts")
 KEPT: dict[str, str] = {}
 
 
-def defined_constants() -> dict[str, list[tuple[pathlib.Path, int]]]:
-    """Every ``_UPPER_CASE`` assigned at module level under ``src``."""
-    found: dict[str, list[tuple[pathlib.Path, int]]] = collections.defaultdict(list)
+def _module_of(path: pathlib.Path) -> str | None:
+    """The dotted module a file under ``src`` is, or ``None`` outside it."""
+    try:
+        relative = path.relative_to(ROOT / "src")
+    except ValueError:
+        return None
+    parts = list(relative.with_suffix("").parts)
+    if parts[-1] == "__init__":
+        parts.pop()
+    return ".".join(parts)
+
+
+def defined_constants() -> dict[tuple[str, str], tuple[pathlib.Path, int]]:
+    """Every ``_UPPER_CASE`` assigned at module level, keyed by module and name.
+
+    Keyed by the pair rather than by the name alone: two modules may define
+    the same private name, and one of them being read says nothing about the
+    other. That is not hypothetical, it is how a duplicated absolute zero and
+    a duplicated model list both stayed in the tree.
+    """
+    found: dict[tuple[str, str], tuple[pathlib.Path, int]] = {}
     for path in sorted(SOURCE.rglob("*.py")):
+        module = _module_of(path)
+        if module is None:  # pragma: no cover - SOURCE is inside src
+            continue
         tree = ast.parse(path.read_text(encoding="utf-8"))
         for node in tree.body:
             targets: list[ast.Name] = []
@@ -53,31 +74,58 @@ def defined_constants() -> dict[str, list[tuple[pathlib.Path, int]]]:
                 name = target.id
                 private = name.startswith("_") and not name.startswith("__")
                 if private and name.upper() == name:
-                    found[name].append((path, node.lineno))
+                    found.setdefault((module, name), (path, node.lineno))
     return found
 
 
-def names_read() -> collections.Counter[str]:
-    """Every identifier read anywhere in the tree, however it is reached."""
-    seen: collections.Counter[str] = collections.Counter()
+def _imported_from(tree: ast.AST, module: str | None) -> set[tuple[str, str]]:
+    """``(module, name)`` pairs a file imports by name, relative ones resolved."""
+    pairs: set[tuple[str, str]] = set()
+    package = module.rsplit(".", 1)[0] if module and "." in module else (module or "")
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.ImportFrom):
+            continue
+        if node.level:
+            # A relative import climbs from the importing file's own package.
+            base = package.split(".")
+            climbed = base[: len(base) - (node.level - 1)] if node.level > 1 else base
+            target = ".".join([*climbed, node.module] if node.module else climbed)
+        else:
+            target = node.module or ""
+        for alias in node.names:
+            pairs.add((target, alias.name))
+    return pairs
+
+
+def names_read() -> tuple[dict[str, set[str]], set[tuple[str, str]], set[str]]:
+    """What reads what: bare names per file, imported pairs, and loose names.
+
+    The three are not interchangeable. A bare name can only reach a private
+    module-level constant from inside the module that defines it, so it is
+    kept per file. An ``from x import _Y`` names both sides, so it is kept as
+    a pair. An attribute or a string could be either, so those are kept as
+    loose names and credited to every definition of that name, which is the
+    generous half of the scan.
+    """
+    bare: dict[str, set[str]] = collections.defaultdict(set)
+    imported: set[tuple[str, str]] = set()
+    loose: set[str] = set()
     for directory in SEARCHED:
         for path in sorted((ROOT / directory).rglob("*.py")):
             try:
                 tree = ast.parse(path.read_text(encoding="utf-8"))
             except SyntaxError:  # pragma: no cover - a file being edited
                 continue
+            module = _module_of(path)
+            imported |= _imported_from(tree, module)
             for node in ast.walk(tree):
                 if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load):
-                    seen[node.id] += 1
+                    bare[str(path)].add(node.id)
                 elif isinstance(node, ast.Attribute):
-                    seen[node.attr] += 1
-                elif isinstance(node, ast.alias):
-                    seen[node.name.split(".")[-1]] += 1
-                    if node.asname:
-                        seen[node.asname] += 1
+                    loose.add(node.attr)
                 elif isinstance(node, ast.Constant) and isinstance(node.value, str):
-                    seen[node.value] += 1
-    return seen
+                    loose.add(node.value)
+    return bare, imported, loose
 
 
 def main() -> int:
@@ -86,21 +134,26 @@ def main() -> int:
     parser.parse_args()
 
     defined = defined_constants()
-    read = names_read()
+    bare, imported, loose = names_read()
     dead = {
-        name: places
-        for name, places in sorted(defined.items())
-        if read[name] == 0 and name not in KEPT
+        (module, name): place
+        for (module, name), place in sorted(defined.items())
+        if name not in bare[str(place[0])]
+        and (module, name) not in imported
+        and name not in loose
+        and name not in KEPT
     }
-    stale = sorted(name for name in KEPT if read[name] > 0 or name not in defined)
+    live = {name for _module, name in defined} - {name for _module, name in dead}
+    stale = sorted(
+        name for name in KEPT if name in live or name not in {n for _m, n in defined}
+    )
     if not dead and not stale:
         print(f"No unread private constant among the {len(defined)} defined in src.")
         return 0
     if dead:
         print("::error::a private constant nothing reads - see below")
         print(f"{len(dead)} private constant(s) are defined and never read:")
-        for name, places in dead.items():
-            path, line = places[0]
+        for (_module, name), (path, line) in dead.items():
             print(f"  {name}  <- {path.relative_to(ROOT)}:{line}")
         print(
             "  -> use it, delete it, or, if it must stay, add it to KEPT at the "

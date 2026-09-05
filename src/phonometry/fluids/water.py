@@ -53,7 +53,6 @@ _BAR_PER_MPA = 10.0
 _KGCM2_PER_BAR = 1.019716
 #: Minimum depth samples in a profile: two points are the floor for a
 #: piecewise-linear profile and for ``np.gradient``'s finite differences.
-_MIN_POLYLINE_NODES = 2
 
 _MODELS = ("unesco", "del_grosso", "mackenzie", "medwin")
 
