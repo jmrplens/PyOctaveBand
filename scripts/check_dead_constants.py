@@ -128,25 +128,45 @@ def names_read() -> tuple[dict[str, set[str]], set[tuple[str, str]], set[str]]:
     return bare, imported, loose
 
 
+def classify(
+    defined: dict[tuple[str, str], tuple[pathlib.Path, int]],
+    read: tuple[dict[str, set[str]], set[tuple[str, str]], set[str]],
+    kept: dict[str, str],
+) -> tuple[dict[tuple[str, str], tuple[pathlib.Path, int]], list[str]]:
+    """Split the defined constants into the dead ones and the stale ``kept`` entries.
+
+    Deadness is settled first and ``kept`` applied to the answer, not folded
+    into the test. Folding it in makes the hatch report itself: a kept name
+    would be excluded from the dead set, land in the live one by subtraction,
+    and be named stale on every run, so no entry could ever be added.
+
+    :param defined: Every private constant, keyed by module and name.
+    :param read: The three readings of :func:`names_read`.
+    :param kept: The escape hatch, name to reason.
+    :return: The dead constants, and the sorted ``kept`` names that no longer
+        describe an unread constant, either because something now reads it or
+        because it is gone.
+    """
+    bare, imported, loose = read
+    unread = {
+        (module, name): place
+        for (module, name), place in sorted(defined.items())
+        if name not in bare.get(str(place[0]), frozenset())
+        and (module, name) not in imported
+        and name not in loose
+    }
+    dead = {key: place for key, place in unread.items() if key[1] not in kept}
+    still_unread = {name for _module, name in unread}
+    return dead, sorted(name for name in kept if name not in still_unread)
+
+
 def main() -> int:
     """Report every private constant no file reads."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.parse_args()
 
     defined = defined_constants()
-    bare, imported, loose = names_read()
-    dead = {
-        (module, name): place
-        for (module, name), place in sorted(defined.items())
-        if name not in bare[str(place[0])]
-        and (module, name) not in imported
-        and name not in loose
-        and name not in KEPT
-    }
-    live = {name for _module, name in defined} - {name for _module, name in dead}
-    stale = sorted(
-        name for name in KEPT if name in live or name not in {n for _m, n in defined}
-    )
+    dead, stale = classify(defined, names_read(), KEPT)
     if not dead and not stale:
         print(f"No unread private constant among the {len(defined)} defined in src.")
         return 0
