@@ -87,7 +87,39 @@ try {
   process.exit(1);
 }
 
-const child = spawn(command[0], command.slice(1), { stdio: 'inherit', shell: false });
+// Every audit run through here drives a headless Chrome, and they do not all
+// ask the same package for it: the in-house scripts use `puppeteer`, which is
+// the version this site pins and the one whose browser `pnpm install` puts in
+// the cache, while `pa11y-ci` carries its own older `puppeteer-core` and asks
+// for whatever Chrome *that* was built against. Two different browsers, one
+// downloaded.
+//
+// On a developer machine the cache accumulates versions and both are usually
+// present, so the mismatch is invisible; on a fresh CI worker only the one
+// `puppeteer` installs exists, and pa11y dies with "Could not find Chrome
+// (ver. ...)" on a page that is perfectly fine. Worse, it dies intermittently,
+// because a warm runner cache can still hold the older build.
+//
+// So the browser is decided here, once, and every child is told which one to
+// drive. An explicit PUPPETEER_EXECUTABLE_PATH in the environment still wins,
+// for the reader who wants to point an audit at a system Chrome.
+const env = { ...process.env };
+if (!env.PUPPETEER_EXECUTABLE_PATH) {
+  try {
+    // Through the shared resolver, not a bare import: it falls back to the
+    // pnpm virtual store when the package is not linked at the top level, and
+    // a resolution that misses here would silently leave pa11y-ci picking its
+    // own browser again, which is the whole thing this is here to stop.
+    const { loadPuppeteer } = await import('./shared/audit.mjs');
+    env.PUPPETEER_EXECUTABLE_PATH = await loadPuppeteer().executablePath();
+  } catch (error) {
+    // Not fatal: a command that needs no browser runs perfectly well without
+    // this, and one that does will fail with its own clearer message.
+    console.error(`with-preview: could not resolve a browser (${error.message})`);
+  }
+}
+
+const child = spawn(command[0], command.slice(1), { stdio: 'inherit', shell: false, env });
 child.on('exit', (code, signal) => {
   stop();
   process.exit(signal ? 1 : (code ?? 1));
