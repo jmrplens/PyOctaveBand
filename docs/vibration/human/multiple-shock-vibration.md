@@ -212,7 +212,7 @@ result = vibration.MultipleShockResult(
     years=20,
     days_per_year=120.0,
     peaks=peaks,
-    risk_thresholds=vibration.RISK_THRESHOLDS_MALE,
+    risk_thresholds=(0.72, 1.42, 2.17),   # Table C.2, male: 10 / 50 / 90 % risk
 )
 result.report(
     "multiple_shock.pdf",

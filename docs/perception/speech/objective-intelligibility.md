@@ -162,9 +162,8 @@ audible, is credited for the speech glimpsed there, which STOI's per-band
 average largely misses.
 
 ```python
-from phonometry import speech
-
-estoi = speech.stoi(clean, degraded, fs, extended=True)
+# The same speech-like material and flat masker as above, scored the other way.
+estoi = speech.stoi(clean, clean + gain * masker, fs, extended=True)
 print(round(estoi.value, 3))
 ```
 

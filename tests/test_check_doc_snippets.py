@@ -155,3 +155,25 @@ def test_a_stale_skip_entry_is_reported(
     monkeypatch.setitem(check_doc_snippets._SKIP, "fine", "reason")
     (failure,) = check_doc_snippets.check_execution([page])
     assert "runs now" in failure
+
+
+def test_a_skip_entry_stays_while_one_edition_still_fails(
+    tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An entry names a guide, and a guide is written twice.
+
+    The site page and the hand-written mirror under ``docs/`` share a stem, so
+    one entry covers both. Reporting it stale the moment either one runs would
+    turn the report into a failing page on the next run.
+    """
+    site = _page(tmp_path, "print('runs fine')", name="fine.md")
+    mirror_dir = tmp_path / "mirror"
+    mirror_dir.mkdir()
+    mirror = _page(mirror_dir, "raise SystemExit('still broken')", name="fine.md")
+    monkeypatch.setitem(check_doc_snippets._SKIP, "fine", "reason")
+    assert check_doc_snippets.check_execution([site, mirror]) == []
+    # Once both editions run, the entry has to go, and it is reported once.
+    mirror.write_text("```python\nprint('now fine too')\n```\n", encoding="utf-8")
+    failures = check_doc_snippets.check_execution([site, mirror])
+    assert len(failures) == 1
+    assert "runs now" in failures[0]

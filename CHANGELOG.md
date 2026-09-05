@@ -321,6 +321,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   test holds the class shut: a standard's number always follows its body, so a
   designation with no digit whose clause opens with one has lost it.
 
+- The 835 code blocks of the `docs/` mirror were never run. The site pages are
+  executed in reading order and the mirror was read for name shadowing only,
+  on the grounds that it is hand-written for GitHub and does not carry the
+  same examples. Both halves of that are true, and 105 of its 171 pages do
+  carry different code, which is the reason to run it rather than the reason
+  not to: it is the copy a GitHub reader pastes. Running it found three
+  published examples that do not work.
+
+  One passed a 40000-sample signal against a 48000-sample one, having picked
+  up `clean` and `degraded` from two sections at different sample rates. One
+  called `vibration.RISK_THRESHOLDS_MALE`, which the library does not publish;
+  the site page prints the same three numbers as the literal Table C.2 tuple
+  they are. And the namespace example in the API quick reference passed five
+  names nothing had defined, so it is written as the sketch it is.
+
+- The curated API quick table says what each name is, and twenty-one rows said
+  the wrong thing: eight coefficient tables, a tuple and an array were
+  `function`, so were seven result dataclasses and a warning class, and two
+  functions were `dataclass`. A reader following the column writes code that
+  cannot run. The coverage gate now reads the column and asks the object, with
+  a vocabulary as wide as the table's own: `constant` is a better word for a
+  module-level float than `float` and `mapping` than `dict`, and a row may
+  name the concrete type, so the row passes on any word that is true of what
+  it names. A row carrying several names now names several kinds.
+
 - The evaluation zones were shaded with the series palette, which told the
   reader the opposite of what the scale says. Zone B, "unrestricted
   operation", came out red and zone C, "limited operation", came out green, so

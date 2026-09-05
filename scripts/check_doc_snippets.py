@@ -270,18 +270,27 @@ def check_execution(pages: list[pathlib.Path]) -> list[str]:
     runnable = [p for p in pages if p.stem not in _SKIP and _blocks(p)]
     skipped = [p for p in pages if p.stem in _SKIP and _blocks(p)]
     failures: list[str] = []
+    still_skipped: dict[str, list[pathlib.Path]] = {}
     with concurrent.futures.ProcessPoolExecutor() as pool:
         for page, error in pool.map(_run_page, runnable):
             if error:
                 failures.append(f"{_rel(page)}: {error}")
         # A page that starts running must leave the skip list, or the list
-        # quietly grows into a list of pages nobody checks.
+        # quietly grows into a list of pages nobody checks. An entry covers a
+        # guide, and a guide is written twice, as the site page and as the
+        # hand-written mirror under docs/; the entry is stale only once both
+        # editions run, since dropping it while one of them still fails would
+        # turn a stale-skip report into a failing page.
         for page, error in pool.map(_run_page, skipped):
-            if not error:
-                failures.append(
-                    f"{_rel(page)}: runs now; remove it from _SKIP in "
-                    f"{_rel(pathlib.Path(__file__))}"
-                )
+            if error:
+                still_skipped.setdefault(page.stem, []).append(page)
+    for page in skipped:
+        if page.stem not in still_skipped:
+            failures.append(
+                f"{_rel(page)}: runs now; remove it from _SKIP in "
+                f"{_rel(pathlib.Path(__file__))}"
+            )
+            still_skipped[page.stem] = []
     return failures
 
 
@@ -355,11 +364,21 @@ def main() -> int:
     failures += check_translations(pairs)
     stage = "static checks"
     if not args.static:
-        runnable = [
-            p
-            for p in pages
-            if p.is_relative_to(_SITE) and not p.is_relative_to(_SITE_ES)
-        ] + _published()
+        # Every edition a reader can copy from: the site page, and the
+        # hand-written mirror under docs/ that GitHub serves. The mirror is
+        # not a copy -- 105 of its 171 pages carry different code from their
+        # site page, mostly reworded comments but not only -- so running the
+        # site page proves nothing about it, and its 835 blocks were the
+        # largest body of published example code nothing executed.
+        runnable = (
+            [
+                p
+                for p in pages
+                if p.is_relative_to(_SITE) and not p.is_relative_to(_SITE_ES)
+            ]
+            + [p for p in pages if p.is_relative_to(_DOCS)]
+            + _published()
+        )
         failures += check_execution(runnable)
         stage = "checks"
 
