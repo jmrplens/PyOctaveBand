@@ -285,6 +285,12 @@ _ES_EXACT = {
     "limit of zone A ($Z$ = 1)": "límite de la zona A ($Z$ = 1)",
     "limit of zone B ($Z$ = 2.56)": "límite de la zona B ($Z$ = 2,56)",
     "limit of zone C ($Z$ = 6.4)": "límite de la zona C ($Z$ = 6,4)",
+    # machine_vector_change: the library renderer already translates the
+    # three vector labels, and this one comes out the same word in Spanish.
+    # Written here as its own translation rather than left to
+    # ENGLISH_BY_DESIGN, which would say "do not translate" instead of
+    # "looked at, and it is the same".
+    "final $A_2$": "final $A_2$",
     "zone A: newly commissioned": "zona A: recién puesta en servicio",
     "zone B: unrestricted operation": "zona B: operación sin restricción",
     "zone C: limited operation": "zona C: operación limitada",
