@@ -321,6 +321,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   test holds the class shut: a standard's number always follows its body, so a
   designation with no digit whose clause opens with one has lost it.
 
+- `flow_noise_straight_duct` was credited to Bies, Hansen & Howard 5e
+  Eq. (8.251), a second-hand citation of a law this project holds the primary
+  source for. The printed page settles it: Bies gives that equation as "(VDI
+  2081-1, 2003)", and VDI 2081 Part 1 prints the two halves in two places on
+  the same page. Equation (16) is the overall level, and the level difference
+  the octave spectrum needs is printed inside Figure 16 itself, on an abscissa
+  of `f_m / v`. The docstring now cites the guideline first and the handbook as
+  the place the two are written on one line.
+
+  With that in hand the "does not sum back" sentence gets the reason it was
+  missing. The difference Figure 16 prints tends to `-2 - 26 lg 1,14`, which is
+  `-2,5` dB, as `f_m / v` falls, so the energy sum grows with however many
+  octaves are taken and no fixed shortfall can be quoted. Over the range the
+  figure is actually drawn for it lands within half a decibel of the overall.
+
 - Three railway coefficient rows cited `Appendix G` with no document, which is
   the CNOSSOS-EU case the override file exists for: the appendix belongs to
   Annex II of Directive 2002/49/EC and the tables inside each row are owned by
@@ -437,7 +452,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   at a time. It wrapped `evaluation_zone`, which has always taken an array, and
   then applied the most-restrictive rule of 5.2.3 by comparing the two gradings
   as text: with an array in, that text was the array's own repr, so a month of
-  daily readings came back as the eighteen-character string `"['A' 'C' 'D']"`.
+  daily readings came back as the thirteen-character string `"['A' 'C' 'D']"`.
   The rule is applied to the zone indices now and the letters looked up once at
   the end, so an array in gives one letter per reading and a scalar still gives
   a letter. A scalar and an array together broadcast, which is the shape of
