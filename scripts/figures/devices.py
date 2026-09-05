@@ -6126,13 +6126,20 @@ def generate_vdi2081_flow_noise(output_dir: str) -> None:
         ),
     ):
         ax.plot(duty, level, marker="o", ms=6, color=colour, zorder=5)
+        # Chipped: the readout sits on the curve it reads off.
         ax.annotate(
             f"{level:.0f} dB",
             xy=(duty, level),
-            xytext=(18, offset),
+            xytext=(15, offset),
             textcoords="offset points",
             fontsize=9,
             color=colour,
+            bbox={
+                "boxstyle": "round,pad=0.3",
+                "facecolor": COLOR_PANEL,
+                "edgecolor": COLOR_GRID,
+            },
+            zorder=6,
         )
     # The two forms cross where 32 = 20 lg v, which is 39,8 m/s in any duct:
     # far outside a ventilation system, so the A-weighted overall stays the
