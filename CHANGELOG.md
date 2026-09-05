@@ -265,6 +265,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   cross-reference in its tables resolves there. The two current editions are
   listed on the support page.
 
+- A gate against the defect those three VDI rows were, `make conformance-rows`.
+  A conformance row says what a standard prints and what the library computes,
+  and passes when the two agree; a row that works out the expected value itself
+  from the same constants is comparing a formula with a second copy of it and
+  reports Pass whatever the library does. The three that did could not have
+  failed on any defect in the function they certified.
+
+  Counting them is the hard half. A row usually delegates: to a helper beside
+  it, to one imported from `..shared`, or to the library under a name that is
+  not `ph`. Reading only each row's own body reports a hundred and two rows on
+  this tree, of which ninety-five are fine, and a list that long buries the
+  seven that are not. So the check resolves the delegation, through helpers and
+  across modules and under any import alias, and reports seven.
+
+  Six of the seven are not defects, and the gate has a list where each says so
+  in prose: the ground projection and slant length of the ISO/TR 17534-3 test
+  geometry pin how this project read the printed coordinates, the library does
+  not own the distance between two points; the Doc 29 event assembly checks the
+  printed total against the printed segments it is the sum of, which is the
+  oracle vouched for before it is trusted; and the DPSS eigenvalue is a check
+  of SciPy, deliberately. An entry that stops being needed fails the gate just
+  as loudly as a row that is missing one.
+
+- Two rows for the branch split of the SAE Method, replacing the one that
+  computed both sides itself. SAE ARP 5534 Section 3.2.2 splits at a mid-band
+  attenuation of 150 dB, Equation (7) below it and Equation (8) above, and the
+  two are printed to meet there within 0,003 dB. `sae_band_attenuation` takes a
+  path length rather than an attenuation, so the split is reached by scaling
+  the path: one call at unit length gives the coefficient, and 150 divided by
+  it is the length at which the mid-band attenuation lands exactly on the
+  boundary. A hair either side picks one branch or the other, and each is now
+  judged against the other branch's printed formula, which is what continuity
+  at the split means and what neither branch can fake alone.
+
 ### Changed
 
 - Ten visco-thermal models take a `phonometry.fluids.Fluid` where they took

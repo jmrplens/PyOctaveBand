@@ -567,6 +567,30 @@ jobs:
     - name: Check that every private constant is read somewhere
       run: python scripts/check_dead_constants.py
 
+  # A conformance row states what a standard prints and what this library
+  # computes. A row that computes the expected value itself, from the same
+  # constants, compares a formula with a second copy of it and reports Pass
+  # whatever the library does; three did, and a wrong sign in the function they
+  # certified would have gone out green. Counting them needs the delegation
+  # resolved -- through helpers, across modules, and under whatever name the
+  # imports gave the library -- so the check is an AST walk rather than a grep.
+  # Static and dependency-free, so it runs on its own.
+  conformance-rows:
+    name: Every conformance row runs the library
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v7
+      with:
+        python-version: "3.13"
+    - name: Check that no row certifies the library without running it
+      run: python scripts/check_conformance_rows.py
+
   # The committed example .report() fiches (.github/reports) must match a fresh
   # `make reports` run. Same drift gate as the figures, one layer further down
   # the pipeline: the fiches are what the documentation links to as worked

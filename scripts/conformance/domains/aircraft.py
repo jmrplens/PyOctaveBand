@@ -168,17 +168,55 @@ def _chk_doc29_event_assembly() -> Outcome:
     return numeric(B1[("JETFDS", "R03")], total, 1e-2, unit="dB", places=3)
 
 
+# ARP 5534 §3.2.2 splits the SAE Method at a mid-band attenuation of
+# δ_t = 150 dB: Eq. 7 below it, Eq. 8 above. The library takes a path length
+# rather than a δ_t, so the split is reached by scaling the path: one call at
+# unit length returns α, and 150/α is the length at which δ_t lands exactly on
+# the split. A hair either side of that length picks one branch or the other,
+# and each is then judged against the *other* branch's printed formula, which
+# is what continuity at the split means. At 10 kHz the split falls at a slant
+# range of about 1,5 km, well inside the certification geometry.
+_SPLIT_BAND_HZ = 10000.0
+
+
+def _arp5534_at_split(offset: float) -> float:
+    """Library δ_B (dB) at the path whose δ_t is ``150 (1 + offset)`` dB."""
+    alpha = float(
+        ph.aircraft.sae_band_attenuation([_SPLIT_BAND_HZ], 1.0).midband_attenuation[0]
+    )
+    res = ph.aircraft.sae_band_attenuation(
+        [_SPLIT_BAND_HZ], 150.0 / alpha * (1.0 + offset)
+    )
+    return float(res.band_attenuation[0])
+
+
 @register(
     _AIRCRAFT,
-    "SAE ARP 5534 band-attenuation continuity",
-    "SAE-Method δ_B at the 150 dB branch split (Eq. 7 vs Eq. 8), dB",
+    "SAE ARP 5534 low branch at the split (Eq. 7)",
+    "SAE-Method δ_B just below δ_t = 150 dB vs the printed Eq. 8 value there, dB",
 )
 def _chk_arp5534_continuity() -> Outcome:
-    # The two SAE-Method branches meet at δ_t = 150 dB (Eqs. 7-8).
+    # Printed Eq. 8, 9,2 + 0,765 · 150 = 123,95 dB, against the library on its
+    # Eq. 7 branch. The two printed branches do not meet to the digit: Eq. 7
+    # gives 123,953 dB there, a step of 0,003 dB, which is the tolerance's
+    # reason for being 0,01 dB rather than tighter.
+    return numeric(
+        9.2 + 0.765 * 150.0, _arp5534_at_split(-1e-9), 0.01, unit="dB", places=3
+    )
+
+
+@register(
+    _AIRCRAFT,
+    "SAE ARP 5534 high branch at the split (Eq. 8)",
+    "SAE-Method δ_B just above δ_t = 150 dB vs the printed Eq. 7 value there, dB",
+)
+def _chk_arp5534_high_branch() -> Outcome:
+    # The mirror of the row above: printed Eq. 7 at the split against the
+    # library on its Eq. 8 branch, so a wrong constant in either printed
+    # formula has a row that fails on it.
     a, b, c, d, e = 0.867942, 0.111761, 0.95824, 0.008191, 1.6
     eq7 = a * 150.0 * (1.0 + b * (c - d * 150.0)) ** e
-    eq8 = 9.2 + 0.765 * 150.0
-    return numeric(eq8, eq7, 0.01, unit="dB", places=3)
+    return numeric(eq7, _arp5534_at_split(1e-9), 0.01, unit="dB", places=3)
 
 
 @register(

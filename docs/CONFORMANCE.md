@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**778/778 conformance checks pass** across 66 domains and 391 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**779/779 conformance checks pass** across 66 domains and 392 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -988,7 +988,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>Aircraft noise (ICAO Annex 16 / IEC 61265)</b>: 100% (17/17)</summary>
+<summary><b>Aircraft noise (ICAO Annex 16 / IEC 61265)</b>: 100% (18/18)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -999,7 +999,8 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ECAC Doc 29 start-of-roll directivity (jet) | ΔSOR behind a takeoff ground-roll segment vs the Vol 3 Part 1 workbook, dB | 0.3196 dB (+/-0.01 dB) | 0.3196 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ECAC Doc 29 start-of-roll directivity (turboprop) | ΔSOR behind a takeoff ground-roll segment (turboprop, Eq. 4-24b), dB | 1.0943 dB (+/-0.01 dB) | 1.0944 dB | 0.0001 dB | 1 % | ![Pass][cv-pass] Pass |
 | ECAC Doc 29 workbook event assembly (JETFDS/R03, behind SOR) | Energy sum of the reference per-segment SELs vs the B-1 event total, dB | 74.73 dB (+/-0.01 dB) | 74.733 dB | 0.003 dB | 30 % | ![Pass][cv-pass] Pass |
-| SAE ARP 5534 band-attenuation continuity | SAE-Method δ_B at the 150 dB branch split (Eq. 7 vs Eq. 8), dB | 123.95 dB (+/-0.01 dB) | 123.953 dB | 0.003 dB | 30 % | ![Pass][cv-pass] Pass |
+| SAE ARP 5534 low branch at the split (Eq. 7) | SAE-Method δ_B just below δ_t = 150 dB vs the printed Eq. 8 value there, dB | 123.95 dB (+/-0.01 dB) | 123.953 dB | 0.003 dB | 30 % | ![Pass][cv-pass] Pass |
+| SAE ARP 5534 high branch at the split (Eq. 8) | SAE-Method δ_B just above δ_t = 150 dB vs the printed Eq. 7 value there, dB | 123.953 dB (+/-0.01 dB) | 123.95 dB | -0.003 dB | 30 % | ![Pass][cv-pass] Pass |
 | EASA ANP database round-trip | Interpolated NPD level at a tabulated node vs the published ANP value, dB | 98.8 dB (+/-0 dB) | 98.8 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ECAC Doc 29 NPD interpolation | Log-linear NPD level at the log-midpoint distance (Eq. 4-4), dB | 97 dB (+/-0 dB) | 97 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | SAE ARP 5534 pure-tone coefficient (ISO 9613-1) | Mid-band α at 1 kHz, 25 °C, 70 % RH, 101.325 kPa, dB/m | 0.006186 dB/m (+/-0 dB/m) | 0.006186 dB/m | 0 dB/m | 0 % | ![Pass][cv-pass] Pass |
