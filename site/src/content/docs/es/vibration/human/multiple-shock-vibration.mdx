@@ -56,7 +56,7 @@ En caso de duda, la delimitación es cuantitativa: cuando la aceleración de
 pico vertical de banda limitada supera 9,81 m/s² (1 g, el umbral de caída
 libre), se aplican el apartado 5 y el Anexo C.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso2631_5_es.svg" alt="Flujo desde la aceleración vertical del asiento az(t), acondicionada como exige el apartado 5.1.3 con un paso alto de 0,01 Hz de segundo orden y un paso bajo de 80 Hz de cuarto orden, y no con los filtros de 0,4 a 100 Hz de ISO 2631-1, hasta la respuesta espinal, la dosis de aceleración Dz y la dosis diaria Dzd, la tensión compresiva Sd, la variable de tensión R acumulada con la edad, y la probabilidad de lesión lumbar de Weibull" width="86%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso2631_5.svg" alt="Flujo desde la aceleración vertical del asiento az(t), acondicionada como exige el apartado 5.1.3 con un paso alto de 0,01 Hz de segundo orden y un paso bajo de 80 Hz de cuarto orden, y no con los filtros de 0,4 a 100 Hz de ISO 2631-1, hasta la respuesta espinal, la dosis de aceleración Dz y la dosis diaria Dzd, la tensión compresiva Sd, la variable de tensión R acumulada con la edad, y la probabilidad de lesión lumbar de Weibull" width="86%" loading="eager" />
 
 ## 1. Conseguir el registro (apartados 5.1.2 y 5.1.4)
 
@@ -64,7 +64,7 @@ Todo lo que viene después parte de un $a_\mathrm{z}(t)$ medido, y la ISO 2631-5
 cuatro requisitos de adquisición sobre los de la ISO 2631-1, cada uno propio de
 la exposición a choques.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso2631_5_setup_es.svg" alt="Izquierda: la banqueta del asiento en sección con las tuberosidades isquiáticas de un ocupante sentado apoyadas sobre el disco de montaje semirrígido de ISO 10326-1 de 250 más menos 50 mm de diámetro y 12 mm de altura como máximo, que sostiene un disco metálico de 75 más menos 5 mm por 1,5 mm para los acelerómetros, fijado con cinta al cojín, con un interruptor de contacto al lado y el eje z positivo hacia craneal, sobre un asiento con suspensión. Derecha: una aceleración registrada con dos ventanas sombreadas en las que se pierde el contacto, excluidas de la exposición, que parten el registro en tres tramos de contacto que se acondicionan por separado. Debajo: los requisitos de equipo del apartado 5.1.2 y el requisito de duración del apartado 5.1.4" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso2631_5_setup.svg" alt="Izquierda: la banqueta del asiento en sección con las tuberosidades isquiáticas de un ocupante sentado apoyadas sobre el disco de montaje semirrígido de ISO 10326-1 de 250 más menos 50 mm de diámetro y 12 mm de altura como máximo, que sostiene un disco metálico de 75 más menos 5 mm por 1,5 mm para los acelerómetros, fijado con cinta al cojín, con un interruptor de contacto al lado y el eje z positivo hacia craneal, sobre un asiento con suspensión. Derecha: una aceleración registrada con dos ventanas sombreadas en las que se pierde el contacto, excluidas de la exposición, que parten el registro en tres tramos de contacto que se acondicionan por separado. Debajo: los requisitos de equipo del apartado 5.1.2 y el requisito de duración del apartado 5.1.4" width="94%" />
 
 **Dónde (5.1.2).** $a_\mathrm{z}(t)$ se mide en la interfaz entre el asiento y las
 **tuberosidades isquiáticas**. La ubicación de medida sobre el asiento y el
@@ -211,7 +211,7 @@ from phonometry import vibration
 print(round(vibration.dose_from_peaks([40.0] * 5), 2))  # 55.97  m/s2
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/spinal_response_peaks_es.svg" alt="Dos paneles apilados sobre el mismo registro de 8 s de asiento todoterreno a 256 muestras por segundo. Arriba: la aceleración acondicionada del asiento y la respuesta espinal superpuestas, con cada impacto convertido en una respuesta que resuena, y una caída libre de 0,4 s fijada en menos 9,81 metros por segundo al cuadrado antes del impacto mayor. Abajo: la misma respuesta espinal con sus 28 picos positivos contabilizados marcados, una línea discontinua en un tercio del pico mayor, y los tres picos mayores anotados con su parte de la suma de sextas potencias: 30,3 aporta el 98,6 por ciento, 14,7 el 1,3 por ciento y 9,2 el 0,1 por ciento, para una dosis de aceleración de 32,5 metros por segundo al cuadrado" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/spinal_response_peaks.svg" alt="Dos paneles apilados sobre el mismo registro de 8 s de asiento todoterreno a 256 muestras por segundo. Arriba: la aceleración acondicionada del asiento y la respuesta espinal superpuestas, con cada impacto convertido en una respuesta que resuena, y una caída libre de 0,4 s fijada en menos 9,81 metros por segundo al cuadrado antes del impacto mayor. Abajo: la misma respuesta espinal con sus 28 picos positivos contabilizados marcados, una línea discontinua en un tercio del pico mayor, y los tres picos mayores anotados con su parte de la suma de sextas potencias: 30,3 aporta el 98,6 por ciento, 14,7 el 1,3 por ciento y 9,2 el 0,1 por ciento, para una dosis de aceleración de 32,5 metros por segundo al cuadrado" width="94%" />
 
 *Lo que el apartado 5 le hace a un registro, y en el dominio en el que se lo
 hace. El filtro asiento-columna es resonante, así que un impacto seco del asiento
@@ -378,7 +378,7 @@ este registro de 10 s y una jornada de 4 h ese atajo divide la dosis entre
 $(t_\mathrm{d}/t_\mathrm{m})^{1/6} = 3{,}36$ y declara $R = 0{,}46$ en lugar de $1{,}53$ — un 3 %
 de probabilidad de lesión donde la exposición da un 58 %.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/multiple_shock_es.svg" alt="Izquierda: la transmisibilidad asiento-columna sube hasta cerca de 1,6 en una resonancia de 5 Hz y luego cae casi a cero en 80 Hz. Derecha: la probabilidad de lesión lumbar de Weibull frente a la variable de tensión R para hombre y mujer, con los niveles de riesgo del 10, 50 y 90 por ciento y el ejemplo masculino del Anexo C en R = 1,22, en torno al 37 por ciento" width="96%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/multiple_shock.svg" alt="Izquierda: la transmisibilidad asiento-columna sube hasta cerca de 1,6 en una resonancia de 5 Hz y luego cae casi a cero en 80 Hz. Derecha: la probabilidad de lesión lumbar de Weibull frente a la variable de tensión R para hombre y mujer, con los niveles de riesgo del 10, 50 y 90 por ciento y el ejemplo masculino del Anexo C en R = 1,22, en torno al 37 por ciento" width="96%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>

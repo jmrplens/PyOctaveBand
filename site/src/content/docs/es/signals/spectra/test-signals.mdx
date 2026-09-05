@@ -38,7 +38,7 @@ espectral](/phonometry/es/signals/spectra/spectral-analysis/#5-generadores-de-ru
 Antes de los detalles, el retrato de familia: qué aspecto tiene cada
 estímulo en el tiempo y dónde se reparte su energía en frecuencia.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_test_signals_es.svg" alt="Cuadrícula con cinco miniaturas etiquetadas de señales de ensayo: ruido blanco con forma de onda irregular y densidad espectral plana de 0 dB por octava, igual potencia por hercio; ruido rosa con forma de onda más suave y densidad de menos 3 dB por octava, igual potencia por octava; una MLS binaria de periodo 2 elevado a m menos 1 muestras con espectro de rayas plano; un esquema tiempo-frecuencia donde el barrido lineal es una recta mientras el exponencial se pega a las frecuencias bajas y dedica igual tiempo a cada octava; y una ráfaga tonal IEC 60268-1 de periodos completos que empieza en un paso por cero, 25 periodos de 5 kHz durante 5 ms" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_test_signals.svg" alt="Cuadrícula con cinco miniaturas etiquetadas de señales de ensayo: ruido blanco con forma de onda irregular y densidad espectral plana de 0 dB por octava, igual potencia por hercio; ruido rosa con forma de onda más suave y densidad de menos 3 dB por octava, igual potencia por octava; una MLS binaria de periodo 2 elevado a m menos 1 muestras con espectro de rayas plano; un esquema tiempo-frecuencia donde el barrido lineal es una recta mientras el exponencial se pega a las frecuencias bajas y dedica igual tiempo a cada octava; y una ráfaga tonal IEC 60268-1 de periodos completos que empieza en un paso por cero, 25 periodos de 5 kHz durante 5 ms" width="92%" />
 
 Cinco estímulos, y qué los separa. El **ruido** excita todo a la vez y
 necesita promediado para vencer su propia aleatoriedad. Una **MLS** es
@@ -91,7 +91,7 @@ número entero de periodos completos empezando en un paso por cero, la
 energía de la ráfaga tonal tiene la forma cerrada exacta $A^2 N/2$, que es como se
 verifica el generador.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_train_es.svg" alt="Ráfagas tonales IEC 60268-1: una ráfaga tonal única de 5 ms de tono de 5 kHz que comienza en un paso por cero con su envolvente rectangular de conmutación, y un tren repetitivo de cuatro ráfagas tonales a 10 ráfagas por segundo con un ciclo de trabajo del 5 por ciento" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_train.svg" alt="Ráfagas tonales IEC 60268-1: una ráfaga tonal única de 5 ms de tono de 5 kHz que comienza en un paso por cero con su envolvente rectangular de conmutación, y un tren repetitivo de cuatro ráfagas tonales a 10 ráfagas por segundo con un ciclo de trabajo del 5 por ciento" width="82%" loading="eager" />
 
 *Todas las cifras de la imagen son exactas y no nominales, que es de lo que trata
 el apartado A2.1. La ráfaga son 240 muestras, 25 periodos completos de 5 kHz a
@@ -184,7 +184,7 @@ print(res.n_taps, res.passband_edge_hz)  # FIR diseñado, 20947.5 Hz
 res.plot()   # el filtro antisolapamiento entregado frente a su especificación
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/resampling_antialias_es.svg" alt="Respuesta en magnitud del filtro antisolapamiento diseñado para un remuestreo polifásico de 44,1 a 48 kilohercios sobre un eje de frecuencia logarítmico: banda de paso plana hasta el borde discontinuo justo por debajo de 21 kilohercios, transición abrupta hasta el borde de la banda atenuada en 22,05 kilohercios, y un suelo de banda atenuada que se mantiene por debajo de la línea punteada de atenuación de diseño de menos 120 decibelios a lo largo de la banda rechazada sombreada" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/resampling_antialias.svg" alt="Respuesta en magnitud del filtro antisolapamiento diseñado para un remuestreo polifásico de 44,1 a 48 kilohercios sobre un eje de frecuencia logarítmico: banda de paso plana hasta el borde discontinuo justo por debajo de 21 kilohercios, transición abrupta hasta el borde de la banda atenuada en 22,05 kilohercios, y un suelo de banda atenuada que se mantiene por debajo de la línea punteada de atenuación de diseño de menos 120 decibelios a lo largo de la banda rechazada sombreada" width="82%" />
 
 *El filtro antisolapamiento entregado por la conversión 44,1 → 48 kHz por
 defecto: la banda atenuada empieza exactamente en la frecuencia de Nyquist

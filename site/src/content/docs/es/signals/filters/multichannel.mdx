@@ -59,7 +59,7 @@ entradas de Bendat y Piersol.
 
 ## Un análisis estéreo en una llamada
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_multichannel_es.svg" alt="Análisis estéreo: ruido rosa y barrido logarítmico resueltos por canal en tercios de octava" width="80%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_multichannel.svg" alt="Análisis estéreo: ruido rosa y barrido logarítmico resueltos por canal en tercios de octava" width="80%" loading="eager" />
 
 *Una sola llamada a `octave_filter`, dos canales: ruido rosa a la izquierda,
 un barrido logarítmico a la derecha. Los dos vuelven planos en tercios de
@@ -134,7 +134,7 @@ spl, freq = filters.octave_filter(stereo, fs, fraction=3)
 
 ## Formas aceptadas, de un vistazo
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_multichannel_es.svg" alt="Flujo de formas de array: una entrada 1-D (muestras,) se reduce a un escalar y una entrada 2-D (canales, muestras) se reduce a (canales,), porque la operación actúa sobre el último eje mientras el eje de canal se conserva" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_multichannel.svg" alt="Flujo de formas de array: una entrada 1-D (muestras,) se reduce a un escalar y una entrada 2-D (canales, muestras) se reduce a (canales,), porque la operación actúa sobre el último eje mientras el eje de canal se conserva" width="80%" />
 
 | Entrada | Se interpreta como | Salida típica |
 | :--- | :--- | :--- |
@@ -173,7 +173,7 @@ explicitar:
   número de canales lo reinicia; ver
   [Procesado por bloques](/phonometry/es/signals/filters/block-processing/).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_channel_average_es.svg" alt="Panel superior: cinco curvas finas grises de tercios de octava correspondientes a cinco posiciones de una misma sala, junto con un promedio energético azul grueso y un promedio aritmético de los valores en decibelios en rojo discontinuo. Por encima de unos 400 Hz las cinco posiciones coinciden dentro de un decibelio y los dos promedios se superponen; por debajo, en la región modal, las posiciones se dispersan hasta quince decibelios y el promedio rojo discontinuo queda por debajo del azul. Panel inferior: la diferencia entre ambos banda a banda, nula por encima de 400 Hz y creciente hasta una subestimación máxima de 3,8 dB a 40 Hz" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_channel_average.svg" alt="Panel superior: cinco curvas finas grises de tercios de octava correspondientes a cinco posiciones de una misma sala, junto con un promedio energético azul grueso y un promedio aritmético de los valores en decibelios en rojo discontinuo. Por encima de unos 400 Hz las cinco posiciones coinciden dentro de un decibelio y los dos promedios se superponen; por debajo, en la región modal, las posiciones se dispersan hasta quince decibelios y el promedio rojo discontinuo queda por debajo del azul. Panel inferior: la diferencia entre ambos banda a banda, nula por encima de 400 Hz y creciente hasta una subestimación máxima de 3,8 dB a 40 Hz" width="88%" />
 
 *Las dos líneas de código, sobre un muestreo realista. Donde las posiciones
 coinciden, los dos promedios son el mismo número; donde discrepan — la región
@@ -230,7 +230,7 @@ de fila a posición hay que anotarlo en el momento de la captura**, porque un pa
 intercambiado produce niveles perfectamente válidos atribuidos a las posiciones
 equivocadas.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_multichannel_capture_es.svg" alt="Captura con un array de cuatro micrófonos. A la izquierda, cuatro micrófonos de medida sobre trípodes con la separación de un muestreo de sala, etiquetados de P1 a P4, con las cápsulas a 1,2 m del suelo y cada una rotulada con su propia sensibilidad en milivoltios por pascal; un calibrador acústico aparece acoplado a la cápsula P2 con una flecha discontinua que indica que va pasando de cápsula en cápsula. En el centro, un preamplificador de cuatro canales y una interfaz con una barra resaltada que abarca las cuatro entradas y dice reloj de muestreo único, fs igual a 48 kHz, y a su lado una segunda interfaz tachada con la leyenda dos interfaces son dos relojes, no un array. A la derecha, el array x dibujado como cuatro filas apiladas etiquetadas de ch0 igual a P1 hasta ch3 igual a P4, con la forma (4, N). Un pie repite los tres invariantes: un reloj, ganancias fijadas, mapa de fila a posición anotado" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_multichannel_capture.svg" alt="Captura con un array de cuatro micrófonos. A la izquierda, cuatro micrófonos de medida sobre trípodes con la separación de un muestreo de sala, etiquetados de P1 a P4, con las cápsulas a 1,2 m del suelo y cada una rotulada con su propia sensibilidad en milivoltios por pascal; un calibrador acústico aparece acoplado a la cápsula P2 con una flecha discontinua que indica que va pasando de cápsula en cápsula. En el centro, un preamplificador de cuatro canales y una interfaz con una barra resaltada que abarca las cuatro entradas y dice reloj de muestreo único, fs igual a 48 kHz, y a su lado una segunda interfaz tachada con la leyenda dos interfaces son dos relojes, no un array. A la derecha, el array x dibujado como cuatro filas apiladas etiquetadas de ch0 igual a P1 hasta ch3 igual a P4, con la forma (4, N). Un pie repite los tres invariantes: un reloj, ganancias fijadas, mapa de fila a posición anotado" width="94%" />
 
 La tabla de formas de más arriba es la abstracción de ese dibujo: cada fila de
 `x` es un micrófono, y la correspondencia entre un índice de fila y una posición

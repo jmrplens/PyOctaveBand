@@ -131,7 +131,7 @@ mínimo/máximo de atenuación relativa en frecuencias normalizadas
 $\Omega = f/f_\mathrm{m}$,
 los mismos límites que usan el verificador y la figura de abajo.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/class_mask_overlay_es.svg" alt="Respuesta Butterworth serpenteando entre las regiones prohibidas de la máscara de clase 1 de IEC 61260-1" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/class_mask_overlay.svg" alt="Respuesta Butterworth serpenteando entre las regiones prohibidas de la máscara de clase 1 de IEC 61260-1" width="80%" />
 
 *La respuesta del Butterworth de orden 6 (azul) serpentea entre las regiones
 prohibidas: debe atenuar al menos la máscara roja fuera de la banda y no más
@@ -206,7 +206,7 @@ print(result["overall_class"])          # 0  (el Butterworth por defecto la supe
 print(result["bands"][0]["margin_class0_db"])
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_class0_mask_es.svg" alt="Corredores de aceptación anidados en la banda de paso para las clases 0, 1 y 2 de IEC 61260:1995 con la respuesta Butterworth de orden 6 dentro del corredor de clase 0 más estrecho" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_class0_mask.svg" alt="Corredores de aceptación anidados en la banda de paso para las clases 0, 1 y 2 de IEC 61260:1995 con la respuesta Butterworth de orden 6 dentro del corredor de clase 0 más estrecho" width="80%" />
 
 *El corredor de clase 0 (±0,15 dB en el centro de banda) es el más estrecho; la
 clase 1 (±0,3 dB) y la clase 2 (±0,5 dB) son progresivamente más anchas. El
@@ -273,7 +273,7 @@ valoraciones abstractas:
   unos 70 dB por debajo, y una arquitectura más abrupta (o mayor orden) es la
   única forma de empujar ese suelo más abajo.
 
-  <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_leakage_floor_es.svg" alt="Niveles en tercios de octava de un tono de 1 kHz a 100 dB SPL sobre un fondo de ruido rosa cuyos niveles de banda rondan los 22 dB, analizados con bancos de orden 6 y de orden 10. La banda de 1 kHz lee 100 dB, las bandas vecinas caen bruscamente y por debajo de unos 500 Hz los niveles medidos se aplanan sobre una falda situada entre 65 y 70 dB por debajo del tono, muy por encima del nivel de fondo real dibujado con línea de puntos; por encima de unos 8 kHz la falda ya ha caído por debajo del ruido y los niveles medidos se juntan con él. El banco de orden 10 baja la falda de forma visible en el lado agudo del tono" width="88%" />
+  <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_leakage_floor.svg" alt="Niveles en tercios de octava de un tono de 1 kHz a 100 dB SPL sobre un fondo de ruido rosa cuyos niveles de banda rondan los 22 dB, analizados con bancos de orden 6 y de orden 10. La banda de 1 kHz lee 100 dB, las bandas vecinas caen bruscamente y por debajo de unos 500 Hz los niveles medidos se aplanan sobre una falda situada entre 65 y 70 dB por debajo del tono, muy por encima del nivel de fondo real dibujado con línea de puntos; por encima de unos 8 kHz la falda ya ha caído por debajo del ruido y los niveles medidos se juntan con él. El banco de orden 10 baja la falda de forma visible en el lado agudo del tono" width="88%" />
 
   *Cómo se ve la última frase convertida en medida. Toda banda cuyo nivel se
   apoya en la falda está informando del rechazo del filtro al tono de 1 kHz, no
@@ -316,7 +316,7 @@ Bajo la edición de 2014 esa misma ordenación se lee 1 / 1 / — / — / —:
 `cheby2` se junta con Butterworth en lo más alto porque ya no existe la clase 0
 para separarlos.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/class_mask_architectures_es.svg" alt="Cuatro paneles, cada uno con la banda de octava de 1 kHz de un banco de orden 6 dibujada sobre el corredor de aceptación de IEC 61260-1, con las muestras fuera de tolerancia marcadas en rojo. Butterworth enhebra limpiamente el corredor de clase 1 e informa overall_class 1. Chebyshev I se sale del corredor en dos rachas cortas justo por dentro de cada borde de banda, donde está su rizado de banda de paso, e informa None. El elíptico hace lo mismo en los dos bordes e informa None. Bessel se sale del corredor a lo largo de toda la falda inferior porque cae demasiado despacio, e informa None" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/class_mask_architectures.svg" alt="Cuatro paneles, cada uno con la banda de octava de 1 kHz de un banco de orden 6 dibujada sobre el corredor de aceptación de IEC 61260-1, con las muestras fuera de tolerancia marcadas en rojo. Butterworth enhebra limpiamente el corredor de clase 1 e informa overall_class 1. Chebyshev I se sale del corredor en dos rachas cortas justo por dentro de cada borde de banda, donde está su rizado de banda de paso, e informa None. El elíptico hace lo mismo en los dos bordes e informa None. Bessel se sale del corredor a lo largo de toda la falda inferior porque cae demasiado despacio, e informa None" width="94%" />
 
 *Los veredictos de la tabla, dibujados. Chebyshev I y el elíptico asoman por
 encima del límite justo por dentro de los bordes de banda, donde vive su rizado;

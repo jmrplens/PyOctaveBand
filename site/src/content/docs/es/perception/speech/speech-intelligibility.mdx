@@ -49,7 +49,7 @@ un sistema de sonido. Para esto último, consulta la
 :::
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_speech_intelligibility_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_speech_intelligibility.svg"
   alt="El flujo de cálculo del SII: tres entradas de nivel espectral equivalente (habla Ei', ruido Ni', umbral de audición Ti') alimentan la etapa de autoenmascaramiento del habla y propagación del enmascaramiento (nivel espectral de enmascaramiento equivalente Zi), después la perturbación equivalente Di, después la función de audibilidad de banda Ai acotada a [0, 1], y por último la suma ponderada por importancia de banda SII sobre las 18 bandas de tercio de octava"
   width="94%"
   loading="eager"
@@ -200,7 +200,7 @@ enmascaramiento: un ventilador o un conducto que pone toda su energía por debaj
 de 450 Hz:
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_masking_chain_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_masking_chain.svg"
   alt="La cadena del apartado 5 de ANSI S3.5 sobre las 18 bandas de tercio de octava para el habla estándar de esfuerzo normal en un enmascarador cuyo nivel espectral de 60 dB queda confinado por debajo de 450 Hz. El ruido externo cae a nada por encima de 400 Hz, pero el nivel espectral de enmascaramiento equivalente decae en cambio de forma gradual, y sigue valiendo 23 dB a 1 kHz, donde no hay ruido ninguno; la perturbación equivalente lo sigue, la ventana sombreada de 30 dB de D menos 15 a D más 15 dB se dibuja a su alrededor, y la audibilidad de banda del eje derecho sube de cero a 500 Hz hasta uno a 2000 Hz a medida que la curva del habla sale de esa ventana. El índice vale 0,60"
   width="92%"
 />
@@ -267,7 +267,7 @@ result.plot()   # la figura de abajo: Ai y la contribución ponderada por banda
 ```
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/speech_intelligibility_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/speech_intelligibility.svg"
   alt="Audibilidad de banda del espectro de habla estándar de esfuerzo normal en un ruido de banda ancha descendente: las barras claras son la audibilidad por banda Ai sobre las 18 bandas de tercio de octava de 160 Hz a 8000 Hz, las barras más oscuras la contribución ponderada por importancia Ii*Ai (escalada), y el SII global es 0,46"
   width="90%"
 />
@@ -338,7 +338,7 @@ Los mismos habla y ruido escuchados por una persona con pérdida auditiva en
 agudos muestran lo que eso cuesta, banda a banda:
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_hearing_loss_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_hearing_loss.svg"
   alt="Audibilidad de banda del espectro de habla estándar de esfuerzo normal en el mismo ruido de banda ancha, para un oyente con pérdida auditiva descendente en agudos: las bandas hasta 800 Hz conservan buena parte de su audibilidad, las bandas desde 4000 Hz caen a cero y el SII resultante es 0,36 frente al 0,46 de una audición normal"
   width="90%"
 />
@@ -424,7 +424,7 @@ esfuerzo, y su `.plot()` los dibuja como una familia etiquetada sobre el eje de
 bandas de tercio de octava.
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/standard_speech_spectrum_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/standard_speech_spectrum.svg"
   alt="Los cuatro espectros de voz estándar de ANSI S3.5-1997 (normal, elevado, fuerte, grito) como una familia etiquetada: el nivel espectral de voz en dB SPL sobre las 18 bandas de tercio de octava de 160 Hz a 8000 Hz, cada esfuerzo mayor sube todo el espectro"
   width="90%"
 />
@@ -463,7 +463,7 @@ Los mismos cuatro espectros alimentan el índice: en un ruido de banda ancha
 fijo, cada esfuerzo vocal mayor sube el espectro de voz y aumenta el SII.
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_vocal_efforts_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_vocal_efforts.svg"
   alt="Izquierda: los cuatro espectros de voz estándar de ANSI S3.5-1997 (normal, elevado, fuerte, grito) de 160 Hz a 8000 Hz, cada esfuerzo mayor sube todo el espectro. Derecha: el SII resultante en un ruido de banda ancha fijo, subiendo de 0,12 (normal) a 0,79 (grito)"
   width="96%"
 />
@@ -556,7 +556,7 @@ bandas, mayor es cada $I_i$. Cada función suma uno, salvo la de la Tabla 2, que
 imprime `0,0588` en cada una de sus 17 bandas y por tanto suma 0,9996.
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_band_procedures_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_band_procedures.svg"
   alt="La función de importancia de banda de los cuatro procedimientos por bandas de ANSI S3.5-1997 superpuestos en un mismo eje logarítmico de frecuencia: las 21 bandas críticas, las 17 bandas críticas de contribución equitativa, las 18 bandas de tercio de octava y las 6 bandas de octava, cada una dibujada como escalón sobre sus propios límites de banda. Las cuatro trazan el mismo ascenso hasta un máximo en torno a 2 kHz, y cuanto más anchas son las bandas más alto es el escalón: la función de octava culmina en 0,265 frente a 0,090 de la de tercio de octava"
   width="90%"
 />
@@ -620,7 +620,7 @@ fuerte en baja frecuencia, no verá ese ruido alcanzando las bandas que portan e
 habla.
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_octave_masking_blindness_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_octave_masking_blindness.svg"
   alt="El SII calculado por los cuatro procedimientos de bandas frente al nivel espectral de un ruido de baja frecuencia confinado por debajo de 450 Hz, barrido de 45 a 80 dB. Las curvas de banda crítica, de contribución equitativa y de tercio de octava caen juntas desde unos 0,75 hasta por debajo de 0,07, mientras que la de octava se mantiene plana en 0,87 en todo el recorrido; en el punto más ruidoso se anota que ambas están separadas por 0,81 unidades de índice"
   width="88%"
 />

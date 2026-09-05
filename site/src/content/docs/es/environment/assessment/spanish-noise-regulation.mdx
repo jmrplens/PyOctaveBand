@@ -115,7 +115,7 @@ environment.corrected_level(63.0, kt=6, kf=3, ki=0)          # LKeq = 72,0 dB
 environment.total_correction(kt=6, kf=6, ki=3)               # 9,0 dB: el tope
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_tonal_correction_es.svg" alt="El espectro en tercios de octava del fragmento dibujado como barras de 100 Hz a 1 kHz, con la media aritmética de las dos vecinas de cada banda marcada encima, la banda de 250 Hz destacando 10,5 dB sobre la media de sus vecinas y señalada como banda determinante, y la fila de umbrales que le aplica impresa al lado" width="86%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_tonal_correction.svg" alt="El espectro en tercios de octava del fragmento dibujado como barras de 100 Hz a 1 kHz, con la media aritmética de las dos vecinas de cada banda marcada encima, la banda de 250 Hz destacando 10,5 dB sobre la media de sus vecinas y señalada como banda determinante, y la fila de umbrales que le aplica impresa al lado" width="86%" />
 
 *La comprobación enfrenta una banda a la media **aritmética** de sus dos vecinas,
 no a un suelo ajustado ni al espectro entero. Solo la banda de 250 Hz
@@ -136,7 +136,7 @@ plt.show()
 
 </details>
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_kf_ki_es.svg" alt="Las correcciones de baja frecuencia e impulsiva dibujadas como funciones escalonadas de la diferencia de nivel de 0 a 20 dB: las dos valen cero hasta 10 dB, saltan a 3 dB entre 10 y 15 dB y vuelven a saltar a 6 dB por encima de 15 dB, con los puntos del ejemplo resuelto marcados, Lf = 13 dB dando 3 dB y Li = 5 dB dando 0 dB" width="86%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_kf_ki.svg" alt="Las correcciones de baja frecuencia e impulsiva dibujadas como funciones escalonadas de la diferencia de nivel de 0 a 20 dB: las dos valen cero hasta 10 dB, saltan a 3 dB entre 10 y 15 dB y vuelven a saltar a 6 dB por encima de 15 dB, con los puntos del ejemplo resuelto marcados, Lf = 13 dB dando 3 dB y Li = 5 dB dando 0 dB" width="86%" />
 
 *$K_\mathrm{f}$ y $K_\mathrm{i}$ son la misma escalera de dos peldaños leída sobre dos diferencias
 distintas del sonómetro, y los peldaños son donde la aritmética se vuelve
@@ -189,7 +189,7 @@ módulo implementa las variantes propias del RD en lugar de delegar en aquellas:
 - $K_\mathrm{f}$ no tiene ninguna contraparte en ISO 1996: la diferencia
   $L_\mathrm{Ceq} - L_\mathrm{Aeq}$ es propia del reglamento español.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_vs_iso_tonal_es.svg" alt="Dos espectros en tercios de octava dibujados como barras uno al lado del otro con tres filas de veredicto bajo cada uno. El espectro de la izquierda tiene una emergencia de 10,5 dB en 250 Hz y todos los métodos coinciden en que hay un tono. El de la derecha tiene una emergencia más suave elegida para que los veredictos se separen: la corrección tonal del RD 1367 la sigue graduando, mientras que el método de cribado de ISO 1996-2 no levanta ningún indicador porque la banda no supera a ambas vecinas en el margen exigido, y el método de ingeniería del anexo C de ISO devuelve un Kt continuo más pequeño" width="90%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_vs_iso_tonal.svg" alt="Dos espectros en tercios de octava dibujados como barras uno al lado del otro con tres filas de veredicto bajo cada uno. El espectro de la izquierda tiene una emergencia de 10,5 dB en 250 Hz y todos los métodos coinciden en que hay un tono. El de la derecha tiene una emergencia más suave elegida para que los veredictos se separen: la corrección tonal del RD 1367 la sigue graduando, mientras que el método de cribado de ISO 1996-2 no levanta ningún indicador porque la banda no supera a ambas vecinas en el margen exigido, y el método de ingeniería del anexo C de ISO devuelve un Kt continuo más pequeño" width="90%" />
 
 *Los dos procedimientos están lo bastante cerca como para confundirse y lo
 bastante lejos como para discrepar sobre un espectro real. Una banda de 250 Hz
@@ -308,7 +308,7 @@ supere en más de 3 dB y que ningún $L_{\mathrm{Keq},Ti}$ medido en una fase de
 supere en más de 5 dB. A efectos de la inspección de una actividad ya en
 funcionamiento, el artículo 25.2 aplica solo los dos últimos.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_rd1367_chain_es.svg" alt="Cuatro etapas de izquierda a derecha. Primero una franja de 24 horas partida en los periodos día, tarde y noche del RD 1367 a las 07:00, 19:00 y 23:00, con la franja del día dividida en las tres fases del ejemplo resuelto de 2, 6 y 4 horas. Segundo, cada fase llevando LAeq,Ti más Kt más Kf más Ki hasta LKeq,Ti con el tope de 9 dB anotado. Tercero, la media energética ponderada por duración hasta el nivel del periodo LKeq,x con round_reported_level aplicado. Cuarto, la media anual ponderada por días de funcionamiento hasta LK,x, redondeada de nuevo, que alimenta tres cajas de comparación en paralelo: la fase peor frente al límite más 5 dB, el valor diario frente al límite más 3 dB y el valor anual frente al propio límite, con una nota de que el artículo 25.2 suprime la tercera para una actividad ya en funcionamiento" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_rd1367_chain.svg" alt="Cuatro etapas de izquierda a derecha. Primero una franja de 24 horas partida en los periodos día, tarde y noche del RD 1367 a las 07:00, 19:00 y 23:00, con la franja del día dividida en las tres fases del ejemplo resuelto de 2, 6 y 4 horas. Segundo, cada fase llevando LAeq,Ti más Kt más Kf más Ki hasta LKeq,Ti con el tope de 9 dB anotado. Tercero, la media energética ponderada por duración hasta el nivel del periodo LKeq,x con round_reported_level aplicado. Cuarto, la media anual ponderada por días de funcionamiento hasta LK,x, redondeada de nuevo, que alimenta tres cajas de comparación en paralelo: la fase peor frente al límite más 5 dB, el valor diario frente al límite más 3 dB y el valor anual frente al propio límite, con una nota de que el artículo 25.2 suprime la tercera para una actividad ya en funcionamiento" width="92%" />
 
 ## Ejemplo resuelto: una actividad nueva sobre suelo residencial
 
@@ -350,7 +350,7 @@ verdict.periods[0].reported_long_term    # 56 dB  (LK,d)
 verdict.complies                         # False: LK,d supera los 55 dB
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_activity_assessment_es.svg" alt="Evaluación de una actividad según el RD 1367/2007: nivel máximo de fase, LKeq,x diario y LK,x anual de cada periodo frente a los valores límite +5 dB, +3 dB y de tabla, con el nivel anual del periodo día superando su límite" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_activity_assessment.svg" alt="Evaluación de una actividad según el RD 1367/2007: nivel máximo de fase, LKeq,x diario y LK,x anual de cada periodo frente a los valores límite +5 dB, +3 dB y de tabla, con el nivel anual del periodo día superando su límite" width="80%" />
 
 *Tres índices por periodo frente a tres criterios distintos, y solo el más
 estricto acaba mordiendo. En el periodo día la fase peor marca 59 dB frente a

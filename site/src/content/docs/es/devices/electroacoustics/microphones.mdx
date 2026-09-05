@@ -105,7 +105,7 @@ de tratar eso:
   modo que $L_{M,\text{diff}} = L_{M,\text{ff}} - D$ con $D$ el índice de
   directividad de la sección 2.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_microphone_references_es.svg" alt="Tres paneles sobre un mismo dibujo de cápsula: campo libre, con una onda plana que llega por el eje de referencia y las dos reglas de admisibilidad r al menos d y r al menos d al cuadrado entre lambda; campo difuso, con rayos que llegan de todas las direcciones y la definición de la sensibilidad de campo difuso como el valor eficaz del patrón; y presión, con la cápsula cerrada en un acoplador cuya cavidad es pequeña frente a la longitud de onda. Debajo, el banco: la cámara anecoica y la regla de media longitud de onda para la onda plana, la calibración por sustitución contra un micrófono de referencia en el mismo punto, la variante de comparación simultánea con su condición de más menos 1 dB, y la exactitud global de más menos 2 dB o mejor" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_microphone_references.svg" alt="Tres paneles sobre un mismo dibujo de cápsula: campo libre, con una onda plana que llega por el eje de referencia y las dos reglas de admisibilidad r al menos d y r al menos d al cuadrado entre lambda; campo difuso, con rayos que llegan de todas las direcciones y la definición de la sensibilidad de campo difuso como el valor eficaz del patrón; y presión, con la cápsula cerrada en un acoplador cuya cavidad es pequeña frente a la longitud de onda. Debajo, el banco: la cámara anecoica y la regla de media longitud de onda para la onda plana, la calibración por sustitución contra un micrófono de referencia en el mismo punto, la variante de comparación simultánea con su condición de más menos 1 dB, y la exactitud global de más menos 2 dB o mejor" width="92%" />
 
 **La regla de elección.** Una cápsula de campo libre apuntada a una fuente
 conocida en campo libre o casi libre; una cápsula de incidencia aleatoria en una
@@ -181,7 +181,7 @@ fracción de un campo difuso que la cápsula sigue captando:
 | Hipercardioide | 3/4 | −0,50 | 110° | 6,0 dB | 0,250 | 2,00 |
 | Figura en ocho | 1 | −1,00 | ±90° | 4,8 dB | 0,333 | 1,73 |
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_patterns_es.svg" alt="Los seis miembros de la familia de primer orden sobre un mismo eje polar en un rango de 30 dB: omnidireccional, subcardioide, cardioide, supercardioide, hipercardioide y figura en ocho, cada uno etiquetado con el índice de directividad que la biblioteca calcula para él, 0,0, 3,2, 4,8, 5,7, 6,0 y 4,8 dB respectivamente" width="72%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_patterns.svg" alt="Los seis miembros de la familia de primer orden sobre un mismo eje polar en un rango de 30 dB: omnidireccional, subcardioide, cardioide, supercardioide, hipercardioide y figura en ocho, cada uno etiquetado con el índice de directividad que la biblioteca calcula para él, 0,0, 3,2, 4,8, 5,7, 6,0 y 4,8 dB respectivamente" width="72%" />
 
 *El cardioide y la figura en ocho devuelven los mismos 4,8 dB desde geometrías
 opuestas: el índice dice cuánta potencia reverberante rechaza una cápsula, no
@@ -249,7 +249,7 @@ ponderación BS.468 está expuesta como `itu_r_468_weighting` en el
 electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/),
 donde también pondera la THD.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_noise_weightings_es.svg" alt="Panel superior: un espectro de banda de ruido propio que decrece con la frecuencia, dibujado en bruto, ponderado A y ponderado ITU-R BS.468-4, de modo que se ve la curva 468 levantando las bandas de 2 a 10 kHz que la curva A ya ha empezado a atenuar. Panel inferior: los niveles sumados por bandas de las dos ponderaciones para esa cápsula y para otra más siseante cuyo ruido crece hacia 20 kHz, con la diferencia debida solo a la red anotada en cada caso, más 2,4 dB y más 8,3 dB respectivamente" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_noise_weightings.svg" alt="Panel superior: un espectro de banda de ruido propio que decrece con la frecuencia, dibujado en bruto, ponderado A y ponderado ITU-R BS.468-4, de modo que se ve la curva 468 levantando las bandas de 2 a 10 kHz que la curva A ya ha empezado a atenuar. Panel inferior: los niveles sumados por bandas de las dos ponderaciones para esa cápsula y para otra más siseante cuyo ruido crece hacia 20 kHz, con la diferencia debida solo a la red anotada en cada caso, más 2,4 dB y más 8,3 dB respectivamente" width="82%" />
 
 *Cuánta parte de esa diferencia explica la red por sí sola depende de la forma
 del ruido de cada cápsula: 2,4 dB para el espectro 1/f decreciente del ejemplo y
@@ -466,7 +466,7 @@ result.plot(quantity="noise")        # espectro de banda del ruido inherente
 result.plot(quantity="distortion")   # THD frente al nivel de presión acústica
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_response_es.svg" alt="Respuesta relativa de campo libre del micrófono con su banda de tolerancia sombreada, el marcador de la frecuencia de referencia y los marcadores del rango efectivo sobre un eje de frecuencias nominales" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_response.svg" alt="Respuesta relativa de campo libre del micrófono con su banda de tolerancia sombreada, el marcador de la frecuencia de referencia y los marcadores del rango efectivo sobre un eje de frecuencias nominales" width="82%" />
 
 *La banda sombreada es la tolerancia que declara quien lee (`tolerance_db`, 3 dB
 aquí) y los bordes del rango efectivo del apartado 12.2 son sus cruces
@@ -496,7 +496,7 @@ plt.show()
 
 </details>
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_directivity_es.svg" alt="Diagrama direccional cardioide del micrófono a 1000 Hz sobre el círculo de referencia de 25 dB de IEC 60263" width="72%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_directivity.svg" alt="Diagrama direccional cardioide del micrófono a 1000 Hz sobre el círculo de referencia de 25 dB de IEC 60263" width="72%" />
 
 *Dibujado sobre el círculo de referencia de 25 dB del apartado 3 de IEC 60263,
 así que el radio completo son 25 dB y cada anillo son 5 dB; el rechazo trasero
@@ -529,7 +529,7 @@ plt.show()
 
 </details>
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_noise_es.svg" alt="Espectro de nivel de banda del ruido inherente del micrófono frente a la frecuencia" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_noise.svg" alt="Espectro de nivel de banda del ruido inherente del micrófono frente a la frecuencia" width="82%" />
 
 *El desglose por bandas que hay detrás de la cifra única de ruido equivalente, y
 atención a la ordenada: son niveles de banda de **presión acústica**
@@ -563,7 +563,7 @@ plt.show()
 
 </details>
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_distortion_es.svg" alt="Distorsión armónica total del micrófono en porcentaje frente al nivel de presión acústica, con el límite de THD y el nivel de presión acústica de sobrecarga marcados" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_distortion.svg" alt="Distorsión armónica total del micrófono en porcentaje frente al nivel de presión acústica, con el límite de THD y el nivel de presión acústica de sobrecarga marcados" width="82%" />
 
 *El codo es donde el movimiento de la cápsula deja de ser lineal, y el nivel de
 presión acústica de sobrecarga del apartado 15.2 no es más que la lectura de

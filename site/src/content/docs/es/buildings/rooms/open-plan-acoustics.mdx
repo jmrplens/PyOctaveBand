@@ -111,7 +111,7 @@ ventilación o el sistema de enmascaramiento bajados devuelve un STI mayor en
 todas las posiciones y desplaza las dos distancias metros hacia fuera sin que
 nada haya cambiado en la sala.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan_es.svg" alt="Línea de medición de oficina diáfana ISO 3382-3 desde la fuente a 1 m a lo largo de posiciones de 2 m a 16 m, que alimenta las cuatro magnitudes que devuelve open_plan_metrics, D2,S, Lp,A,S,4m, rD y rP, con una nota de que el apartado 4 exige además el ruido de fondo medio ponderado A Lp,A,B" width="86%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan.svg" alt="Línea de medición de oficina diáfana ISO 3382-3 desde la fuente a 1 m a lo largo de posiciones de 2 m a 16 m, que alimenta las cuatro magnitudes que devuelve open_plan_metrics, D2,S, Lp,A,S,4m, rD y rP, con una nota de que el apartado 4 exige además el ruido de fondo medio ponderado A Lp,A,B" width="86%" />
 
 ```python
 import numpy as np
@@ -144,7 +144,7 @@ sobre la recta aunque no hubiera ningún micrófono a 4 m, que es también la ra
 de que se prefieran seis posiciones — cuatro apenas sujetan una pendiente en
 cuanto hay que descartar una de ellas.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_decay_es.svg" alt="Decaimiento espacial en oficina diáfana: nivel de habla ponderado A y STI frente a la distancia a la fuente en eje logarítmico, con la regresión D2,S, el marcador Lp,A,S,4m a 4 m y los cruces de distancia rD y rP" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_decay.svg" alt="Decaimiento espacial en oficina diáfana: nivel de habla ponderado A y STI frente a la distancia a la fuente en eje logarítmico, con la regresión D2,S, el marcador Lp,A,S,4m a 4 m y los cruces de distancia rD y rP" width="80%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -211,7 +211,7 @@ plt.show()
 Frente a la escala del Anexo A, esa única oficina queda entre dos salas muy
 distintas:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_quality_es.svg" alt="Dos paneles apilados sobre un eje logarítmico de distancia común de 2 a 16 metros. Arriba, el nivel de habla ponderado A de una oficina tratada decayendo a 8 dB por duplicación y pasando por 47 dB a 4 metros, y el de una sin tratar a 4 dB por duplicación pasando por 52 dB, con las bandas del Anexo A sombreadas: por encima de 50 dB mala, en 48 dB o por debajo el objetivo bueno. Abajo, las dos regresiones de STI cruzando 0,50 a 4,5 y 11,0 metros, con la banda buena hasta 5 metros y la banda mala más allá de 10 metros sombreadas y la línea de privacidad STI = 0,20 marcada" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_quality.svg" alt="Dos paneles apilados sobre un eje logarítmico de distancia común de 2 a 16 metros. Arriba, el nivel de habla ponderado A de una oficina tratada decayendo a 8 dB por duplicación y pasando por 47 dB a 4 metros, y el de una sin tratar a 4 dB por duplicación pasando por 52 dB, con las bandas del Anexo A sombreadas: por encima de 50 dB mala, en 48 dB o por debajo el objetivo bueno. Abajo, las dos regresiones de STI cruzando 0,50 a 4,5 y 11,0 metros, con la banda buena hasta 5 metros y la banda mala más allá de 10 metros sombreadas y la línea de privacidad STI = 0,20 marcada" width="92%" />
 
 *Los dos extremos del Anexo A sobre un mismo eje. La oficina tratada cumple los
 tres objetivos; la sin tratar incumple los tres, y su distancia de privacidad
@@ -246,7 +246,7 @@ la fuente, la línea de micrófonos entre los puestos de trabajo y las dos
 distancias sobre el eje, y un resultado que retuvo sus posiciones redibuja su
 propia línea con `m.plot_geometry()`.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_line_geometry_es.svg" alt="Planta a escala de la línea de medida en oficina diáfana: la estrella roja de la fuente en el origen, seis micrófonos azules de 2 m a 16 m sobre una línea punteada entre los bloques grises de los puestos de trabajo, la distancia de distracción rD = 6,5 m y la de privacidad rP = 13 m marcadas a trazos sobre la línea y los 16 m de recorrido acotados" width="86%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_line_geometry.svg" alt="Planta a escala de la línea de medida en oficina diáfana: la estrella roja de la fuente en el origen, seis micrófonos azules de 2 m a 16 m sobre una línea punteada entre los bloques grises de los puestos de trabajo, la distancia de distracción rD = 6,5 m y la de privacidad rP = 13 m marcadas a trazos sobre la línea y los 16 m de recorrido acotados" width="86%" />
 
 *Todas las magnitudes de ISO 3382-3 salen de esta única línea: seis
 micrófonos de 2 m a 16 m entre los puestos de trabajo, con $r_\mathrm{D}$ y $r_\mathrm{P}$
@@ -315,7 +315,7 @@ por bandas de octava, el STI, el nivel de fondo por bandas de octava y la
 distancia a la fuente — de **125 Hz a 8 kHz**, con un tiempo de integración de
 **al menos 10 s** (más largo con un fondo no estacionario, como el tráfico).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan_setup_es.svg" alt="Dos paneles. El panel a es una planta de una oficina diáfana de 30 por 12 metros dividida en una zona con islas absorbentes y otra de yeso a secas, con una franja de exclusión de 2,0 metros a lo largo de todas las paredes, grupos de mesas con mamparas de 1,2 metros, la fuente S1 en la posición de cabeza de un puesto y la fuente S2 en el extremo opuesto emitiendo de vuelta, ocho posiciones de medición sobre un recorrido no recto con P1 en el puesto más cercano, una acotación de holgura de 0,5 metros junto a una mesa y la ventana de regresión de 2 a 16 metros acotada. El panel b es una sección que fija el centro acústico del altavoz y el micrófono a 1,2 metros junto a un ocupante sentado, con la lista de apartados de la fuente, la cadena de recepción, el estado de la sala y la línea" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan_setup.svg" alt="Dos paneles. El panel a es una planta de una oficina diáfana de 30 por 12 metros dividida en una zona con islas absorbentes y otra de yeso a secas, con una franja de exclusión de 2,0 metros a lo largo de todas las paredes, grupos de mesas con mamparas de 1,2 metros, la fuente S1 en la posición de cabeza de un puesto y la fuente S2 en el extremo opuesto emitiendo de vuelta, ocho posiciones de medición sobre un recorrido no recto con P1 en el puesto más cercano, una acotación de holgura de 0,5 metros junto a una mesa y la ventana de regresión de 2 a 16 metros acotada. El panel b es una sección que fija el centro acústico del altavoz y el micrófono a 1,2 metros junto a un ocupante sentado, con la lista de apartados de la fuente, la cadena de recepción, el estado de la sala y la línea" width="94%" />
 
 **Por qué la ventana se detiene en 2 m y en 16 m.** El apartado 6.2 solo admite
 en la regresión de $D_\mathrm{2,S}$ las posiciones entre 2 m y 16 m, y los dos extremos
@@ -578,7 +578,7 @@ que eso y no hay absorción alguna que permita conversar a través de tu propia
 mesa sin que te oigan en la de al lado. La distribución de arriba pasa, con
 $r_t/r_s = 1{,}67$ y 3,6 m² de margen entre las cotas.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_per_table_es.svg" alt="Dos paneles. A la izquierda, la absorción por mesa ocupada frente a la separación, con la cota de comunicación 6,31 r al cuadrado por encima de la cota de privacidad 3,16 r al cuadrado, los dos puntos calculados a 1 metro y a 2,5 metros marcados, y la banda factible de 9,1 a 12,7 metros cuadrados sombreada para una distribución con 1,2 metros a través de la mesa y 2,0 metros entre mesas. A la derecha, la anchura de esa ventana factible frente a la razón entre el paso de mesas y la separación a través de la mesa, cruzando el cero en 1,41 y alcanzando 3,6 metros cuadrados en la razón 1,67 de esta distribución" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_per_table.svg" alt="Dos paneles. A la izquierda, la absorción por mesa ocupada frente a la separación, con la cota de comunicación 6,31 r al cuadrado por encima de la cota de privacidad 3,16 r al cuadrado, los dos puntos calculados a 1 metro y a 2,5 metros marcados, y la banda factible de 9,1 a 12,7 metros cuadrados sombreada para una distribución con 1,2 metros a través de la mesa y 2,0 metros entre mesas. A la derecha, la anchura de esa ventana factible frente a la razón entre el paso de mesas y la separación a través de la mesa, cruzando el cero en 1,41 y alcanzando 3,6 metros cuadrados en la razón 1,67 de esta distribución" width="94%" />
 
 *Izquierda: para una distribución, las dos desigualdades dejan una banda de
 absorción por mesa factible. Derecha: cuánto mide esa banda a medida que las
@@ -623,7 +623,7 @@ lleno con la misma absorción, y es la razón de que añadir mesas con la absorc
 fija sea lo que empuja una sala más allá de su límite. Significa también que un
 T30 medido con la sala vacía basta para predecir cómo sonará llena.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/restaurant_crowd_noise_es.svg" alt="Nivel de ruido autogenerado por el público frente al número de hablantes simultáneos para tres áreas de absorción de sala de 20, 95 y 190 m², con el nivel de habla directo de 60 dB a 1,2 m y el límite de comunicación de 66 dB dibujados como referencias horizontales" width="85%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/restaurant_crowd_noise.svg" alt="Nivel de ruido autogenerado por el público frente al número de hablantes simultáneos para tres áreas de absorción de sala de 20, 95 y 190 m², con el nivel de habla directo de 60 dB a 1,2 m y el límite de comunicación de 66 dB dibujados como referencias horizontales" width="85%" />
 
 *Los mismos 20 hablantes en tres salas. La sala dura (20 m² de absorción)
 cruza el límite de comunicación antes de que se ocupe la cuarta mesa; añadir

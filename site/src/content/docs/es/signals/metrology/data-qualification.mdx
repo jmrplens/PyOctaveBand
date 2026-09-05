@@ -53,7 +53,7 @@ La cualificación es una decisión, no un estadístico, así que se lee mejor
 como un flujo: segmentar el registro, contar inversiones, y dejar que la
 región de la Tabla A.6 diga si se puede promediar.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_data_qualification_es.svg" alt="Diagrama de flujo de decisión de la cualificación de datos: un registro temporal, antes de confiar en cualquier promedio PSD, Leq o GUM, se divide en 20 segmentos iguales cuyas medias cuadráticas forman una secuencia, el recuento de inversiones A con media sin tendencia 95 se compara con la región de aceptación de la Tabla A.6, mayor que 64 y como máximo 125, al nivel del 5 por ciento, y el rombo se bifurca hacia una caja verde de estacionario, ruido estable con A igual a 91 aceptado de modo que valen los intervalos chi-cuadrado y las fórmulas de error, o hacia una caja roja de no estacionario, una rampa de ganancia del 20 por ciento con A igual a 7 rechazada, aconsejando dividir en el cambio o pasar a análisis de corto plazo; las notas al pie nombran el test de rachas como compañero y el punto ciego de la media cuadrática ante deslizamientos de frecuencia" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_data_qualification.svg" alt="Diagrama de flujo de decisión de la cualificación de datos: un registro temporal, antes de confiar en cualquier promedio PSD, Leq o GUM, se divide en 20 segmentos iguales cuyas medias cuadráticas forman una secuencia, el recuento de inversiones A con media sin tendencia 95 se compara con la región de aceptación de la Tabla A.6, mayor que 64 y como máximo 125, al nivel del 5 por ciento, y el rombo se bifurca hacia una caja verde de estacionario, ruido estable con A igual a 91 aceptado de modo que valen los intervalos chi-cuadrado y las fórmulas de error, o hacia una caja roja de no estacionario, una rampa de ganancia del 20 por ciento con A igual a 7 rechazada, aconsejando dividir en el cambio o pasar a análisis de corto plazo; las notas al pie nombran el test de rachas como compañero y el punto ciego de la media cuadrática ante deslizamientos de frecuencia" width="92%" />
 
 ## 0. Antes de los tests: validar el registro
 
@@ -134,7 +134,7 @@ print(res.trend_free, round(res.p_value, 3))   # True, 0.586
 res.plot(language="es")
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/trend_test_es.svg" alt="Dos secuencias de veinte observaciones dibujadas frente al índice de muestra: el Ejemplo 4.4 de Bendat y Piersol, que fluctúa en torno a cinco con ochenta y seis inversiones de orden y se acepta como sin tendencia, y las mismas fluctuaciones con una deriva ascendente añadida que sube de unos cinco a nueve, cuyas treinta y ocho inversiones de orden caen por debajo del límite inferior de aceptación de sesenta y cuatro y se rechazan como con tendencia al nivel del cinco por ciento" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/trend_test.svg" alt="Dos secuencias de veinte observaciones dibujadas frente al índice de muestra: el Ejemplo 4.4 de Bendat y Piersol, que fluctúa en torno a cinco con ochenta y seis inversiones de orden y se acepta como sin tendencia, y las mismas fluctuaciones con una deriva ascendente añadida que sube de unos cinco a nueve, cuyas treinta y ocho inversiones de orden caen por debajo del límite inferior de aceptación de sesenta y cuatro y se rechazan como con tendencia al nivel del cinco por ciento" width="82%" loading="eager" />
 
 *El test no mira nunca la pendiente ajustada, solo el orden de los valores. A la
 izquierda, el propio Ejemplo 4.4 de Bendat y Piersol: $A = 86$, holgadamente
@@ -231,7 +231,7 @@ print(res.stationary, res.count)          # False, 7  (tendencia al alza -> A ba
 res.plot(language="es")
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stationarity_test_es.svg" alt="Veinte medias cuadráticas por segmento de dos registros de ruido: un registro estable cuyos valores fluctúan en torno a uno con un conteo de inversiones de orden de noventa y uno, aceptado como estacionario, y el mismo ruido con una rampa de ganancia del veinte por ciento cuyas medias cuadráticas por segmento suben de forma sostenida hasta uno coma cinco, dando solo siete inversiones de orden, rechazado como no estacionario al nivel del cinco por ciento" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stationarity_test.svg" alt="Veinte medias cuadráticas por segmento de dos registros de ruido: un registro estable cuyos valores fluctúan en torno a uno con un conteo de inversiones de orden de noventa y uno, aceptado como estacionario, y el mismo ruido con una rampa de ganancia del veinte por ciento cuyas medias cuadráticas por segmento suben de forma sostenida hasta uno coma cinco, dando solo siete inversiones de orden, rechazado como no estacionario al nivel del cinco por ciento" width="82%" loading="eager" />
 
 *La misma secuencia de veinte segmentos cuenta la estacionariedad con la misma
 aritmética. Las medias cuadráticas por segmento del registro estable se quedan
@@ -331,7 +331,7 @@ La primera salvedad es la que le cuesta un resultado equivocado a quien lee,
 porque hace que el test *acepte* un registro que debería rechazar. Merece la pena
 verla:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stationarity_glide_blind_spot_es.svg" alt="Tres paneles apilados. Arriba: la frecuencia instantánea de un barrido de amplitud constante que sube linealmente de 200 Hz a 2 kHz en ocho segundos, con la banda de 200 a 400 Hz sombreada. En medio: las veinte medias cuadráticas de segmento del registro de banda completa, planas en 0,5 con un recuento de inversiones de 96 dentro de la región de aceptación, aceptado. Abajo: el mismo registro limitado a la banda de 200 a 400 Hz, cuyas medias cuadráticas de segmento se desploman a cero a partir del tercer segmento, dando un recuento de 173 por encima de la cota superior, rechazado" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stationarity_glide_blind_spot.svg" alt="Tres paneles apilados. Arriba: la frecuencia instantánea de un barrido de amplitud constante que sube linealmente de 200 Hz a 2 kHz en ocho segundos, con la banda de 200 a 400 Hz sombreada. En medio: las veinte medias cuadráticas de segmento del registro de banda completa, planas en 0,5 con un recuento de inversiones de 96 dentro de la región de aceptación, aceptado. Abajo: el mismo registro limitado a la banda de 200 a 400 Hz, cuyas medias cuadráticas de segmento se desploman a cero a partir del tercer segmento, dando un recuento de 173 por encima de la cota superior, rechazado" width="88%" />
 
 *Un barrido de amplitud constante de 200 Hz a 2 kHz es todo lo no estacionario
 que puede ser un registro, y la media cuadrática de banda completa no lo ve: los
@@ -399,7 +399,7 @@ alternating = np.tile([1.0, -1.0], 10)   # 20 rachas: rechazado por el otro lado
 print(metrology.trend_test(alternating, method="runs").trend_free)   # False
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/runs_test_es.svg" alt="Dos paneles de secuencias clasificadas respecto a su mediana, puntos por encima en azul y por debajo en rojo. Izquierda: cuarenta observaciones gaussianas con veinte rachas dentro de la región de aceptación de catorce a veintisiete, veredicto sin tendencia. Derecha: una secuencia de veinte valores estrictamente alternante que también da veinte rachas, pero contra la región de aceptación de seis a quince para veinte valores, veredicto rechazado por alternancia demasiado rápida" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/runs_test.svg" alt="Dos paneles de secuencias clasificadas respecto a su mediana, puntos por encima en azul y por debajo en rojo. Izquierda: cuarenta observaciones gaussianas con veinte rachas dentro de la región de aceptación de catorce a veintisiete, veredicto sin tendencia. Derecha: una secuencia de veinte valores estrictamente alternante que también da veinte rachas, pero contra la región de aceptación de seis a quince para veinte valores, veredicto rechazado por alternancia demasiado rápida" width="92%" />
 
 *El veredicto bilateral del test de rachas: 20 rachas no llaman la atención
 en 40 observaciones gaussianas (izquierda, aceptado), pero el mismo
@@ -485,7 +485,7 @@ print(round(res.apparent_frequency, 1))   # 60.0
 res.plot(language="es")
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_level_crossings_es.svg" alt="Tasas de cruce por nivel medidas de un registro de ruido gaussiano de banda limitada entre ochocientos y mil doscientos hercios, dibujadas como puntos frente al nivel de cruce desde menos tres coma cinco hasta más tres coma cinco unidades de la señal en un eje de tasas logarítmico, cayendo desde unos dos mil cruces por segundo en el nivel cero hasta unos pocos por segundo a tres sigmas, con la curva exponencial de Rice pasando por todos los puntos medidos" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_level_crossings.svg" alt="Tasas de cruce por nivel medidas de un registro de ruido gaussiano de banda limitada entre ochocientos y mil doscientos hercios, dibujadas como puntos frente al nivel de cruce desde menos tres coma cinco hasta más tres coma cinco unidades de la señal en un eje de tasas logarítmico, cayendo desde unos dos mil cruces por segundo en el nivel cero hasta unos pocos por segundo a tres sigmas, con la curva exponencial de Rice pasando por todos los puntos medidos" width="82%" loading="eager" />
 
 *Dos momentos del espectro predicen una curva que abarca casi tres décadas de
 tasa. La tasa de cruces por cero medida en este registro de 800-1200 Hz es de
@@ -534,7 +534,7 @@ como un exceso. Las tasas basadas en conteo necesitan el registro
 holgadamente sobremuestreado: un cruce entre dos muestras del mismo signo
 queda sin contar.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_nongaussian_screen_es.svg" alt="Izquierda: tasas de cruce por nivel de tres registros de la misma varianza y el mismo ancho de banda frente al nivel de cruce en unidades de sigma, cada uno con su propia curva de Rice. La referencia gaussiana cae sobre su curva, el registro recortado duro en 2,5 sigma no tiene ningún cruce más allá del nivel de recorte, y el registro con picos dispersos de seis sigma queda por encima de su curva en las dos colas. Derecha: el factor de irregularidad de un registro paso bajo de dos kilohercios con un suelo de ruido 50 decibelios por debajo, representado frente a la frecuencia de corte superior de análisis, plano en el valor de forma cerrada 0,745 cerca de la banda física y cayendo a 0,47 en 22 kilohercios" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_nongaussian_screen.svg" alt="Izquierda: tasas de cruce por nivel de tres registros de la misma varianza y el mismo ancho de banda frente al nivel de cruce en unidades de sigma, cada uno con su propia curva de Rice. La referencia gaussiana cae sobre su curva, el registro recortado duro en 2,5 sigma no tiene ningún cruce más allá del nivel de recorte, y el registro con picos dispersos de seis sigma queda por encima de su curva en las dos colas. Derecha: el factor de irregularidad de un registro paso bajo de dos kilohercios con un suelo de ruido 50 decibelios por debajo, representado frente a la frecuencia de corte superior de análisis, plano en el valor de forma cerrada 0,745 cerca de la banda física y cayendo a 0,47 en 22 kilohercios" width="92%" />
 
 *Izquierda: el aspecto real del cribado. Tres registros con la misma varianza y
 la misma banda de 800-1200 Hz, cada uno dibujado con su propia curva de Rice para
@@ -601,7 +601,7 @@ print(res.peak_exceedance(4.0))                # exp(-8): aprox. 1 entre 3000
 res.plot(language="es")   # excedencia empírica contra la mezcla de Rice (figura de abajo)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_peak_distribution_es.svg" alt="Probabilidad de excedencia de la altura de pico de ruido gaussiano paso bajo en eje logarítmico frente a la altura de pico estandarizada desde menos dos coma cinco hasta cuatro coma cinco: la escalera empírica de medio millón de muestras sigue la curva de mezcla de Rice para un factor de irregularidad de cero coma siete cuatro seis, claramente por debajo del límite de Rayleigh discontinuo y por encima del límite gaussiano punteado, con una fracción visible de máximos negativos" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_peak_distribution.svg" alt="Probabilidad de excedencia de la altura de pico de ruido gaussiano paso bajo en eje logarítmico frente a la altura de pico estandarizada desde menos dos coma cinco hasta cuatro coma cinco: la escalera empírica de medio millón de muestras sigue la curva de mezcla de Rice para un factor de irregularidad de cero coma siete cuatro seis, claramente por debajo del límite de Rayleigh discontinuo y por encima del límite gaussiano punteado, con una fracción visible de máximos negativos" width="82%" loading="eager" />
 
 *Un solo número decide qué curva siguen los picos. El ruido paso bajo ideal
 tiene la forma cerrada $r = \sqrt5/3 = 0{,}745$, y el registro mide 0,746, que

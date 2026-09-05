@@ -161,7 +161,7 @@ de modo que los errores de redondeo quedan localizados en lugar de acumularse
 en un único polinomio de orden alto. La otra mitad, la minúscula razón
 $B / f_\mathrm{s}$ en sí, es lo que arregla el diezmado.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pole_migration_es.svg" alt="Tres paneles para la banda de tercio de octava de 25 Hz de un banco a 48 kHz. A la izquierda, la constelación en el plano z de la banda diseñada a la frecuencia completa: todos los polos colapsados sobre z = 1, con un recuadro ampliado que muestra los seis polos repartidos en menos de una milésima del radio y la anotación 1 menos r igual a 8,7e-05. En el centro, esa misma banda tal como la realiza de verdad el banco, a 96 Hz tras diezmar por 500: los polos aparecen claramente separados alrededor del círculo unidad, con 1 menos r igual a 4,6e-02. A la derecha, el mayor radio de polo de todas las bandas del banco en ejes log-log: el diseño a una sola frecuencia sube de forma sostenida desde 4e-05 a 12,5 Hz hasta 5e-02 a 20 kHz, mientras que el banco multitasa se mantiene fijo cerca de 5e-02 en todo el rango" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pole_migration.svg" alt="Tres paneles para la banda de tercio de octava de 25 Hz de un banco a 48 kHz. A la izquierda, la constelación en el plano z de la banda diseñada a la frecuencia completa: todos los polos colapsados sobre z = 1, con un recuadro ampliado que muestra los seis polos repartidos en menos de una milésima del radio y la anotación 1 menos r igual a 8,7e-05. En el centro, esa misma banda tal como la realiza de verdad el banco, a 96 Hz tras diezmar por 500: los polos aparecen claramente separados alrededor del círculo unidad, con 1 menos r igual a 4,6e-02. A la derecha, el mayor radio de polo de todas las bandas del banco en ejes log-log: el diseño a una sola frecuencia sube de forma sostenida desde 4e-05 a 12,5 Hz hasta 5e-02 a 20 kHz, mientras que el banco multitasa se mantiene fijo cerca de 5e-02 en todo el rango" width="94%" />
 
 *La selectividad es proximidad, y el precio es el condicionamiento. A la
 frecuencia completa, los polos de la banda de 25 Hz quedan a menos de $10^{-4}$
@@ -195,7 +195,7 @@ Una banda de tercio de octava de 25 Hz a 48 kHz abarca unos 5,8 Hz, el
 numéricamente inestables. El banco lo evita filtrando las bandas bajas a una
 frecuencia diezmada:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_multirate_es.svg" alt="Diezmado multitasa: las bandas altas se filtran a la frecuencia de entrada y las bajas tras un paso bajo antialiasing y diezmado, para que las secciones SOS se mantengan numéricamente sanas" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_multirate.svg" alt="Diezmado multitasa: las bandas altas se filtran a la frecuencia de entrada y las bajas tras un paso bajo antialiasing y diezmado, para que las secciones SOS se mantengan numéricamente sanas" width="92%" loading="eager" />
 
 Diezmar por $M$ reescala el problema: el mismo ancho de banda de 5,8 Hz se
 vuelve $M$ veces mayor respecto al nuevo Nyquist, el radio de los polos se
@@ -381,14 +381,14 @@ Para procesado por bloques pasa `stateful=True` (la misma convención que
 `WeightingFilter`); el atajo de un solo uso es
 `parametric_eq(x, fs, sections=...)`.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/parametric_eq_cascade_es.svg" alt="Dos paneles apilados dibujados por el propio objeto resultado. Arriba, la magnitud de la cascada de tres secciones del fragmento: más 4 dB por debajo de 100 Hz del shelving grave, una campana de menos 6 dB y una octava de ancho a 1 kHz, y más 3 dB por encima de 8 kHz del shelving agudo, con cada sección individual dibujada en gris claro por debajo de la línea gruesa de la cascada. Abajo, la fase de esa misma cascada en grados, oscilando unos veinte grados a cada lado de cero en torno a las frecuencias de los shelving y de la campana" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/parametric_eq_cascade.svg" alt="Dos paneles apilados dibujados por el propio objeto resultado. Arriba, la magnitud de la cascada de tres secciones del fragmento: más 4 dB por debajo de 100 Hz del shelving grave, una campana de menos 6 dB y una octava de ancho a 1 kHz, y más 3 dB por encima de 8 kHz del shelving agudo, con cada sección individual dibujada en gris claro por debajo de la línea gruesa de la cascada. Abajo, la fase de esa misma cascada en grados, oscilando unos veinte grados a cada lado de cero en torno a las frecuencias de los shelving y de la campana" width="88%" />
 
 *Las tres secciones del fragmento (en gris) y la cascada que suman; el panel
 inferior es la fase que cuesta esa magnitud. Cualquier resultado de la
 biblioteca se redibuja así: el `res.plot()` de arriba produjo exactamente esta
 figura.*
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/parametric_eq_family_es.svg" alt="Respuestas en magnitud de la familia de biquads del RBJ Audio EQ Cookbook: campana, shelving, paso bajo/alto, paso banda y rechazo de banda" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/parametric_eq_family.svg" alt="Respuestas en magnitud de la familia de biquads del RBJ Audio EQ Cookbook: campana, shelving, paso bajo/alto, paso banda y rechazo de banda" width="80%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -458,7 +458,7 @@ spl_c2, _, xb_cheby2 = filters.octave_filter(
 # 'xb_butter' y 'xb_cheby2' contienen las señales por banda en el dominio del tiempo
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_decomposition_es.svg" alt="Descomposición por bandas en el tiempo comparando Butterworth y Chebyshev II, incluida la respuesta al impulso" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_decomposition.svg" alt="Descomposición por bandas en el tiempo comparando Butterworth y Chebyshev II, incluida la respuesta al impulso" width="80%" />
 
 *El panel superior es la entrada, los intermedios son sus señales de banda con
 **Butterworth** (línea continua) y **Chebyshev II** (discontinua), y el inferior
@@ -531,7 +531,7 @@ casi plano en la banda de paso (los transitorios sobreviven), mientras que
 Chebyshev I y el Elíptico pagan su caída abrupta con fuertes picos de retardo en
 los bordes de banda.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/group_delay_comparison_es.svg" alt="Retardo de grupo de la banda de 1 kHz para las cinco arquitecturas: Bessel casi plano, Chebyshev y elíptico con picos en los bordes" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/group_delay_comparison.svg" alt="Retardo de grupo de la banda de 1 kHz para las cinco arquitecturas: Bessel casi plano, Chebyshev y elíptico con picos en los bordes" width="80%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -589,7 +589,7 @@ bank = filters.OctaveFilterBank(fs=48000, fraction=3)
 spl, freq, xb = bank.filter(y, sigbands=True, zero_phase=True)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zero_phase_comparison_es.svg" alt="Filtrado causal frente a fase cero de una ráfaga: la salida de fase cero queda alineada con la entrada" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zero_phase_comparison.svg" alt="Filtrado causal frente a fase cero de una ráfaga: la salida de fase cero queda alineada con la entrada" width="80%" />
 
 *El filtrado causal retrasa la ráfaga según el retardo de grupo del filtro; el
 filtrado de fase cero la mantiene alineada con la entrada.*

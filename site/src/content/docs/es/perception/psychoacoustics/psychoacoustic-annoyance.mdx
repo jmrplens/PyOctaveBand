@@ -45,7 +45,7 @@ cerrada para ruido de banda ancha modulado en amplitud (Ec. 10.2) como el modelo
 de señal de Osses et al. (2016), y la utilidad que deriva las cuatro sensaciones
 a partir de una grabación.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psychoacoustic_annoyance_es.svg" alt="Molestia psicoacústica PA frente a la sonoridad percentil N5 para tres perfiles de sensación: una base neutra donde PA es igual a N5, un sonido agudo y un sonido áspero y fluctuante ambos elevados sobre la base, con el ejemplo resuelto PA = 37,05 marcado" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psychoacoustic_annoyance.svg" alt="Molestia psicoacústica PA frente a la sonoridad percentil N5 para tres perfiles de sensación: una base neutra donde PA es igual a N5, un sonido agudo y un sonido áspero y fluctuante ambos elevados sobre la base, con el ejemplo resuelto PA = 37,05 marcado" width="82%" loading="eager" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -109,7 +109,7 @@ ese umbral); $w_{FR}$ pondera la aspereza con más peso que la intensidad de
 fluctuación (0,6 frente a 0,4). Esas dos elecciones son todo el juicio de
 modelado que hay en la fórmula, y cuesta menos fiarse de ellas una vez vistas:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/annoyance_weightings_es.svg" alt="A la izquierda, la ponderación de agudeza wS frente a la agudeza de 1 a 5 acum para sonoridades percentiles de 10, 30 y 60 sonios, plana en cero por debajo de 1,75 acum y abriéndose en abanico por encima. A la derecha, la molestia psicoacústica frente a una magnitud de sensación gastada por entero en aspereza o por entero en intensidad de fluctuación, con la sonoridad fija en 30 sonios y la agudeza en 2 acum, con la curva de aspereza subiendo hasta 45,4 frente a 40,5 de la intensidad de fluctuación para una magnitud de 1,5" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/annoyance_weightings.svg" alt="A la izquierda, la ponderación de agudeza wS frente a la agudeza de 1 a 5 acum para sonoridades percentiles de 10, 30 y 60 sonios, plana en cero por debajo de 1,75 acum y abriéndose en abanico por encima. A la derecha, la molestia psicoacústica frente a una magnitud de sensación gastada por entero en aspereza o por entero en intensidad de fluctuación, con la sonoridad fija en 30 sonios y la agudeza en 2 acum, con la curva de aspereza subiendo hasta 45,4 frente a 40,5 de la intensidad de fluctuación para una magnitud de 1,5" width="94%" />
 
 *Un sonido tiene que ser más agudo que la referencia de 1,75 acum antes de que
 la agudeza cueste nada en absoluto, y el abanico por encima de ese punto es la
@@ -190,7 +190,7 @@ El modelo es tan compacto que cabe entero en un dibujo: dos ponderaciones y
 una combinación. El diagrama recorre con él el ejemplo resuelto, sensación a
 sensación.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_psychoacoustic_annoyance_es.svg" alt="Diagrama de bloques del modelo de molestia psicoacústica de Fastl y Zwicker: las cuatro sensaciones del ejemplo resuelto, agudeza de 2,0 acum, sonoridad percentil N5 de 30 sonios, intensidad de fluctuación de 0,5 vacil y aspereza de 0,3 asper, alimentan dos ponderaciones, la de la agudeza wS de 0,1001, nula por debajo de 1,75 acum, y la de aspereza y fluctuación wFR de 0,2125, que pesa la aspereza 0,6 frente a 0,4, y se combinan en PA igual a N5 por uno más la raíz de wS al cuadrado más wFR al cuadrado, con resultado 37,05; una nota final recuerda que un sonido neutro queda en la línea base PA igual a N5" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_psychoacoustic_annoyance.svg" alt="Diagrama de bloques del modelo de molestia psicoacústica de Fastl y Zwicker: las cuatro sensaciones del ejemplo resuelto, agudeza de 2,0 acum, sonoridad percentil N5 de 30 sonios, intensidad de fluctuación de 0,5 vacil y aspereza de 0,3 asper, alimentan dos ponderaciones, la de la agudeza wS de 0,1001, nula por debajo de 1,75 acum, y la de aspereza y fluctuación wFR de 0,2125, que pesa la aspereza 0,6 frente a 0,4, y se combinan en PA igual a N5 por uno más la raíz de wS al cuadrado más wFR al cuadrado, con resultado 37,05; una nota final recuerda que un sonido neutro queda en la línea base PA igual a N5" width="92%" />
 
 ### 2.1 A partir de una señal (estimación de ingeniería)
 
@@ -270,7 +270,7 @@ ECMA-418-2), en vacil_HMS, está en
 ojo con que la unidad de esta página es el vacil y la de aquella el vacil_HMS,
 así que las dos no son el mismo número para el mismo sonido.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_es.svg" alt="A la izquierda, la intensidad de fluctuación de forma cerrada y la del modelo de señal para el mismo ruido de banda ancha modulado en amplitud a 60 dB frente a la frecuencia de modulación, ambas de paso de banda en torno a 4 Hz, con el modelo de señal alcanzando 5,5 vacil frente a los 3,7 de la forma cerrada, un exceso de factor 1,5 a 4 Hz. A la derecha, el modelo de señal sobre el tono de 1 kHz a 70 dB modulado en amplitud de su contraste bibliográfico de la Tabla 1, con máximo de 1,09 vacil a 4 Hz" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength.svg" alt="A la izquierda, la intensidad de fluctuación de forma cerrada y la del modelo de señal para el mismo ruido de banda ancha modulado en amplitud a 60 dB frente a la frecuencia de modulación, ambas de paso de banda en torno a 4 Hz, con el modelo de señal alcanzando 5,5 vacil frente a los 3,7 de la forma cerrada, un exceso de factor 1,5 a 4 Hz. A la derecha, el modelo de señal sobre el tono de 1 kHz a 70 dB modulado en amplitud de su contraste bibliográfico de la Tabla 1, con máximo de 1,09 vacil a 4 Hz" width="88%" />
 
 *Los dos modelos sobre el mismo estímulo, que es la comparación que el aviso de
 abajo convierte en regla. Los dos son pasos de banda centrados cerca de 4 Hz,
@@ -373,7 +373,7 @@ res.plot()   # intensidad de fluctuación específica F′(z) sobre el eje de Ba
 ```
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_specific_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_specific.svg"
   alt="Intensidad de fluctuación específica sobre el eje de Bark para un tono de 1 kHz a 70 dB SPL modulado en amplitud al 100 % a 4 Hz: la sensación se concentra en las bandas críticas en torno a la portadora, cerca de 8 Bark, e integra unos 1,1 vacil"
   width="82%"
 />

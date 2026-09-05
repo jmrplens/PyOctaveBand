@@ -109,7 +109,7 @@ Comprobación de coherencia antes de calcular nada: añadir la muestra siempre
 acorta el decaimiento, así que $T_2 < T_1$ y $T_4 < T_3$. Un coeficiente de
 absorción negativo significa que los miembros de una pareja entraron al revés.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_scattering_reverb_es.svg" alt="Montaje de dispersión de incidencia aleatoria de ISO 17497-1: una cámara reverberante con la muestra de ensayo sobre una plataforma giratoria y su placa base a al menos 1 m de las paredes, dos posiciones fijas de altavoz y tres posiciones fijas de micrófono, siendo la plataforma lo único que se mueve, y el mapeo de la Tabla 2 de T1 a T4 sobre los coeficientes de absorción de incidencia aleatoria y especular a partir de los cuales se deriva el coeficiente de dispersión" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_scattering_reverb.svg" alt="Montaje de dispersión de incidencia aleatoria de ISO 17497-1: una cámara reverberante con la muestra de ensayo sobre una plataforma giratoria y su placa base a al menos 1 m de las paredes, dos posiciones fijas de altavoz y tres posiciones fijas de micrófono, siendo la plataforma lo único que se mueve, y el mapeo de la Tabla 2 de T1 a T4 sobre los coeficientes de absorción de incidencia aleatoria y especular a partir de los cuales se deriva el coeficiente de dispersión" width="92%" loading="eager" />
 
 **Por qué al girar la muestra sale un segundo coeficiente de absorción
 (apartado 4).** Las reflexiones filtradas por banda de una misma superficie
@@ -295,7 +295,7 @@ print(np.round(result.scattering[[0, 6, 12]], 3))   # [0.011 0.428 0.844]
 result.plot()   # s(f) en eje de frecuencia logarítmico, de 0 a 1 (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scattering_coefficient_es.svg" alt="Dos paneles apilados sobre las 13 bandas de tercio de octava de 250 a 4000 Hz: arriba, el coeficiente de absorción de incidencia aleatoria plano medido con la plataforma inmóvil y el coeficiente de absorción especular medido con la plataforma en rotación subiendo por encima de él, con el hueco entre ambos sombreado como numerador de la ecuación 5; abajo, el coeficiente de dispersión resultante creciendo desde casi cero hasta 0,84 a 4 kHz" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scattering_coefficient.svg" alt="Dos paneles apilados sobre las 13 bandas de tercio de octava de 250 a 4000 Hz: arriba, el coeficiente de absorción de incidencia aleatoria plano medido con la plataforma inmóvil y el coeficiente de absorción especular medido con la plataforma en rotación subiendo por encima de él, con el hueco entre ambos sombreado como numerador de la ecuación 5; abajo, el coeficiente de dispersión resultante creciendo desde casi cero hasta 0,84 a 4 kHz" width="88%" />
 
 *La ec. (5) dibujada tal como se calcula. El hueco sombreado del panel superior
 es el numerador, $\alpha_\mathrm{spec} - \alpha_\mathrm{s}$: la pareja inmóvil $(T_1, T_2)$ da
@@ -453,7 +453,7 @@ reflejado, no cuánto se dispersa. Un goniómetro barre un receptor sobre un arc
 polar y registra el nivel reflejado $L_i$ en cada ángulo; el coeficiente es la
 autocorrelación normalizada de la distribución de energía polar.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_diffusion_goniometer_es.svg" alt="Goniómetro de difusión en campo libre de ISO 17497-2: una muestra de ensayo sobre una plataforma giratoria, una fuente de altavoz fija y un arco semicircular de micrófonos receptores muestreando la respuesta polar reflejada, a partir de la cual se calcula el coeficiente de difusión por autocorrelación" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_diffusion_goniometer.svg" alt="Goniómetro de difusión en campo libre de ISO 17497-2: una muestra de ensayo sobre una plataforma giratoria, una fuente de altavoz fija y un arco semicircular de micrófonos receptores muestreando la respuesta polar reflejada, a partir de la cual se calcula el coeficiente de difusión por autocorrelación" width="92%" />
 
 ### 2.1 De tres respuestas al impulso a un nivel
 
@@ -503,7 +503,7 @@ tercio de octava $L'$ se obtiene por integración numérica con al menos tres
 puntos espectrales dentro de la banda, y no vale rellenar con ceros para llegar
 a esa cuenta (apartado 7.4.4).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_measurement_chain_es.svg" alt="Cinco trazas temporales apiladas de la reducción de datos de ISO 17497-2: la respuesta con la muestra, que enseña un pulso directo, la reflexión de la muestra y una reflexión tardía de la sala; la respuesta de fondo sin la muestra; su diferencia, ya sin la aportación de la sala; la respuesta de la muestra deconvolucionada; y esa misma traza con la ventana rectangular dibujada sobre la reflexión, con sus bordes anotados con los tiempos de camino muestra-receptor más corto y más largo" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_measurement_chain.svg" alt="Cinco trazas temporales apiladas de la reducción de datos de ISO 17497-2: la respuesta con la muestra, que enseña un pulso directo, la reflexión de la muestra y una reflexión tardía de la sala; la respuesta de fondo sin la muestra; su diferencia, ya sin la aportación de la sala; la respuesta de la muestra deconvolucionada; y esa misma traza con la ventana rectangular dibujada sobre la reflexión, con sus bordes anotados con los tiempos de camino muestra-receptor más corto y más largo" width="88%" />
 
 *La cadena del apartado 7.4 sobre la geometría del propio QRD de $N = 7$ de esta
 página, dibujada sobre un eje de un milisegundo. El panel (c) es donde
@@ -637,7 +637,7 @@ El montaje que suponen esas fórmulas merece dibujarse a escala.
 semicírculo de 37 micrófonos cada 5 grados a 5 m alrededor de la muestra, con
 la fuente a 10 m sobre la normal.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_goniometer_geometry_es.svg" alt="Planta a escala del goniómetro de difusión en campo libre: un semicírculo de 37 micrófonos cada 5 grados a 5 m de radio alrededor de la pequeña muestra en el centro, la estrella roja de la fuente a 10 m sobre la normal encima, y las distancias de 10 m y 5 m acotadas" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_goniometer_geometry.svg" alt="Planta a escala del goniómetro de difusión en campo libre: un semicírculo de 37 micrófonos cada 5 grados a 5 m de radio alrededor de la pequeña muestra en el centro, la estrella roja de la fuente a 10 m sobre la normal encima, y las distancias de 10 m y 5 m acotadas" width="88%" />
 
 *El arco polar detrás de cada $L_i$ de la fórmula (5), a escala: 37 receptores
 cada 5 grados a 5 m, la fuente al doble de distancia sobre la normal y la
@@ -711,7 +711,7 @@ pozos a escala de abajo, y una `DiffuserPolarResponse` predicha retiene su
 geometría, así que `qrd.plot_geometry()` dibuja la superficie para la que se
 calculó.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/qrd_geometry_es.svg" alt="Perfil de pozos a escala de dos periodos del difusor comercial de residuos cuadráticos N = 7: pozos de 80,7 mm de ancho con paso de 85,7 mm, separados por aletas finas sobre una base rígida, siguiendo la secuencia de profundidades 0, 50, 200, 100, 100, 200, 50 mm con los pozos más profundos a 200 mm, y el sonido incidente llegando desde arriba" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/qrd_geometry.svg" alt="Perfil de pozos a escala de dos periodos del difusor comercial de residuos cuadráticos N = 7: pozos de 80,7 mm de ancho con paso de 85,7 mm, separados por aletas finas sobre una base rígida, siguiendo la secuencia de profundidades 0, 50, 200, 100, 100, 200, 50 mm con los pozos más profundos a 200 mm, y el sonido incidente llegando desde arriba" width="88%" />
 
 *Dos de los seis periodos, a escala: los residuos cuadráticos $n^2 \bmod 7$
 convertidos en una superficie construible. La frecuencia de diseño de
@@ -790,7 +790,7 @@ print(round(result.coefficient, 2))   # 0.11
 result.plot()   # respuesta polar reflejada, d en el título (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_polar_es.svg" alt="Un diagrama polar del nivel de presión acústica reflejado predicho de un difusor de residuos cuadráticos N=7 de seis periodos sobre 37 receptores de -90 a 90 grados, con la energía concentrada en un abanico de lóbulos de red discretos, dando un coeficiente de difusión por autocorrelación d de aproximadamente 0,11" width="72%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_polar.svg" alt="Un diagrama polar del nivel de presión acústica reflejado predicho de un difusor de residuos cuadráticos N=7 de seis periodos sobre 37 receptores de -90 a 90 grados, con la energía concentrada en un abanico de lóbulos de red discretos, dando un coeficiente de difusión por autocorrelación d de aproximadamente 0,11" width="72%" />
 
 *El array periódico de QRD divide la energía reflejada en un abanico de
 lóbulos de red discretos en lugar de un único pico especular, pero seis
@@ -978,7 +978,7 @@ Del propio dibujo se deducen unas cuantas reglas de diseño:
 Las dos primeras reglas definen juntas la banda en la que un diseño funciona de
 verdad, y el modelo reproduce las dos.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/qrd_working_band_es.svg" alt="Coeficiente de difusión predicho de un difusor de residuos cuadráticos N = 7 diseñado para 500 Hz con pozos de 10 cm y cinco periodos, sobre una rejilla fina de frecuencias de 200 a 6000 Hz: la curva sube hasta un pico en la frecuencia de diseño de 500 Hz, se desploma sobre la referencia casi nula del panel plano en un valle ancho centrado en 3500 Hz, y la región por encima de 1715 Hz aparece sombreada como la banda en la que un pozo ya no es una guía de onda de un solo modo" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/qrd_working_band.svg" alt="Coeficiente de difusión predicho de un difusor de residuos cuadráticos N = 7 diseñado para 500 Hz con pozos de 10 cm y cinco periodos, sobre una rejilla fina de frecuencias de 200 a 6000 Hz: la curva sube hasta un pico en la frecuencia de diseño de 500 Hz, se desploma sobre la referencia casi nula del panel plano en un valle ancho centrado en 3500 Hz, y la región por encima de 1715 Hz aparece sombreada como la banda en la que un pozo ya no es una guía de onda de un solo modo" width="88%" />
 
 *Las dos reglas de diseño, dibujadas sobre una rejilla fina en lugar de en los
 centros de banda para que las dos queden resueltas. En $N f_0 = 3500$ Hz todos
@@ -1023,7 +1023,7 @@ La cuarta regla merece más probarla que creérsela, porque el modelo acepta un
 array de profundidades arbitrario por el argumento `depths` y la comparación no
 cuesta nada.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuser_modulation_es.svg" alt="Dos paneles que comparan seis repeticiones de un periodo de residuos cuadráticos N = 7 frente al mismo periodo alternado con su inverso sobre la misma huella de 4,2 m: a la izquierda, un diagrama polar semicircular a 1 kHz donde la disposición modulada llena el arco de forma más uniforme y alcanza un coeficiente de difusión de 0,32 frente a 0,22; a la derecha, el coeficiente de difusión normalizado banda a banda de 250 a 2000 Hz, donde la disposición modulada es más alta en todas las bandas salvo en la frecuencia de diseño de 500 Hz" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuser_modulation.svg" alt="Dos paneles que comparan seis repeticiones de un periodo de residuos cuadráticos N = 7 frente al mismo periodo alternado con su inverso sobre la misma huella de 4,2 m: a la izquierda, un diagrama polar semicircular a 1 kHz donde la disposición modulada llena el arco de forma más uniforme y alcanza un coeficiente de difusión de 0,32 frente a 0,22; a la derecha, el coeficiente de difusión normalizado banda a banda de 250 a 2000 Hz, donde la disposición modulada es más alta en todas las bandas salvo en la frecuencia de diseño de 500 Hz" width="92%" />
 
 *Los mismos 42 pozos, los mismos 4,2 m de pared, una sola diferencia: si el
 periodo se repite o se alterna con su inverso. La modulación compra difusión en
@@ -1110,7 +1110,7 @@ flat = materials.predicted_diffusion_spectrum(0.10, freqs,
 print(np.round(flat.normalized, 3))            # [0. 0. 0. 0.]
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuser_prediction_es.svg" alt="Coeficiente de difusión predicho sobre las bandas de tercio de octava de 250 a 5000 Hz para un diseño de difusor de residuo cuadrático N = 7 comparado con un panel plano de la misma huella: la curva del QRD queda muy por encima de la curva casi nula del panel plano en toda la banda" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuser_prediction.svg" alt="Coeficiente de difusión predicho sobre las bandas de tercio de octava de 250 a 5000 Hz para un diseño de difusor de residuo cuadrático N = 7 comparado con un panel plano de la misma huella: la curva del QRD queda muy por encima de la curva casi nula del panel plano en toda la banda" width="88%" />
 
 *Predicho solo a partir del diseño: el QRD $N = 7$ reparte la energía reflejada
 mucho más uniformemente que el panel plano de la misma huella, de modo que su

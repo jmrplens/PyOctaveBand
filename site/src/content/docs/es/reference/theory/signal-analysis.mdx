@@ -202,7 +202,7 @@ for f, pxx in zip(freq_bins[in_band], psd[in_band]):
     print(f, pxx)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3_es.svg" alt="Análisis espectral en tercios de octava de una señal de seis tonos con la PSD en bruto de fondo" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3.svg" alt="Análisis espectral en tercios de octava de una señal de seis tonos con la PSD en bruto de fondo" width="80%" />
 
 *Los dos objetos sobre un mismo eje, para una señal de seis tonos a 20, 100,
 500, 2000, 4000 y 15 000 Hz. La traza gris es una PSD de Welch ($f_\mathrm{s}$ = 48 kHz,
@@ -300,7 +300,7 @@ lo que cuantifica la regla de establecimiento de más abajo.
 consulta [Verificación de clase de
 filtro](/phonometry/es/signals/filters/filter-compliance/).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_type_comparison_es.svg" alt="Comparación de la respuesta en magnitud de las cinco arquitecturas de filtro para la banda de octava de 1 kHz, con un zoom en el cruce de −3 dB" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_type_comparison.svg" alt="Comparación de la respuesta en magnitud de las cinco arquitecturas de filtro para la banda de octava de 1 kHz, con un zoom en el cruce de −3 dB" width="88%" />
 
 *La misma banda de octava de 1 kHz diseñada de cinco maneras. Hay que mirar tres
 cosas: la planitud de la meseta de la banda de paso (Butterworth y Chebyshev II
@@ -336,7 +336,7 @@ $10^{-4}$ del círculo unidad, donde los coeficientes en float64 ya no los
 resuelven y la ecuación en diferencias degenera. Dos medidas mantienen a todas
 las bandas del banco lejos de ese régimen:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow_es.svg" alt="Flujo de datos dentro de una banda del banco de filtros: una banda en la que cabe diezmar, es decir en la que la mitad de la frecuencia de muestreo sigue por encima de 1,25 veces su borde superior, toma la rama de diezmado con resample_poly hasta fs entre M para que sus polos se alejen del círculo unidad, después toda banda es una cascada de secciones de segundo orden diseñada sobre los bordes de banda de IEC 61260-1 en lugar de una función de transferencia de orden alto, ambas ramas terminan en el nivel de banda en dB y sigbands=True devuelve además la señal de banda devuelta a la frecuencia de entrada" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow.svg" alt="Flujo de datos dentro de una banda del banco de filtros: una banda en la que cabe diezmar, es decir en la que la mitad de la frecuencia de muestreo sigue por encima de 1,25 veces su borde superior, toma la rama de diezmado con resample_poly hasta fs entre M para que sus polos se alejen del círculo unidad, después toda banda es una cascada de secciones de segundo orden diseñada sobre los bordes de banda de IEC 61260-1 en lugar de una función de transferencia de orden alto, ambas ramas terminan en el nivel de banda en dB y sigbands=True devuelve además la señal de banda devuelta a la frecuencia de entrada" width="92%" />
 
 1. **Secciones de segundo orden (SOS):** cada banda es una cascada de biquads en
    lugar de una única función de transferencia de orden alto, así que un error
@@ -416,7 +416,7 @@ frecuencias deformadas* es la del impreso en las verdaderas, y transforma ese;
 consulta
 [Ponderación frecuencial](/phonometry/es/signals/levels/weighting/).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, C y Z de IEC 61672-1 con zoom de la región positiva de la curva A (+1,27 dB a 2,5 kHz)" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses.svg" alt="Curvas de ponderación A, C y Z de IEC 61672-1 con zoom de la región positiva de la curva A (+1,27 dB a 2,5 kHz)" width="80%" />
 
 *Las tres curvas de ponderación de IEC 61672-1 que aplica la biblioteca, con la pequeña región positiva de la curva A ampliada. Las curvas especiales B, D y AU están en [Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/).*
 
@@ -460,7 +460,7 @@ estado cuadrático medio anterior. Consulta
 [Por qué phonometry](/phonometry/es/start/why-phonometry/) para la
 verificación de esta implementación con ráfagas tonales de IEC 61672-1.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis_es.svg" alt="Respuestas de las ponderaciones temporales Fast, Slow e Impulse a una ráfaga de ruido" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis.svg" alt="Respuestas de las ponderaciones temporales Fast, Slow e Impulse a una ráfaga de ruido" width="80%" />
 
 *El integrador exponencial con las tres constantes de tiempo normalizadas: Fast sigue la ráfaga, Slow la suaviza e Impulse retiene su pico.*
 
@@ -482,7 +482,7 @@ $$
 
 Los cuatro ceros frente a ocho polos dan forma a la respuesta característica: una subida de aproximadamente **+12 dB/octava entre 1 Hz y 20 Hz**, con caídas de aproximadamente **24 dB/octava** por debajo de 1 Hz y por encima de 20 Hz.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response_es.svg" alt="Respuesta en frecuencia de la ponderación G de 0,1 Hz a 1 kHz con los valores nominales de la Tabla 2 de ISO 7196 superpuestos" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response.svg" alt="Respuesta en frecuencia de la ponderación G de 0,1 Hz a 1 kHz con los valores nominales de la Tabla 2 de ISO 7196 superpuestos" width="80%" />
 
 *La forma que dibujan esos cuatro ceros y cuatro pares de polos, frente a los
 valores nominales de la Tabla 2 de ISO 7196: 0 dB en el anclaje de 10 Hz, la
@@ -504,7 +504,7 @@ $$
 \mathrm{SEL} = L_{\mathrm{eq},T} + 10 \log_{10}\left(\frac{T}{T_0}\right), \qquad T_0 = 1\ \text{s}
 $$
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sel_concept_es.svg" alt="Historial de nivel del paso de un vehículo con su Leq sobre todo el evento y el bloque SEL de un segundo de igual energía" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sel_concept.svg" alt="Historial de nivel del paso de un vehículo con su Leq sobre todo el evento y el bloque SEL de un segundo de igual energía" width="80%" />
 
 *Lo que la fórmula le hace a un evento: el paso se sustituye por un bloque de un
 segundo con la misma energía total, que es la razón por la que el SEL supera al
@@ -584,13 +584,13 @@ micrófonos en las mismas entradas y con la misma orientación con las que se va
 a usar, y cualquier compensación de fase aplicada ahí sigue aplicada durante la
 medición.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_es.svg" alt="Una sonda p-p de intensidad acústica de dos micrófonos: dos micrófonos de presión con un separador entre ellos, a partir de los cuales se estiman el gradiente de presión y con él la intensidad normal" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe.svg" alt="Una sonda p-p de intensidad acústica de dos micrófonos: dos micrófonos de presión con un separador entre ellos, a partir de los cuales se estiman el gradiente de presión y con él la intensidad normal" width="88%" />
 
 El **índice presión-intensidad** $\delta_{pI} = L_p - L_I$ mide cuán reactivo es el campo: en una onda plana progresiva libre vale $10 \log_{10}(\rho_0 c / 400) = 0{,}14$ dB, mientras que valores grandes delatan campos reactivos o ruidosos en los que domina el error de fase entre canales. El Anexo A de ISO 9614-1:1993 lo generaliza sobre una superficie de medición como el indicador F2 (con F3 para la potencia parcial negativa y F4 para la no uniformidad del campo), y la **capacidad dinámica** del instrumento $L_\mathrm{d} = \delta_{pI0} - K$ (índice presión-intensidad residual menos el factor de error de sesgo: 10 dB para los grados 1/2, 7 dB para el grado 3) debe superar F2 para que la medición sea válida (criterio 1).
 
 Consulta la [guía de intensidad acústica](/phonometry/es/devices/emission/intensity/) para su uso.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo_es.svg" alt="Niveles de presión e intensidad en tercios de octava para una onda plana progresiva frente a una onda estacionaria" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo.svg" alt="Niveles de presión e intensidad en tercios de octava para una onda plana progresiva frente a una onda estacionaria" width="92%" />
 
 *El estimador p-p en los dos campos límite: la separación entre $L_p$ y $L_I$ es el índice presión-intensidad que delata los campos reactivos.*
 
@@ -632,7 +632,7 @@ no gaussiana, así que el intervalo es más estrecho que $\pm 1{,}96\,u$), y el
 ejemplo del bloque patrón del Anexo H.1 de la GUM da
 $k = t_{0{,}99}(\nu_{\mathrm{eff}} = 16) = 2{,}92$ y $U_{99} = 93$ nm.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget_es.svg" alt="Dos paneles para el ejemplo del nivel ponderado A. Izquierda: el balance de incertidumbre GUM, un diagrama de barras horizontales con la contribución de cada entrada a la incertidumbre combinada y una línea discontinua en uc igual a 0,407 dB. Derecha: el histograma de salida de Monte Carlo con la gaussiana GUM superpuesta y el intervalo de cobertura del 95 por ciento sombreado; el título indica Y igual a 74,00 dB, U igual a 0,86 dB, k igual a 2,11" width="96%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget.svg" alt="Dos paneles para el ejemplo del nivel ponderado A. Izquierda: el balance de incertidumbre GUM, un diagrama de barras horizontales con la contribución de cada entrada a la incertidumbre combinada y una línea discontinua en uc igual a 0,407 dB. Derecha: el histograma de salida de Monte Carlo con la gaussiana GUM superpuesta y el intervalo de cobertura del 95 por ciento sombreado; el título indica Y igual a 74,00 dB, U igual a 0,86 dB, k igual a 2,11" width="96%" />
 
 *Las dos vías sobre un mismo problema, un nivel ponderado A y no el ejemplo de
 cuatro términos del Suplemento 1 citado más arriba. A la izquierda, la ley de

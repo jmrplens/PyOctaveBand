@@ -73,7 +73,7 @@ print(res.lags[peak], res.values[peak])   # retardo y su coeficiente
 res.plot()
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/correlation_normalizations_es.webp" alt="Dos paneles para un modelo de dos sensores con retardo. Arriba: la función coeficiente de correlación sobre más y menos 50 milisegundos de retardo, un suelo de ruido plano cercano a cero con un pico nítido de aproximadamente 0,85 exactamente sobre la línea discontinua del retardo verdadero en más 12,5 milisegundos. Abajo: las estimaciones sesgada e insesgada sobre los más y menos 2 segundos completos de retardo; el suelo de ruido de la sesgada se atenúa hacia los extremos del registro mientras que el de la insesgada se abre en abanico con varianza creciente allí" width="86%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/correlation_normalizations.webp" alt="Dos paneles para un modelo de dos sensores con retardo. Arriba: la función coeficiente de correlación sobre más y menos 50 milisegundos de retardo, un suelo de ruido plano cercano a cero con un pico nítido de aproximadamente 0,85 exactamente sobre la línea discontinua del retardo verdadero en más 12,5 milisegundos. Abajo: las estimaciones sesgada e insesgada sobre los más y menos 2 segundos completos de retardo; el suelo de ruido de la sesgada se atenúa hacia los extremos del registro mientras que el de la insesgada se abre en abanico con varianza creciente allí" width="86%" />
 
 *El modelo de dos sensores $y(t) = 0{,}8\,x(t-\tau_0) + n(t)$ bajo las tres
 normalizaciones: la función coeficiente está acotada y tiene su pico en
@@ -177,7 +177,7 @@ La imagen física son dos micrófonos y un frente de onda: el camino extra
 hasta el micrófono lejano es $c$ por el retardo, y todo el problema de
 estimación es localizar un pico en el eje de retardos.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_correlation_delay_es.svg" alt="Diagrama de la estimación de retardo por correlación: una fuente de altavoz radia hacia dos micrófonos en pie, el micrófono 1 captura x de t y el micrófono 2 captura y de t igual a alfa por x retardada tau 0 más ruido, con el frente de onda que pasa por el micrófono 1 dejando un camino extra de c por tau 0, unos 0,84 metros a 343 metros por segundo, y seno de theta igual a c tau 0 entre la separación d; debajo, un panel de correlograma muestra el correlador directo como una joroba ancha y GCC-PHAT con ponderación 1 entre el módulo de Gxy como un pico estrecho, ambos en tau 0 igual a 20 muestras entre 8192 hercios, 2,44 milisegundos; el pie anota el refinado a fracción de muestra por interpolación parabólica del pico con sobremuestreo local de 16 veces hasta por debajo de 0,002 muestras" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_correlation_delay.svg" alt="Diagrama de la estimación de retardo por correlación: una fuente de altavoz radia hacia dos micrófonos en pie, el micrófono 1 captura x de t y el micrófono 2 captura y de t igual a alfa por x retardada tau 0 más ruido, con el frente de onda que pasa por el micrófono 1 dejando un camino extra de c por tau 0, unos 0,84 metros a 343 metros por segundo, y seno de theta igual a c tau 0 entre la separación d; debajo, un panel de correlograma muestra el correlador directo como una joroba ancha y GCC-PHAT con ponderación 1 entre el módulo de Gxy como un pico estrecho, ambos en tau 0 igual a 20 muestras entre 8192 hercios, 2,44 milisegundos; el pie anota el refinado a fracción de muestra por interpolación parabólica del pico con sobremuestreo local de 16 veces hasta por debajo de 0,002 muestras" width="92%" />
 
 ### Del retardo a la geometría
 
@@ -246,7 +246,7 @@ directo no es dominante y que el retardo que tienes es el de una reflexión.
 `delay_std` no te va a avisar: la ecuación 8.129 modela la dispersión de un
 único pico, no la elección entre dos.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/gcc_phat_delay_es.svg" alt="Correlación cruzada normalizada de un par de señales coloreadas de dos sensores frente al retardo en milisegundos: el correlador directo muestra un pico ancho alrededor del retardo verdadero de 20 muestras mientras que la curva GCC-PHAT colapsa en una espiga afilada exactamente sobre la línea discontinua del retardo verdadero" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/gcc_phat_delay.svg" alt="Correlación cruzada normalizada de un par de señales coloreadas de dos sensores frente al retardo en milisegundos: el correlador directo muestra un pico ancho alrededor del retardo verdadero de 20 muestras mientras que la curva GCC-PHAT colapsa en una espiga afilada exactamente sobre la línea discontinua del retardo verdadero" width="82%" loading="eager" />
 
 *Los dos estimadores caen en el retardo de 2,441 ms (2,4413 ms el directo,
 2,4418 ms el PHAT), así que la discusión no es sobre la exactitud con un par
@@ -366,7 +366,7 @@ res = signals.align_impulse_responses(ir_b, ir_a, fs)  # elimina el retardo esti
 res.plot()                       # superposición referencia frente a alineada
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ir_alignment_es.svg" alt="Un pulso de referencia de banda limitada en 5 milisegundos, una copia medida retardada 7,37 muestras dibujada a trazos y visiblemente desplazada a la derecha, y la respuesta alineada dibujada con puntos exactamente encima de la referencia, con una nota que dice retardo estimado eliminado 7,36 muestras" width="86%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ir_alignment.svg" alt="Un pulso de referencia de banda limitada en 5 milisegundos, una copia medida retardada 7,37 muestras dibujada a trazos y visiblemente desplazada a la derecha, y la respuesta alineada dibujada con puntos exactamente encima de la referencia, con una nota que dice retardo estimado eliminado 7,36 muestras" width="86%" />
 
 *Una RI medida con un retardo fraccionario de 7,37 muestras (trazos) se
 alinea de vuelta sobre su referencia: el desplazamiento de banda limitada
@@ -475,7 +475,7 @@ res.plot()               # señal + envolvente, frecuencia instantánea
 slow = signals.envelope(x, fs, decimation_factor=32)   # con antialias, fs/32
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hilbert_envelope_es.svg" alt="Dos paneles para un modo de 250 hercios en decaimiento con ruido ligero. Arriba: la señal oscilante con la envolvente de Hilbert exponencial y suave trazando su decaimiento por arriba y por abajo. Abajo: la frecuencia instantánea manteniéndose sobre la línea discontinua de la portadora de 250 hercios mientras el modo es fuerte y con un temblor creciente a medida que la señal se hunde en el suelo de ruido" width="86%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hilbert_envelope.svg" alt="Dos paneles para un modo de 250 hercios en decaimiento con ruido ligero. Arriba: la señal oscilante con la envolvente de Hilbert exponencial y suave trazando su decaimiento por arriba y por abajo. Abajo: la frecuencia instantánea manteniéndose sobre la línea discontinua de la portadora de 250 hercios mientras el modo es fuerte y con un temblor creciente a medida que la señal se hunde en el suelo de ruido" width="86%" />
 
 *Las magnitudes de Hilbert de un modo de 250 Hz golpeado: la envolvente
 traza el decaimiento exponencial (arriba), y la frecuencia instantánea se

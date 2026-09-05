@@ -67,7 +67,7 @@ diferencia entre el $R$ de laboratorio y el $R'$ de campo. EN 12354 predice el
 índice aparente in situ a partir de los índices de laboratorio de los elementos
 más la transmisión vibratoria de sus uniones.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_flanking_paths_es.svg" alt="La trayectoria directa Dd a través del elemento separador y las tres trayectorias por flancos Ff, Df y Fd en cada unión entre un elemento de flanco y el elemento separador" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_flanking_paths.svg" alt="La trayectoria directa Dd a través del elemento separador y las tres trayectorias por flancos Ff, Df y Fd en cada unión entre un elemento de flanco y el elemento separador" width="92%" loading="eager" />
 
 Cada unión entre un elemento de flanco y el elemento separador lleva tres
 trayectorias, $Ff$ (flanco→flanco), $Df$ (directo→flanco) y $Fd$ (flanco→directo),
@@ -141,14 +141,14 @@ $-0{,}3$ dB donde la respuesta es 12,5 dB. Y como $m'_i$ es el elemento *de la
 trayectoria de transmisión*, la misma unión tiene una relación de masas distinta
 para $K_{13}$ y para $K_{12}$ — la relación es por trayectoria, no por unión.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_junction_catalogue_es.svg" alt="El catálogo de uniones del Anexo E: cruz rígida, T rígida, T con capa elástica intermedia, esquina, cambio de espesor y una pared ligera de doble hoja encontrándose con un forjado homogéneo, cada una con sus elementos numerados, sus ramas de trayectoria coloreadas, la longitud de acoplamiento marcada y la relación de masas resuelta en uno de los paneles" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_junction_catalogue.svg" alt="El catálogo de uniones del Anexo E: cruz rígida, T rígida, T con capa elástica intermedia, esquina, cambio de espesor y una pared ligera de doble hoja encontrándose con un forjado homogéneo, cada una con sus elementos numerados, sus ramas de trayectoria coloreadas, la longitud de acoplamiento marcada y la relación de masas resuelta en uno de los paneles" width="92%" />
 
 Cada dibujo de arriba se corresponde con un par de argumentos
 `(junction_type, path)`, y la rama de trayectoria importa tanto como el tipo de
 unión: sobre la misma cruz rígida del ejemplo resuelto, `path='through'` da
 12,5 dB y `path='corner'`, 8,9 dB.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/prediction_flanking_demo_es.svg" alt="Índices de reducción acústica por trayectoria para el ejemplo del Anexo H.3 de EN 12354-1 y la fracción de energía transmitida de cada trayectoria, mostrando la trayectoria directa dominando en R'w = 52 dB" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/prediction_flanking_demo.svg" alt="Índices de reducción acústica por trayectoria para el ejemplo del Anexo H.3 de EN 12354-1 y la fracción de energía transmitida de cada trayectoria, mostrando la trayectoria directa dominando en R'w = 52 dB" width="80%" />
 
 *Arriba, los índices por trayectoria; abajo, la fracción de energía transmitida.
 La trayectoria directa es el mayor contribuyente individual, con el 33 %, y aun
@@ -386,7 +386,7 @@ print(round(building.standardized_impact_level(imp.l_prime_n_w, 50.0), 1))   # 4
 imp.plot()   # los términos de la Fórmula (21) como barras: Ln,w,eq - dLw + K -> L'n,w (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_prediction_terms_es.svg" alt="La predicción de impactos del Anexo E.3 de EN 12354-2 como sus términos de la Fórmula 21: el nivel equivalente del forjado desnudo de 76,2 dB, la mejora de menos 33 dB del suelo flotante, la corrección de flancos de más 2 dB y el nivel de impactos aparente previsto resultante de 45,2 dB" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_prediction_terms.svg" alt="La predicción de impactos del Anexo E.3 de EN 12354-2 como sus términos de la Fórmula 21: el nivel equivalente del forjado desnudo de 76,2 dB, la mejora de menos 33 dB del suelo flotante, la corrección de flancos de más 2 dB y el nivel de impactos aparente previsto resultante de 45,2 dB" width="80%" />
 
 *Todo el modelo simplificado de EN 12354-2 es una resta: el forjado masivo
 desnudo parte de $L_\mathrm{n,w,eq} = 76{,}2$ dB, el suelo flotante recupera 33 dB

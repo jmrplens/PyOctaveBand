@@ -96,7 +96,7 @@ recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 g_weighted = filters.weighting_filter(recording, fs, curve='G')
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response_es.svg" alt="Respuesta en frecuencia de la ponderación G de 0,1 Hz a 1 kHz con los valores nominales de la Tabla 2 de ISO 7196 superpuestos" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response.svg" alt="Respuesta en frecuencia de la ponderación G de 0,1 Hz a 1 kHz con los valores nominales de la Tabla 2 de ISO 7196 superpuestos" width="80%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -191,7 +191,7 @@ micrófono se coloca en el centro de una placa rígida sobre el suelo, dentro de
 un paravientos primario de espuma, con una pantalla hemisférica secundaria
 añadida cuando hay viento y con su pérdida por inserción documentada y corregida.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_infrasound_chain_es.svg" alt="La cadena de medida de infrasonido: una vista en sección de una cápsula de medida enrasada en el centro de una placa rígida sobre el suelo, con una llamada sobre su orificio de compensación de presión estática y el punto de corte de primer orden que ese orificio impone, un paravientos primario de espuma encima y una pantalla hemisférica secundaria alrededor; después la cadena eléctrica en tres bloques, un preamplificador cuyo punto de corte está muy por debajo de 0,25 Hz, un grabador con el conmutador de corte de graves desactivado, y la ponderación G seguida de un integrador de al menos 10 segundos; a la derecha, un recuadro con la respuesta de 0,1 Hz a 1 kHz que muestra la curva G de ISO 7196 con su tramo de 0,25 a 315 Hz sombreado y el punto de corte del paso alto de la propia cadena dibujado con línea discontinua sobre ella, con el solape anotado como banda utilizable" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_infrasound_chain.svg" alt="La cadena de medida de infrasonido: una vista en sección de una cápsula de medida enrasada en el centro de una placa rígida sobre el suelo, con una llamada sobre su orificio de compensación de presión estática y el punto de corte de primer orden que ese orificio impone, un paravientos primario de espuma encima y una pantalla hemisférica secundaria alrededor; después la cadena eléctrica en tres bloques, un preamplificador cuyo punto de corte está muy por debajo de 0,25 Hz, un grabador con el conmutador de corte de graves desactivado, y la ponderación G seguida de un integrador de al menos 10 segundos; a la derecha, un recuadro con la respuesta de 0,1 Hz a 1 kHz que muestra la curva G de ISO 7196 con su tramo de 0,25 a 315 Hz sombreado y el punto de corte del paso alto de la propia cadena dibujado con línea discontinua sobre ella, con el solape anotado como banda utilizable" width="94%" />
 
 Lo que hay que dejar registrado para que el resultado sea informable es breve:
 el punto de corte en baja frecuencia de la propia cadena, la placa y las
@@ -206,7 +206,7 @@ referencia con la que se define o se describe cada una: B como la curva
 intermedia entre A y C, D como la que tiene una joroba que A no tiene, y AU
 como la propia A con un paso bajo añadido.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/special_weighting_responses_es.svg" alt="Curvas de ponderación B, D y AU medidas a 96 kHz frente a una referencia gris ancha de ponderación A, con la joroba de +11,5 dB de D en 3,15 kHz y el corte de AU 13 dB por debajo de A en 16 kHz anotados" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/special_weighting_responses.svg" alt="Curvas de ponderación B, D y AU medidas a 96 kHz frente a una referencia gris ancha de ponderación A, con la joroba de +11,5 dB de D en 3,15 kHz y el corte de AU 13 dB por debajo de A en 16 kHz anotados" width="80%" />
 
 *Las tres curvas frente a la referencia A (gris ancha), medidas a 96 kHz para
 que el eje llegue a los 40 kHz donde IEC 61012 aún especifica el paso bajo U.

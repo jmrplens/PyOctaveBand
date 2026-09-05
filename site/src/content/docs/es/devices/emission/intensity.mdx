@@ -73,14 +73,14 @@ suelo cercano a 0,14 dB y no a 0 — todo lo que una medición en campo enseñe 
 encima de ese suelo es o bien un campo genuinamente reactivo o contaminado por
 ruido, o bien el propio error de fase del instrumento.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_es.svg" alt="Sonda de intensidad p-p de dos micrófonos con la distancia del espaciador y el eje de medición" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe.svg" alt="Sonda de intensidad p-p de dos micrófonos con la distancia del espaciador y el eje de medición" width="92%" loading="eager" />
 
 La propia sonda es lo bastante pequeña para dibujarla a escala real.
 `plot_pp_probe_geometry` coloca el clásico espaciador macizo de 12 mm entre
 las dos cápsulas enfrentadas, y un `IntensityResult` calculado que retuvo su
 `spacing` redibuja su propia sonda con `res.plot_geometry()`.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pp_probe_geometry_es.svg" alt="Vista lateral a escala de la sonda de intensidad p-p cara a cara: dos cápsulas azules de media pulgada sobre sus cuerpos cilíndricos grises enfrentadas a través del espaciador macizo claro de 12 mm, con la separación acotada debajo y el eje de intensidad Ir dibujado como flecha azul a la derecha" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pp_probe_geometry.svg" alt="Vista lateral a escala de la sonda de intensidad p-p cara a cara: dos cápsulas azules de media pulgada sobre sus cuerpos cilíndricos grises enfrentadas a través del espaciador macizo claro de 12 mm, con la separación acotada debajo y el eje de intensidad Ir dibujado como flecha azul a la derecha" width="92%" />
 
 *La diferencia finita a escala real: dos cápsulas de media pulgada cara a
 cara a través de 12 mm de espaciador macizo, y ese $\Delta r$ es a la vez la
@@ -129,7 +129,7 @@ print(res.frequency, res.intensity_level)                  # por banda
 res.plot()   # Lp frente a LI por banda + el índice presión-intensidad (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo_es.svg" alt="Niveles de presión e intensidad en tercios de octava para una onda plana progresiva frente a una onda estacionaria" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo.svg" alt="Niveles de presión e intensidad en tercios de octava para una onda plana progresiva frente a una onda estacionaria" width="92%" />
 
 *Izquierda: en una onda plana progresiva toda la presión se transporta, así que
 $L_I \approx L_p$. Derecha: una onda estacionaria no transporta (casi) energía
@@ -324,7 +324,7 @@ fi = emission.field_indicators(lp_bands, in_bands, freqs)   # (posiciones, banda
 fi.plot(dynamic_capability=ld)   # F2/F3 por banda frente a Ld, F4 en eje gemelo (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_indicators_es.svg" alt="Indicadores de campo de ISO 9614-1 de un barrido de diez posiciones sobre seis bandas de octava: F2 y F3 suben hacia baja frecuencia al volverse reactivo el campo, cruzando la línea discontinua de capacidad dinámica Ld en 125 Hz, donde F3 además sube por encima de F2, con la no uniformidad del campo F4 dibujada como barras en un eje gemelo" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_indicators.svg" alt="Indicadores de campo de ISO 9614-1 de un barrido de diez posiciones sobre seis bandas de octava: F2 y F3 suben hacia baja frecuencia al volverse reactivo el campo, cruzando la línea discontinua de capacidad dinámica Ld en 125 Hz, donde F3 además sube por encima de F2, con la no uniformidad del campo F4 dibujada como barras en un eje gemelo" width="88%" />
 
 *$F_2$ sube hacia baja frecuencia al volverse reactivo el campo y en 125 Hz
 cruza la capacidad dinámica del instrumento $L_\mathrm{d} = \delta_{pI0} - K$: esa banda
@@ -431,7 +431,7 @@ página y de la
 entera, y la biblioteca no lo calcula: se mide, una vez por cadena
 sonda-espaciador-analizador, en el banco.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_residual_intensity_check_es.svg" alt="Tres paneles. Primero, el dispositivo de ensayo de intensidad residual de IEC 61043: un pequeño acoplador que lleva ruido rosa o blanco a las dos cápsulas de la sonda al mismo nivel dentro de más menos 0,1 decibelios, del que se lee el índice residual como el nivel de presión menos el nivel de intensidad indicado. Segundo, un calibrador acústico de clase 0 o clase 1 según IEC 60942 aplicado a un micrófono cada vez, con el instrumento ajustado dentro de más menos 0,1 decibelios en los dos canales. Tercero, el ensayo in situ de inversión de la sonda: la sonda sobre la superficie de medición marcando una intensidad normal positiva y después girada 180 grados alrededor de su centro acústico marcando una negativa, aceptado cuando las dos tienen signos opuestos y difieren menos de 1,5 decibelios en la banda de nivel máximo" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_residual_intensity_check.svg" alt="Tres paneles. Primero, el dispositivo de ensayo de intensidad residual de IEC 61043: un pequeño acoplador que lleva ruido rosa o blanco a las dos cápsulas de la sonda al mismo nivel dentro de más menos 0,1 decibelios, del que se lee el índice residual como el nivel de presión menos el nivel de intensidad indicado. Segundo, un calibrador acústico de clase 0 o clase 1 según IEC 60942 aplicado a un micrófono cada vez, con el instrumento ajustado dentro de más menos 0,1 decibelios en los dos canales. Tercero, el ensayo in situ de inversión de la sonda: la sonda sobre la superficie de medición marcando una intensidad normal positiva y después girada 180 grados alrededor de su centro acústico marcando una negativa, aceptado cuando las dos tienen signos opuestos y difieren menos de 1,5 decibelios en la banda de nivel máximo" width="92%" />
 
 **El ensayo de intensidad residual (apartado 10.2 de IEC 61043).** El
 dispositivo de ensayo es un pequeño acoplador que presenta *el mismo* campo
@@ -515,7 +515,7 @@ res.plot()                        # δpI0 medido sobre las dos máscaras de la t
 res.report("verificacion.pdf")    # ficha de verificación de una página (PDF)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_class_es.svg" alt="Índice presión-intensidad residual medido de un instrumento de intensidad completo con espaciador de 12 mm, dibujado como curva escalonada sobre los mínimos de clase 1 y clase 2 de la tabla 2 de IEC 61043; la región de aceptación de clase 2 sombreada queda por encima de la máscara discontinua de clase 2, y la banda de 100 Hz aparece marcada donde el índice medido cae por debajo de la máscara continua de clase 1" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_class.svg" alt="Índice presión-intensidad residual medido de un instrumento de intensidad completo con espaciador de 12 mm, dibujado como curva escalonada sobre los mínimos de clase 1 y clase 2 de la tabla 2 de IEC 61043; la región de aceptación de clase 2 sombreada queda por encima de la máscara discontinua de clase 2, y la banda de 100 Hz aparece marcada donde el índice medido cae por debajo de la máscara continua de clase 1" width="92%" />
 
 *Ambas máscaras de la tabla 2 bajan $10\log_{10}(12/25) = -3{,}2\ \text{dB}$ por el
 espaciador
@@ -794,7 +794,7 @@ print(power.expanded_uncertainty)          # [nan  3.  3.  2.  2.  2.] dB
 print(np.round(power.confidence_interval[0], 1))     # [-1.7  1.2] dB
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/discrete_point_qualification_es.svg" alt="Dos paneles apilados sobre seis bandas de octava de 125 Hz a 4 kHz para un muestreo de dieciséis posiciones. Arriba, las posiciones que exige el criterio 2, C por F4 al cuadrado, como una pareja de barras por banda para el grado 1 y el grado 2, frente a una línea discontinua en las dieciséis posiciones medidas: la exigencia crece con la frecuencia, la barra del grado 1 pasa la línea en 2 kHz y llega a 30 en 4 kHz, la del grado 2 se queda por debajo en todas las bandas, y la pareja de 125 Hz aparece en gris porque el criterio 1 ya falló ahí. Una etiqueta sobre cada banda nombra el grado alcanzado: sin grado, grado 1, grado 1, grado 1, grado 2, grado 2. Abajo, el intervalo de confianza del 95 % de la fórmula B.3 banda a banda, que se ensancha desde unos más menos medio decibelio en 125 Hz hasta más 1,3 y menos 1,9 decibelios en 4 kHz" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/discrete_point_qualification.svg" alt="Dos paneles apilados sobre seis bandas de octava de 125 Hz a 4 kHz para un muestreo de dieciséis posiciones. Arriba, las posiciones que exige el criterio 2, C por F4 al cuadrado, como una pareja de barras por banda para el grado 1 y el grado 2, frente a una línea discontinua en las dieciséis posiciones medidas: la exigencia crece con la frecuencia, la barra del grado 1 pasa la línea en 2 kHz y llega a 30 en 4 kHz, la del grado 2 se queda por debajo en todas las bandas, y la pareja de 125 Hz aparece en gris porque el criterio 1 ya falló ahí. Una etiqueta sobre cada banda nombra el grado alcanzado: sin grado, grado 1, grado 1, grado 1, grado 2, grado 2. Abajo, el intervalo de confianza del 95 % de la fórmula B.3 banda a banda, que se ensancha desde unos más menos medio decibelio en 125 Hz hasta más 1,3 y menos 1,9 decibelios en 4 kHz" width="92%" />
 
 *El grado es un presupuesto de posiciones, y se gasta banda a banda. El
 muestreo dibujado aquí es un segundo, de una máquina que radia de forma
@@ -961,7 +961,7 @@ opuestos:
   $10\log_{10}(\Delta r/25\ \text{mm})$, de modo que doblar el espaciador aporta
   3 dB de margen en baja frecuencia.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/spacer_bandwidth_es.svg" alt="Dos paneles apilados frente a la frecuencia. Arriba, el sesgo por diferencias finitas de los espaciadores de 6, 12 y 50 mm, cada uno alejándose de 0 dB y cruzando la línea discontinua de menos 0,3 dB justo en su propia frecuencia máxima válida de 5,72, 2,86 y 0,69 kHz. Abajo, el margen de índice residual que hereda cada espaciador respecto a la separación de 25 mm para la que está escrita la tabla 2 de IEC 61043: menos 6,2 dB con 6 mm, menos 3,2 dB con 12 mm y más 3,0 dB con 50 mm" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/spacer_bandwidth.svg" alt="Dos paneles apilados frente a la frecuencia. Arriba, el sesgo por diferencias finitas de los espaciadores de 6, 12 y 50 mm, cada uno alejándose de 0 dB y cruzando la línea discontinua de menos 0,3 dB justo en su propia frecuencia máxima válida de 5,72, 2,86 y 0,69 kHz. Abajo, el margen de índice residual que hereda cada espaciador respecto a la separación de 25 mm para la que está escrita la tabla 2 de IEC 61043: menos 6,2 dB con 6 mm, menos 3,2 dB con 12 mm y más 3,0 dB con 50 mm" width="92%" />
 
 *Los dos límites se cierran desde lados opuestos. El panel superior es
 geometría: la `max_valid_frequency` de cada espaciador está exactamente donde su

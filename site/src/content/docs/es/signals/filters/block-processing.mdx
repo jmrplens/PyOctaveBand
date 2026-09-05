@@ -37,7 +37,7 @@ capturando, o un registrador embebido que solo ve un búfer cada vez. En todos
 esos casos la señal tiene que procesarse bloque a bloque, y los filtros deben
 comportarse exactamente como si hubieran visto la señal completa de una vez.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_block_processing_es.svg" alt="Dos carriles que comparan el procesado por bloques conservando el estado del filtro entre bloques, con una envolvente continua, frente a reiniciarlo en cada bloque, donde la envolvente arranca desde cero en cada unión" width="86%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_block_processing.svg" alt="Dos carriles que comparan el procesado por bloques conservando el estado del filtro entre bloques, con una envolvente continua, frente a reiniciarlo en cada bloque, donde la envolvente arranca desde cero en cada unión" width="86%" loading="eager" />
 
 Las clases `OctaveFilterBank`, `WeightingFilter` (cualquier curva de
 ponderación: A, C, Z y las especiales B, D, G y AU) y `TimeWeighting` admiten
@@ -54,7 +54,7 @@ Antes llegaba a sus secciones a través de una etapa de interpolación y otra de
 diezmado, que no se pueden partir en bloques, así que el streaming tenía que
 recurrir al diseño bilineal simple.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/block_processing_continuity_es.svg" alt="Procesado por bloques con estado igual al resultado continuo frente a bloques independientes que reinician el transitorio" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/block_processing_continuity.svg" alt="Procesado por bloques con estado igual al resultado continuo frente a bloques independientes que reinician el transitorio" width="80%" />
 
 *Con `stateful=True` las salidas concatenadas por bloques coinciden exactamente
 con el resultado continuo; sin estado, cada frontera de bloque reinicia el
@@ -288,7 +288,7 @@ $y[n-1]$, que es el mismo valor que la API funcional devuelve como
   calibrador al principio y al final del despliegue, y un intervalo fijo de
   almacenamiento de niveles.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/streaming_level_seams_es.svg" alt="Dos paneles de nivel ponderado A con respuesta Fast frente al tiempo. A la izquierda, ocho bloques de 100 ms de un ruido con escalones de nivel: la traza continua de una sola pasada y la traza en streaming con estado se superponen exactamente, con un error máximo de 0 dB, mientras que la traza sin estado se desploma a 30 dB en cada frontera de bloque y vuelve a subir por la rampa del detector, hasta 64 dB por debajo del nivel real en una unión. A la derecha, esos mismos primeros 0,8 s ampliados con los primeros 0,63 segundos sombreados: la traza con steady_ic False sube desde 30 dB por la rampa de asentamiento mientras que la traza con steady_ic True arranca cerca de 64 dB, y ambas convergen cuando termina la rampa" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/streaming_level_seams.svg" alt="Dos paneles de nivel ponderado A con respuesta Fast frente al tiempo. A la izquierda, ocho bloques de 100 ms de un ruido con escalones de nivel: la traza continua de una sola pasada y la traza en streaming con estado se superponen exactamente, con un error máximo de 0 dB, mientras que la traza sin estado se desploma a 30 dB en cada frontera de bloque y vuelve a subir por la rampa del detector, hasta 64 dB por debajo del nivel real en una unión. A la derecha, esos mismos primeros 0,8 s ampliados con los primeros 0,63 segundos sombreados: la traza con steady_ic False sube desde 30 dB por la rampa de asentamiento mientras que la traza con steady_ic True arranca cerca de 64 dB, y ambas convergen cuando termina la rampa" width="94%" />
 
 *Las trampas anteriores, en el dominio que un lector en streaming mira de
 verdad. Conservar el estado no cuesta nada y lo gana todo: la traza azul es la

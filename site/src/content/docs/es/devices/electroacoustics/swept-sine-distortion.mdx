@@ -86,7 +86,7 @@ La cadena es exactamente el esquema siguiente: reproducir el barrido, grabar,
 convolucionar con el filtro inverso, y los armónicos caen por delante de la
 respuesta lineal con sus adelantos fijos.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_swept_sine_es.svg" alt="Cadena de medición de distorsión con barrido sinusoidal: un barrido exponencial de 20 Hz a 6 kHz en T igual a 4 s excita el dispositivo débilmente no lineal, la grabación se deconvoluciona con el filtro inverso invertido en el tiempo con su pendiente de +6 dB por octava, y en el eje temporal resultante la respuesta al impulso lineal h1 queda en t igual a cero mientras las respuestas de los armónicos segundo, tercero y cuarto aparecen como prellegadas menores en sus propias ventanas discontinuas, adelantadas L por ln n, 0,49 s para h2 y 0,77 s para h3 con L igual a 0,70 s" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_swept_sine.svg" alt="Cadena de medición de distorsión con barrido sinusoidal: un barrido exponencial de 20 Hz a 6 kHz en T igual a 4 s excita el dispositivo débilmente no lineal, la grabación se deconvoluciona con el filtro inverso invertido en el tiempo con su pendiente de +6 dB por octava, y en el eje temporal resultante la respuesta al impulso lineal h1 queda en t igual a cero mientras las respuestas de los armónicos segundo, tercero y cuarto aparecen como prellegadas menores en sus propias ventanas discontinuas, adelantadas L por ln n, 0,49 s para h2 y 0,77 s para h3 con L igual a 0,70 s" width="92%" />
 
 *Los adelantos los fija el barrido por sí solo — aquí
 $L = T/\ln(f_2/f_1) = 0{,}70$ s — y no el dispositivo, que es la razón de que
@@ -174,9 +174,9 @@ relación señal-ruido no puede mostrar un armónico del 0,05 % por bien colocad
 que estén las ventanas —, así que informa del suelo de ruido medido junto a la
 curva.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sweep_bench_es.svg" alt="Dos bancos para una medición con barrido: el panel (a), una interfaz de audio que excita un dispositivo eléctrico bajo ensayo con un segundo canal de la interfaz cableado directamente de vuelta desde la salida como referencia de bucle que fija t igual a cero; el panel (b), un altavoz y un micrófono de medición, los dos a 1,20 m sobre un suelo duro y separados 1,00 m, con el camino reflejado de 2,60 m en trazo discontinuo y el tiempo libre de reflexiones resultante de 4,7 ms indicado; debajo de ambos, el eje temporal propio del barrido con la llegada lineal en t igual a cero, las prellegadas del segundo y el tercer armónico en menos 0,49 y menos 0,77 segundos, la ventana por orden de 8192 muestras y la separación de llegadas más corta L ln(3/2) igual a 0,28 s" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sweep_bench.svg" alt="Dos bancos para una medición con barrido: el panel (a), una interfaz de audio que excita un dispositivo eléctrico bajo ensayo con un segundo canal de la interfaz cableado directamente de vuelta desde la salida como referencia de bucle que fija t igual a cero; el panel (b), un altavoz y un micrófono de medición, los dos a 1,20 m sobre un suelo duro y separados 1,00 m, con el camino reflejado de 2,60 m en trazo discontinuo y el tiempo libre de reflexiones resultante de 4,7 ms indicado; debajo de ambos, el eje temporal propio del barrido con la llegada lineal en t igual a cero, las prellegadas del segundo y el tercer armónico en menos 0,49 y menos 0,77 segundos, la ventana por orden de 8192 muestras y la separación de llegadas más corta L ln(3/2) igual a 0,28 s" width="92%" />
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/swept_sine_thd_es.svg" alt="Distorsión armónica total y razones del segundo y tercer armónico de un polinomio cúbico seguido de un paso bajo de 3 kHz, frente a la frecuencia de excitación: cada orden se asienta exactamente en su nivel de Chebyshev a baja frecuencia y cae donde su propio producto cruza el corte del filtro" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/swept_sine_thd.svg" alt="Distorsión armónica total y razones del segundo y tercer armónico de un polinomio cúbico seguido de un paso bajo de 3 kHz, frente a la frecuencia de excitación: cada orden se asienta exactamente en su nivel de Chebyshev a baja frecuencia y cae donde su propio producto cruza el corte del filtro" width="82%" loading="eager" />
 
 *Las mesetas planas de baja frecuencia son los niveles de Chebyshev
 $(a_2/2)/H_1$ y $(a_3/4)/H_1$ del polinomio sin memoria, y cada orden se dobla
@@ -231,7 +231,7 @@ Lo que el método existe para producir, sin embargo, no son las razones escalare
 de transferencia armónicas**. Cada $H_n$ es una respuesta en frecuencia completa
 sobre su propia banda $[n f_1, n f_2]$:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/swept_sine_harmonic_responses_es.svg" alt="Las magnitudes de las tres respuestas armónicas separadas de un polinomio cúbico seguido de un paso bajo de 3 kHz, cada una dibujada sobre su propia banda: H1 de 20 Hz a 6 kHz, H2 de 40 Hz a 12 kHz y H3 de 60 Hz a 18 kHz, cada una asentada en su nivel de Chebyshev punteado a baja frecuencia y cayendo en el mismo corte del postfiltro de 3 kHz" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/swept_sine_harmonic_responses.svg" alt="Las magnitudes de las tres respuestas armónicas separadas de un polinomio cúbico seguido de un paso bajo de 3 kHz, cada una dibujada sobre su propia banda: H1 de 20 Hz a 6 kHz, H2 de 40 Hz a 12 kHz y H3 de 60 Hz a 18 kHz, cada una asentada en su nivel de Chebyshev punteado a baja frecuencia y cayendo en el mismo corte del postfiltro de 3 kHz" width="82%" />
 
 *Cada orden es una respuesta, no un número, y aquí están representados frente a
 la frecuencia del propio armónico: los tres caen en los mismos 3 kHz, porque el
@@ -346,7 +346,7 @@ sección 1 se leen idénticos; entre los dos métodos solo cambian las fases de
 los armónicos (y el tope de banda de cada orden). Las dos diferencias se ven
 sobre una misma grabación:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/swept_sine_methods_es.svg" alt="La respuesta del segundo armónico de una misma grabación de un cúbico sin memoria, analizada dos veces: en el panel superior las magnitudes coinciden sobre el nivel de Chebyshev a2 entre 2, pero la curva de Farina se corta en seco en f2 igual a 6 kHz mientras la sincronizada continúa hasta 2 f2 igual a 12 kHz; en el panel inferior la fase sincronizada se mantiene en el valor verdadero de menos pi entre dos en todas las frecuencias mientras la fase de Farina se aparta por encima de aproximadamente 1 kHz" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/swept_sine_methods.svg" alt="La respuesta del segundo armónico de una misma grabación de un cúbico sin memoria, analizada dos veces: en el panel superior las magnitudes coinciden sobre el nivel de Chebyshev a2 entre 2, pero la curva de Farina se corta en seco en f2 igual a 6 kHz mientras la sincronizada continúa hasta 2 f2 igual a 12 kHz; en el panel inferior la fase sincronizada se mantiene en el valor verdadero de menos pi entre dos en todas las frecuencias mientras la fase de Farina se aparta por encima de aproximadamente 1 kHz" width="82%" />
 
 *La misma grabación, las mismas magnitudes, dos diferencias. La deconvolución
 sincronizada mide $H_2$ hasta $2f_2$; el filtro inverso de Farina lo detiene en
@@ -434,7 +434,7 @@ res.excess_group_delay                 # la parte paso todo, en s
 res.plot()                             # magnitud, fases, retardos de grupo
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/phase_decomposition_es.svg" alt="Tres paneles apilados de la descomposición fase mínima / paso todo de un ecualizador de campana de +6 dB medido a través de una latencia de 2,5 ms: la joroba de magnitud en 1 kHz, la fase medida cayendo con la frecuencia mientras la fase mínima se mantiene pequeña y el exceso de fase lleva la rampa lineal del retardo, y los retardos de grupo donde el retardo de grupo de exceso lee 2,5 ms planos" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/phase_decomposition.svg" alt="Tres paneles apilados de la descomposición fase mínima / paso todo de un ecualizador de campana de +6 dB medido a través de una latencia de 2,5 ms: la joroba de magnitud en 1 kHz, la fase medida cayendo con la frecuencia mientras la fase mínima se mantiene pequeña y el exceso de fase lleva la rampa lineal del retardo, y los retardos de grupo donde el retardo de grupo de exceso lee 2,5 ms planos" width="82%" />
 
 *Un ecualizador de campana de +6 dB medido a través de una latencia de
 procesado de 2,5 ms: la parte de fase mínima lleva solo la pequeña ondulación

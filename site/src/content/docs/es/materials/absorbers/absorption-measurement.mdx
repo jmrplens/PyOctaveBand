@@ -60,7 +60,7 @@ es la herramienta adecuada y por qué los dos números no coinciden.
 
 ## 1. Medición en cámara reverberante (ISO 354)
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso354_room_es.svg" alt="Planta de una cámara reverberante ISO 354 con paredes no paralelas: la probeta rectangular de 10,8 metros cuadrados sobre el suelo, con sus bordes deliberadamente no paralelos a los bordes de la sala y una separación de 0,75 metros acotada hasta el paramento más cercano, tres posiciones de micrófono y dos posiciones de altavoz con sus reglas de separación, paneles difusores suspendidos cerca del techo, un recuadro que muestra la sala vacía dando T1 y A1 sobre la sala con la probeta dando T2 y A2, y una franja que compara en sección los montajes de tipo A y de tipo E-400" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso354_room.svg" alt="Planta de una cámara reverberante ISO 354 con paredes no paralelas: la probeta rectangular de 10,8 metros cuadrados sobre el suelo, con sus bordes deliberadamente no paralelos a los bordes de la sala y una separación de 0,75 metros acotada hasta el paramento más cercano, tres posiciones de micrófono y dos posiciones de altavoz con sus reglas de separación, paneles difusores suspendidos cerca del techo, un recuadro que muestra la sala vacía dando T1 y A1 sobre la sala con la probeta dando T2 y A2, y una franja que compara en sección los montajes de tipo A y de tipo E-400" width="92%" loading="eager" />
 
 La medición en cámara reverberante propiamente dicha es
 `measure_sound_absorption`. Toma el tiempo de reverberación en tercios de
@@ -128,7 +128,7 @@ print(meas.alpha_s[7])   # alpha_s a 500 Hz: 0.328...
 meas.plot()              # alpha_s frente a la frecuencia en tercios de octava
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_absorption_measurement_es.svg" alt="Absorción acústica en cámara reverberante ISO 354: el espectro de alpha_s de una probeta de absorbente poroso en las bandas de tercio de octava de 100 Hz a 5000 Hz, subiendo desde casi cero a baja frecuencia hasta un máximo ancho en torno a 0,69 cerca de 1600 Hz y suavizándose por encima" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_absorption_measurement.svg" alt="Absorción acústica en cámara reverberante ISO 354: el espectro de alpha_s de una probeta de absorbente poroso en las bandas de tercio de octava de 100 Hz a 5000 Hz, subiendo desde casi cero a baja frecuencia hasta un máximo ancho en torno a 0,69 cerca de 1600 Hz y suavizándose por encima" width="80%" />
 
 *La inversión de Sabine de los dos tiempos de caída: la probeta porosa apenas
 cambia las caídas largas de baja frecuencia ($\alpha_\mathrm{s} \to 0$), muerde más
@@ -414,7 +414,7 @@ inversión (`t_empty`, `t_specimen`, `absorption_area_empty` y
 `absorption_area_with_specimen`), y merece la pena mirarlos, porque enseñan
 dónde el método es fuerte y dónde se está quedando sin señal:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_absorption_inversion_es.svg" alt="Dos paneles apilados sobre el eje de tercios de octava de 100 Hz a 5 kHz. El panel superior traza el tiempo de reverberación de la sala vacía T1 y el tiempo con la probeta T2, que casi coinciden a 100 Hz y se separan mucho por encima de 500 Hz. El panel inferior traza las áreas de absorción equivalente A1 y A2 con la diferencia A2 menos A1 rellena entre ambas, y un eje a la derecha que lee el alpha_s resultante" width="86%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_absorption_inversion.svg" alt="Dos paneles apilados sobre el eje de tercios de octava de 100 Hz a 5 kHz. El panel superior traza el tiempo de reverberación de la sala vacía T1 y el tiempo con la probeta T2, que casi coinciden a 100 Hz y se separan mucho por encima de 500 Hz. El panel inferior traza las áreas de absorción equivalente A1 y A2 con la diferencia A2 menos A1 rellena entre ambas, y un eje a la derecha que lee el alpha_s resultante" width="86%" />
 
 *Toda la inversión de ISO 354 del ejemplo de la sección 1, dibujada: los dos
 tiempos de decaimiento (arriba) y las dos áreas de Sabine a las que invierten
@@ -502,7 +502,7 @@ La medición de la sección 1 entrega el espectro de $\alpha_\mathrm{s}$ en band
 tercio de octava. ISO 11654:1997 convierte ese espectro en una valoración de
 número único comparable entre productos.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso11654_es.svg" alt="Flujo de valoración ISO 11654: el alpha_s medido pasa a alpha_p práctico por banda de octava, la curva de referencia se desplaza hasta el mejor ajuste, alpha_w se lee a 500 Hz con indicadores de forma, dando la clase de absorción A a E" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso11654.svg" alt="Flujo de valoración ISO 11654: el alpha_s medido pasa a alpha_p práctico por banda de octava, la curva de referencia se desplaza hasta el mejor ajuste, alpha_w se lee a 500 Hz con indicadores de forma, dando la clase de absorción A a E" width="82%" loading="eager" />
 
 **Coeficiente de absorción práctico (apartado 4.1).** Los datos de tercio de
 octava se agrupan primero en bandas de octava, cada una la media aritmética de
@@ -557,7 +557,7 @@ carretera», que tienen [EN 1793-1](#incertidumbre-de-medida-de-la-absorcion) e
 [ISO 13472](/phonometry/es/materials/surfaces/road-absorption/) propias. Por eso
 la ficha imprime siempre el espectro completo junto al número único.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_es.svg" alt="Valoración ponderada de absorción acústica de ISO 11654: el espectro de absorción práctica trazado frente a la curva de referencia desplazada de 250 Hz a 4000 Hz, con la desviación desfavorable a 250 Hz sombreada y el coeficiente ponderado alpha_w leído a 500 Hz" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating.svg" alt="Valoración ponderada de absorción acústica de ISO 11654: el espectro de absorción práctica trazado frente a la curva de referencia desplazada de 250 Hz a 4000 Hz, con la desviación desfavorable a 250 Hz sombreada y el coeficiente ponderado alpha_w leído a 500 Hz" width="80%" />
 
 *El ejemplo resuelto del Anexo A.2: la curva de referencia se desplaza hacia
 abajo 0,40 hasta que las desviaciones desfavorables suman 0,05 ($\le 0{,}10$),
@@ -742,7 +742,7 @@ gaussiano; para otra confianza, léela de esa misma tabla con
 redondea a dos decimales para los coeficientes de absorción y a un decimal para
 el área equivalente y $DL_{\alpha,\text{NRD}}$.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_uncertainty_es.svg" alt="Incertidumbre del coeficiente de absorción acústica ISO 12999-2: el espectro medido de alpha_s en bandas de tercio de octava de 63 Hz a 5000 Hz con una banda sombreada de más-menos U con factor de cobertura k = 2, reproduciendo el ejemplo resuelto de la Tabla 4 de la norma" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_uncertainty.svg" alt="Incertidumbre del coeficiente de absorción acústica ISO 12999-2: el espectro medido de alpha_s en bandas de tercio de octava de 63 Hz a 5000 Hz con una banda sombreada de más-menos U con factor de cobertura k = 2, reproduciendo el ejemplo resuelto de la Tabla 4 de la norma" width="80%" />
 
 *El ejemplo resuelto de la Tabla 4: el espectro de $\alpha_\mathrm{s}$ medido con su
 franja de $\pm U$ a $k = 2$ (95 %), donde $\sigma_\mathrm{R} = m_\mathrm{R}\,\alpha_\mathrm{s} + n_\mathrm{R}$ toma
@@ -859,7 +859,7 @@ integral hay que evaluarla ángulo a ángulo a partir de un modelo:
 Merece la pena ver el tamaño de la brecha, porque «suele salir más alto» no es
 una afirmación útil de diseño:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuse_field_absorption_es.svg" alt="Coeficiente de absorción de una capa porosa de 50 mm con respaldo rígido frente a la frecuencia de 125 Hz a 4 kHz: el promedio de Paris a incidencia aleatoria queda por encima de la curva a incidencia normal, y las dos convergen a medida que la capa se hace gruesa frente a la longitud de onda" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuse_field_absorption.svg" alt="Coeficiente de absorción de una capa porosa de 50 mm con respaldo rígido frente a la frecuencia de 125 Hz a 4 kHz: el promedio de Paris a incidencia aleatoria queda por encima de la curva a incidencia normal, y las dos convergen a medida que la capa se hace gruesa frente a la longitud de onda" width="80%" />
 
 *Lo que lee el tubo y lo que lee la cámara, para la misma capa porosa de 50 mm
 con respaldo rígido ($\sigma = 20$ kPa·s/m², Miki): el tubo mide $\alpha(0°)$,

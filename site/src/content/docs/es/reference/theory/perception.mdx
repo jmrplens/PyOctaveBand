@@ -200,7 +200,7 @@ La norma **no especifica interpolación** entre las frecuencias tabuladas. La F�
 
 Consulta la [guía de sonoridad](/phonometry/es/perception/psychoacoustics/loudness/) para su uso.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/equal_loudness_contours_es.svg" alt="Líneas isofónicas normales de ISO 226:2023 de 20 a 90 fonios con la curva del umbral de audición" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/equal_loudness_contours.svg" alt="Líneas isofónicas normales de ISO 226:2023 de 20 a 90 fonios con la curva del umbral de audición" width="80%" />
 
 *Las líneas isofónicas de ISO 226:2023 según la Fórmula (1), de 20 a 90 fonios, con el umbral de audición.*
 
@@ -241,7 +241,7 @@ por debajo de 1 sonio el programa de referencia usa $L_\mathrm{N} = 40 (N + 0{,}
 
 Consulta la [guía de sonoridad](/phonometry/es/perception/psychoacoustics/loudness/) para su uso.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern_es.svg" alt="Patrones de sonoridad específica sobre la escala Bark para un sonido de banda estrecha de 1 kHz y un sonido de banda ancha con el mismo nivel de banda" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern.svg" alt="Patrones de sonoridad específica sobre la escala Bark para un sonido de banda estrecha de 1 kHz y un sonido de banda ancha con el mismo nivel de banda" width="80%" />
 
 *Sonoridad específica N′(z) sobre el eje de Bark: la energía repartida entre muchas bandas críticas suma más sonios que el mismo nivel de banda concentrado en una sola.*
 
@@ -312,7 +312,7 @@ uso y la tabla de elección de modelo.
 
 ECMA-418-2 construye sus tres métricas sobre un único front-end auditivo (apartado 5): un filtro de oído externo/medio, un banco de 53 filtros paso banda solapados de tipo gammatone espaciados en la escala Bark_HMS ($z = 0{,}5$ a $26{,}5$), rectificación de media onda y un RMS de bloque corto $\tilde{p}(l, z)$ por banda $z$ y bloque temporal $l$. Una no linealidad compresiva (Fórmula 23) convierte el RMS de banda en la **sonoridad de base específica** $N'_{\mathrm{basis}}(l, z)$, cuya constante de calibración $c_\mathrm{N}$ fija un tono de 1 kHz / 40 dB SPL en 1 sone_HMS. La sonoridad ensambla las sonoridades tonal y de ruido (abajo) sobre bandas y tiempo (Fórmulas 113–117); crece unas $1{,}65\times$ por cada 10 dB, más lentamente que el factor de 2 de Zwicker, una propiedad intrínseca de la suma de Sottek.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison_es.svg" alt="Sonoridad de un tono de 1 kHz en función del nivel para los modelos de Zwicker, Moore-Glasberg y Sottek, los tres pasando cerca de 1 sonio a 40 dB SPL" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison.svg" alt="Sonoridad de un tono de 1 kHz en función del nivel para los modelos de Zwicker, Moore-Glasberg y Sottek, los tres pasando cerca de 1 sonio a 40 dB SPL" width="80%" />
 
 *La divergencia que se acaba de enunciar, dibujada sobre la única señal en la
 que están calibrados los tres modelos. Pasan juntos por 1 sonio aproximadamente
@@ -354,7 +354,7 @@ tiempo (apartado 7.1.10); la constante $c_\mathrm{R}$ (Fórmula 104) calibra el 
 de referencia (un portador de 1 kHz modulado en amplitud al 100 % a 70 Hz y 60
 dB SPL) a 1 asper.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hms_modulation_bandpass_es.svg" alt="Percepción de modulación lenta frente a rápida en ECMA-418-2: la intensidad de fluctuación forma un paso banda sobre la frecuencia de modulación con máximo cerca de 4 a 6 Hz, mientras que la aspereza de esos mismos tonos de 1 kHz modulados en amplitud tiene su máximo cerca de 70 Hz" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hms_modulation_bandpass.svg" alt="Percepción de modulación lenta frente a rápida en ECMA-418-2: la intensidad de fluctuación forma un paso banda sobre la frecuencia de modulación con máximo cerca de 4 a 6 Hz, mientras que la aspereza de esos mismos tonos de 1 kHz modulados en amplitud tiene su máximo cerca de 70 Hz" width="80%" />
 
 *La ponderación por tasa de modulación que aplican las fórmulas anteriores, y
 la razón por la que el rango «aproximadamente 20–300 Hz, máxima cerca de
@@ -374,7 +374,7 @@ $$
 
 evaluado sobre la misma malla de 240 puntos a 0,1 Bark. La constante $k$ no está codificada a mano, sino que se deriva del requisito de calibración (apartado 6): un ruido de banda estrecha de una banda crítica de ancho, 920–1080 Hz a 60 dB SPL, puntúa exactamente 1 acum, y la $k = 0{,}108$ derivada cae dentro de la ventana normativa $0{,}105 \le k < 0{,}115$ (apartado 5.2). Las ponderaciones informativas del Anexo B se ofrecen bajo el mismo anclaje de 1 acum: von Bismarck (codo en 15 Bark, $0{,}2\ e^{0{,}308(z-15)} + 0{,}8$) y Aures (dependiente de la sonoridad, $g(z) = 0{,}078\ (e^{0{,}171 z}/z)\ N/\ln(0{,}05 N + 1)$). Los objetivos de banda estrecha de la Tabla A.2 se reproducen dentro de la tolerancia del apartado 6 (5 % o 0,05 acum): 0,38 acum a 250 Hz, 1,00 a 1 kHz, 1,78 a 2,5 kHz, 2,82 a 4 kHz.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sharpness_weighting_es.svg" alt="Ponderación de agudeza g(z) de DIN 45692 frente a la tasa de banda crítica en eje logarítmico, comparando las curvas DIN, von Bismarck y Aures con los codos de 15,8 y 15 Bark marcados" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sharpness_weighting.svg" alt="Ponderación de agudeza g(z) de DIN 45692 frente a la tasa de banda crítica en eje logarítmico, comparando las curvas DIN, von Bismarck y Aures con los codos de 15,8 y 15 Bark marcados" width="80%" />
 
 *Las tres ponderaciones $g(z)$ de la fórmula anterior en un mismo eje: la DIN
 con su codo en 15,8 Bark, la de von Bismarck con su codo en 15 Bark y la curva
@@ -424,7 +424,7 @@ $$
 
 **PR** (apartado 12) compara el nivel de la banda crítica centrada en el tono, $L_M$, con la potencia media de las dos bandas críticas **contiguas** $L_L$, $L_\mathrm{U}$ (bordes según las Fórmulas ajustadas 21–22 con las Tablas 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Fórmula 23). Para $f_\mathrm{t} \le 171{,}4$ Hz la banda inferior se trunca en 20 Hz y su potencia se reescala a un **ancho de banda de 100 Hz** (Fórmula 24). El criterio (Fórmulas 25–26) es 9,0 dB para $f_\mathrm{t} \ge 1$ kHz, y crece como $9{,}0 + 10{,}0\log_{10}(1000/f_\mathrm{t})$ por debajo. Los tonos se evalúan dentro del rango de interés de 89,1 Hz – 11,2 kHz (apartados 11.5 / 12.6).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment_es.svg" alt="Relación tono-ruido de un tono de ventilador de 250 Hz representada frente al criterio de prominencia de ECMA-418-1: el criterio cae desde unos 17 dB a 89 Hz hasta 8 dB constantes por encima de 1 kHz, y el tono evaluado se sitúa en 15,1 dB, 2,1 dB por encima del criterio de 13,0 dB a 250 Hz, así que es prominente" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment.svg" alt="Relación tono-ruido de un tono de ventilador de 250 Hz representada frente al criterio de prominencia de ECMA-418-1: el criterio cae desde unos 17 dB a 89 Hz hasta 8 dB constantes por encima de 1 kHz, y el tono evaluado se sitúa en 15,1 dB, 2,1 dB por encima del criterio de 13,0 dB a 250 Hz, así que es prominente" width="88%" />
 
 *El criterio de TNR dibujado en lugar de evaluado, sobre el rango de interés de
 89,1 Hz – 11,2 kHz, con un tono evaluado encima. Como el criterio vale
@@ -464,7 +464,7 @@ $$
 
 truncado a 1,0.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_band_mti_es.svg" alt="Índice de transmisión de modulación por banda de octava de 125 Hz a 8 kHz para una sala con 0,9 s de tiempo de reverberación y una relación habla-ruido de 15 dB: las siete barras quedan próximas entre sí, entre unos 0,54 y 0,60, y dan STI = 0,58 con la valoración E del Anexo F" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_band_mti.svg" alt="Índice de transmisión de modulación por banda de octava de 125 Hz a 8 kHz para una sala con 0,9 s de tiempo de reverberación y una relación habla-ruido de 15 dB: las siete barras quedan próximas entre sí, entre unos 0,54 y 0,60, y dan STI = 0,58 con la valoración E del Anexo F" width="88%" />
 
 *Los siete $\mathrm{MTI}_k$ que consume la suma ponderada anterior, para una
 sala con $T = 0{,}9$ s y una relación habla-ruido de 15 dB. Cada barra es ya la
@@ -473,7 +473,7 @@ por debajo del $m(F)$ en bruto; las barras caen dentro de 0,06 unas de otras, qu
 es el caso en el que los términos de redundancia $\beta_k$ apenas restan nada y
 el STI se acerca a la media simple ponderada por $\alpha$.*
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_vs_t60_es.svg" alt="STI frente al tiempo de reverberación con las bandas de valoración del Anexo F de IEC 60268-16 sombreadas" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_vs_t60.svg" alt="STI frente al tiempo de reverberación con las bandas de valoración del Anexo F de IEC 60268-16 sombreadas" width="80%" />
 
 *El final de la cadena en lugar de su parte central: lo que la forma cerrada de
 Schroeder le hace al STI a medida que crece la reverberación, frente a las
@@ -518,7 +518,7 @@ Consulta la [guía del índice de transmisión del habla](/phonometry/es/percept
 
 Mientras el STI caracteriza un canal de transmisión, el SII (ANSI S3.5-1997; los números de apartado que siguen son los de esa edición) predice la inteligibilidad a partir de lo que el oyente puede oír realmente: 18 bandas de tercio de octava de 160 Hz a 8 kHz, cada una con su importancia de banda $I_i$ (Tabla 3, $\sum I_i = 1$, con máximo cerca de 2 kHz).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_band_procedures_es.svg" alt="La función de importancia de banda de los cuatro procedimientos por bandas de ANSI S3.5-1997 superpuestos sobre un mismo eje logarítmico de frecuencia: las 21 bandas críticas, las 17 bandas críticas de contribución equitativa, las 18 bandas de tercio de octava y las 6 bandas de octava, cada una dibujada como un escalón entre sus propios límites de banda. Las cuatro trazan la misma subida hasta un máximo en torno a 2 kHz, y cuanto más anchas son las bandas más alto queda el escalón: la función de octava llega a 0,265 frente a 0,090 de la de tercio de octava" width="90%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_band_procedures.svg" alt="La función de importancia de banda de los cuatro procedimientos por bandas de ANSI S3.5-1997 superpuestos sobre un mismo eje logarítmico de frecuencia: las 21 bandas críticas, las 17 bandas críticas de contribución equitativa, las 18 bandas de tercio de octava y las 6 bandas de octava, cada una dibujada como un escalón entre sus propios límites de banda. Las cuatro trazan la misma subida hasta un máximo en torno a 2 kHz, y cuanto más anchas son las bandas más alto queda el escalón: la función de octava llega a 0,265 frente a 0,090 de la de tercio de octava" width="90%" />
 
 *La función de importancia dice dónde están las claves del habla, y los cuatro
 procedimientos por bandas de más abajo coinciden en ello: la misma subida hasta
@@ -555,7 +555,7 @@ $$
 
 La misma cadena recorre las otras tres tablas de bandas de la norma, seleccionadas con `method=`: las 21 bandas críticas de la Tabla 1, las 17 bandas críticas de contribución equitativa de la Tabla 2 y las 6 bandas de octava de la Tabla 4. Esas tres expresan la pendiente de enmascaramiento mediante el ancho de banda tabulado, $C_i = -80 + 0{,}6\,(B_i + 10 \log_{10} W_i)$, que es la misma fórmula que el $10 \log_{10} f_i - 6{,}353$ de arriba abrevia para una banda de tercio de octava; el procedimiento por bandas de octava prescinde por completo de la propagación del enmascaramiento, ya que una banda de octava ya es más ancha que la propagación que se modela. Los espectros normalizados de habla de la Tabla 3 para los esfuerzos vocales normal, elevado, fuerte y grito están incorporados (25,01 / 33,86 / 42,16 / 51,31 dB a 1 kHz); el $U_i$ del factor de distorsión de nivel es siempre el espectro de esfuerzo normal.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/standard_speech_spectrum_es.svg" alt="Los cuatro espectros de habla normalizados de ANSI S3.5-1997 (normal, elevado, fuerte y grito) como una sola familia rotulada: el nivel del espectro de habla normalizado en dB SPL de 160 Hz a 8000 Hz, con cada esfuerzo mayor levantando el espectro entero" width="90%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/standard_speech_spectrum.svg" alt="Los cuatro espectros de habla normalizados de ANSI S3.5-1997 (normal, elevado, fuerte y grito) como una sola familia rotulada: el nivel del espectro de habla normalizado en dB SPL de 160 Hz a 8000 Hz, con cada esfuerzo mayor levantando el espectro entero" width="90%" />
 
 *Los cuatro esfuerzos vocales, en nivel espectral y no en nivel de banda, que es
 la razón por la que la curva de esfuerzo normal pasa por 25,01 dB a 1 kHz y no
@@ -629,7 +629,7 @@ y cualquier fractil sigue un modelo gaussiano bilateral (apartado 4.4), $\Delta 
 
 Consulta la [guía de umbral de audición](/phonometry/es/perception/hearing/hearing-threshold/) para su uso.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_threshold_es.svg" alt="Dos paneles. Izquierda: la desviación mediana del umbral de audición de ISO 7029 para hombres a los 20, 40, 60 y 80 años en un eje de audiograma invertido, con la banda del 10 al 90 por ciento en torno a la curva de 70 años; la pérdida se acentúa hacia las altas frecuencias y con la edad. Derecha: el umbral de referencia de campo libre y campo difuso de ISO 389-7, que coinciden por debajo de 1 kHz y divergen por encima, con un mínimo cerca de 3 a 4 kHz" width="96%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_threshold.svg" alt="Dos paneles. Izquierda: la desviación mediana del umbral de audición de ISO 7029 para hombres a los 20, 40, 60 y 80 años en un eje de audiograma invertido, con la banda del 10 al 90 por ciento en torno a la curva de 70 años; la pérdida se acentúa hacia las altas frecuencias y con la edad. Derecha: el umbral de referencia de campo libre y campo difuso de ISO 389-7, que coinciden por debajo de 1 kHz y divergen por encima, con un mínimo cerca de 3 a 4 kHz" width="96%" />
 
 *La desviación mediana con la edad de ISO 7029 con su banda de fractiles (izquierda) y los umbrales de referencia de campo libre y difuso de ISO 389-7 (derecha).*
 
@@ -651,7 +651,7 @@ $$
 
 Los ejemplos resueltos del Anexo D (Tablas D.1–D.4; p. ej. 100 dB / 40 años a 3 kHz: 29/38/60 dB en los fractiles 0,10/0,50/0,90) se reproducen exactamente con el redondeo a enteros de la norma, y el valor a mano de la Fórmula 2 a 4 kHz / 20 años / 90 dB es $N_{50} = 12{,}94$ dB.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/nipts_audiogram_es.svg" alt="Desplazamiento permanente del umbral inducido por ruido según ISO 1999 tras 40 años a 95 dB(A) normalizados a 8 h, en un eje de audiograma invertido de 500 Hz a 6000 Hz: la mediana es casi nula a 500 Hz y se ahonda hasta unos 26 dB a 4000 Hz antes de recuperarse a 6000 Hz, y la banda de fractiles del 10 al 90 por ciento a su alrededor llega casi a 37 dB para el décimo más susceptible" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/nipts_audiogram.svg" alt="Desplazamiento permanente del umbral inducido por ruido según ISO 1999 tras 40 años a 95 dB(A) normalizados a 8 h, en un eje de audiograma invertido de 500 Hz a 6000 Hz: la mediana es casi nula a 500 Hz y se ahonda hasta unos 26 dB a 4000 Hz antes de recuperarse a 6000 Hz, y la banda de fractiles del 10 al 90 por ciento a su alrededor llega casi a 37 dB para el décimo más susceptible" width="88%" />
 
 *El modelo como audiograma: 40 años a 95 dB(A) normalizados a 8 h. La muesca a
 4 kHz es lo que hace reconocible en consulta la pérdida inducida por ruido, y

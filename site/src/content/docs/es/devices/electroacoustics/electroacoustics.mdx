@@ -102,7 +102,7 @@ conversor. Y el apartado 9 exige que el amplificador funcione aproximadamente en
 condiciones normalizadas de medición durante 1 h antes de la primera lectura,
 porque el calentamiento interno mueve la tensión de salida.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_distortion_bench_es.svg" alt="Banco de distorsión eléctrica de la IEC 60268-3: un generador de sinusoide con la f.e.m. de fuente nominal reducida 10 dB alimenta el amplificador bajo ensayo a través de la impedancia de fuente nominal, los terminales de salida se cargan con una resistencia de carga nominal no inductiva, una rama de trazos inserta el filtro paso bajo analógico de la IEC 61606-1 para las salidas en clase D, y un divisor resistivo alimenta el analizador con al menos 10 dB de margen, con las tres comprobaciones de aceptación y el ancho de banda de medición AES17 de 20 Hz a 20 kHz anotados debajo" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_distortion_bench.svg" alt="Banco de distorsión eléctrica de la IEC 60268-3: un generador de sinusoide con la f.e.m. de fuente nominal reducida 10 dB alimenta el amplificador bajo ensayo a través de la impedancia de fuente nominal, los terminales de salida se cargan con una resistencia de carga nominal no inductiva, una rama de trazos inserta el filtro paso bajo analógico de la IEC 61606-1 para las salidas en clase D, y un divisor resistivo alimenta el analizador con al menos 10 dB de margen, con las tres comprobaciones de aceptación y el ancho de banda de medición AES17 de 20 Hz a 20 kHz anotados debajo" width="92%" />
 
 **Qué hay que anotar.** Ninguna de las razones de abajo significa nada por sí
 sola. Informa, junto a cada cifra, de la frecuencia fundamental, de la tensión o
@@ -156,7 +156,7 @@ su banda media y en torno al 10 % donde alcanza su límite de excursión —, po
 significan que una lectura del «2 %» condena a un amplificador y no tiene nada
 de particular en un woofer.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/distortion_es.svg" alt="Espectro de magnitud de un ensayo con tono único de 1 kHz en dB respecto al fundamental, con los cinco primeros armónicos marcados sobre un suelo de ruido de banda ancha, anotado con THD (F), THD (R), THD+N y SINAD" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/distortion.svg" alt="Espectro de magnitud de un ensayo con tono único de 1 kHz en dB respecto al fundamental, con los cinco primeros armónicos marcados sobre un suelo de ruido de banda ancha, anotado con THD (F), THD (R), THD+N y SINAD" width="82%" loading="eager" />
 
 *La escalera de armónicos es la firma del dispositivo, y su forma es
 diagnóstica: un segundo armónico dominante apunta a una no linealidad asimétrica
@@ -303,7 +303,7 @@ print(electroacoustics.weighted_thd(signal, fs, 100.0, weighting="A"))   # varia
 print(electroacoustics.itu_r_468_weighting([6300.0]))                    # [+12.2167] dB
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/itu_r_468_weighting_es.svg" alt="La red de ponderación ITU-R BS.468-4 frente a la frecuencia, que sube hasta más 12,2 dB cerca de 6,3 kHz y cae bruscamente por encima, con la variante CCIR-RMS desplazada 5,63 dB hacia abajo para que valga 0 dB a 2 kHz, y la curva de ponderación A dibujada en tono claro como referencia; los puntos marcados son 0 dB a 1 kHz y más 12,2 dB a 6,3 kHz para la forma 468, y menos 5,63 dB a 1 kHz para la CCIR-RMS" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/itu_r_468_weighting.svg" alt="La red de ponderación ITU-R BS.468-4 frente a la frecuencia, que sube hasta más 12,2 dB cerca de 6,3 kHz y cae bruscamente por encima, con la variante CCIR-RMS desplazada 5,63 dB hacia abajo para que valga 0 dB a 2 kHz, y la curva de ponderación A dibujada en tono claro como referencia; los puntos marcados son 0 dB a 1 kHz y más 12,2 dB a 6,3 kHz para la forma 468, y menos 5,63 dB a 1 kHz para la CCIR-RMS" width="82%" />
 
 *Una sola curva gobierna tres magnitudes de esta página y una cuarta en la guía
 de micrófonos, así que vale la pena leerla una vez. No es una curva de sonoridad:
@@ -465,7 +465,7 @@ modulación del espectro armónico de la sección 1. La relación asimétrica en
 los pares $n = 2$ y $n = 3$ lee de un vistazo el equilibrio entre los términos
 cuadrático y cúbico de la no linealidad:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/modulation_distortion_es.svg" alt="Espectro de distorsión de modulación de un ensayo de dos tonos de 60 Hz más 7 kHz a través de un amplificador débilmente no lineal: la portadora a 7 kHz como referencia de 0 dB y las cuatro bandas laterales de intermodulación a 7 kHz más menos 60 y 120 Hz marcadas con su orden, anotado con los valores por orden d2 y d3 de IEC 60268-3 y el RMS combinado SMPTE" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/modulation_distortion.svg" alt="Espectro de distorsión de modulación de un ensayo de dos tonos de 60 Hz más 7 kHz a través de un amplificador débilmente no lineal: la portadora a 7 kHz como referencia de 0 dB y las cuatro bandas laterales de intermodulación a 7 kHz más menos 60 y 120 Hz marcadas con su orden, anotado con los valores por orden d2 y d3 de IEC 60268-3 y el RMS combinado SMPTE" width="82%" />
 
 *El par $n = 2$ lee el término cuadrático de la no linealidad y el par $n = 3$
 el cúbico, así que su relación dice qué orden domina antes de abrir ningún
@@ -496,7 +496,7 @@ Los otros tres ensayos devuelven escalares, así que la única forma de ver *qu�
 productos cuenta cada uno — que es toda la diferencia entre ellos — es marcarlos
 sobre el espectro de un mismo dispositivo:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intermodulation_tests_es.svg" alt="Tres espectros apilados del mismo dispositivo débilmente no lineal: el ensayo de diferencia de frecuencias a 13 y 14 kHz con el producto de segundo orden en 1 kHz y los dos productos de tercer orden en 12 y 15 kHz etiquetados; el ensayo de distorsión total por diferencia de frecuencias a 8 y 11,95 kHz con solo los dos productos en banda cerca de 3,95 y 4,05 kHz sombreados; y la señal de intermodulación dinámica, cuyo peine de onda cuadrada de 3,15 kHz filtrada en paso bajo se mezcla con la sinusoide de 15 kHz y deja un conjunto de productos por debajo de 15 kHz, cada uno con su tallo y etiquetado con su índice armónico k" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intermodulation_tests.svg" alt="Tres espectros apilados del mismo dispositivo débilmente no lineal: el ensayo de diferencia de frecuencias a 13 y 14 kHz con el producto de segundo orden en 1 kHz y los dos productos de tercer orden en 12 y 15 kHz etiquetados; el ensayo de distorsión total por diferencia de frecuencias a 8 y 11,95 kHz con solo los dos productos en banda cerca de 3,95 y 4,05 kHz sombreados; y la señal de intermodulación dinámica, cuyo peine de onda cuadrada de 3,15 kHz filtrada en paso bajo se mezcla con la sinusoide de 15 kHz y deja un conjunto de productos por debajo de 15 kHz, cada uno con su tallo y etiquetado con su índice armónico k" width="92%" />
 
 *El mismo dispositivo, tres ensayos, tres conjuntos distintos de productos. El
 ensayo de diferencia de frecuencias cuenta el producto grave $f_2 - f_1$ y los
@@ -547,7 +547,7 @@ entrada; para un camino lineal sin ruido ambos recuperan la respuesta verdadera
 y $\gamma^2 = 1$. El ruido aditivo a la salida sesga $H_2$ al alza y baja la
 coherencia hasta $\mathrm{SNR}/(1+\mathrm{SNR})$.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/frequency_response_es.svg" alt="Tres paneles que comparan los estimadores H1 y H2 del mismo dispositivo paso banda: con el ruido en la salida, H1 sigue la respuesta verdadera y H2 se eleva por encima de ella hacia los bordes de banda; con el ruido en la entrada el veredicto se invierte y H2 es el estimador insesgado; y el panel compartido de coherencia de abajo muestra la gamma cuadrado medida asentada sobre la predicción punteada SNR partido por uno más SNR" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/frequency_response.svg" alt="Tres paneles que comparan los estimadores H1 y H2 del mismo dispositivo paso banda: con el ruido en la salida, H1 sigue la respuesta verdadera y H2 se eleva por encima de ella hacia los bordes de banda; con el ruido en la entrada el veredicto se invierte y H2 es el estimador insesgado; y el panel compartido de coherencia de abajo muestra la gamma cuadrado medida asentada sobre la predicción punteada SNR partido por uno más SNR" width="82%" />
 
 *Elige el estimador cuyo canal ruidoso está en el denominador: $H_1$ cuando el
 ruido está en la salida y $H_2$ cuando está en la entrada, y el mismo registro

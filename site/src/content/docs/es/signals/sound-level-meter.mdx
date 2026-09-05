@@ -38,13 +38,13 @@ sonómetro funcional. Todos los fragmentos se ejecutan tal cual (las señales
 se sintetizan para que la página sea autocontenida), y cada etapa enlaza con
 la guía de fondo que la explica por completo.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_slm_pipeline_es.svg" alt="La cadena del sonómetro de esta página: el tono del calibrador alimenta a sensitivity() para obtener el factor en pascales por unidad digital, la grabación de medición se une a él como presión calibrada y de ahí salen tres ramas de lectura, weighting_filter con time_weighting para el LAF(t) de pantalla y los niveles percentiles, laeq, sel y lc_peak para los niveles integrados, y octave_filter para el espectro en tercios de octava, cerradas por verify_weighting_class y verify_filter_class frente a los límites de aceptación de la Tabla 3 de IEC 61672-1 y la Tabla 1 de IEC 61260-1" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_slm_pipeline.svg" alt="La cadena del sonómetro de esta página: el tono del calibrador alimenta a sensitivity() para obtener el factor en pascales por unidad digital, la grabación de medición se une a él como presión calibrada y de ahí salen tres ramas de lectura, weighting_filter con time_weighting para el LAF(t) de pantalla y los niveles percentiles, laeq, sel y lc_peak para los niveles integrados, y octave_filter para el espectro en tercios de octava, cerradas por verify_weighting_class y verify_filter_class frente a los límites de aceptación de la Tabla 3 de IEC 61672-1 y la Tabla 1 de IEC 61260-1" width="92%" loading="eager" />
 
 Es la misma cadena que IEC 61672-1 dibuja para el instrumento físico: el
 calibrador de clase 1 ancla el micrófono a 94 dB a 1 kHz, y cada etapa
 posterior es una función de esta página.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_slm_chain_es.svg" alt="Cadena del sonómetro según IEC 61672-1: un calibrador acústico de clase 1 a 94 dB y 1 kHz acoplado al micrófono de medición con su pantalla antiviento, seguido de las cuatro etapas del instrumento: micrófono y preamplificador, ponderación frecuencial A, C o Z, cuadrado con la ponderación temporal exponencial F o S de 125 ms o 1 s, y la pantalla con LAF(t) en dB re 20 µPa" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_slm_chain.svg" alt="Cadena del sonómetro según IEC 61672-1: un calibrador acústico de clase 1 a 94 dB y 1 kHz acoplado al micrófono de medición con su pantalla antiviento, seguido de las cuatro etapas del instrumento: micrófono y preamplificador, ponderación frecuencial A, C o Z, cuadrado con la ponderación temporal exponencial F o S de 125 ms o 1 s, y la pantalla con LAF(t) en dB re 20 µPa" width="92%" />
 
 Los fragmentos de esta página se apoyan unos en otros: ejecútalos de arriba
 abajo en una misma sesión (o pega la página entera en un script).
@@ -214,7 +214,7 @@ la energía comprimida en un segundo. Los percentiles se leen al revés: el even
 ocupa exactamente el 10 % del registro, así que sube el $L_{10}$ a 78,0 dB y
 deja el $L_{90}$ en 54,9 dB, el nivel de fondo.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slm_level_track_es.svg" alt="Historial de nivel ponderado A con respuesta Fast de la grabación de diez segundos de esta página, que sube desde unos 55 dB de fondo rosa hasta 80 dB durante el evento de un segundo en el segundo cuatro, con líneas horizontales en LAeq 70,2 dB, L10 78,0 dB, L50 55,1 dB y L90 54,9 dB, el segundo del evento sombreado, y una anotación que dice LAE 80,2 dB, toda la energía del evento comprimida en un segundo" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slm_level_track.svg" alt="Historial de nivel ponderado A con respuesta Fast de la grabación de diez segundos de esta página, que sube desde unos 55 dB de fondo rosa hasta 80 dB durante el evento de un segundo en el segundo cuatro, con líneas horizontales en LAeq 70,2 dB, L10 78,0 dB, L50 55,1 dB y L90 54,9 dB, el segundo del evento sombreado, y una anotación que dice LAE 80,2 dB, toda la energía del evento comprimida en un segundo" width="88%" />
 
 *Las lecturas de este paso dibujadas sobre la grabación que las produjo: el
 segundo del evento sube el $L_\mathrm{Aeq}$ y el $L_{10}$, y deja el $L_{50}$ y el
@@ -299,7 +299,7 @@ print(f"suma de las bandas A {10 * np.log10(np.sum(10 ** (spl_a / 10))):.1f} dB"
 Esa identidad cierra el círculo entre las dos mitades del sonómetro: la etapa de
 ponderación y la etapa de filtrado miden la misma energía.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slm_third_octave_es.svg" alt="Treinta y tres niveles de banda de tercio de octava de la grabación de esta página en forma de gráfica escalonada de 12,5 Hz a 20 kHz, con las bandas sin ponderar planas en torno a 43 dB y la banda de 1 kHz resaltada en 70 dB, dibujadas junto al espectro ponderado A de la misma grabación, que cae por debajo de 500 Hz y por encima de 4 kHz" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slm_third_octave.svg" alt="Treinta y tres niveles de banda de tercio de octava de la grabación de esta página en forma de gráfica escalonada de 12,5 Hz a 20 kHz, con las bandas sin ponderar planas en torno a 43 dB y la banda de 1 kHz resaltada en 70 dB, dibujadas junto al espectro ponderado A de la misma grabación, que cae por debajo de 500 Hz y por encima de 4 kHz" width="88%" />
 
 *La misma grabación leída en bandas, sin ponderar y con ponderación A. El ruido
 rosa da niveles de banda de fracción de octava casi constantes, así que el suelo

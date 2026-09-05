@@ -138,7 +138,7 @@ niveles se dispersan más de 3 dB, ver la sección de incertidumbre de
 [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/));
 en todo lo demás, energía.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/energy_vs_arithmetic_mean_es.svg" alt="Panel izquierdo: dos barras, medio periodo a 60 dB y medio periodo a 80 dB, con la media aritmética de los valores en decibelios marcada en 70 dB y la media energética real, el Leq, en 77 dB, y la diferencia de siete decibelios entre ambas anotada. Panel derecho: la diferencia entre el Leq y la media aritmética de los valores de nivel frente a la desviación típica de esos niveles, de cero a doce decibelios, con una curva para una dispersión gaussiana que sigue 0,115 sigma al cuadrado y otra para una dispersión de dos niveles, ambas crecientes de forma monótona desde cero, con la desviación típica de cinco decibelios que corresponde a una dispersión de diez decibelios marcada en torno a dos decibelios y medio" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/energy_vs_arithmetic_mean.svg" alt="Panel izquierdo: dos barras, medio periodo a 60 dB y medio periodo a 80 dB, con la media aritmética de los valores en decibelios marcada en 70 dB y la media energética real, el Leq, en 77 dB, y la diferencia de siete decibelios entre ambas anotada. Panel derecho: la diferencia entre el Leq y la media aritmética de los valores de nivel frente a la desviación típica de esos niveles, de cero a doce decibelios, con una curva para una dispersión gaussiana que sigue 0,115 sigma al cuadrado y otra para una dispersión de dos niveles, ambas crecientes de forma monótona desde cero, con la desviación típica de cinco decibelios que corresponde a una dispersión de diez decibelios marcada en torno a dos decibelios y medio" width="88%" />
 
 *La media aritmética de decibelios siempre lee de menos. El error es la
 diferencia del panel izquierdo, crece con la dispersión de los niveles que se
@@ -213,7 +213,7 @@ print(f"LA10={stats[10]:.1f}  LA50={stats[50]:.1f}  LA90={stats[90]:.1f} dB")
 # LA10=66.6  LA50=65.2  LA90=58.5 dB  -> L10 (eventos) > L50 (mediana) > L90 (fondo)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ln_levels_example_es.svg" alt="Historial del nivel Fast de un ruido fluctuante con los niveles estadísticos L10, L50 y L90 marcados" width="80%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ln_levels_example.svg" alt="Historial del nivel Fast de un ruido fluctuante con los niveles estadísticos L10, L50 y L90 marcados" width="80%" loading="eager" />
 
 *$L_{10}$ sigue los picos de los eventos, $L_{50}$ el nivel mediano y
 $L_{90}$ el fondo.*
@@ -274,7 +274,7 @@ que las normativas siempre indican la ponderación temporal.
 
 ### Leer Leq frente a los percentiles
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/level_distribution_es.svg" alt="Panel izquierdo: dos historiales de nivel Fast a lo largo de sesenta segundos que comparten una misma línea de LAeq en 61 dB, un ruido estacionario de tipo tráfico que oscila entre 55 y 66 dB y un fondo plano de 53 dB interrumpido por tres eventos breves de 78 dB. Panel derecho: sus curvas de excedencia, nivel frente a porcentaje del tiempo superado, con L10, L50 y L90 marcados en cada una. La curva del ruido estacionario cae suavemente de 66 a 55 dB en todo el rango, mientras que la de los eventos se mantiene plana en 53 dB a partir de un 6 % y solo sube con fuerza en sus primeros puntos porcentuales, y las dos anotaciones indican L10 menos L90 de 8,0 dB frente a 0,5 dB, y LAeq menos L50 de 1,7 dB frente a 7,6 dB" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/level_distribution.svg" alt="Panel izquierdo: dos historiales de nivel Fast a lo largo de sesenta segundos que comparten una misma línea de LAeq en 61 dB, un ruido estacionario de tipo tráfico que oscila entre 55 y 66 dB y un fondo plano de 53 dB interrumpido por tres eventos breves de 78 dB. Panel derecho: sus curvas de excedencia, nivel frente a porcentaje del tiempo superado, con L10, L50 y L90 marcados en cada una. La curva del ruido estacionario cae suavemente de 66 a 55 dB en todo el rango, mientras que la de los eventos se mantiene plana en 53 dB a partir de un 6 % y solo sube con fuerza en sus primeros puntos porcentuales, y las dos anotaciones indican L10 menos L90 de 8,0 dB frente a 0,5 dB, y LAeq menos L50 de 1,7 dB frente a 7,6 dB" width="88%" />
 
 *El mismo $L_\mathrm{Aeq}$, dos ruidos opuestos. El estacionario tiene la dispersión
 percentil ancha y un $L_\mathrm{eq}$ que queda justo por encima de su mediana; el que
@@ -455,7 +455,7 @@ tonos de HF sostenidos hasta ~1,15 dB (un tono de 8 kHz a 48 kHz tiene solo
 original. Con `duration_hours`, la entrada se trata como muestra representativa
 de ese periodo de exposición; sin él, la entrada es el evento completo.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/peak_oversampling_es.svg" alt="Panel izquierdo: dos ciclos y medio de un tono de 8 kHz muestreado a 48 kHz, con seis puntos de muestra por ciclo dibujados sobre la forma de onda continua reconstruida y la cresta cayendo justo a mitad de camino entre dos muestras, con el pico verdadero en 1,0 y la mayor muestra en 0,87 marcados y etiquetados como 1,25 dB por debajo. Panel derecho: la subestimación en el peor caso, en decibelios, frente al número de muestras por ciclo de tres a cuarenta y ocho en eje logarítmico, con una curva para cada valor de sobremuestreo 1, 2, 4 y 8; la curva de sobremuestreo 1 va entre unos 0,8 y 2,8 decibelios, la de sobremuestreo 2 entre 0,3 y 1,2, y la de sobremuestreo 8 queda plana por debajo de una décima de decibelio" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/peak_oversampling.svg" alt="Panel izquierdo: dos ciclos y medio de un tono de 8 kHz muestreado a 48 kHz, con seis puntos de muestra por ciclo dibujados sobre la forma de onda continua reconstruida y la cresta cayendo justo a mitad de camino entre dos muestras, con el pico verdadero en 1,0 y la mayor muestra en 0,87 marcados y etiquetados como 1,25 dB por debajo. Panel derecho: la subestimación en el peor caso, en decibelios, frente al número de muestras por ciclo de tres a cuarenta y ocho en eje logarítmico, con una curva para cada valor de sobremuestreo 1, 2, 4 y 8; la curva de sobremuestreo 1 va entre unos 0,8 y 2,8 decibelios, la de sobremuestreo 2 entre 0,3 y 1,2, y la de sobremuestreo 8 queda plana por debajo de una décima de decibelio" width="88%" />
 
 *El pico de una forma de onda muestreada casi nunca cae sobre una muestra: con
 seis muestras por ciclo el peor caso pierde 1,25 dB, y dónde caen las muestras
@@ -531,7 +531,7 @@ de modo que los eventos de cualquier duración resultan directamente
 comparables, y $N$ eventos idénticos se suman como $+10\log_{10}N$. Es el
 bloque básico de los modelos de ruido aeroportuario y ferroviario.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sel_concept_es.svg" alt="Historial del nivel del paso de un vehículo con su Leq sobre el evento completo y el bloque SEL de un segundo con la misma energía" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sel_concept.svg" alt="Historial del nivel del paso de un vehículo con su Leq sobre el evento completo y el bloque SEL de un segundo con la misma energía" width="80%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -652,7 +652,7 @@ como *representativa* de todo el periodo, así que una muestra tomada durante
 unos minutos poco representativos sesga la jornada entera de forma directa, que
 es justo lo que las estrategias de muestreo de ISO 9612 existen para controlar.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dose_exchange_es.svg" alt="Nivel ponderado A de 80 a 110 decibelios frente a la duración de la exposición de un minuto a ocho horas en eje logarítmico, con tres contornos rectos de igual exposición para LEX,8h de 80, 85 y 87 decibelios, cada uno rotulado con su exposición sonora en pascales al cuadrado por hora, todos con pendiente ascendente de tres decibelios por cada reducción a la mitad de la duración, y el punto de anclaje de 90 decibelios durante ocho horas marcado en 3,2 pascales al cuadrado por hora" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dose_exchange.svg" alt="Nivel ponderado A de 80 a 110 decibelios frente a la duración de la exposición de un minuto a ocho horas en eje logarítmico, con tres contornos rectos de igual exposición para LEX,8h de 80, 85 y 87 decibelios, cada uno rotulado con su exposición sonora en pascales al cuadrado por hora, todos con pendiente ascendente de tres decibelios por cada reducción a la mitad de la duración, y el punto de anclaje de 90 decibelios durante ocho horas marcado en 3,2 pascales al cuadrado por hora" width="88%" />
 
 *Todos los puntos de una misma línea son la misma exposición diaria. La
 pendiente de 3 dB por cada reducción a la mitad de la duración es la hipótesis
@@ -726,7 +726,7 @@ levels, freq, times = bank.spectrogram(recording, window_time=0.125, overlap=0.5
 # levels: (bandas, ventanas) — listo para pcolormesh(times, freq, levels)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/spectrogram_example_es.webp" alt="Espectrograma en bandas de 1/12 de octava de un barrido logarítmico con dos ráfagas tonales" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/spectrogram_example.webp" alt="Espectrograma en bandas de 1/12 de octava de un barrido logarítmico con dos ráfagas tonales" width="80%" />
 
 *Un barrido logarítmico y dos ráfagas tonales, resueltos en el tiempo y en
 bandas normalizadas de 1/12 de octava.*

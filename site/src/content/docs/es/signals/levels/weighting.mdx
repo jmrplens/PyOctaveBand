@@ -47,7 +47,7 @@ Esta guía cubre **A**, **C** y **Z**, las curvas especificadas en
 la familia, la curva G de infrasonido, las históricas B y D y la curva AU, es
 [Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, C y Z de IEC 61672-1 con zoom de la región positiva de la curva A (+1,27 dB a 2,5 kHz)" width="80%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses.svg" alt="Curvas de ponderación A, C y Z de IEC 61672-1 con zoom de la región positiva de la curva A (+1,27 dB a 2,5 kHz)" width="80%" loading="eager" />
 
 *Las tres curvas de IEC 61672-1, medidas con los filtros de la propia
 biblioteca a 48 kHz: A, que descarta los graves; C, que los conserva; y Z,
@@ -130,7 +130,7 @@ ningún conformado dentro de la banda especificada; su objetivo de diseño es
 ceros está en la
 página de [Teoría](/phonometry/es/reference/theory/signal-analysis/).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_equal_loudness_weighting_es.svg" alt="Líneas isofónicas según ISO 226 a la izquierda, con la línea isofónica de 40 fonios resaltada; a la derecha la curva de ponderación A superpuesta a la línea isofónica de 40 fonios invertida, mostrando que A es la línea isofónica volteada congelada en un filtro realizable" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_equal_loudness_weighting.svg" alt="Líneas isofónicas según ISO 226 a la izquierda, con la línea isofónica de 40 fonios resaltada; a la derecha la curva de ponderación A superpuesta a la línea isofónica de 40 fonios invertida, mostrando que A es la línea isofónica volteada congelada en un filtro realizable" width="92%" />
 
 ### Una breve historia: A, B, C y Z
 
@@ -187,7 +187,7 @@ print(f"LAeq = {la:.1f} dB   LCeq = {lc:.1f} dB   C - A = {lc - la:.1f} dB")
 # C - A por encima de 20 dB: el número ponderado A ocultaría el retumbo.
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/c_minus_a_spectrum_es.svg" alt="Niveles en tercios de octava de dos señales, cada una dibujada sin ponderar, con ponderación A y con ponderación C. A la izquierda, un retumbo de 50 Hz bajo un siseo ligero: las curvas sin ponderar y ponderada C coinciden en un pico de 77 dB en la banda de 50 Hz, mientras que la curva ponderada A recorta esa misma banda hasta 47 dB, y el recuadro indica LAeq 52,4 dB, LCeq 75,7 dB y C menos A 23,2 dB. A la derecha, ruido rosa de banda ancha: las tres curvas quedan a un par de decibelios unas de otras desde 1 kHz hacia arriba y la curva A cae por debajo de esa frecuencia, y el recuadro indica LAeq 54,6 dB, LCeq 56,4 dB y C menos A 1,8 dB" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/c_minus_a_spectrum.svg" alt="Niveles en tercios de octava de dos señales, cada una dibujada sin ponderar, con ponderación A y con ponderación C. A la izquierda, un retumbo de 50 Hz bajo un siseo ligero: las curvas sin ponderar y ponderada C coinciden en un pico de 77 dB en la banda de 50 Hz, mientras que la curva ponderada A recorta esa misma banda hasta 47 dB, y el recuadro indica LAeq 52,4 dB, LCeq 75,7 dB y C menos A 23,2 dB. A la derecha, ruido rosa de banda ancha: las tres curvas quedan a un par de decibelios unas de otras desde 1 kHz hacia arriba y la curva A cae por debajo de esa frecuencia, y el recuadro indica LAeq 54,6 dB, LCeq 56,4 dB y C menos A 1,8 dB" width="92%" />
 
 *Los mismos tres niveles de banda para dos señales. Una fuente concentrada en
 baja frecuencia (izquierda) pone casi toda su energía justo donde A recorta con
@@ -369,7 +369,7 @@ reales tiene pendiente nula allí. De ahí sale la fila 468 de la tabla anterior
 —su falda sigue cayendo a unos $-30$ dB/octava donde termina la banda— y es el
 3 % de la tolerancia de $\pm 2$ dB de esa curva, no una carencia de exactitud.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_accuracy_hf_es.svg" alt="Precisión en alta frecuencia de la ponderación A a 48 kHz: curva analítica frente a bilineal simple y diseño ajustado a la frecuencia de muestreo, con error" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_accuracy_hf.svg" alt="Precisión en alta frecuencia de la ponderación A a 48 kHz: curva analítica frente a bilineal simple y diseño ajustado a la frecuencia de muestreo, con error" width="80%" />
 
 *El diseño bilineal simple (rojo) cruza la tolerancia de clase 1 cerca de
 12,5 kHz; el diseño ajustado (azul) se apoya sobre la curva analítica.*
@@ -540,7 +540,7 @@ nota al pie de su Tabla V hace que una sola máscara gobierne todas las
 características de ponderación, así que B se somete allí a esos mismos
 límites en lugar de tomar prestados los de ANSI.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_class_mask_es.svg" alt="Desviaciones de las ponderaciones A y C a 48 kHz dentro del corredor de aceptación de clase 1 de la Tabla 3 de IEC 61672-1, con los límites más amplios de clase 2 punteados" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_class_mask.svg" alt="Desviaciones de las ponderaciones A y C a 48 kHz dentro del corredor de aceptación de clase 1 de la Tabla 3 de IEC 61672-1, con los límites más amplios de clase 2 punteados" width="80%" />
 
 *Los diseños ajustados A y C (azul, morado) se mantienen cerca de
 desviación cero, holgadamente dentro del corredor de clase 1 (sombreado); los

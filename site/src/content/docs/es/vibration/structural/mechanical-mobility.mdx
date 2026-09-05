@@ -44,7 +44,7 @@ añade el lado de medición: la estimación de FRF a partir de señales medidas 
 sus criterios de aceptación. Esta base de FRF sustenta las normas de fuente y
 transmisión de ruido estructural: ISO 9611, ISO 10846, EN 15657 y EN 12354-5.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mechanical_mobility_es.svg" alt="Magnitudes de receptancia, movilidad y acelerancia del mismo resonador de un grado de libertad en un eje de frecuencia log-log, cada una multiplicada por una constante para que las tres compartan un mismo eje y alcancen el máximo a la misma altura, en torno a veinticinco. Las tres alcanzan el máximo a la misma frecuencia y difieren en pendiente a uno y otro lado de él en una potencia de la frecuencia: la receptancia es plana por debajo de la resonancia y cae con pendiente pronunciada por encima, la acelerancia sube con pendiente pronunciada por debajo y se aplana por encima, y la movilidad queda entre ambas con pendiente más uno y menos uno." width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mechanical_mobility.svg" alt="Magnitudes de receptancia, movilidad y acelerancia del mismo resonador de un grado de libertad en un eje de frecuencia log-log, cada una multiplicada por una constante para que las tres compartan un mismo eje y alcancen el máximo a la misma altura, en torno a veinticinco. Las tres alcanzan el máximo a la misma frecuencia y difieren en pendiente a uno y otro lado de él en una potencia de la frecuencia: la receptancia es plana por debajo de la resonancia y cae con pendiente pronunciada por encima, la acelerancia sube con pendiente pronunciada por debajo y se aplana por encima, y la movilidad queda entre ambas con pendiente más uno y menos uno." width="82%" loading="eager" />
 
 *Toda la familia de la Tabla 1 en una sola figura. Las tres curvas alcanzan el
 máximo a la misma frecuencia porque describen el mismo resonador; lo que las
@@ -224,7 +224,7 @@ martillo instrumentado: cambia el espectro controlado del excitador acoplado
 por rapidez, con un espectro de excitación fijado por la masa del impactador
 y la rigidez de la punta.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_mobility_rig_es.svg" alt="Medición de movilidad ISO 7626: una viga libre-libre en suspensión blanda excitada por un excitador a través de una varilla de arrastre y una cabeza de impedancia en el punto de excitación, un acelerómetro en un punto de transferencia y un martillo de impacto como excitación alternativa. Debajo, un recuadro de tres paneles muestra el acelerómetro conectado a través de la varilla de arrastre marcado como no válido, el transductor de fuerza en la estructura marcado como válido y el transductor de fuerza en el extremo del excitador marcado con precaución, con los criterios de movilidad de diez veces para el acoplo del excitador y para la suspensión enunciados debajo." width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_mobility_rig.svg" alt="Medición de movilidad ISO 7626: una viga libre-libre en suspensión blanda excitada por un excitador a través de una varilla de arrastre y una cabeza de impedancia en el punto de excitación, un acelerómetro en un punto de transferencia y un martillo de impacto como excitación alternativa. Debajo, un recuadro de tres paneles muestra el acelerómetro conectado a través de la varilla de arrastre marcado como no válido, el transductor de fuerza en la estructura marcado como válido y el transductor de fuerza en el extremo del excitador marcado con precaución, con los criterios de movilidad de diez veces para el acoplo del excitador y para la suspensión enunciados debajo." width="92%" />
 
 ### Qué tiene que hacer la suspensión (apartado 5.3)
 
@@ -432,7 +432,7 @@ El criterio de error aleatorio es una decisión que se toma *antes* de medir, no
 una comprobación posterior, y cuántos promedios cuesta depende mucho de la
 coherencia que se espere:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mobility_random_error_es.svg" alt="Error aleatorio normalizado frente al número de espectros promediados en ejes logarítmicos, con una recta descendente por cada valor de coherencia de 0,5 a 0,95. Una línea horizontal de trazos marca el criterio del cinco por ciento, y donde la cruza cada curva se señala el número de promedios que esa coherencia necesita para alcanzarlo: once promedios con una coherencia de 0,95, veintidós con 0,9, cincuenta con 0,8, ochenta y seis con 0,7 y doscientos con 0,5. Una estrella marca el propio ejemplo resuelto de la norma, una coherencia de 0,8 con setenta y cinco promedios que da 4,08 por ciento." width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mobility_random_error.svg" alt="Error aleatorio normalizado frente al número de espectros promediados en ejes logarítmicos, con una recta descendente por cada valor de coherencia de 0,5 a 0,95. Una línea horizontal de trazos marca el criterio del cinco por ciento, y donde la cruza cada curva se señala el número de promedios que esa coherencia necesita para alcanzarlo: once promedios con una coherencia de 0,95, veintidós con 0,9, cincuenta con 0,8, ochenta y seis con 0,7 y doscientos con 0,5. Una estrella marca el propio ejemplo resuelto de la norma, una coherencia de 0,8 con setenta y cinco promedios que da 4,08 por ciento." width="82%" />
 
 *Lo que cuesta el criterio, en función de lo buena que ya sea la medición.
 Llegar al 5 % cuesta 11 promedios con $\gamma^2 = 0,95$ y 200 con
@@ -513,7 +513,7 @@ print(res.passed)                                         # False (la deriva sup
 res.plot()
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rigid_mass_calibration_es.svg" alt="Verificación de calibración con masa rígida de un bloque de 10 kg: la magnitud de acelerancia medida sigue la recta plana de masa rígida dentro de la banda de tolerancia de más menos cinco por ciento en casi todo el rango, luego se desvía por encima de la banda hacia unos pocos kilohercios donde se marcan los puntos fuera de tolerancia, y el panel inferior muestra la misma desviación en porcentaje cruzando el límite de más cinco por ciento" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rigid_mass_calibration.svg" alt="Verificación de calibración con masa rígida de un bloque de 10 kg: la magnitud de acelerancia medida sigue la recta plana de masa rígida dentro de la banda de tolerancia de más menos cinco por ciento en casi todo el rango, luego se desvía por encima de la banda hacia unos pocos kilohercios donde se marcan los puntos fuera de tolerancia, y el panel inferior muestra la misma desviación en porcentaje cruzando el límite de más cinco por ciento" width="82%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -566,7 +566,7 @@ print(res.frequencies[int(np.argmax(res.magnitude))].round(1))   # ~10.1 Hz
 res.plot()   # |Y(f)| con la resonancia marcada (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mobility_result_lines_es.svg" alt="Magnitud de la movilidad en el punto de excitación de un resonador de un grado de libertad en ejes log-log, subiendo por la línea de rigidez por debajo de la resonancia, bajando por la línea de masa por encima y con el pico en uno partido por el coeficiente de amortiguamiento en la resonancia" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mobility_result_lines.svg" alt="Magnitud de la movilidad en el punto de excitación de un resonador de un grado de libertad en ejes log-log, subiendo por la línea de rigidez por debajo de la resonancia, bajando por la línea de masa por encima y con el pico en uno partido por el coeficiente de amortiguamiento en la resonancia" width="82%" />
 
 *Leer una movilidad en el punto de excitación es un diagnóstico estructural.
 Por debajo de la resonancia la magnitud sube por la **línea de rigidez**
@@ -660,7 +660,7 @@ cuando la excitación es un momento y no una fuerza; y
 `longitudinal_rod_mobility` (con su recíproca `longitudinal_rod_impedance`)
 cubre un puntal o un tramo de tubería cargados a lo largo de su eje.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/infinite_mobilities_es.svg" alt="Dos paneles que comparten un eje logarítmico de frecuencia. El panel superior es la magnitud de la movilidad en el punto de excitación de cuatro estructuras: el resonador de un grado de libertad con su pico agudo dibujado a trazos, una línea horizontal para la placa infinita de hormigón, una recta descendente de pendiente menos un medio para la viga infinita de acero y una segunda línea horizontal para el puntal de acero en movimiento longitudinal. El panel inferior es la fase de cada una: el resonador barre desde más noventa grados hasta menos noventa pasando por cero en su resonancia, mientras que la placa y la barra se quedan en cero y la viga se queda en menos cuarenta y cinco grados a toda frecuencia." width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/infinite_mobilities.svg" alt="Dos paneles que comparten un eje logarítmico de frecuencia. El panel superior es la magnitud de la movilidad en el punto de excitación de cuatro estructuras: el resonador de un grado de libertad con su pico agudo dibujado a trazos, una línea horizontal para la placa infinita de hormigón, una recta descendente de pendiente menos un medio para la viga infinita de acero y una segunda línea horizontal para el puntal de acero en movimiento longitudinal. El panel inferior es la fase de cada una: el resonador barre desde más noventa grados hasta menos noventa pasando por cero en su resonancia, mientras que la placa y la barra se quedan en cero y la viga se queda en menos cuarenta y cinco grados a toda frecuencia." width="82%" />
 
 *El contraste al que va toda la sección. Una estructura infinita no devuelve
 nunca nada reflejado, así que no tiene resonancia ni pico: la placa y la barra

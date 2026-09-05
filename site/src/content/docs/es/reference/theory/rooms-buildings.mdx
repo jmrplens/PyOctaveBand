@@ -266,7 +266,7 @@ punto de tangencia.
 
 Consulta la [guía de criterios de ruido de salas](/phonometry/es/buildings/rooms/room-noise/) para su uso.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria_es.svg" alt="Dos paneles para el mismo espectro de sala dominado por la ventilación. Izquierda: los niveles medidos por banda de octava sobre la familia de curvas NC, con un rombo rojo que marca el punto de tangencia a 250 Hz que fija la valoración NC-42,5. Derecha: el mismo espectro sobre la curva de referencia RC-35, con las bandas de baja frecuencia atravesando la tolerancia de retumbo sombreada (más 5 dB por debajo de 500 Hz) de modo que el ruido se clasifica como RC-35(R), y la tolerancia de siseo (más 3 dB a 1000 Hz y por encima) sombreada para comparar" width="96%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria.svg" alt="Dos paneles para el mismo espectro de sala dominado por la ventilación. Izquierda: los niveles medidos por banda de octava sobre la familia de curvas NC, con un rombo rojo que marca el punto de tangencia a 250 Hz que fija la valoración NC-42,5. Derecha: el mismo espectro sobre la curva de referencia RC-35, con las bandas de baja frecuencia atravesando la tolerancia de retumbo sombreada (más 5 dB por debajo de 500 Hz) de modo que el ruido se clasifica como RC-35(R), y la tolerancia de siseo (más 3 dB a 1000 Hz y por encima) sombreada para comparar" width="96%" />
 
 *Un único espectro dominado por la ventilación, leído por los dos
 procedimientos. El índice NC lo fija la banda de 250 Hz, y no ninguna de las
@@ -327,7 +327,7 @@ $$
 
 es decir, una suma acumulada invertida en tiempo discreto. La integración inversa cancela la fluctuación aleatoria de una única respuesta al impulso al cuadrado: para un decaimiento de energía puramente exponencial $p^2(t) = e^{-a t}$ da $E(t) = e^{-a t}/a$, una recta exactamente $L(t) = -(10 a / \ln 10)\ t$. El ruido de fondo aplana $E(t)$, así que la integración se trunca en el cruce $t_1$ de la recta de decaimiento ajustada con el nivel de ruido y la cola que falta se compensa con una exponencial de la pendiente ajustada; sin ese término la integral finita **subestima** sistemáticamente $T$.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/schroeder_decay_es.webp" alt="Respuesta al impulso al cuadrado con su curva de decaimiento por integración inversa de Schroeder, y las ventanas de regresión EDT, T20 y T30 marcadas" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/schroeder_decay.webp" alt="Respuesta al impulso al cuadrado con su curva de decaimiento por integración inversa de Schroeder, y las ventanas de regresión EDT, T20 y T30 marcadas" width="80%" />
 
 *Una respuesta al impulso al cuadrado, su integral inversa de Schroeder y las ventanas de regresión EDT/T20/T30 del siguiente apartado.*
 
@@ -365,7 +365,7 @@ $$
 
 con $t_\mathrm{e} = 50$ ms (C50, habla) o 80 ms (C80, música), y el **tiempo central** $T_\mathrm{s} = \int_0^{\infty} t\ p^2\ dt / \int_0^{\infty} p^2\ dt$. Para un decaimiento puramente exponencial tienen formas cerradas $C_{te} = 10 \log_{10}(e^{a t_\mathrm{e}} - 1)$ y $T_\mathrm{s} = 1/a$; a $T = 1$ s ($a = 13{,}8155$) evalúan a C80 = 3,05 dB, C50 = −0,02 dB, D50 = 0,499 y Ts = 72,4 ms, los valores que reproduce la implementación. Las JND de la Tabla A.1 (EDT 5 %, C80 1 dB, D50 0,05, Ts 10 ms) acotan con qué finura merece la pena informar cada una.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_parameters_bands_es.svg" alt="Parámetros por banda de ISO 3382 de una respuesta al impulso de sala sintética: barras agrupadas de EDT, T20 y T30 por banda de octava que caen desde unos 1,4 s a 125 Hz hasta 0,7 s a 4 kHz, sobre un segundo panel donde C50 y C80 crecen con la frecuencia" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_parameters_bands.svg" alt="Parámetros por banda de ISO 3382 de una respuesta al impulso de sala sintética: barras agrupadas de EDT, T20 y T30 por banda de octava que caen desde unos 1,4 s a 125 Hz hasta 0,7 s a 4 kHz, sobre un segundo panel donde C50 y C80 crecen con la frecuencia" width="92%" />
 
 *Las formas cerradas anteriores valen para un único decaimiento exponencial;
 una sala real da un juego de valores por banda. El panel superior es el
@@ -389,7 +389,7 @@ distancia cruza 0,50 y 0,20; una pendiente ajustada no negativa (el STI no
 decrece con la distancia) las deja indefinidas, materializando la nota de la
 norma de que «puede resultar imposible de determinar».
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_decay_es.svg" alt="Decaimiento espacial en oficina diáfana: nivel de habla ponderado A y STI frente a la distancia a la fuente en eje logarítmico, con la regresión de D2,S, el marcador de Lp,A,S,4m a 4 m y los cruces de las distancias rD y rP" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_decay.svg" alt="Decaimiento espacial en oficina diáfana: nivel de habla ponderado A y STI frente a la distancia a la fuente en eje logarítmico, con la regresión de D2,S, el marcador de Lp,A,S,4m a 4 m y los cruces de las distancias rD y rP" width="80%" />
 
 *Dos regresiones sobre dos ejes distintos, que es lo que hace difícil de
 retener este apartado. La recta de nivel se ajusta frente a
@@ -441,7 +441,7 @@ sobre el mismo rango de bandas que el índice al que acompañan, así que un té
 de adaptación citado sobre 100–3150 Hz y otro extendido hasta 50 Hz no son
 magnitudes comparables.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating_es.svg" alt="Índice de reducción acústica medido en tercios de octava con la curva de referencia de ISO 717-1 desplazada y el índice ponderado resultante a 500 Hz" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating.svg" alt="Índice de reducción acústica medido en tercios de octava con la curva de referencia de ISO 717-1 desplazada y el índice ponderado resultante a 500 Hz" width="80%" />
 
 *Un espectro R medido frente a la referencia de ISO 717-1 desplazada: el índice es la referencia desplazada leída a 500 Hz.*
 
@@ -464,7 +464,7 @@ ISO 717-2 se reproducen exactamente (tercios $L_\mathrm{n,w} = 79$, $C_\mathrm{I
 octavas $54$, $0$), mediante la misma búsqueda de desplazamiento monótono que
 ISO 717-1 ejecutada sobre las curvas negadas.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating_es.svg" alt="Nivel de presión acústica de impactos normalizado medido en tercios de octava con la curva de referencia de ISO 717-2 desplazada y el índice ponderado resultante leído a 500 Hz" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating.svg" alt="Nivel de presión acústica de impactos normalizado medido en tercios de octava con la curva de referencia de ISO 717-2 desplazada y el índice ponderado resultante leído a 500 Hz" width="80%" />
 
 *La imagen especular de la figura de ruido aéreo anterior, dibujada para que la
 inversión se vea en vez de enunciarse. Allí las desviaciones desfavorables se
@@ -534,7 +534,7 @@ que difiere en *qué se normaliza* no es laboratorio frente a campo, sino ruido
 aéreo frente a impactos: los índices a ruido aéreo escalan por la razón
 superficie-absorción $S/A$, y los niveles de impactos por $A/A_0$.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_lab_es.svg" alt="Planta de un conjunto de transmisión de laboratorio según ISO 10140: dos cámaras reverberantes, emisora y receptora, desacopladas estructuralmente y de unos 59 y 51 metros cúbicos, con el elemento de ensayo montado en el hueco de ensayo de 10 metros cuadrados entre ambas, un altavoz en una esquina de la cámara emisora y un micrófono en movimiento continuo con un radio de barrido de al menos 1 m en cada cámara" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_lab.svg" alt="Planta de un conjunto de transmisión de laboratorio según ISO 10140: dos cámaras reverberantes, emisora y receptora, desacopladas estructuralmente y de unos 59 y 51 metros cúbicos, con el elemento de ensayo montado en el hueco de ensayo de 10 metros cuadrados entre ambas, un altavoz en una esquina de la cámara emisora y un micrófono en movimiento continuo con un radio de barrido de al menos 1 m en cada cámara" width="92%" />
 
 Lo que significa físicamente que «una instalación cualificada la suprime» está
 dibujado arriba: un conjunto según ISO 10140-5 son dos cámaras reverberantes
@@ -571,7 +571,7 @@ cada elemento de flanco $F=f$ a través de su unión con el elemento separador, 
 tres trayectorias $Ff$, $Df$ y $Fd$ (EN 12354-1, modelo simplificado de un solo
 número, Fórmula 26):
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_flanking_paths_es.svg" alt="La trayectoria directa Dd a través del elemento separador y las tres trayectorias por flancos Ff, Df y Fd a través de cada unión entre un elemento de flanco y el elemento separador" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_flanking_paths.svg" alt="La trayectoria directa Dd a través del elemento separador y las tres trayectorias por flancos Ff, Df y Fd a través de cada unión entre un elemento de flanco y el elemento separador" width="92%" />
 
 *Las cuatro etiquetas solo tienen sentido sobre este dibujo. La mayúscula es el
 lado emisor y la minúscula el lado receptor, así que $Dd$ atraviesa directamente
@@ -663,7 +663,7 @@ reproducen: la sala desnuda de 29,75 m³ da $A = 2{,}26$ m² y $T = 2{,}1$ s a
 baja $T$ a 0,9 s. El método informativo del Anexo D para espacios irregulares
 y absorción distribuida de forma no uniforme queda fuera de alcance.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_space_absorption_es.svg" alt="Dos paneles para una oficina de 60 metros cúbicos con techo desnudo frente a techo tratado acústicamente: el área de absorción equivalente por banda de octava, mucho mayor con el techo acústico, y el tiempo de reverberación cayendo desde unos cinco segundos en baja frecuencia para la sala desnuda hasta menos de un segundo con el techo acústico" width="96%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_space_absorption.svg" alt="Dos paneles para una oficina de 60 metros cúbicos con techo desnudo frente a techo tratado acústicamente: el área de absorción equivalente por banda de octava, mucho mayor con el techo acústico, y el tiempo de reverberación cayendo desde unos cinco segundos en baja frecuencia para la sala desnuda hasta menos de un segundo con el techo acústico" width="96%" />
 
 *Lo que hace la Fórmula 1 banda a banda: el área de absorción equivalente a la
 izquierda y el tiempo de reverberación que implica por la Fórmula 5 a la
@@ -716,7 +716,7 @@ $10\log_{10}(S/S_\mathrm{a})$. La trayectoria de transmisión resonante y la rad
 doble se apoyan en la eficiencia de radiación de placa y las movilidades
 puntuales de la [teoría de vibración](/phonometry/es/reference/theory/vibration/).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept_es.svg" alt="Cuatro paneles: la ley de masas de una hoja simple con su caída de aislamiento en la coincidencia, la pared doble con la resonancia masa-muelle-masa y la ganancia de cámara, la eficiencia de radiación de la placa subiendo a la unidad por encima de la frecuencia crítica, y una pared compuesta cuya rendija abierta del 1 % limita R al tope del área abierta" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept.svg" alt="Cuatro paneles: la ley de masas de una hoja simple con su caída de aislamiento en la coincidencia, la pared doble con la resonancia masa-muelle-masa y la ganancia de cámara, la eficiencia de radiación de la placa subiendo a la unidad por encima de la frecuencia crítica, y una pared compuesta cuya rendija abierta del 1 % limita R al tope del área abierta" width="92%" />
 
 *Los cuatro comportamientos del párrafo anterior, uno por panel. Arriba a la
 izquierda, la ley de masas subiendo 6 dB por octava con la caída del aislamiento en la coincidencia
@@ -728,7 +728,7 @@ el techo que impone una fuga: un área abierta del 1 % deja la composición en
 $10\log_{10}(S/S_\mathrm{a}) = 20$ dB por buena que sea la pared, que es el panel que
 merece la pena enseñar a un cliente.*
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aperture_slit_geometry_es.svg" alt="Sección a escala de una rendija de 2 mm a través de una pared de 100 mm: la pared rayada dibujada en sección con la estrecha ranura de aire horizontal a media altura, una flecha de sonido incidente que apunta a la ranura desde la izquierda, las cotas de los 100 mm de espesor de pared y los 2 mm de ancho de rendija, y frentes de onda circulares transmitidos esbozados expandiéndose desde la salida de la rendija a la derecha" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aperture_slit_geometry.svg" alt="Sección a escala de una rendija de 2 mm a través de una pared de 100 mm: la pared rayada dibujada en sección con la estrecha ranura de aire horizontal a media altura, una flecha de sonido incidente que apunta a la ranura desde la izquierda, las cotas de los 100 mm de espesor de pared y los 2 mm de ancho de rendija, y frentes de onda circulares transmitidos esbozados expandiéndose desde la salida de la rendija a la derecha" width="80%" />
 
 Consulta la guía [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/)
 para su uso.

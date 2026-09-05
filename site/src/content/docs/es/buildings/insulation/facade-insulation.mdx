@@ -142,7 +142,7 @@ superficie reflectante y es por tanto más alto que el campo libre que la misma
 fuente produciría con el edificio quitado, así que un $D_{2\mathrm{m,nT}}$ y un $D_\mathrm{nT}$
 interior no son la misma clase de número aunque tengan el mismo tamaño.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_facade_setup_es.svg" alt="Sección por una fachada de vivienda: un altavoz sobre el terreno con la línea de incidencia de 45 grados más menos 5 grados hasta el centro de un elemento de ensayo de 11,5 metros cuadrados, la distancia oblicua r acotada en 5 m para el método del elemento y 7 m para el método global y la perpendicular D debajo, un micrófono sujeto enrasado sobre el elemento de ensayo con sus tolerancias de 10 mm en paralelo y 3 mm en normal, y el micrófono global a 2,0 más menos 0,2 m del plano de la fachada a 1,5 m sobre el suelo del recinto receptor" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_facade_setup.svg" alt="Sección por una fachada de vivienda: un altavoz sobre el terreno con la línea de incidencia de 45 grados más menos 5 grados hasta el centro de un elemento de ensayo de 11,5 metros cuadrados, la distancia oblicua r acotada en 5 m para el método del elemento y 7 m para el método global y la perpendicular D debajo, un micrófono sujeto enrasado sobre el elemento de ensayo con sus tolerancias de 10 mm en paralelo y 3 mm en normal, y el micrófono global a 2,0 más menos 0,2 m del plano de la fachada a 1,5 m sobre el suelo del recinto receptor" width="92%" loading="eager" />
 
 <span id="elegir-y-realizar-el-metodo"></span>
 
@@ -241,7 +241,7 @@ print(building.weighted_rating(fac.d_2m_nt).rating)             # 42  Dls,2m,nT,
 fac.plot()   # D2m,nT por banda con D2m, D2m,n y R' superpuestos (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_field_insulation_es.svg" alt="Aislamiento de fachada in situ de una vivienda con el método del altavoz a 45 grados: la D2m,nT estandarizada, la D2m bruta, la D2m,n normalizada y el índice de reducción aparente R'45 por banda de tercio de octava, con el índice Dls,2m,nT,w anotado" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_field_insulation.svg" alt="Aislamiento de fachada in situ de una vivienda con el método del altavoz a 45 grados: la D2m,nT estandarizada, la D2m bruta, la D2m,n normalizada y el índice de reducción aparente R'45 por banda de tercio de octava, con el índice Dls,2m,nT,w anotado" width="80%" />
 
 *Las cuatro magnitudes de fachada de una misma medición: la $D_{2\mathrm{m}}$ bruta,
 sus formas estandarizada y normalizada, y la $R'_{45°}$ de elemento con la
@@ -367,7 +367,7 @@ tabla de la Figura C.2 para galerías, balcones y terrazas, interpolando sobre
 la absorción del intradós $\alpha_\mathrm{w}$). Los índices de un solo número reutilizan
 EN ISO 717-1 (`weighted_rating`).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_prediction_es.svg" alt="Índices de reducción acústica parciales por elemento y la reducción aparente de la fachada R' y la diferencia de nivel estandarizada D2m,nT resultantes para el ejemplo resuelto del Anexo F de EN 12354-3, con la entrada de aire limitando las bandas bajas" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_prediction.svg" alt="Índices de reducción acústica parciales por elemento y la reducción aparente de la fachada R' y la diferencia de nivel estandarizada D2m,nT resultantes para el ejemplo resuelto del Anexo F de EN 12354-3, con la entrada de aire limitando las bandas bajas" width="80%" />
 
 *Una fachada compuesta la gobierna su elemento peor, y las curvas dibujadas
 dicen cuál es banda a banda: la entrada de aire, una fracción de metro
@@ -438,7 +438,7 @@ calculada. `plot_facade_elements` la tesela con el área dibujada de cada
 elemento igual a su área real, y una predicción que retuvo sus `elements`
 redibuja *su propia* fachada con `fac.plot_geometry()`.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_elevation_geometry_es.svg" alt="Alzado a escala de una fachada compuesta: un muro de fábrica rayado de 6 m2, una ventana de 1,5 m2 y un estrecho cajón de persiana de 0,3 m2 dibujados como piezas de una fachada de 3,95 m por 1,97 m cuyas áreas dibujadas igualan las reales, cada pieza rotulada con su área y el ancho y alto totales acotados" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_elevation_geometry.svg" alt="Alzado a escala de una fachada compuesta: un muro de fábrica rayado de 6 m2, una ventana de 1,5 m2 y un estrecho cajón de persiana de 0,3 m2 dibujados como piezas de una fachada de 3,95 m por 1,97 m cuyas áreas dibujadas igualan las reales, cada pieza rotulada con su área y el ancho y alto totales acotados" width="88%" />
 
 *Las áreas que pondera la suma energética, a escala: la ventana tiene un
 cuarto del área del muro pero cada metro cuadrado suyo transmite cien veces
@@ -553,7 +553,7 @@ print(round(a_tot, 1), round(building.outdoor_level(62.9, a_tot), 1))   # 26.3 3
 seg.plot()   # LW radiada por octava con la línea de LWA ponderada A (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiated_power_outdoor_es.svg" alt="Nivel de potencia acústica radiada por banda de octava del segmento de muro con puerta industrial del Anexo G de EN 12354-4, con el valor único ponderado A dibujado como línea discontinua sobre las barras" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiated_power_outdoor.svg" alt="Nivel de potencia acústica radiada por banda de octava del segmento de muro con puerta industrial del Anexo G de EN 12354-4, con el valor único ponderado A dibujado como línea discontinua sobre las barras" width="80%" />
 
 *El segmento del lado 1 del Anexo G: el muro domina la superficie pero la
 $R$ más débil de la puerta gobierna la potencia radiada, así que el espectro

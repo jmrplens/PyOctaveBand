@@ -54,7 +54,7 @@ respuesta al impulso en un micrófono a la altura $d_\mathrm{m}$. Las componente
 Adrienne; su función de transferencia da el factor de reflexión y de ahí la
 absorción.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction_es.svg" alt="Absorción in situ de pavimentos por la técnica de sustracción de ISO 13472-1: un altavoz a 1,25 m y un micrófono a 0,25 m sobre la superficie del pavimento, con los trayectos de rayo directo y reflejado por el pavimento y una medición de referencia en campo libre, con la componente reflejada aislada por una ventana temporal de Adrienne" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction.svg" alt="Absorción in situ de pavimentos por la técnica de sustracción de ISO 13472-1: un altavoz a 1,25 m y un micrófono a 0,25 m sobre la superficie del pavimento, con los trayectos de rayo directo y reflejado por el pavimento y una medición de referencia en campo libre, con la componente reflejada aislada por una ventana temporal de Adrienne" width="92%" loading="eager" />
 
 **Divergencia geométrica (apartado 4.1).** La onda reflejada recorre más camino
 que la directa, así que se atenúa por el factor de divergencia geométrica
@@ -217,7 +217,7 @@ espectro que sube de forma inverosímil en las bandas declaradas más bajas es l
 señal habitual de una ventana demasiado corta, o de una llegada parásita dentro
 de ella.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/adrienne_window_es.svg" alt="Tres paneles apilados sobre un eje temporal común: la respuesta al impulso de referencia en campo libre con la ventana de Adrienne colocada sobre el sonido directo; la respuesta medida sobre el pavimento, donde las llegadas directa y reflejada se solapan, con su separación de 1,47 milisegundos acotada, la reflexión de la superficie ya restada y la ventana de Adrienne de 10,5 milisegundos dibujada encima con una llegada parásita justo fuera de la puerta; y los espectros incidente y reflejado enventanados resultantes, con el límite recíproco de la ventana de 95 hercios marcado y la región por debajo de la banda declarada de 250 hercios sombreada" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/adrienne_window.svg" alt="Tres paneles apilados sobre un eje temporal común: la respuesta al impulso de referencia en campo libre con la ventana de Adrienne colocada sobre el sonido directo; la respuesta medida sobre el pavimento, donde las llegadas directa y reflejada se solapan, con su separación de 1,47 milisegundos acotada, la reflexión de la superficie ya restada y la ventana de Adrienne de 10,5 milisegundos dibujada encima con una llegada parásita justo fuera de la puerta; y los espectros incidente y reflejado enventanados resultantes, con el límite recíproco de la ventana de 95 hercios marcado y la región por debajo de la banda declarada de 250 hercios sombreada" width="88%" />
 
 *Todo el método en tres trazas. Las dos llegadas están separadas 1,47 ms en la
 geometría obligatoria, así que ninguna puerta las separa; la traza roja del
@@ -282,7 +282,7 @@ print(np.round(result.absorption[[0, 6, 12]], 2))  # [0.31 0.65 1.  ]
 result.plot()   # diagrama de barras alpha(f) en 250-4000 Hz (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_absorption_es.svg" alt="Un espectro de absorción de pavimento in situ en tercios de octava calculado por la vía del factor de reflexión a partir de una reflexión de pavimento sintética, creciendo desde cerca de 0,3 a 250 Hz hasta casi 1,0 por encima de 2 kHz" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_absorption.svg" alt="Un espectro de absorción de pavimento in situ en tercios de octava calculado por la vía del factor de reflexión a partir de una reflexión de pavimento sintética, creciendo desde cerca de 0,3 a 250 Hz hasta casi 1,0 por encima de 2 kHz" width="88%" />
 
 *La absorción crece con la frecuencia porque la superficie refleja menos energía
 de alta frecuencia, exactamente como dicta el factor de reflexión paso bajo
@@ -348,7 +348,7 @@ disposición estándar con ese radio muestreado sobre la superficie, y un
 `InsituAbsorptionResult` medido que retuvo sus alturas redibuja el suyo con
 `result.plot_geometry()`.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_setup_geometry_es.svg" alt="Vista lateral a escala del montaje de absorción in situ: el altavoz en su mástil a 1,25 m sobre la superficie rayada de la calzada, el micrófono en la misma vertical a 0,25 m, el trayecto reflejado en la superficie a trazos bajo él y el radio de 1,34 m de la zona muestreada acotado sobre la superficie" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_setup_geometry.svg" alt="Vista lateral a escala del montaje de absorción in situ: el altavoz en su mástil a 1,25 m sobre la superficie rayada de la calzada, el micrófono en la misma vertical a 0,25 m, el trayecto reflejado en la superficie a trazos bajo él y el radio de 1,34 m de la zona muestreada acotado sobre la superficie" width="88%" />
 
 *La geometría estándar a escala: fuente a 1,25 m, micrófono a 0,25 m en la
 misma vertical, y la ventana de 5 ms convertida en los 1,34 m de radio de
@@ -462,7 +462,7 @@ transferencia es la
 rutina de tubo de impedancia `two_microphone_impedance` (véase la
 [guía del Tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/)).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spot_tube_es.svg" alt="Método puntual de ISO 13472-2: un tubo circular corto sellado sobre la superficie del pavimento con un altavoz en la parte superior y dos micrófonos enrasados en la pared del tubo con espaciado s, midiendo la absorción de 250 a 1600 Hz mediante el método de la función de transferencia de dos micrófonos de ISO 10534-2" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spot_tube.svg" alt="Método puntual de ISO 13472-2: un tubo circular corto sellado sobre la superficie del pavimento con un altavoz en la parte superior y dos micrófonos enrasados en la pared del tubo con espaciado s, midiendo la absorción de 250 a 1600 Hz mediante el método de la función de transferencia de dos micrófonos de ISO 10534-2" width="92%" />
 
 El aparato es un tubo de impedancia portátil puesto en vertical: un altavoz
 en la parte superior, dos micrófonos enrasados con espaciado $s$ en la pared
@@ -613,7 +613,7 @@ entre 315 Hz y 1600 Hz aunque sus campos de aplicación difieran:
   tipos de superficie y los criterios de aceptación, esa diferencia práctica
   suele ser la que decide.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_method_windows_es.svg" alt="Dos paneles: arriba, los rangos declarados en tercios de octava de los dos métodos dibujados como barras sobre un eje logarítmico de frecuencia común, de 250 a 4000 hercios para la técnica de sustracción y de 250 a 1600 hercios para el tubo puntual, con el intervalo de 315 a 1600 hercios en el que la Parte 2 espera que coincidan sombreado; abajo, el techo de onda plana del tubo puntual cayendo según crece el diámetro, con el ejemplo resuelto de 100 milímetros marcado en 1989 hercios y la región por debajo del borde superior de banda de 1800 hercios sombreada para mostrar que un diámetro por encima de 111 milímetros deja de cubrir el rango declarado" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_method_windows.svg" alt="Dos paneles: arriba, los rangos declarados en tercios de octava de los dos métodos dibujados como barras sobre un eje logarítmico de frecuencia común, de 250 a 4000 hercios para la técnica de sustracción y de 250 a 1600 hercios para el tubo puntual, con el intervalo de 315 a 1600 hercios en el que la Parte 2 espera que coincidan sombreado; abajo, el techo de onda plana del tubo puntual cayendo según crece el diámetro, con el ejemplo resuelto de 100 milímetros marcado en 1989 hercios y la región por debajo del borde superior de banda de 1800 hercios sombreada para mostrar que un diámetro por encima de 111 milímetros deja de cubrir el rango declarado" width="88%" />
 
 *Por qué la elección se decide tanto por ancho de banda como por logística. El
 techo del tubo puntual lo fija su propio diámetro, y el diámetro tiene dos

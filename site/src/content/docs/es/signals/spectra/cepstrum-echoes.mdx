@@ -49,7 +49,7 @@ Todo el truco es una cadena de cuatro pasos: el logaritmo convierte un eco
 multiplicativo en ondulación espectral aditiva, y la FFT inversa colapsa esa
 ondulación en un único pico de quefrencia.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_cepstrum_echoes_es.svg" alt="Diagrama de bloques de la cadena del cepstrum: una señal formada por una ondícula fuente más un eco con coeficiente de reflexión 0,5 a 8 milisegundos produce un espectro ondulado con periodo de 125 hercios, tomar el logaritmo del módulo al cuadrado convierte el eco multiplicativo en ondulación aditiva, y la FFT inversa aterriza en el eje de quefrencia, dibujado debajo con la ondícula fuente concentrada bajo 2 milisegundos, un pico de altura 0,5 exactamente en 8 milisegundos, un segundo rahmónico negativo de menos 0,125 al doble del retardo, y un corte de lifter discontinuo en 4 milisegundos que separa el lado paso bajo de la envolvente del lado paso alto de la ondulación; los pies dan la serie de alturas de los rahmónicos y las cotas de la ondulación de más 3,5 y menos 6,0 decibelios" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_cepstrum_echoes.svg" alt="Diagrama de bloques de la cadena del cepstrum: una señal formada por una ondícula fuente más un eco con coeficiente de reflexión 0,5 a 8 milisegundos produce un espectro ondulado con periodo de 125 hercios, tomar el logaritmo del módulo al cuadrado convierte el eco multiplicativo en ondulación aditiva, y la FFT inversa aterriza en el eje de quefrencia, dibujado debajo con la ondícula fuente concentrada bajo 2 milisegundos, un pico de altura 0,5 exactamente en 8 milisegundos, un segundo rahmónico negativo de menos 0,125 al doble del retardo, y un corte de lifter discontinuo en 4 milisegundos que separa el lado paso bajo de la envolvente del lado paso alto de la ondulación; los pies dan la serie de alturas de los rahmónicos y las cotas de la ondulación de más 3,5 y menos 6,0 decibelios" width="92%" />
 
 El vocabulario es el juego de palabras deliberado de Bogert sobre el dominio
 que refleja, que es el único dato que hace los nombres memorables en lugar de
@@ -97,7 +97,7 @@ print(res.quefrencies[:3], res.cepstrum.shape)   # eje de quefrencia, en s
 res.plot(language="es")
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_variants_es.svg" alt="Los cepstra de potencia, real y complejo de una ondícula con un eco de 8 milisegundos superpuestos frente a la quefrencia hasta 20 milisegundos: los tres llevan un pico positivo nítido en 8 milisegundos y uno negativo pequeño en 16 milisegundos, la ondícula fuente llena la región por debajo de unos 2 milisegundos, y un recuadro ampliado sobre el primer rahmónico muestra los picos de potencia y complejo llegando a 0,5 mientras el cepstrum real llega exactamente a la mitad" width="86%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_variants.svg" alt="Los cepstra de potencia, real y complejo de una ondícula con un eco de 8 milisegundos superpuestos frente a la quefrencia hasta 20 milisegundos: los tres llevan un pico positivo nítido en 8 milisegundos y uno negativo pequeño en 16 milisegundos, la ondícula fuente llena la región por debajo de unos 2 milisegundos, y un recuadro ampliado sobre el primer rahmónico muestra los picos de potencia y complejo llegando a 0,5 mientras el cepstrum real llega exactamente a la mitad" width="86%" />
 
 *Las tres variantes de un mismo registro con eco (una ondícula de banda
 limitada más una reflexión en 8 ms, $a = 0{,}5$). Las tres llevan los
@@ -194,7 +194,7 @@ print(res.delay, res.reflection_coefficient)  # 0.008 s, ~0.5
 res.plot(language="es")
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_echo_es.svg" alt="Cepstrum de potencia de una respuesta al impulso con una reflexión frente a la quefrencia en milisegundos: un pico positivo afilado exactamente a 8 milisegundos marcado como eco detectado, un segundo rahmónico negativo menor a 16 milisegundos, la envolvente de la fuente en las quefrencias bajas fuera de la banda de búsqueda sombreada y una línea discontinua en el retardo verdadero" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_echo.svg" alt="Cepstrum de potencia de una respuesta al impulso con una reflexión frente a la quefrencia en milisegundos: un pico positivo afilado exactamente a 8 milisegundos marcado como eco detectado, un segundo rahmónico negativo menor a 16 milisegundos, la envolvente de la fuente en las quefrencias bajas fuera de la banda de búsqueda sombreada y una línea discontinua en el retardo verdadero" width="82%" loading="eager" />
 
 *El cepstrum lee el eco en el eje y no en la forma de onda: el pico detectado
 cae en 8,000 ms y se levanta 0,488 frente al $a = 0{,}5$ verdadero. La
@@ -297,7 +297,7 @@ Cuatro condiciones deciden si el número significa algo:
    llegadas que interesan también evita que reflexiones posteriores añadan
    rahmónicos propios.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_echo_geometry_es.svg" alt="Alzado dibujado a escala: una fuente y un micrófono de medición separados 1 m a 1,2 m sobre un suelo duro, el camino directo de 1,00 m trazado en recta y el camino reflejado en el suelo de 2,60 m trazado a través de la fuente imagen bajo el plano del suelo, lo que da una diferencia de camino de 1,60 m y un retardo de 4,7 ms a 343 m por segundo; un segundo panel repite la construcción para una pared lateral a 1,37 m, que da los 8 ms y los 2,74 m propios de la página" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_echo_geometry.svg" alt="Alzado dibujado a escala: una fuente y un micrófono de medición separados 1 m a 1,2 m sobre un suelo duro, el camino directo de 1,00 m trazado en recta y el camino reflejado en el suelo de 2,60 m trazado a través de la fuente imagen bajo el plano del suelo, lo que da una diferencia de camino de 1,60 m y un retardo de 4,7 ms a 343 m por segundo; un segundo panel repite la construcción para una pared lateral a 1,37 m, que da los 8 ms y los 2,74 m propios de la página" width="92%" />
 
 ## 3. Liftering: envolvente frente a estructura fina
 
@@ -323,7 +323,7 @@ print(np.allclose(low.liftered_db + high.liftered_db, low.spectrum_db))
 low.plot(language="es")
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lifter_split_es.svg" alt="Dos paneles entre 500 y 2000 hercios para una ondícula que lleva un eco puro de 8 milisegundos: el espectro logarítmico oscila con un rizado de 125 hercios alrededor de la envolvente plana del lifter paso bajo, y debajo el rizado aislado por el lifter paso alto oscila exactamente entre las cotas discontinuas de forma cerrada en más 3,5 y menos 6 decibelios" width="86%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lifter_split.svg" alt="Dos paneles entre 500 y 2000 hercios para una ondícula que lleva un eco puro de 8 milisegundos: el espectro logarítmico oscila con un rizado de 125 hercios alrededor de la envolvente plana del lifter paso bajo, y debajo el rizado aislado por el lifter paso alto oscila exactamente entre las cotas discontinuas de forma cerrada en más 3,5 y menos 6 decibelios" width="86%" />
 
 *El reparto del lifter de 4 ms sobre un registro de eco puro: el lado paso
 bajo devuelve la envolvente espectral suave, el lado paso alto aísla el
@@ -479,7 +479,7 @@ print(res.mean_level, res.amplitude[k])      # ~1.0 y ~0.4
 res.plot(language="es")
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/envelope_spectrum_es.svg" alt="Espectro de la envolvente de un tono de un kilohercio modulado en amplitud dentro de ruido, frente a la frecuencia hasta cien hercios: una única línea afilada en la frecuencia de modulación de veinticinco hercios que alcanza exactamente la referencia punteada de amplitud cero coma cuatro, con un suelo de ruido plano en el resto" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/envelope_spectrum.svg" alt="Espectro de la envolvente de un tono de un kilohercio modulado en amplitud dentro de ruido, frente a la frecuencia hasta cien hercios: una única línea afilada en la frecuencia de modulación de veinticinco hercios que alcanza exactamente la referencia punteada de amplitud cero coma cuatro, con un suelo de ruido plano en el resto" width="82%" loading="eager" />
 
 *La línea no es proporcional a la modulación: **es** la modulación. Con $f_\mathrm{m}$ en
 un bin de análisis el detector de magnitud lee 0,3996 frente a la forma cerrada

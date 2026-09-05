@@ -70,7 +70,7 @@ apartado 20.3.
 (La trampa del micrófono es el *valor de referencia*, y tiene
 [su propia sección](/phonometry/es/devices/electroacoustics/microphones/#1-la-sensibilidad-y-sus-referencias-iec-60268-4-apartado-11).)
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_loudspeaker_freefield_es.svg" alt="Medición de la sensibilidad de un altavoz en campo libre según IEC 60268-5: un altavoz sobre un soporte en una cámara anecoica, alimentado por un amplificador a 2,83 V, con un micrófono de medición a la distancia de referencia r = 1 m sobre el eje de referencia, y las relaciones que gobiernan: la sensibilidad característica como Lp a 1 m para 1 W en la impedancia nominal, la tensión de excitación Up = raíz de (R por 1 W), la referencia por distancia inversa Lp(1 m) = Lp(r) + 20 lg(r / 1 m), y la sensibilidad de micrófono de IEC 60268-4 en mV/Pa o dB re 1 V/Pa" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_loudspeaker_freefield.svg" alt="Medición de la sensibilidad de un altavoz en campo libre según IEC 60268-5: un altavoz sobre un soporte en una cámara anecoica, alimentado por un amplificador a 2,83 V, con un micrófono de medición a la distancia de referencia r = 1 m sobre el eje de referencia, y las relaciones que gobiernan: la sensibilidad característica como Lp a 1 m para 1 W en la impedancia nominal, la tensión de excitación Up = raíz de (R por 1 W), la referencia por distancia inversa Lp(1 m) = Lp(r) + 20 lg(r / 1 m), y la sensibilidad de micrófono de IEC 60268-4 en mV/Pa o dB re 1 V/Pa" width="92%" />
 
 *La trampa que el dibujo existe para evitar es la de los 2,83 V: esa tensión es
 1 W en 8 Ω y 2 W en 4 Ω, así que la misma cifra infla un altavoz de 4 Ω en
@@ -212,7 +212,7 @@ print(round(float(res.directivity_index[0]), 2))  # 3.01 dB, límite de semiespa
 res.plot()                                      # R1 y X1 vs ka
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_radiation_impedance_es.svg" alt="Resistencia de radiación normalizada R1 y reactancia X1 de un pistón circular con pantalla de 75 mm frente a ka en eje logarítmico: R1 sube desde ka al cuadrado entre dos hasta la unidad con rizados decrecientes, mientras la X1 de tipo masa alcanza su máximo cerca de ka de 1,4 y decae, con el límite de alta frecuencia R1 igual a 1 marcado" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_radiation_impedance.svg" alt="Resistencia de radiación normalizada R1 y reactancia X1 de un pistón circular con pantalla de 75 mm frente a ka en eje logarítmico: R1 sube desde ka al cuadrado entre dos hasta la unidad con rizados decrecientes, mientras la X1 de tipo masa alcanza su máximo cerca de ka de 1,4 y decae, con el límite de alta frecuencia R1 igual a 1 marcado" width="82%" />
 
 *El `.plot()` del pistón de 75 mm de arriba es la figura clásica de impedancia
 de Beranek y Mellow: por debajo de $ka \approx 1$ la carga es
@@ -294,7 +294,7 @@ print(pattern.directivity_db.shape)  # (3, 361): una fila por ka
 pattern.plot()                       # diagrama de haz polar en dB (necesita matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_directivity_es.svg" alt="Directividad de campo lejano en polar de un pistón circular con pantalla para ka de 3, 8 y 16 sobre el hemisferio frontal, con el nivel en el eje arriba como referencia de 0 dB, que muestra el estrechamiento del lóbulo principal y la aparición de los lóbulos secundarios al crecer ka" width="72%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_directivity.svg" alt="Directividad de campo lejano en polar de un pistón circular con pantalla para ka de 3, 8 y 16 sobre el hemisferio frontal, con el nivel en el eje arriba como referencia de 0 dB, que muestra el estrechamiento del lóbulo principal y la aparición de los lóbulos secundarios al crecer ka" width="72%" />
 
 *Un pistón a tres frecuencias, no tres pistones: el primer nulo sigue a
 $ka\sin\theta = 3{,}8317$, así que un cono de 75 mm de radio alcanza $ka = 16$
@@ -319,7 +319,7 @@ resultado del pistón lo dibuja: la placa en su pantalla rígida a escala, con
 el lóbulo de campo lejano de la frecuencia más alta calculada superpuesto en
 el lado de radiación.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry_es.svg" alt="Un pistón rígido de 10 cm de radio dibujado a escala como una placa de 200 mm de diámetro empotrada en una pantalla vertical rayada, con el diámetro del pistón acotado y el lóbulo de directividad de campo lejano normalizado para ka de 7,3 superpuesto en el lado de radiación: un lóbulo principal largo pegado al eje punteado con pequeños lóbulos secundarios replegándose cerca de la placa" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry.svg" alt="Un pistón rígido de 10 cm de radio dibujado a escala como una placa de 200 mm de diámetro empotrada en una pantalla vertical rayada, con el diámetro del pistón acotado y el lóbulo de directividad de campo lejano normalizado para ka de 7,3 superpuesto en el lado de radiación: un lóbulo principal largo pegado al eje punteado con pequeños lóbulos secundarios replegándose cerca de la placa" width="82%" />
 
 *El pistón que describen las curvas de impedancia y directividad, a escala:
 a 4 kHz esta placa de 10 cm de radio tiene $ka \approx 7{,}3$, así que el lóbulo
@@ -478,7 +478,7 @@ result.plot(quantity="thd")          # distorsión armónica total vs frecuencia
 result.plot(quantity="directivity")  # respuesta polar sobre el círculo de 25 dB
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_response_es.svg" alt="Respuesta del nivel de presión acústica en el eje con su banda de tolerancia sombreada, la línea de referencia de -10 dB y los marcadores del rango efectivo sobre un eje de frecuencias nominales" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_response.svg" alt="Respuesta del nivel de presión acústica en el eje con su banda de tolerancia sombreada, la línea de referencia de -10 dB y los marcadores del rango efectivo sobre un eje de frecuencias nominales" width="82%" />
 
 *La ordenada está comprimida a la proporción de IEC 60263 de una década de
 frecuencia por cada 25 dB, que es lo que hace comparables a ojo dos hojas de
@@ -508,7 +508,7 @@ plt.show()
 
 </details>
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_impedance_es.svg" alt="Módulo de impedancia del altavoz frente a la frecuencia con la línea de impedancia nominal y la línea del 80 % de la nominal" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_impedance.svg" alt="Módulo de impedancia del altavoz frente a la frecuencia con la línea de impedancia nominal y la línea del 80 % de la nominal" width="82%" />
 
 *El pico a 52 Hz de este ejemplo es la resonancia fundamental del altavoz, donde
 la masa móvil y la compliancia de la suspensión intercambian energía y la fuerza
@@ -538,7 +538,7 @@ plt.show()
 
 </details>
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_thd_es.svg" alt="Distorsión armónica total del altavoz en porcentaje frente a la frecuencia" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_thd.svg" alt="Distorsión armónica total del altavoz en porcentaje frente a la frecuencia" width="82%" />
 
 *Se lee frente a la respuesta de encima: un pico de distorsión que coincide con
 un pico de respuesta es una resonancia excitada con fuerza, y una subida hacia
@@ -569,7 +569,7 @@ plt.show()
 
 </details>
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_directivity_es.svg" alt="Respuesta direccional polar del altavoz a 2000 Hz sobre el círculo de referencia de 25 dB de IEC 60263" width="72%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_directivity.svg" alt="Respuesta direccional polar del altavoz a 2000 Hz sobre el círculo de referencia de 25 dB de IEC 60263" width="72%" />
 
 *Dibujada sobre el círculo de referencia del apartado 3 de IEC 60263: el radio
 completo son 25 dB y cada anillo son 5 dB, así que el semiángulo de $-6$ dB — la
@@ -579,7 +579,7 @@ que reajustar la excitación en cada banda mientras se toma el corte.*
 
 El panel es un corte, y el apartado 23.1.2 dice cómo se toma un corte:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_loudspeaker_polar_es.svg" alt="Vista en planta de una medición polar en cámara anecoica: el altavoz está sobre un plato giratorio con su punto de referencia sobre el eje de giro y su eje de referencia a cero grados, el micrófono de medición está fijo sobre ese eje a r = 2 m, y el arco barrido de cero a 180 grados lleva los pasos de theta de 10 o 15 grados. Al lado, la condición de excitación: la tensión de entrada se reajusta en cada frecuencia o banda para que el nivel en el eje de referencia se mantenga constante, con las frecuencias preferentes de 500 Hz, 1, 2, 4 y 8 kHz, y un recuadro con el corte resultante sobre el círculo de referencia de 25 dB de IEC 60263. Un pie da las dos vías para el índice de directividad" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_loudspeaker_polar.svg" alt="Vista en planta de una medición polar en cámara anecoica: el altavoz está sobre un plato giratorio con su punto de referencia sobre el eje de giro y su eje de referencia a cero grados, el micrófono de medición está fijo sobre ese eje a r = 2 m, y el arco barrido de cero a 180 grados lleva los pasos de theta de 10 o 15 grados. Al lado, la condición de excitación: la tensión de entrada se reajusta en cada frecuencia o banda para que el nivel en el eje de referencia se mantenga constante, con las frecuencias preferentes de 500 Hz, 1, 2, 4 y 8 kHz, y un recuadro con el corte resultante sobre el círculo de referencia de 25 dB de IEC 60263. Un pie da las dos vías para el índice de directividad" width="92%" />
 
 El altavoz gira y el micrófono no: el punto de referencia se sitúa sobre el eje
 de giro para que la distancia de medición no cambie al barrer $\theta$
@@ -667,7 +667,7 @@ $-3$ dB para un cardioide apuntado al hablante. Al sumar la serie infinita de
 idas y vueltas, el sistema oscila cuando la ganancia del lazo alcanza la
 unidad, es decir $Z_\mathrm{S} + G_\mathrm{S} = 0$ (ec. (18.16)).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_reinforcement_geometry_es.svg" alt="Esquema del lazo de realimentación de un sistema de refuerzo sonoro: el hablante a 0,3 metros del micrófono, el altavoz colgado a 4 metros del micrófono y a 12 metros del oyente medio, con el camino de la señal en trazo continuo y el de realimentación discontinuo" width="85%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_reinforcement_geometry.svg" alt="Esquema del lazo de realimentación de un sistema de refuerzo sonoro: el hablante a 0,3 metros del micrófono, el altavoz colgado a 4 metros del micrófono y a 12 metros del oyente medio, con el camino de la señal en trazo continuo y el de realimentación discontinuo" width="85%" />
 
 *Los cuatro puntos del lazo. En el criterio solo entran el campo sonoro que el
 altavoz produce en dos de ellos y el tipo y la orientación del micrófono: el
@@ -729,7 +729,7 @@ todas las copias a la vez y no cambian en nada que la serie converja o no,
 mientras que 6 dB más de ganancia **de lazo** son la diferencia entre un
 sistema y un acoplo.*
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/feedback_stability_es.svg" alt="Dos diagramas de barras apilados del mismo caso de auditorio. En el de arriba, con un solo micrófono abierto, la ganancia en lazo abierto de menos 6 dB y la ganancia del lazo de realimentación de menos 4 dB se acumulan hasta una ganancia de lazo total de menos 10 dB, justo sobre el límite de estabilidad discontinuo de 10 dB, con un margen de cero. En el de abajo, cuatro micrófonos abiertos añaden una corrección de más 6 dB y el total sube a menos 4 dB, seis decibelios por encima del límite y por tanto inestable" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/feedback_stability.svg" alt="Dos diagramas de barras apilados del mismo caso de auditorio. En el de arriba, con un solo micrófono abierto, la ganancia en lazo abierto de menos 6 dB y la ganancia del lazo de realimentación de menos 4 dB se acumulan hasta una ganancia de lazo total de menos 10 dB, justo sobre el límite de estabilidad discontinuo de 10 dB, con un margen de cero. En el de abajo, cuatro micrófonos abiertos añaden una corrección de más 6 dB y el total sube a menos 4 dB, seis decibelios por encima del límite y por tanto inestable" width="82%" />
 
 *El tipo de altavoz, su número y su potencia no aparecen por ninguna parte de la
 pila, y por eso poner más amplificador nunca compra ganancia antes de la

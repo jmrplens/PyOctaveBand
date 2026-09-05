@@ -113,7 +113,7 @@ $$
 Las posiciones se promedian en energía con
 $L = 10 \log_{10}\left( \frac{1}{n} \sum_j 10^{L_j/10} \right)$.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_setup_es.svg" alt="Montaje de aislamiento a ruido aéreo en campo: un altavoz en el recinto emisor, micrófonos promediados en energía en los recintos emisor y receptor a través del cerramiento común" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_setup.svg" alt="Montaje de aislamiento a ruido aéreo en campo: un altavoz en el recinto emisor, micrófonos promediados en energía en los recintos emisor y receptor a través del cerramiento común" width="92%" loading="eager" />
 
 La prima de $R'$ es una convención, no un adorno: las magnitudes con prima
 ($R'$, $L'_\mathrm{n}$, $L'_\mathrm{nT}$) se miden **en el edificio** e incluyen todas las
@@ -408,7 +408,7 @@ máximo con ponderación Fast y la suma ponderada A del Anexo D de ISO 717-2, no
 una curva de referencia desplazada. Tiene guía propia,
 [Fuentes de impacto pesadas y blandas](/phonometry/es/buildings/insulation/heavy-impact-sources/).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impact_setup_es.svg" alt="Montaje de aislamiento a impactos en campo: una máquina de impactos normalizada sobre el suelo del recinto emisor superior, micrófonos promediados en energía en el recinto receptor inferior, y el tiempo de reverberación del recinto receptor" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impact_setup.svg" alt="Montaje de aislamiento a impactos en campo: una máquina de impactos normalizada sobre el suelo del recinto emisor superior, micrófonos promediados en energía en el recinto receptor inferior, y el tiempo de reverberación del recinto receptor" width="92%" />
 
 ```python
 import numpy as np
@@ -529,7 +529,7 @@ imp.report("LnTw_insitu.pdf", language="es",
            metadata=ReportMetadata(requirement=58.0))  # L'nT,w (CI)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_airborne_insulation_es.svg" alt="Cadena de medida aérea in situ: la diferencia de niveles bruta D y la DnT estandarizada en las dieciséis bandas de tercio de octava, con la corrección de reverberación sombreada entre ambas y los índices DnT,w y R'w anotados" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_airborne_insulation.svg" alt="Cadena de medida aérea in situ: la diferencia de niveles bruta D y la DnT estandarizada en las dieciséis bandas de tercio de octava, con la corrección de reverberación sombreada entre ambas y los índices DnT,w y R'w anotados" width="80%" />
 
 *El tiempo de reverberación del recinto receptor convierte la diferencia de
 niveles bruta $D$ en la $D_\mathrm{nT}$ estandarizada banda a banda; con $T$ por
@@ -614,7 +614,7 @@ $k$ de la Tabla 8. Un intervalo bilateral $Y = y \pm U$ (Fórmula 3, $k = 1{,}96
 95 %) *informa de* un valor; el factor **unilateral** ($k = 1{,}65$ al 95 %) *declara
 conformidad* con un requisito (Fórmulas 4/5).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso12999_es.svg" alt="Flujo de incertidumbre ISO 12999-1: incertidumbre típica de las tablas, reducida por mediciones repetidas y combinada en cuadratura, y luego expandida por el factor de cobertura de la Tabla 8 en un informe bilateral o una decisión de conformidad unilateral" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso12999.svg" alt="Flujo de incertidumbre ISO 12999-1: incertidumbre típica de las tablas, reducida por mediciones repetidas y combinada en cuadratura, y luego expandida por el factor de cobertura de la Tabla 8 en un informe bilateral o una decisión de conformidad unilateral" width="82%" />
 
 ```python
 from phonometry import building
@@ -659,7 +659,7 @@ son insensibles a mayúsculas y con alias (`rprime_w`/`dnt_w`→`r_w`,
 `combine_uncertainties`, y redúcelas por $m$ mediciones independientes con
 `reduce_by_independent_measurements` ($u/\sqrt{m}$).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_uncertainty_demo_es.svg" alt="Un índice ponderado informado con su incertidumbre expandida bilateral al 95 % en las situaciones A, B y C, con la incertidumbre de reproducibilidad más ancha y la de repetibilidad más estrecha" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_uncertainty_demo.svg" alt="Un índice ponderado informado con su incertidumbre expandida bilateral al 95 % en las situaciones A, B y C, con la incertidumbre de reproducibilidad más ancha y la de repetibilidad más estrecha" width="80%" />
 
 *El mismo índice, declarado de tres maneras. Cuál de los intervalos se aplica no
 es una propiedad de la medición sino de la pregunta: la situación A es lo que

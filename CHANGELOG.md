@@ -337,6 +337,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- The Spanish edition of a figure follows the page, not the author. `ThemeImage`
+  derived the dark variant of whatever URL it was handed and nothing else, so a
+  Spanish page had to name its own `_es` file, and nine of them did not: the
+  caption was in Spanish and the axis labels underneath it were in English.
+  `Video.astro` had always read the page's language and added the suffix
+  itself; the figure component does the same now, so a Spanish page and its
+  English twin carry the identical `src` and a translator copying the English
+  line cannot get it wrong. The 687 references that spelled `_es` no longer do,
+  and passing one that still does is refused at build time rather than
+  resolving to `_es_es`.
+
 - `vibration.industrial_machine_zone` grades a run of measurements one reading
   at a time. It wrapped `evaluation_zone`, which has always taken an array, and
   then applied the most-restrictive rule of 5.2.3 by comparing the two gradings

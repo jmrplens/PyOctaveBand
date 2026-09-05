@@ -95,7 +95,7 @@ modo que el reparto se lee de la base de datos en lugar de suponerse; la
 Directiva solo añade que, cuando una componente real queda entre las dos alturas
 del modelo, su energía se distribuye proporcionalmente entre ambas.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_cnossos_rail_es.svg" alt="Dos paneles de la geometría de la fuente ferroviaria CNOSSOS-EU. Sección: una vía de doble carril sobre balasto de 1,435 m de ancho con el plano tangente a las dos superficies superiores de los carriles dibujado como referencia, la fuente A en el eje de la vía a 0,5 m por encima de él y la fuente B a 4,0 m, cada una con la lista de componentes que se le asignan, un receptor a 25 m y a 4 m del suelo con línea de visión a cada fuente, y el ángulo vertical psi acotado desde el plano horizontal que pasa por la fuente, con el semiespacio inferior sombreado y etiquetado como la región donde la corrección vertical de la fuente A es idénticamente nula. Planta: el eje de la vía, la dirección al receptor, el ángulo horizontal phi acotado desde el eje de la vía y el diagrama polar dipolar dibujado a escala con 0 dB en la perpendicular y menos 20 dB a lo largo de la vía" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_cnossos_rail.svg" alt="Dos paneles de la geometría de la fuente ferroviaria CNOSSOS-EU. Sección: una vía de doble carril sobre balasto de 1,435 m de ancho con el plano tangente a las dos superficies superiores de los carriles dibujado como referencia, la fuente A en el eje de la vía a 0,5 m por encima de él y la fuente B a 4,0 m, cada una con la lista de componentes que se le asignan, un receptor a 25 m y a 4 m del suelo con línea de visión a cada fuente, y el ángulo vertical psi acotado desde el plano horizontal que pasa por la fuente, con el semiespacio inferior sombreado y etiquetado como la región donde la corrección vertical de la fuente A es idénticamente nula. Planta: el eje de la vía, la dirección al receptor, el ángulo horizontal phi acotado desde el eje de la vía y el diagrama polar dipolar dibujado a escala con 0 dB en la perpendicular y menos 20 dB a lo largo de la vía" width="92%" />
 
 ### De una línea real a los descriptores
 
@@ -157,7 +157,7 @@ conversión de rugosidad dos apartados más abajo usa m/s. Las dos son correctas
 y confundirlas es el error más caro disponible en este modelo.
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_rail_emission_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_rail_emission.svg"
   alt="Potencia de la línea fuente por bandas de octava de una línea convencional: barras grises para las dos alturas de fuente combinadas, una línea azul con marcadores para la fuente A a 0,5 m y otra roja para la fuente B a 4,0 m, con la fuente A entre veinte y treinta decibelios por encima de la fuente B en todas las bandas"
   width="88%"
   loading="eager"
@@ -197,7 +197,7 @@ plt.show()
 
 </details>
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_rail_components_es.svg" alt="Dos paneles para una unidad eléctrica de cuatro ejes sobre vía monobloque con mantenimiento normal. Izquierda: la potencia acústica en tercios de octava de cada componente de la escena de 160 km/h, con el ruido de rodadura de la fuente A unos veinte decibelios por encima del ruido de tracción, el ruido de tracción presente en las dos alturas de fuente, y las componentes aerodinámica y de puente ausentes porque ninguna está activa a esta velocidad. Derecha: la potencia de línea total por bandas de octava de la fuente A a 0,5 m y de la fuente B a 4,0 m frente a la velocidad de 60 a 350 km/h; la fuente A sube de forma continua todo el rango mientras que la fuente B baja despacio hasta un mínimo a 200 km/h y luego salta nueve decibelios cuando se activa el término aerodinámico, estrechando la separación entre las dos líneas de unos 30 dB a 19 dB" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_rail_components.svg" alt="Dos paneles para una unidad eléctrica de cuatro ejes sobre vía monobloque con mantenimiento normal. Izquierda: la potencia acústica en tercios de octava de cada componente de la escena de 160 km/h, con el ruido de rodadura de la fuente A unos veinte decibelios por encima del ruido de tracción, el ruido de tracción presente en las dos alturas de fuente, y las componentes aerodinámica y de puente ausentes porque ninguna está activa a esta velocidad. Derecha: la potencia de línea total por bandas de octava de la fuente A a 0,5 m y de la fuente B a 4,0 m frente a la velocidad de 60 a 350 km/h; la fuente A sube de forma continua todo el rango mientras que la fuente B baja despacio hasta un mínimo a 200 km/h y luego salta nueve decibelios cuando se activa el término aerodinámico, estrechando la separación entre las dos líneas de unos 30 dB a 19 dB" width="92%" />
 
 *Izquierda: la tabla de asignación de esta sección, dibujada. El ruido de
 rodadura es toda la fuente A a 160 km/h; la tracción es la única componente
@@ -297,7 +297,7 @@ rápido suene brillante y uno lento no: la misma rugosidad de escala milimétric
 excita una banda más alta.
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_rail_roughness_shift_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_rail_roughness_shift.svg"
   alt="Rugosidad efectiva total frente a la frecuencia en tercios de octava para 60, 160 y 300 km/h, tres curvas de la misma forma desplazadas hacia arriba y hacia la derecha al aumentar la velocidad, que cruzan los cero decibelios cerca de 400 Hz, 1 kHz y 2 kHz respectivamente"
   width="88%"
 />
@@ -471,7 +471,7 @@ environment.vertical_directivity(-30.0)                                        #
 environment.vertical_directivity(-30.0, edition=environment.DirectivityEdition.ORIGINAL_2015)  # positivo
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_rail_directivity_es.svg" alt="Dos diagramas polares de la directividad ferroviaria de CNOSSOS-EU. Izquierda, la corrección vertical de la fuente A a 250 Hz y 4 kHz para las dos ediciones: la forma de 2021 es idénticamente nula en todo el semiespacio por debajo del horizonte y por encima de unos 41,4 grados se vuelve negativa, mientras que la de 2015 es simétrica respecto al horizonte y positiva a ambos lados, coincidiendo las dos solo en la cuña de 0 a 41,4 grados. Derecha, el dipolo horizontal en el plano de la vía: 0 dB en la perpendicular a la vía y menos 20 dB a lo largo de ella, con el cero longitudinal marcado" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_rail_directivity.svg" alt="Dos diagramas polares de la directividad ferroviaria de CNOSSOS-EU. Izquierda, la corrección vertical de la fuente A a 250 Hz y 4 kHz para las dos ediciones: la forma de 2021 es idénticamente nula en todo el semiespacio por debajo del horizonte y por encima de unos 41,4 grados se vuelve negativa, mientras que la de 2015 es simétrica respecto al horizonte y positiva a ambos lados, coincidiendo las dos solo en la cuña de 0 a 41,4 grados. Derecha, el dipolo horizontal en el plano de la vía: 0 dB en la perpendicular a la vía y menos 20 dB a lo largo de ella, con el cero longitudinal marcado" width="92%" />
 
 *Izquierda: las dos ediciones solo coinciden en el primer cuadrante por debajo de
 41,4°, que es exactamente donde el corchete

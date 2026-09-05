@@ -97,7 +97,7 @@ entero, **ISO 2631-2** a la vibración en edificios, **ISO 2631-4** al confort
 de marcha ferroviaria e **ISO 5349-1/-2** a la vibración transmitida a la mano.
 Esta página recorre toda la cadena.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_human_vibration_es.svg" alt="Cadena de medida de vibración de cuerpo entero: un acelerómetro triaxial en la interfaz asiento/cuerpo de una persona sentada mide la aceleración x, y y z; cada eje se limita en banda y se pondera en frecuencia (Wk vertical, Wd horizontal) según ISO 8041-1, se reduce a un valor eficaz ponderado a_w y VDV según ISO 2631-1, y el mayor valor por eje ponderado en frecuencia max(1,4 a_wx, 1,4 a_wy, a_wz) se normaliza a la exposición diaria A(8) y se evalúa frente al VAE y el VLE de la Directiva 2002/44/CE" width="94%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_human_vibration.svg" alt="Cadena de medida de vibración de cuerpo entero: un acelerómetro triaxial en la interfaz asiento/cuerpo de una persona sentada mide la aceleración x, y y z; cada eje se limita en banda y se pondera en frecuencia (Wk vertical, Wd horizontal) según ISO 8041-1, se reduce a un valor eficaz ponderado a_w y VDV según ISO 2631-1, y el mayor valor por eje ponderado en frecuencia max(1,4 a_wx, 1,4 a_wy, a_wz) se normaliza a la exposición diaria A(8) y se evalúa frente al VAE y el VLE de la Directiva 2002/44/CE" width="94%" loading="eager" />
 
 ## 0. Obtener los números
 
@@ -137,7 +137,7 @@ exposición que se evalúa, y se declara con el resultado (5.5).
 
 ### Mano-brazo: en la empuñadura, en la zona de agarre (ISO 5349-2, 6.1)
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_hand_arm_vibration_es.svg" alt="Izquierda: una empuñadura delantera de motosierra de 30 mm de diámetro agarrada por una mano sobre una zona de agarre de unos 100 mm, con tres posiciones numeradas de acelerómetro (bajo la mano en el centro de la zona de agarre, a ambos lados de la mano y en la parte inferior de la empuñadura junto a la mano), el cable fijado con cinta a la empuñadura junto al transductor, la fuerza de agarre, y el sistema basicéntrico x_h y_h z_h girado para que y_h siga el eje de la empuñadura. Derecha: la cadena de evaluación desde las tres magnitudes por eje ponderadas con Wh hasta el valor total de vibración a_hv, las exposiciones parciales A_i(8) sobre los tiempos de contacto y la A(8) frente al valor de exposición que da lugar a una acción de 2,5 y el valor límite de exposición de 5 m/s^2 de la Directiva 2002/44/CE, con un recuadro que da las reglas de masa, promediado, muestreo y rango" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_hand_arm_vibration.svg" alt="Izquierda: una empuñadura delantera de motosierra de 30 mm de diámetro agarrada por una mano sobre una zona de agarre de unos 100 mm, con tres posiciones numeradas de acelerómetro (bajo la mano en el centro de la zona de agarre, a ambos lados de la mano y en la parte inferior de la empuñadura junto a la mano), el cable fijado con cinta a la empuñadura junto al transductor, la fuerza de agarre, y el sistema basicéntrico x_h y_h z_h girado para que y_h siga el eje de la empuñadura. Derecha: la cadena de evaluación desde las tres magnitudes por eje ponderadas con Wh hasta el valor total de vibración a_hv, las exposiciones parciales A_i(8) sobre los tiempos de contacto y la A(8) frente al valor de exposición que da lugar a una acción de 2,5 y el valor límite de exposición de 5 m/s^2 de la Directiva 2002/44/CE, con un recuadro que da las reglas de masa, promediado, muestreo y rango" width="94%" />
 
 El acelerómetro va en la superficie de la mano, o cerca de ella, por donde la
 vibración entra en el cuerpo, preferiblemente en el **centro de la zona de
@@ -271,7 +271,7 @@ Los factores reproducen las tablas de objetivo de diseño del Anexo B de
 ISO 8041-1 con sus cuatro cifras significativas: `Wk` presenta una meseta cerca
 de −6 dB por debajo de 2 Hz, alcanza +0,46 dB cerca de 6,3 Hz y decae por encima.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting_es.svg" alt="La ponderación vertical de cuerpo entero Wk en decibelios de 0,4 a 100 Hz: una meseta cerca de -6 dB por debajo de 2 Hz, un pequeño pico de +0,5 dB cerca de 6 Hz y una caída hasta cerca de -21 dB a 100 Hz" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting.svg" alt="La ponderación vertical de cuerpo entero Wk en decibelios de 0,4 a 100 Hz: una meseta cerca de -6 dB por debajo de 2 Hz, un pequeño pico de +0,5 dB cerca de 6 Hz y una caída hasta cerca de -21 dB a 100 Hz" width="88%" />
 
 *Lo único que hay que leer aquí es el pequeño pico justo por encima de 6 Hz: esa
 es la resonancia vertical de cuerpo entero de una persona sentada, y es la razón
@@ -341,7 +341,7 @@ de la mano con todo $k = 1$ (ISO 5349-1), que es la razón de que el total
 mano-brazo de la sección 3 sea una suma vectorial pelada, sin ningún factor
 multiplicador dentro.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting_family_es.svg" alt="Las nueve ponderaciones de vibración humana en decibelios de 0,05 Hz a 1,5 kHz en eje logarítmico de frecuencia, agrupadas por color en las ponderaciones de cuerpo entero Wk, Wd y Wc, las de rotación y decúbito We y Wj, las de edificios y ferrocarril Wm y Wb, la de mareo Wf con su máximo en 0,17 Hz y la de mano-brazo Wh con su máximo cerca de 11 Hz; tres barras sobre las curvas marcan la banda en la que está tabulada cada parte de la familia, de 0,1 a 0,5 Hz para Wf, de 0,5 a 80 Hz para las ponderaciones de cuerpo entero y de 6,3 a 1250 Hz para Wh" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting_family.svg" alt="Las nueve ponderaciones de vibración humana en decibelios de 0,05 Hz a 1,5 kHz en eje logarítmico de frecuencia, agrupadas por color en las ponderaciones de cuerpo entero Wk, Wd y Wc, las de rotación y decúbito We y Wj, las de edificios y ferrocarril Wm y Wb, la de mareo Wf con su máximo en 0,17 Hz y la de mano-brazo Wh con su máximo cerca de 11 Hz; tres barras sobre las curvas marcan la banda en la que está tabulada cada parte de la familia, de 0,1 a 0,5 Hz para Wf, de 0,5 a 80 Hz para las ponderaciones de cuerpo entero y de 6,3 a 1250 Hz para Wh" width="94%" />
 
 *Tres familias sobre un mismo eje. `Wf` tiene su máximo en 0,17 Hz porque el
 mareo es un fenómeno por debajo del hercio; las ponderaciones de cuerpo entero
@@ -424,7 +424,7 @@ $a_\mathrm{w}$ de 1,0260 a 1,0267 m/s², así que la advertencia anterior va de 
 un $W_i$ *aislado* con una tabla impresa, no de un valor eficaz de banda ancha,
 donde ambos coinciden en tres cifras.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighted_acceleration_es.svg" alt="Un espectro de aceleración de asiento de vehículo medido (gris) y su contribución ponderada por Wk (azul) sobre los tercios de octava de 1 a 80 Hz: la ponderación atenúa las bandas bajas y altas pero deja el rango de 4 a 8 Hz casi inalterado, dando un valor eficaz ponderado a_w de aproximadamente 1,03 m/s^2" width="90%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighted_acceleration.svg" alt="Un espectro de aceleración de asiento de vehículo medido (gris) y su contribución ponderada por Wk (azul) sobre los tercios de octava de 1 a 80 Hz: la ponderación atenúa las bandas bajas y altas pero deja el rango de 4 a 8 Hz casi inalterado, dando un valor eficaz ponderado a_w de aproximadamente 1,03 m/s^2" width="90%" />
 
 *La ponderación deja las bandas de 4 a 8 Hz casi intactas y tira todo lo que hay
 por encima de 20 Hz, así que $a_\mathrm{w}$ = 1,026 m/s² lo fijan tres bandas de
@@ -550,7 +550,7 @@ print(round(mtvv_s / rms_s, 2))                             # 2.71   > 1.5
 print(round(vdv_s / (rms_s * duration_shock**0.25), 2))     # 2.69   > 1.75
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/shock_dose_measures_es.svg" alt="Tres paneles apilados sobre el mismo registro de 20 s de una persona sentada en todoterreno. Arriba: la aceleración sin ponderar y su versión ponderada con Wk, una oscilación de marcha de 4,5 Hz con cinco impactos. En medio: el valor eficaz móvil de 1 s, plano cerca de 0,25 m/s^2 entre impactos y subiendo a mesetas en cada uno de ellos, con el valor eficaz ponderado global de 0,53 dibujado como línea horizontal y el máximo marcado como MTVV = 1,43, una razón de 2,71 frente al criterio de 1,5. Abajo: la acumulación móvil de cuarta potencia subiendo a escalones en cada impacto hasta un VDV final de 3,01, frente a la curva suave de a_w por t elevado a un cuarto que predeciría el método básico, una razón de 2,69 frente al criterio de 1,75" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/shock_dose_measures.svg" alt="Tres paneles apilados sobre el mismo registro de 20 s de una persona sentada en todoterreno. Arriba: la aceleración sin ponderar y su versión ponderada con Wk, una oscilación de marcha de 4,5 Hz con cinco impactos. En medio: el valor eficaz móvil de 1 s, plano cerca de 0,25 m/s^2 entre impactos y subiendo a mesetas en cada uno de ellos, con el valor eficaz ponderado global de 0,53 dibujado como línea horizontal y el máximo marcado como MTVV = 1,43, una razón de 2,71 frente al criterio de 1,5. Abajo: la acumulación móvil de cuarta potencia subiendo a escalones en cada impacto hasta un VDV final de 3,01, frente a la curva suave de a_w por t elevado a un cuarto que predeciría el método básico, una razón de 2,69 frente al criterio de 1,75" width="94%" />
 
 *Los mismos veinte segundos juzgados de tres maneras. El valor eficaz apenas se
 entera de los cinco impactos, el eficaz móvil los encuentra de uno en uno, y la
@@ -742,7 +742,7 @@ print(result.assessment.zone)             # 'action'  (2.5 <= A(8) < 5.0)
 result.plot()   # exposiciones parciales y A(8) frente a los valores EAV/ELV, como en la figura de abajo (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/daily_vibration_exposure_es.svg" alt="Un diagrama de barras de las tres exposiciones parciales de mano-brazo (cerca de 2,3, 2,1 y 1,8 m/s^2) y la A(8) combinada de 3,61 m/s^2, con el valor de acción de exposición de la Directiva 2002/44/CE en 2,5 y el valor límite de exposición en 5,0 m/s^2 marcados como líneas horizontales; la exposición diaria se sitúa en la zona de acción entre ambos" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/daily_vibration_exposure.svg" alt="Un diagrama de barras de las tres exposiciones parciales de mano-brazo (cerca de 2,3, 2,1 y 1,8 m/s^2) y la A(8) combinada de 3,61 m/s^2, con el valor de acción de exposición de la Directiva 2002/44/CE en 2,5 y el valor límite de exposición en 5,0 m/s^2 marcados como líneas horizontales; la exposición diaria se sitúa en la zona de acción entre ambos" width="82%" />
 
 *La tarea más corta no es la que menos aporta. La tala dura una hora frente a las
 dos de la desbrozadora y aun así se queda a menos de un 8 % de ella, porque
@@ -838,7 +838,7 @@ print(round(vibration.hav_vwf_lifetime_years(2.5), 1))   # 12.0 años en el VAE
 print(round(vibration.hav_vwf_lifetime_years(5.0), 1))   # 5.8 años en el VLE
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hav_vwf_lifetime_es.svg" alt="Duración media de exposición del grupo en años frente a la exposición diaria A(8) en metros por segundo al cuadrado, en ejes log-log: una recta que va de unos 30 años a 1 m/s^2 hasta 0,7 años a 40 m/s^2, con los cuatro puntos de la Tabla C.1 de ISO 5349-1 en 26, 14, 7 y 3,7 m/s^2 marcados sobre ella, líneas verticales discontinuas en el valor de exposición que da lugar a una acción de 2,5 m/s^2 (12,0 años) y en el valor límite de exposición de 5,0 m/s^2 (5,8 años), y las regiones por encima de 8 años y por debajo de 1 año sombreadas como extrapolación fuera de la Tabla C.1" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hav_vwf_lifetime.svg" alt="Duración media de exposición del grupo en años frente a la exposición diaria A(8) en metros por segundo al cuadrado, en ejes log-log: una recta que va de unos 30 años a 1 m/s^2 hasta 0,7 años a 40 m/s^2, con los cuatro puntos de la Tabla C.1 de ISO 5349-1 en 26, 14, 7 y 3,7 m/s^2 marcados sobre ella, líneas verticales discontinuas en el valor de exposición que da lugar a una acción de 2,5 m/s^2 (12,0 años) y en el valor límite de exposición de 5,0 m/s^2 (5,8 años), y las regiones por encima de 8 años y por debajo de 1 año sombreadas como extrapolación fuera de la Tabla C.1" width="88%" />
 
 *Como el exponente es −1,06, la relación es casi inversamente proporcional:
 partir por la mitad la exposición diaria duplica aproximadamente los años medios

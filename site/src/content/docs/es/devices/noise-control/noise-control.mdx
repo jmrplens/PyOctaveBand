@@ -60,7 +60,7 @@ Las tres familias en una escena: encapsular la fuente, silenciar el camino y
 proteger al receptor. Cada medida lleva el valor que calcula su sección, aquí
 o en la guía de silenciadores.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_noise_control_es.svg" alt="Escena de control de ruido dividida en tres zonas: en la fuente una máquina dentro de un cerramiento revestido con IL = R − C = 25 dB a 500 Hz, en el camino un conducto de 113 mm con una cámara de expansión de 0,30 m y relación de áreas 4 cuyo pico de pérdidas de transmisión es de 6,5 dB a 286 Hz, un codo revestido que aporta 6 dB a 1 kHz y un extremo abierto que refleja 18 dB a 63 Hz, y en el receptor una cabina de operario valorada con la misma fórmula en 31 dB a 1 kHz, con una persona de pie en su interior" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_noise_control.svg" alt="Escena de control de ruido dividida en tres zonas: en la fuente una máquina dentro de un cerramiento revestido con IL = R − C = 25 dB a 500 Hz, en el camino un conducto de 113 mm con una cámara de expansión de 0,30 m y relación de áreas 4 cuyo pico de pérdidas de transmisión es de 6,5 dB a 286 Hz, un codo revestido que aporta 6 dB a 1 kHz y un extremo abierto que refleja 18 dB a 63 Hz, y en el receptor una cabina de operario valorada con la misma fórmula en 31 dB a 1 kHz, con una persona de pie en su interior" width="92%" loading="eager" />
 
 ## 1. Atenuación y ruido de flujo en conductos HVAC
 
@@ -93,7 +93,7 @@ fn = hvac.flow_noise_straight_duct(bands, flow_velocity=10.0, area=0.04)
 print(round(float(fn.values[3]), 1))             # 32.4 dB, L_W regenerada a 500 Hz
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hvac_end_reflection_es.svg" alt="Pérdida por reflexión del extremo del conducto por banda de octava para terminaciones enrasadas de 150, 300 y 600 mm de diámetro: la reflexión de vuelta al conducto crece con fuerza hacia baja frecuencia y disminuye con el tamaño del conducto, superando 17 dB a 63 Hz para el conducto de 150 mm y desapareciendo por encima de 1 kHz" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hvac_end_reflection.svg" alt="Pérdida por reflexión del extremo del conducto por banda de octava para terminaciones enrasadas de 150, 300 y 600 mm de diámetro: la reflexión de vuelta al conducto crece con fuerza hacia baja frecuencia y disminuye con el tamaño del conducto, superando 17 dB a 63 Hz para el conducto de 150 mm y desapareciendo por encima de 1 kHz" width="88%" />
 
 *El extremo abierto de un conducto refleja energía de baja frecuencia de vuelta
 por el conducto — gratis, antes de cualquier silenciador: cuanto más pequeño
@@ -135,7 +135,7 @@ El codo es el elemento que el proyectista todavía suele poder elegir, y ese
 mismo flujo que el codo atenúa es el que regenera ruido un poco más adelante
 en el trazado. Los dos van en la misma hoja.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hvac_elbow_flow_noise_es.svg" alt="Dos paneles. Izquierda: pérdida por inserción por banda de octava de un codo de 300 mm para cuatro construcciones, un codo cuadrado revestido que alcanza 11 dB por encima de 1 kHz, un codo cuadrado desnudo con un máximo de 8 dB que vuelve a caer a 3 dB, un codo cuadrado con álabes en 6 dB y un codo circular plano en 3 dB, con la abscisa W partido por lambda igual a uno marcada cerca de 1,1 kHz. Derecha: potencia acústica generada por el flujo en ese mismo conducto de 0,04 metros cuadrados a 5, 10 y 20 metros por segundo, tres espectros paralelos separados unos 16 dB por cada duplicación, más un codo a inglete a 10 metros por segundo que queda por encima del conducto recto a 20 metros por segundo por debajo de 500 Hz y por debajo de él por encima" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hvac_elbow_flow_noise.svg" alt="Dos paneles. Izquierda: pérdida por inserción por banda de octava de un codo de 300 mm para cuatro construcciones, un codo cuadrado revestido que alcanza 11 dB por encima de 1 kHz, un codo cuadrado desnudo con un máximo de 8 dB que vuelve a caer a 3 dB, un codo cuadrado con álabes en 6 dB y un codo circular plano en 3 dB, con la abscisa W partido por lambda igual a uno marcada cerca de 1,1 kHz. Derecha: potencia acústica generada por el flujo en ese mismo conducto de 0,04 metros cuadrados a 5, 10 y 20 metros por segundo, tres espectros paralelos separados unos 16 dB por cada duplicación, más un codo a inglete a 10 metros por segundo que queda por encima del conducto recto a 20 metros por segundo por debajo de 500 Hz y por debajo de él por encima" width="92%" />
 
 *Un codo cuadrado revestido vale de tres a cuatro veces uno circular por encima
 de 1 kHz y prácticamente nada por debajo de 250 Hz, donde $W/\lambda$ es pequeño
@@ -222,7 +222,7 @@ la línea de visión entrada-salida $r$ y el área de salida, más el área de
 pared revestida; `plot_plenum_geometry` dibuja exactamente esas, respetando
 $r$ y su ángulo respecto al eje de entrada.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plenum_geometry_es.svg" alt="Sección de una cámara plenum: el conducto de entrada entra abajo a la izquierda, la boca de salida está marcada en la pared derecha, la línea de visión entrada-salida de 1,2 m se dibuja como una diagonal discontinua a 0,35 rad del eje de entrada, y el área de pared de 6 metros cuadrados y el área de salida de 0,09 metros cuadrados se anotan debajo" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plenum_geometry.svg" alt="Sección de una cámara plenum: el conducto de entrada entra abajo a la izquierda, la boca de salida está marcada en la pared derecha, la línea de visión entrada-salida de 1,2 m se dibuja como una diagonal discontinua a 0,35 rad del eje de entrada, y el área de pared de 6 metros cuadrados y el área de salida de 0,09 metros cuadrados se anotan debajo" width="88%" />
 
 *Solo $r$ y su ángulo respecto al eje de entrada fijan la caja dibujada;
 $S_\text{out}$ y $S_\mathrm{w}$ entran en el método de Wells como áreas a secas, así que
@@ -327,7 +327,7 @@ de envolvente expuesta, 30 m² de superficie interior con una absorción media d
 0,30, y los cuatro elementos — puerta, pasamuros, aberturas de refrigeración y
 apoyo de la máquina — que deciden si entrega lo que prometen los paneles.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_machine_enclosure_es.svg" alt="Sección de un cerramiento de máquina ajustado, de 3,0 m de largo y 1,8 m de alto, apoyado sobre una solera, con la pared dibujada en tres capas (masa de chapa de acero, revestimiento absorbente y chapa perforada). Dentro, la máquina se apoya sobre aisladores de vibración sin tocar la envolvente. Una puerta de acceso abatible de 1,28 metros cuadrados y 15 dB de pérdida de transmisión lleva una junta de compresión arriba y abajo y una rendija sin sellar de 0,24 metros cuadrados a sus pies. Una entrada de cables y tuberías atraviesa un pasamuros sellado en la cubierta, un conducto revestido corto saca el aire de refrigeración por la cubierta y otro lo introduce por la pared derecha. El pie de figura imprime IL = R menos C con C = 3,4 dB, una pérdida por inserción media de 28,9 dB para la envolvente sellada, 21,4 dB con la puerta y 15,1 dB una vez añadida la rendija, frente al tope de 20 dB que fija el área abierta" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_machine_enclosure.svg" alt="Sección de un cerramiento de máquina ajustado, de 3,0 m de largo y 1,8 m de alto, apoyado sobre una solera, con la pared dibujada en tres capas (masa de chapa de acero, revestimiento absorbente y chapa perforada). Dentro, la máquina se apoya sobre aisladores de vibración sin tocar la envolvente. Una puerta de acceso abatible de 1,28 metros cuadrados y 15 dB de pérdida de transmisión lleva una junta de compresión arriba y abajo y una rendija sin sellar de 0,24 metros cuadrados a sus pies. Una entrada de cables y tuberías atraviesa un pasamuros sellado en la cubierta, un conducto revestido corto saca el aire de refrigeración por la cubierta y otro lo introduce por la pared derecha. El pie de figura imprime IL = R menos C con C = 3,4 dB, una pérdida por inserción media de 28,9 dB para la envolvente sellada, 21,4 dB con la puerta y 15,1 dB una vez añadida la rendija, frente al tope de 20 dB que fija el área abierta" width="92%" />
 
 Un cerramiento sellado reduce el ruido radiado en la pérdida de transmisión del
 panel $R$, menos una penalización $C$ por la acumulación reverberante en la
@@ -385,7 +385,7 @@ print(np.round(enc.insertion_loss, 1))            # IL neta = R - C por banda
 enc.plot()                                         # panel R, corrección C e IL
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosure_insertion_loss_es.svg" alt="Pérdida por inserción de un cerramiento de máquina por banda de octava: el índice de reducción acústica R medido del panel como línea discontinua, la corrección interior C casi plana cerca de 5 dB para un interior revestido, y la pérdida por inserción neta IL igual a R menos C siguiendo la curva del panel unos 5 dB por debajo" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosure_insertion_loss.svg" alt="Pérdida por inserción de un cerramiento de máquina por banda de octava: el índice de reducción acústica R medido del panel como línea discontinua, la corrección interior C casi plana cerca de 5 dB para un interior revestido, y la pérdida por inserción neta IL igual a R menos C siguiendo la curva del panel unos 5 dB por debajo" width="88%" />
 
 *Lo que entrega el cerramiento es $R - C$, no el $R$ del panel: incluso este
 interior revestido (absorción media 0,3) cuesta unos 5 dB del índice del panel
