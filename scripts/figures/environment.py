@@ -7,6 +7,7 @@ and the exposure indices and uncertainties the assessment ends in. Everything
 here is embedded by a page under ``environment/``.
 """
 
+import math
 from typing import Any
 
 import matplotlib.pyplot as plt
@@ -2574,4 +2575,211 @@ def generate_rd1367_vs_iso_tonal(output_dir: str) -> None:
     axes[0].set_ylabel("Band sound pressure level [dB]")
     plt.tight_layout()
     save_figure(output_dir, "rd1367_vs_iso_tonal.svg")
+    plt.close()
+
+
+#: ISO/TR 17534-3:2015, 6.2.1: the geometry and the air every test case shares,
+#: and the octave bands their tables are written in.
+_QA_BANDS = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+_QA_SOURCE = (10.0, 10.0, 1.0)
+_QA_RECEIVER = (200.0, 50.0, 4.0)
+_QA_LW = 93.0
+_QA_TEMPERATURE, _QA_HUMIDITY = 20.0, 70.0
+#: The envelope the document declares for a result to count as correct, dB.
+_QA_ENVELOPE = 0.05
+#: Tables 4, 5, 6, 9, 10, 15 and 18, row "L": the printed receiver levels, dB.
+_QA_PRINTED: dict[str, tuple[float, ...]] = {
+    "T01": (39.90, 39.86, 39.70, 39.37, 38.95, 38.17, 35.47, 25.04),
+    "T02": (39.90, 36.17, 33.02, 33.20, 36.11, 36.33, 33.63, 23.20),
+    "T03": (39.90, 32.48, 26.33, 27.03, 33.27, 34.49, 31.79, 21.36),
+    "T04": (39.90, 36.24, 35.23, 36.04, 36.95, 36.57, 33.87, 23.45),
+    "T05": (34.90, 34.86, 34.71, 34.38, 33.95, 33.17, 30.48, 20.05),
+    "T06": (39.88, 35.65, 29.70, 29.24, 34.82, 35.83, 33.13, 22.68),
+    "T07": (35.36, 35.32, 35.16, 34.83, 34.40, 33.62, 30.92, 20.47),
+}
+
+
+def _qa_levels() -> dict[str, NDArray[np.float64]]:
+    """The seven cases ISO 9613-2 can answer on its own, computed.
+
+    Kept beside the figure rather than imported from the conformance domain:
+    the domain is the oracle and must not grow a consumer, and the geometry is
+    two tables of the document either way.
+    """
+    from phonometry import environment as env
+
+    d_p = math.hypot(_QA_RECEIVER[0] - _QA_SOURCE[0], _QA_RECEIVER[1] - _QA_SOURCE[1])
+    d_flat = math.hypot(d_p, _QA_RECEIVER[2] - _QA_SOURCE[2])
+    # Table 13: the ground rises 10 m under the receiver, so the ray gains 13 m.
+    d_sloped = math.hypot(d_p, 13.0)
+    segments = (40.88, 102.19, 51.10)
+    air = env.AtmosphericConditions(
+        temperature=_QA_TEMPERATURE, relative_humidity=_QA_HUMIDITY
+    )
+
+    def general(ground: env.GroundFactors, distance: float) -> NDArray[np.float64]:
+        return np.asarray(
+            env.predicted_receiver_level(
+                np.full(len(_QA_BANDS), _QA_LW),
+                env.PropagationGeometry(
+                    distance,
+                    _QA_SOURCE[2],
+                    _QA_RECEIVER[2],
+                    projected_distance=d_p,
+                ),
+                frequencies=_QA_BANDS,
+                ground=ground,
+                atmosphere=air,
+            )
+        )
+
+    def alternative(mean_height: float, distance: float) -> NDArray[np.float64]:
+        return np.asarray(
+            _QA_LW
+            + env.directivity_omega(_QA_SOURCE[2], _QA_RECEIVER[2], d_p)
+            - env.geometric_divergence(distance)
+            - env.atmospheric_absorption(
+                distance,
+                _QA_BANDS,
+                temperature=_QA_TEMPERATURE,
+                relative_humidity=_QA_HUMIDITY,
+            )
+            - env.ground_attenuation_alternative(distance, mean_height)
+        )
+
+    scale = d_p / (_QA_RECEIVER[0] - _QA_SOURCE[0])
+    profile_x = (
+        0.0,
+        (120.0 - _QA_SOURCE[0]) * scale,
+        (185.0 - _QA_SOURCE[0]) * scale,
+        d_p,
+    )
+    profile_z = (0.0, 0.0, 10.0, 10.0)
+    return {
+        "T01": general(env.GroundFactors(0.0, 0.0, 0.0), d_flat),
+        "T02": general(env.GroundFactors(0.5, 0.5, 0.5), d_flat),
+        "T03": general(env.GroundFactors(1.0, 1.0, 1.0), d_flat),
+        "T04": general(
+            env.region_ground_factors(
+                segments, (0.2, 0.5, 0.9), _QA_SOURCE[2], _QA_RECEIVER[2]
+            ),
+            d_flat,
+        ),
+        "T05": alternative(
+            env.mean_path_height(
+                (0.0, d_p), (0.0, 0.0), _QA_SOURCE[2], _QA_RECEIVER[2]
+            ),
+            d_flat,
+        ),
+        "T06": general(
+            env.region_ground_factors(
+                segments, (0.9, 0.5, 0.2), _QA_SOURCE[2], _QA_RECEIVER[2]
+            ),
+            d_sloped,
+        ),
+        "T07": alternative(
+            env.mean_path_height(
+                profile_x,
+                profile_z,
+                _QA_SOURCE[2],
+                _QA_RECEIVER[2],
+                distance=d_sloped,
+            ),
+            d_sloped,
+        ),
+    }
+
+
+def generate_iso17534_qa_cases(output_dir: str) -> None:
+    """The seven quality-assurance cases ISO 9613-2 can answer on its own."""
+    print("Generating iso17534_qa_cases...")
+    levels = _qa_levels()
+
+    _fig, (ax, ax2) = plt.subplots(
+        1, 2, figsize=(11.6, 5.8), gridspec_kw={"width_ratios": [1.15, 1.0]}
+    )
+    ground = (
+        ("T01", "reflecting ground, $G$ = 0", COLOR_PRIMARY, "-"),
+        ("T02", "mixed ground, $G$ = 0.5", COLOR_TERTIARY, "--"),
+        ("T03", "porous ground, $G$ = 1", COLOR_SECONDARY, "-."),
+    )
+    for case, label, colour, style in ground:
+        ax.semilogx(_QA_BANDS, levels[case], style, color=colour, lw=1.9, label=label)
+        ax.semilogx(
+            _QA_BANDS,
+            _QA_PRINTED[case],
+            "none",
+            color=colour,
+            marker="o",
+            ms=5,
+            markerfacecolor="none",
+        )
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Level at the receiver (dB)")
+    ax.set_title("The Same Path Over Three Grounds", pad=10)
+    ax.set_ylim(19.5, 46.0)
+    format_frequency_axis(ax)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize=8.5)
+    ax.text(
+        0.985,
+        0.965,
+        "93 dB in every band, 195 m out, 1 m up and 4 m down;\n"
+        "rings: the levels the document prints",
+        transform=ax.transAxes,
+        va="top",
+        ha="right",
+        fontsize=8.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.32",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
+
+    cases = tuple(_QA_PRINTED)
+    worst = [
+        float(np.max(np.abs(np.array(_QA_PRINTED[case]) - levels[case])))
+        for case in cases
+    ]
+    positions = np.arange(len(cases), dtype=float)
+    ax2.bar(
+        positions,
+        worst,
+        width=0.6,
+        color=theme_fill(COLOR_PRIMARY, ax2),
+        edgecolor=COLOR_PRIMARY,
+        linewidth=1.2,
+        zorder=3,
+    )
+    ax2.axhline(
+        _QA_ENVELOPE,
+        color=COLOR_SECONDARY,
+        linestyle="--",
+        linewidth=1.6,
+        label="the envelope the document declares: 0.05 dB",
+    )
+    for x, value in zip(positions, worst, strict=True):
+        ax2.text(
+            x,
+            value + 0.0015,
+            f"{value:.3f}",
+            ha="center",
+            va="bottom",
+            fontsize=8,
+            color=COLOR_FG,
+            zorder=4,
+        )
+    ax2.set_xticks(positions)
+    ax2.set_xticklabels(cases, fontsize=9)
+    ax2.set_ylim(0.0, 0.062)
+    ax2.set_ylabel("Worst band deviation (dB)")
+    ax2.set_title("Every Case, Against Its Printed Table", pad=10)
+    ax2.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax2.set_axisbelow(True)
+    ax2.legend(loc="upper left", fontsize=8.5)
+    plt.tight_layout()
+    save_figure(output_dir, "iso17534_qa_cases.svg")
     plt.close()

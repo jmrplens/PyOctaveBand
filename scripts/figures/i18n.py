@@ -45,6 +45,18 @@ _LANG = "en"
 _LANG_SUFFIX = ""
 
 _ES_EXACT = {
+    # ISO/TR 17534-3 quality-assurance cases (environment/propagation).
+    "The Same Path Over Three Grounds": "El mismo camino sobre tres suelos",
+    "Level at the receiver (dB)": "Nivel en el receptor (dB)",
+    "reflecting ground, $G$ = 0": "suelo reflectante, $G$ = 0",
+    "mixed ground, $G$ = 0.5": "suelo mixto, $G$ = 0,5",
+    "porous ground, $G$ = 1": "suelo poroso, $G$ = 1",
+    "93 dB in every band, 195 m out, 1 m up and 4 m down;\n"
+    "rings: the levels the document prints": "93 dB en todas las bandas, a 195 m, 1 m arriba y 4 m abajo;\n"
+    "anillos: los niveles que imprime el documento",
+    "Every Case, Against Its Printed Table": "Cada caso, contra su tabla impresa",
+    "Worst band deviation (dB)": "Peor desviación por banda (dB)",
+    "the envelope the document declares: 0.05 dB": "el sobre que declara el documento: 0,05 dB",
     # HVAC noise by the German method (VDI 2081): the fan its assembly type
     # describes, the worked sheet element by element, and the room step.
     "The Same Duty Point, Three Assemblies": "El mismo punto de trabajo, tres montajes",

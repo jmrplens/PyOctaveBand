@@ -723,7 +723,63 @@ una evaluación en baja frecuencia queda fuera de este método.
 | `lateral` | bool | — | `False` | `True` ⇒ difracción por borde vertical (Ec. (13)) |
 | `line_of_sight_clear` | bool | — | `False` | `True` ⇒ la línea de visión pasa por encima del borde superior: la diferencia de camino toma signo negativo y $K_\mathrm{met} = 1$ (texto tras la Ec. (16)) |
 
-## 3. Alcance, hipótesis y errores habituales
+## 3. Comprobar una implementación contra los casos impresos
+
+La ISO 17534-1 pide que un programa que implemente un método de propagación en
+exteriores declare su conformidad contra un conjunto publicado de casos de
+prueba. La **ISO/TR 17534-3** lleva ese conjunto para la ISO 9613-2: diecinueve
+escenarios, cada uno con su geometría y una tabla paso a paso de todas las
+magnitudes intermedias, y un sobre dentro del cual tiene que quedar un
+resultado para contar como correcto, que el documento fija en 0,05 dB por banda
+y en el total.
+
+Siete de los diecinueve se pueden resolver solo con la ISO 9613-2: «Test cases
+T01 up to T07 can be solved by applying ISO 9613-2 exclusively» (6.1). Del T08
+al T19 añaden pantallas, edificios y reflexiones cuyos caminos de rayo salen de
+las recomendaciones adicionales del capítulo 5 y no de la ISO 9613-2, y quedan
+fuera de lo que implementa esta página.
+
+Los siete comparten una geometría: una fuente a 1 m sobre su suelo local, un
+receptor a 4 m sobre el suyo, 195 m de separación en proyección sobre el suelo,
+y 93 dB planos en todas las octavas para que la forma del espectro impreso sea
+la propagación y nada más. Lo que cambia entre ellos es el suelo.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases.svg" alt="Dos paneles. A la izquierda, el nivel por bandas de octava en el receptor para el mismo camino de 195 metros sobre tres suelos: sobre suelo reflectante cae suavemente de 40 a 25 decibelios, sobre suelo mixto baja hasta 33 decibelios en torno a 250 y 500 hercios y luego se recupera, y sobre suelo poroso el valle llega a 26 decibelios; los anillos marcan los niveles que imprime el documento y caen sobre las curvas. A la derecha, una barra por caso de prueba, de T01 a T07, con la peor desviación del espectro calculado frente al impreso, entre 0,008 y 0,012 decibelios, todas muy por debajo de la línea discontinua del sobre de 0,05 decibelios que declara el documento" width="100%" />
+
+*Aquí el efecto de suelo lo es todo: sobre suelo poroso la banda de 250 Hz
+llega 13 dB más baja que sobre uno reflectante. A la derecha, todos los casos
+caen dentro de una quinta parte del sobre que permite el documento.*
+
+Del T01 al T03 cambia un único factor de suelo, de reflectante a poroso. El T04
+y el T06 parten el camino en tres áreas de suelo distinto y responden por el
+método general del 7.3.1; el T05 y el T07 responden a esos mismos dos
+escenarios por el método alternativo del 7.3.2, que sustituye los tres factores
+por la altura media del rayo sobre el suelo. Dos auxiliares hacen la
+contabilidad que necesitan esos cuatro:
+
+```python
+import math
+
+from phonometry import environment
+
+d_p = math.hypot(190.0, 40.0)
+regions = environment.region_ground_factors(
+    (40.88, 102.19, 51.10), (0.2, 0.5, 0.9), 1.0, 4.0
+)
+print(round(regions.source, 2), round(regions.middle, 2), round(regions.receiver, 2))
+print(round(environment.mean_path_height((0.0, d_p), (0.0, 0.0), 1.0, 4.0), 2))
+```
+
+El primero es la media ponderada por longitud de $G$ en cada una de las tres
+regiones en que la ISO 9613-2 divide un camino, que da 0,20, 0,43 y 0,67 para
+las áreas de la Tabla 7; el segundo es el $F/d$ de la Figura 3, que vale 2,50 m
+sobre suelo plano y 4,99 m en cuanto el suelo sube 10 m bajo el receptor.
+
+Treinta y cuatro filas de conformidad sujetan los siete casos al sobre del
+propio documento, banda a banda y en los dos totales. La peor desviación de
+todas es de 0,012 dB, la cuarta parte de lo que el informe permite.
+
+## 4. Alcance, hipótesis y errores habituales
 
 ### Qué significan las «condiciones favorables a la propagación»
 
@@ -898,7 +954,7 @@ para cómo $\alpha$ alimenta la ISO 354, y la
 para la exposición ocupacional (ISO 9612) que consume niveles
 ponderados A.
 
-## 4. Informes de predicción (`.report()`)
+## 5. Informes de predicción (`.report()`)
 
 Ambos resultados de propagación al aire libre generan una ficha PDF de una
 página de **predicción**. Se etiquetan claramente como predicciones, no como
