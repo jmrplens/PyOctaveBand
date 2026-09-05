@@ -698,6 +698,60 @@ in dB re 1e-12 W (VDI 2081-1), for airflow speed `U` in a duct of area
 
 **Returns:** A [`HvacSpectrumResult`](/phonometry/reference/api/noise_control/hvac/#hvacspectrumresult) of the band sound power level, dB re 1e-12 W.
 
+## flow_noise_straight_duct_overall
+
+```python
+flow_noise_straight_duct_overall(
+    flow_velocity: float,
+    area: float,
+    *,
+    weighting: str = 'Z',
+) -> float
+```
+
+Overall flow-noise sound power of a straight duct (VDI 2081 Part 1, 5.2.1).
+
+$$
+L_W = 7 + 50 \log_{10}(v) + 10 \log_{10}(S)
+$$
+
+$$
+L_{WA} = -25 + 70 \log_{10}(v) + 10 \log_{10}(S)
+$$
+
+Equations (16) and (17): the unweighted overall level and the A-weighted
+one, in dB re 1e-12 W, for a mean flow speed `v` in a duct of section
+`S`. Neither depends on how long the run is, only on how fast the air
+moves through how large a section, and the fifth power of the speed in the
+unweighted form is why halving the duct velocity is worth fifteen decibels.
+
+The two are not one number weighted: the A-weighted form carries a
+seventieth-power dependence on the speed rather than a fiftieth, because
+raising the speed also moves the spectrum up into the part of the curve
+the weighting stops attenuating. Faster air is worse than the unweighted
+number says.
+
+[`flow_noise_straight_duct`](/phonometry/reference/api/noise_control/hvac/#flow_noise_straight_duct) is the same law spread over the octaves,
+Equation (16) with the relative spectrum of Figure 16; the band levels do
+not sum back to this overall, because that figure is a shape and not a
+partition.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `flow_velocity` | Mean flow speed `v` in the duct, m/s. |
+| `area` | Duct cross-sectional area `S`, m2. |
+| `weighting` | `"Z"` (default) for Equation (16) or `"A"` for Equation (17). |
+
+**Returns:** The overall sound power level, dB re 1e-12 W.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the speed or the area is not positive, or the weighting is neither of the two the guideline prints. |
+
 ## HvacSpectrumResult
 
 ```python

@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `noise_control.flow_noise_straight_duct_overall`, the two closed forms VDI
+  2081 Section 5.2.1 prints for the flow noise of a straight run: Equation (16)
+  for the unweighted overall sound power level and Equation (17) for the
+  A-weighted one. The guide already said both were covered; only the first was,
+  and only spread over the octaves by the relative spectrum of Figure 16, which
+  does not sum back to it.
+
+  The A-weighted form is not the other one weighted. It carries a seventieth
+  power of the duct velocity where the unweighted form carries a fiftieth,
+  because raising the speed also moves the spectrum up into the part of the
+  curve the weighting stops attenuating: halving the velocity is worth 15 dB on
+  one number and 21 dB on the other.
+
+  The three conformance rows for Equations (16), (17) and (34) called nothing
+  and computed their own expected value, so no defect in the library could have
+  failed them. All three go through the published functions now, and the limit
+  frequency of Equations (33) and (34) is `plane_wave_limit`, which the library
+  already had from the duct-mode theory: the rectangular form is exactly
+  `c / (2a)` and the round one is the guideline's rounding of the first
+  circular mode, so the law is called rather than written a second time.
+
 - Gear units, by ISO 20816-9:2020, which grades them against a **rating**
   rather than against a machine class. `GEAR_UNIT_ZONES` carries the three
   boundary tables, one per quantity, keyed by the rating number that indexes

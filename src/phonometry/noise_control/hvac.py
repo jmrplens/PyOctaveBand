@@ -90,6 +90,7 @@ from .._internal.validation import (
 )
 from .._internal.warnings import PhonometryWarning
 from ..room.steady_field import room_constant
+from .duct_modes import plane_wave_limit
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -1041,6 +1042,52 @@ def flow_noise_straight_duct(
     )
 
 
+def flow_noise_straight_duct_overall(
+    flow_velocity: float,
+    area: float,
+    *,
+    weighting: str = "Z",
+) -> float:
+    r"""Overall flow-noise sound power of a straight duct (VDI 2081 Part 1, 5.2.1).
+
+    .. math::
+
+       L_W = 7 + 50 \log_{10}(v) + 10 \log_{10}(S)
+
+       L_{WA} = -25 + 70 \log_{10}(v) + 10 \log_{10}(S)
+
+    Equations (16) and (17): the unweighted overall level and the A-weighted
+    one, in dB re 1e-12 W, for a mean flow speed ``v`` in a duct of section
+    ``S``. Neither depends on how long the run is, only on how fast the air
+    moves through how large a section, and the fifth power of the speed in the
+    unweighted form is why halving the duct velocity is worth fifteen decibels.
+
+    The two are not one number weighted: the A-weighted form carries a
+    seventieth-power dependence on the speed rather than a fiftieth, because
+    raising the speed also moves the spectrum up into the part of the curve
+    the weighting stops attenuating. Faster air is worse than the unweighted
+    number says.
+
+    :func:`flow_noise_straight_duct` is the same law spread over the octaves,
+    Equation (16) with the relative spectrum of Figure 16; the band levels do
+    not sum back to this overall, because that figure is a shape and not a
+    partition.
+
+    :param flow_velocity: Mean flow speed ``v`` in the duct, m/s.
+    :param area: Duct cross-sectional area ``S``, m2.
+    :param weighting: ``"Z"`` (default) for Equation (16) or ``"A"`` for
+        Equation (17).
+    :return: The overall sound power level, dB re 1e-12 W.
+    :raises ValueError: If the speed or the area is not positive, or the
+        weighting is neither of the two the guideline prints.
+    """
+    v = require_positive(flow_velocity, "flow_velocity")
+    s = require_positive(area, "area")
+    kind = require_choice(weighting, "weighting", ("Z", "A"))
+    offset, speed_exponent = (7.0, 50.0) if kind == "Z" else (-25.0, 70.0)
+    return offset + speed_exponent * math.log10(v) + 10.0 * math.log10(s)
+
+
 def flow_noise_bend(
     frequencies: ArrayLike,
     flow_velocity: float,
@@ -1680,14 +1727,18 @@ def _vdi2081_branch_flow_noise(
 def _vdi2081_limit_frequency(shape: str, size: float, speed_of_sound: float) -> float:
     """Equation (33) or (34): the frequency below which only plane waves run.
 
-    ``c / (2 a)`` for a rectangular duct of largest side ``a``, and
-    ``0,586 c / d`` for a round one of bore ``d``.
+    The guideline prints ``c / (2 a)`` for a rectangular duct of largest side
+    ``a`` and ``0,586 c / d`` for a round one of bore ``d``, and both are the
+    first cut-on frequency of the duct, which :func:`plane_wave_limit` already
+    computes from the mode theory: the rectangular one exactly, and the round
+    one to the four figures the guideline rounds 1,8412 over pi to. So the
+    law is called rather than written a second time, and the width the
+    rectangular form needs is the one it is given, the other side being
+    irrelevant to the first mode across the largest one.
     """
-    return (
-        speed_of_sound / (2.0 * size)
-        if shape == "rectangular"
-        else 0.586 * speed_of_sound / size
-    )
+    if shape == "rectangular":
+        return plane_wave_limit(width=size, height=size, speed_of_sound=speed_of_sound)
+    return plane_wave_limit(diameter=size, speed_of_sound=speed_of_sound)
 
 
 def _vdi2081_bend(
