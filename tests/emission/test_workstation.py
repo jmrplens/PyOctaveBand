@@ -191,9 +191,21 @@ def test_without_directivity_k3_is_exactly_k2() -> None:
     """A work station that sees no more than the surface needs the same
     correction the surface needed, which is the expression collapsing.
     """
-    for k2 in (1.0, 2.5, 4.0, 6.0):
+    for k2 in (1.0, 2.5, 4.0, 6.0, 7.0):
         k3 = ws.local_environmental_correction(ws.environmental_ratio_from_k2(k2))
         assert k3 == pytest.approx(k2, abs=1e-9)
+
+
+def test_it_stops_following_k2_at_the_cap() -> None:
+    """The claim above holds only as far as 7 dB, which is where the cap is.
+
+    Every value the first test tries sits below the cap, so on its own it
+    would let "K3 equals K2" be written without the qualifier.
+    """
+    for k2 in (8.0, 10.0, 20.0):
+        k3 = ws.local_environmental_correction(ws.environmental_ratio_from_k2(k2))
+        assert k3 == pytest.approx(ws.MAX_K3_DB)
+        assert k3 < k2
 
 
 def test_directivity_reduces_the_correction() -> None:
@@ -307,6 +319,25 @@ def test_a_scalar_in_gives_a_scalar_out() -> None:
     assert isinstance(ws.emission_sound_pressure_level(80.0), float)
 
 
+def test_a_per_band_directivity_keeps_every_band() -> None:
+    """The shape follows the broadcast, not the first argument.
+
+    One environmental correction against a directivity index that varies by
+    band is one ratio per band. Reading the rank off the correction alone
+    returned the first band and dropped the rest without a word.
+    """
+    directivity = np.array([0.0, 3.0, 6.0])
+    ratio = ws.environmental_ratio_from_k2(4.0, directivity)
+    assert isinstance(ratio, np.ndarray)
+    assert ratio.shape == directivity.shape
+    # Rising directivity means the work station hears proportionally less room.
+    assert np.all(np.diff(ratio) > 0)
+
+    absorbed = ws.environmental_ratio_from_absorption(47.0, 16.0, directivity)
+    assert isinstance(absorbed, np.ndarray)
+    assert absorbed.shape == directivity.shape
+
+
 def test_a_spectrum_in_gives_a_spectrum_out() -> None:
     bands = np.array([1.0, 2.0, 3.0, 4.5])
     k3 = ws.local_environmental_correction(ws.environmental_ratio_from_k2(bands))
@@ -314,3 +345,115 @@ def test_a_spectrum_in_gives_a_spectrum_out() -> None:
     assert k3.shape == bands.shape
     # With no directivity the correction is the environmental one, band by band.
     assert k3 == pytest.approx(bands, abs=1e-9)
+
+
+# --------------------------------------------------------------------------
+# The result and its figure
+# --------------------------------------------------------------------------
+
+
+def _result(**overrides: object) -> ws.EmissionPressureResult:
+    """Annex B Example 2 as a result, which is what the figure draws."""
+    fields: dict[str, object] = {
+        "level_db": 73.2,
+        "measured_level_db": 76.9,
+        "background_correction_db": 0.0,
+        "local_correction_db": 3.7,
+        "grade": "engineering",
+        "upper_bound": False,
+        "standard": "ISO 11202",
+    }
+    fields.update(overrides)
+    return ws.EmissionPressureResult(**fields)  # type: ignore[arg-type]
+
+
+def test_the_figure_draws_the_subtraction_it_describes() -> None:
+    """Four bars, and the two corrections hang between the two levels.
+
+    Looking at the figure is not covering it: the arithmetic that positions
+    the floating bars is the part a defect would hide in, so the bar geometry
+    is asserted rather than the fact that a figure appeared.
+    """
+    import matplotlib.pyplot as plt
+
+    ax = _result().plot()
+    bars = ax.patches[:4]
+    heights = [round(bar.get_height(), 3) for bar in bars]
+    bottoms = [round(bar.get_y(), 3) for bar in bars]
+
+    assert heights == [76.9, 0.0, 3.7, 73.2]
+    # The measured and emission bars stand on the axis; K1 starts where the
+    # reading left off and K3 ends on the emission level.
+    assert bottoms[0] == 0.0
+    assert bottoms[3] == 0.0
+    assert bottoms[1] == pytest.approx(76.9)
+    assert bottoms[2] == pytest.approx(73.2)
+    assert bottoms[2] + heights[2] == pytest.approx(76.9)
+    plt.close("all")
+
+
+def test_the_figure_names_the_part_it_followed() -> None:
+    import matplotlib.pyplot as plt
+
+    assert "ISO 11202" in _result().plot().get_title()
+    plt.close("all")
+
+
+def test_the_figure_says_when_the_level_is_an_upper_bound() -> None:
+    """A held background correction is not a footnote; it is hatching."""
+    import matplotlib.pyplot as plt
+
+    plain = _result().plot()
+    assert all(bar.get_hatch() is None for bar in plain.patches[:4])
+    plt.close("all")
+
+    bounded = _result(upper_bound=True).plot()
+    hatches = [bar.get_hatch() for bar in bounded.patches[:4]]
+    assert hatches[0] == "//"
+    assert hatches[3] == "//"
+    assert hatches[1] is None
+    plt.close("all")
+
+
+def test_the_figure_localises_its_labels() -> None:
+    import matplotlib.pyplot as plt
+
+    spanish = _result().plot(language="es")
+    assert "Nivel de presión sonora" in spanish.get_ylabel()
+    assert "puesto de trabajo" in spanish.get_title()
+    labels = [t.get_text() for t in spanish.get_xticklabels()]
+    assert any("medido" in label for label in labels)
+    plt.close("all")
+
+
+def test_the_figure_reports_the_grade_in_its_legend() -> None:
+    import matplotlib.pyplot as plt
+
+    engineering = _result().plot()
+    assert "grade 2" in engineering.get_legend().get_texts()[0].get_text()
+    plt.close("all")
+
+    survey = _result(grade="survey").plot()
+    assert "grade 3" in survey.get_legend().get_texts()[0].get_text()
+    plt.close("all")
+
+
+def test_the_figure_refuses_a_spectrum() -> None:
+    """It draws one determination; a per-band result is a different figure."""
+    import matplotlib.pyplot as plt
+
+    bands = _result(
+        level_db=np.array([70.0, 71.0]),
+        measured_level_db=np.array([74.0, 75.0]),
+        local_correction_db=np.array([4.0, 4.0]),
+    )
+    with pytest.raises(ValueError, match="one determination"):
+        bands.plot()
+    plt.close("all")
+
+
+def test_the_figure_rejects_an_unknown_language() -> None:
+    """Built first, so the refusal can only be the one under test."""
+    result = _result()
+    with pytest.raises(ValueError, match="Unknown language"):
+        result.plot(language="xx")

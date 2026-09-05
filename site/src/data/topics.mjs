@@ -416,6 +416,7 @@ export const topics = [
           'devices/emission/sound-power-in-duct',
           'devices/emission/vibration-sound-power',
           'devices/emission/sound-power-intensity',
+          'devices/emission/workstation-emission',
         ],
       },
       {

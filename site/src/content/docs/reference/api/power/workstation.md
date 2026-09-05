@@ -22,8 +22,9 @@ ISO 11201:2010          Free field over a reflecting plane, so there is no
 ISO 11202:2010          Two approximate routes to $K_3$, one for a
                         machine with a dominating source and one from the
                         directivity the work station sees.
-ISO 11203:1995          No measurement at all: the level is derived from the
-                        sound power level.
+ISO 11203:1995          No sound-pressure measurement at the work station:
+                        the level is derived from the sound power level,
+                        which was itself determined somehow.
 ISO 11204:2010          The same piecewise $K_3$ as ISO 11202 method
                         A.2, reached accurately rather than approximately.
 ISO 11205:2003          By sound intensity, and not implemented here.
@@ -47,8 +48,10 @@ that the term is negligible, which is the same equation with a zero in it.
 **Peak levels take no correction at all.** ISO 11204:2010 clause 7 and
 ISO 11202:2010 clause 8 both say so: $L_{p\mathrm{C,peak}}$ is reported as
 measured. A correction derived from mean-square pressures has no meaning for a
-single largest excursion, so [`emission_sound_pressure_level`](/phonometry/reference/api/power/workstation/#emission_sound_pressure_level) refuses a
-`peak` result that carries either correction rather than quietly applying it.
+single largest excursion. Nothing here can tell a peak level from any other,
+since both arrive as a number of decibels, so this is a rule for the caller and
+not a guard: do not put a peak level through
+[`emission_sound_pressure_level`](/phonometry/reference/api/power/workstation/#emission_sound_pressure_level).
 
 **The background correction** is the same expression the sound-power side
 already uses, ISO 3744:2010 Equation (16), but this group sets its own
@@ -205,7 +208,9 @@ ISO 11204:2010 Equation (9).
 Never call this for a peak level. ISO 11202:2010 clause 8 and ISO 11204:2010
 clause 7 both forbid correcting $L_{p\mathrm{C,peak}}$, which is
 reported exactly as measured: neither correction has a meaning for a single
-largest excursion, both being derived from mean-square pressures.
+largest excursion, both being derived from mean-square pressures. A peak
+level reaches this function as an ordinary number of decibels and cannot be
+recognised, so the rule is the caller's to keep.
 
 **Parameters**
 
@@ -318,9 +323,13 @@ computes for the sound-power methods, and $D^*_{I,\mathrm{op}}$ is the
 apparent directivity index the work station sees.
 
 With no directivity to speak of the expression collapses to
-$z = 10^{-0,1 K_2}$, so $K_3 = K_2$ exactly: a work station that
-sees the machine no more strongly than the measurement surface does needs
-the same correction the surface needed.
+$z = 10^{-0,1 K_2}$, so $K_3 = K_2$: a work station that sees
+the machine no more strongly than the measurement surface does needs the
+same correction the surface needed. That holds until the cap bites, at
+$K_2 = 7$ dB; above it the local correction stays at
+[`MAX_K3_DB`](/phonometry/reference/api/power/workstation/#max_k3_db) however large the environmental one grows, which is the
+piecewise function of [`local_environmental_correction`](/phonometry/reference/api/power/workstation/#local_environmental_correction) and not a
+limitation here.
 
 **Parameters**
 

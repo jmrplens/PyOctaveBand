@@ -187,15 +187,21 @@ def plot_emission_pressure(
         _t("Room $K_3$", language),
         _t("Emission $L_p$", language),
     ]
+    # The three names this figure positions itself are refused rather than
+    # silently overridden, because a bar chart whose bottoms come from the
+    # caller is not this figure any more. Everything the caller may reasonably
+    # want, colour included, goes through setdefault so a kwarg wins.
+    fixed = {"x", "height", "bottom"} & set(kwargs)
+    if fixed:
+        msg = (
+            f"plot_emission_pressure positions its own bars; "
+            f"{', '.join(sorted(fixed))} cannot be overridden."
+        )
+        raise TypeError(msg)
     kwargs.setdefault("width", 0.62)
-    bars = ax.bar(
-        range(len(heights)),
-        heights,
-        bottom=bottoms,
-        color=colours,
-        edgecolor=_C_EDGE,
-        **kwargs,
-    )
+    kwargs.setdefault("color", colours)
+    kwargs.setdefault("edgecolor", _C_EDGE)
+    bars = ax.bar(range(len(heights)), heights, bottom=bottoms, **kwargs)
     if result.upper_bound:
         _hatch_invalid(bars, np.array([True, False, False, True]))
 

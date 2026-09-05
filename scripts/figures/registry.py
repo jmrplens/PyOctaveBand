@@ -189,6 +189,7 @@ from .devices import (
     generate_vdi2081_room_step,
     generate_vdi2081_section_change,
     generate_vibration_sound_power,
+    generate_workstation_emission,
 )
 from .environment import (
     generate_air_absorption_alpha,
@@ -729,6 +730,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_transfer_stiffness,
     generate_rigid_mass_calibration,
     generate_vibration_sound_power,
+    generate_workstation_emission,
     generate_structure_borne_power,
     generate_installed_structure_borne,
     generate_structure_borne_conversion,

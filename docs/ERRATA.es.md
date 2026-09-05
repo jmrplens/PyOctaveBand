@@ -4628,9 +4628,11 @@ dos ediciones con las mismas entradas y en el mismo orden.
 - **Consecuencia:** no es cosmético, porque el valor se propaga. La tabla B.1
   sigue imprimiendo $\sigma_\mathrm{tot} = 1{,}5$ dB y $U = 2{,}4$ dB a partir
   de $\sigma_{R0} = 1{,}5$ dB. Con los 0,4 dB que da la Ecuación (C.1),
-  $\sigma_\mathrm{tot} = \sqrt{1{,}5^2 + 0{,}4^2} = 1{,}55 \to 1{,}6$ dB y
-  $U = 1{,}6 \times 1{,}6 = 2{,}5$ dB. Quien reproduzca el ejemplo desde las
-  ecuaciones no obtiene la incertidumbre que el ejemplo publica.
+  $\sigma_\mathrm{tot} = \sqrt{1{,}5^2 + 0{,}4^2} = 1{,}552 \to 1{,}6$ dB y
+  $U = 1{,}6 \times 1{,}552 = 2{,}48 \to 2{,}5$ dB, porque el factor de
+  cobertura se aplica al total sin redondear y no al decibelio con que se
+  informa. Quien reproduzca el ejemplo desde las ecuaciones no obtiene la
+  incertidumbre que el ejemplo publica.
 - **Mecanismo probable:** tres lecturas son la muestra más pequeña que la
   ecuación admite, y es justo donde los dos divisores más se separan:
   $\sqrt{3/2}$ es un 22 % de diferencia. La función de desviación típica

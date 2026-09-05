@@ -4295,9 +4295,11 @@ in the same order.
 - **Consequence:** it is not cosmetic, because the value propagates. Table B.1
   goes on to print $\sigma_\mathrm{tot} = 1{,}5$ dB and $U = 2{,}4$ dB from
   $\sigma_{R0} = 1{,}5$ dB. With the 0,4 dB that Equation (C.1) gives,
-  $\sigma_\mathrm{tot} = \sqrt{1{,}5^2 + 0{,}4^2} = 1{,}55 \to 1{,}6$ dB and
-  $U = 1{,}6 \times 1{,}6 = 2{,}5$ dB. A reader reproducing the example from
-  the equations does not obtain the uncertainty the example publishes.
+  $\sigma_\mathrm{tot} = \sqrt{1{,}5^2 + 0{,}4^2} = 1{,}552 \to 1{,}6$ dB and
+  $U = 1{,}6 \times 1{,}552 = 2{,}48 \to 2{,}5$ dB, the coverage factor
+  applying to the unrounded total rather than to the decibel it is reported
+  as. A reader reproducing the example from the equations does not obtain the
+  uncertainty the example publishes.
 - **The likely mechanism:** three readings is the smallest sample the equation
   admits, and it is exactly where the two divisors differ most: $\sqrt{3/2}$ is
   a 22 % gap. A spreadsheet's population-standard-deviation function reaches

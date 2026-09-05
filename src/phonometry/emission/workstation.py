@@ -16,8 +16,9 @@ ISO 11201:2010          Free field over a reflecting plane, so there is no
 ISO 11202:2010          Two approximate routes to :math:`K_3`, one for a
                         machine with a dominating source and one from the
                         directivity the work station sees.
-ISO 11203:1995          No measurement at all: the level is derived from the
-                        sound power level.
+ISO 11203:1995          No sound-pressure measurement at the work station:
+                        the level is derived from the sound power level,
+                        which was itself determined somehow.
 ISO 11204:2010          The same piecewise :math:`K_3` as ISO 11202 method
                         A.2, reached accurately rather than approximately.
 ISO 11205:2003          By sound intensity, and not implemented here.
@@ -41,8 +42,10 @@ that the term is negligible, which is the same equation with a zero in it.
 **Peak levels take no correction at all.** ISO 11204:2010 clause 7 and
 ISO 11202:2010 clause 8 both say so: :math:`L_{p\mathrm{C,peak}}` is reported as
 measured. A correction derived from mean-square pressures has no meaning for a
-single largest excursion, so :func:`emission_sound_pressure_level` refuses a
-``peak`` result that carries either correction rather than quietly applying it.
+single largest excursion. Nothing here can tell a peak level from any other,
+since both arrive as a number of decibels, so this is a rule for the caller and
+not a guard: do not put a peak level through
+:func:`emission_sound_pressure_level`.
 
 **The background correction** is the same expression the sound-power side
 already uses, ISO 3744:2010 Equation (16), but this group sets its own
@@ -146,17 +149,20 @@ DEFAULT_COVERAGE_FACTOR = 1.6
 _MIN_REPEATS = 2
 
 
-def _like(
-    values: NDArray[np.float64], source: ArrayLike
-) -> float | NDArray[np.float64]:
-    """Return *values* with the rank the caller passed in.
+def _like(values: NDArray[np.float64]) -> float | NDArray[np.float64]:
+    """Return *values* as a number when they are one, and as an array otherwise.
 
     The array guards coerce a scalar to a one-element array, and a caller who
     handed over one number wants one number back: every quantity here is
     equally at home as an overall A-weighted value and as a spectrum, so the
     shape of the answer follows the shape of the question.
+
+    The question is the *broadcast* of every argument, not of the first one. A
+    scalar environmental correction against a per-band directivity index is one
+    value per band, and reading the rank off the correction alone returned the
+    first band and dropped the rest, silently.
     """
-    return float(values.reshape(-1)[0]) if np.ndim(source) == 0 else values
+    return float(values.reshape(-1)[0]) if values.size == 1 else values
 
 
 @dataclass(frozen=True)
@@ -255,7 +261,7 @@ def background_noise_correction_at_workstation(
             SoundPowerWarning,
             stacklevel=2,
         )
-    return _like(np.asarray(correction, dtype=np.float64), measured_level_db), held
+    return _like(np.asarray(correction, dtype=np.float64)), held
 
 
 def local_environmental_correction(ratio: ArrayLike) -> float | NDArray[np.float64]:
@@ -294,7 +300,7 @@ def local_environmental_correction(ratio: ArrayLike) -> float | NDArray[np.float
     # a report; the two zeros are the same number, so publish the one with the
     # sign a reader expects.
     correction = correction + 0.0
-    return _like(np.asarray(correction, dtype=np.float64), ratio)
+    return _like(np.asarray(correction, dtype=np.float64))
 
 
 def environmental_ratio_from_k2(
@@ -314,9 +320,13 @@ def environmental_ratio_from_k2(
     apparent directivity index the work station sees.
 
     With no directivity to speak of the expression collapses to
-    :math:`z = 10^{-0,1 K_2}`, so :math:`K_3 = K_2` exactly: a work station that
-    sees the machine no more strongly than the measurement surface does needs
-    the same correction the surface needed.
+    :math:`z = 10^{-0,1 K_2}`, so :math:`K_3 = K_2`: a work station that sees
+    the machine no more strongly than the measurement surface does needs the
+    same correction the surface needed. That holds until the cap bites, at
+    :math:`K_2 = 7` dB; above it the local correction stays at
+    :data:`MAX_K3_DB` however large the environmental one grows, which is the
+    piecewise function of :func:`local_environmental_correction` and not a
+    limitation here.
 
     :param environmental_correction_db: :math:`K_2` in decibels, non-negative.
     :param directivity_index_db: :math:`D^*_{I,\mathrm{op}}` in decibels
@@ -329,7 +339,7 @@ def environmental_ratio_from_k2(
         msg = "'environmental_correction_db' is a correction and cannot be negative."
         raise ValueError(msg)
     ratio = 1.0 - (1.0 - np.power(10.0, -0.1 * k2)) * np.power(10.0, -0.1 * di)
-    return _like(np.asarray(ratio, dtype=np.float64), environmental_correction_db)
+    return _like(np.asarray(ratio, dtype=np.float64))
 
 
 def environmental_ratio_from_absorption(
@@ -362,7 +372,7 @@ def environmental_ratio_from_absorption(
     s_m = require_positive(measurement_surface_m2, "measurement_surface_m2")
     di = np.asarray(directivity_index_db, dtype=np.float64)
     ratio = 1.0 - np.power(10.0, -0.1 * di) / (1.0 + a / (4.0 * s_m))
-    return _like(np.asarray(ratio, dtype=np.float64), absorption_area_m2)
+    return _like(np.asarray(ratio, dtype=np.float64))
 
 
 def emission_sound_pressure_level(
@@ -384,7 +394,9 @@ def emission_sound_pressure_level(
     Never call this for a peak level. ISO 11202:2010 clause 8 and ISO 11204:2010
     clause 7 both forbid correcting :math:`L_{p\mathrm{C,peak}}`, which is
     reported exactly as measured: neither correction has a meaning for a single
-    largest excursion, both being derived from mean-square pressures.
+    largest excursion, both being derived from mean-square pressures. A peak
+    level reaches this function as an ordinary number of decibels and cannot be
+    recognised, so the rule is the caller's to keep.
 
     :param measured_level_db: The uncorrected reading :math:`L'_p`, in decibels.
     :param background_correction_db: :math:`K_1` in decibels (default 0).

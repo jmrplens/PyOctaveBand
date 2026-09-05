@@ -206,9 +206,9 @@ def test_expanded_uncertainty_g2() -> None:
     assert environment.environmental_expanded_uncertainty(u) == pytest.approx(
         ref.ISO1996_2_G2_EXPANDED, abs=0.01
     )
-    assert environment.environmental_expanded_uncertainty(u, confidence=0.80) == pytest.approx(
-        1.3 * u
-    )
+    assert environment.environmental_expanded_uncertainty(
+        u, confidence=0.80
+    ) == pytest.approx(1.3 * u)
 
 
 def test_combined_uncertainty_accepts_pairs() -> None:

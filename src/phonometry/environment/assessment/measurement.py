@@ -521,8 +521,8 @@ def environmental_expanded_uncertainty(
        the building one is
        :func:`~phonometry.building.insulation_expanded_uncertainty`, and the
        work-station one is
-       :func:`~phonometry.emission.emission_expanded_uncertainty`, whose factor
-       is the 1,6 the ISO 11200 group prints. This one carried the bare name
+       :func:`~phonometry.emission.emission_expanded_uncertainty`, whose
+       coverage factor is the 1.6 that the ISO 11200 group prints. This one carried the bare name
        until the work-station one needed it too, and one package holding the
        unqualified spelling of a quantity three of them define was the reason
        the other two had to be qualified.

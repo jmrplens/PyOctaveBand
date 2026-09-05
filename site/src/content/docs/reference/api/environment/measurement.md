@@ -128,14 +128,10 @@ above 500 Hz.
 | :--- | :--- |
 | ValueError | If `centre_frequency` is not positive/finite. |
 
-## EnvironmentalMeasurementWarning
-
-Warning for unreliable environmental-noise determinations.
-
-## expanded_uncertainty
+## environmental_expanded_uncertainty
 
 ```python
-expanded_uncertainty(
+environmental_expanded_uncertainty(
     standard_uncertainty: float,
     *,
     confidence: float = 0.95,
@@ -147,13 +143,18 @@ Expanded uncertainty $U = k \cdot u$ (Clause 4).
 Coverage factor $k = 2$ for 95 % or $k = 1.3$ for 80 %.
 
 :::note
-Three domains define an expanded uncertainty over their own coverage
-factors, and each is reached through its own package: this one is
-`environment.expanded_uncertainty`, the building one is
-[`insulation_expanded_uncertainty`](/phonometry/reference/api/building/uncertainty/#insulation_expanded_uncertainty). Until 4.0
-the flat top level had to rename this one to
-`environmental_expanded_uncertainty` to tell them apart, which is the
-clearest thing the flat namespace cost.
+Several domains define an expanded uncertainty over their own coverage
+factors, and each says in its name what it is the uncertainty *of*:
+this one is
+[`environmental_expanded_uncertainty`](/phonometry/reference/api/environment/measurement/#environmental_expanded_uncertainty),
+the building one is
+[`insulation_expanded_uncertainty`](/phonometry/reference/api/building/uncertainty/#insulation_expanded_uncertainty), and the
+work-station one is
+[`emission_expanded_uncertainty`](/phonometry/reference/api/power/workstation/#emission_expanded_uncertainty), whose
+coverage factor is the 1.6 that the ISO 11200 group prints. This one carried the bare name
+until the work-station one needed it too, and one package holding the
+unqualified spelling of a quantity three of them define was the reason
+the other two had to be qualified.
 :::
 
 **Parameters**
@@ -170,6 +171,10 @@ clearest thing the flat namespace cost.
 | Exception | When |
 | :--- | :--- |
 | ValueError | If `u` is negative/non-finite or `confidence` is not one of the tabulated values. |
+
+## EnvironmentalMeasurementWarning
+
+Warning for unreliable environmental-noise determinations.
 
 ## gaussian_residual_level
 

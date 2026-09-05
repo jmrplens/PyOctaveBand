@@ -39,6 +39,14 @@ through openings, intakes and outlets — and it is the natural bridge to the
 structure-borne pages, since the same surface velocity is what
 [Vibration and structure-borne sound](../../vibration/index.md) measures.
 
+The sound power level is not, however, what the person operating the machine
+is exposed to. That is the **emission sound pressure level** at the work
+station, the number the ISO 4871 declaration prints beside the power level and
+the Machinery Directive asks for above 70 dB(A).
+[Emission Sound Pressure at a Work Station](workstation-emission.md)
+covers the ISO 11200 group that determines it: the same reading less a
+background correction and a correction for the reflections the room sent back.
+
 Behind the intensity-based routes sits **sound intensity** itself: the signed
 power flux that can localise sources and separate them from background noise,
 measured with a two-microphone probe per IEC 61043 and qualified by the
@@ -82,6 +90,10 @@ judged against.
   value.
 - [Sound Power by Intensity Scanning](sound-power-intensity.md):
   the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
+- [Emission Sound Pressure at a Work Station](workstation-emission.md):
+  the ISO 11200 group, which turns a reading at the operator's position into
+  what the machine alone puts there, with the background and local
+  environmental corrections and the grade each earns.
 
 ## What this section does not cover
 
