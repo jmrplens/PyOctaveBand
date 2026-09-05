@@ -61,12 +61,17 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import numpy as np
 
 from ..._internal.types import as_float_or_array
-from ..._internal.validation import require_finite_fields, require_positive
+from ..._internal.validation import (
+    require_choice,
+    require_finite_fields,
+    require_non_negative,
+    require_positive,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -346,3 +351,182 @@ def vibration_vector_change(
         initial=(float(initial_magnitude), float(initial_phase_deg)),
         final=(float(final_magnitude), float(final_phase_deg)),
     )
+
+
+# --------------------------------------------------------------------------- #
+# Industrial machines: the boundaries the series prints for them
+# --------------------------------------------------------------------------- #
+@dataclass(frozen=True)
+class MachineZoneLimits:
+    """The two boundary sets one machine class is judged on at once.
+
+    ISO 10816-3:2009 states each class twice, once in displacement and once
+    in velocity, and 5.2.3 says which wins when they disagree: the more
+    restrictive zone applies. Both are read on the same non-rotating part,
+    and A.1 says velocity alone is enough in most cases and that a spectrum
+    expected to carry low-frequency components should be judged on both.
+
+    :ivar displacement_um: The three boundaries in r.m.s. displacement,
+        micrometres.
+    :ivar velocity_mm_s: The three boundaries in r.m.s. velocity, millimetres
+        per second.
+    """
+
+    displacement_um: ZoneBoundaries
+    velocity_mm_s: ZoneBoundaries
+
+
+#: Tables A.1 and A.2 of ISO 10816-3:2009, keyed by machine group and support
+#: class. Group 1 is large machines above 300 kW and up to 50 MW, and
+#: electrical machines of shaft height 315 mm or more; group 2 is medium-sized
+#: machines above 15 kW up to 300 kW, and electrical machines of shaft height
+#: from 160 mm up to but not including 315 mm. A support system whose lowest
+#: natural frequency in the measuring direction is at least 25 % above the
+#: main excitation frequency counts as rigid, and every other one as flexible
+#: (4.3). The boundaries hold for the broad-band r.m.s. value between 10 Hz
+#: and 1 kHz, or from 2 Hz for a machine below 600 r/min (A.1).
+#:
+#: The edition is superseded, by ISO 20816-3, which is not held. It is the
+#: predecessor of that part rather than a competing document, and the ISO
+#: 20816-1 framework these boundaries are used with cites the series as the
+#: place its numbers live.
+INDUSTRIAL_MACHINE_ZONES: dict[tuple[str, str], MachineZoneLimits] = {
+    ("group_1", "rigid"): MachineZoneLimits(
+        displacement_um=ZoneBoundaries(29.0, 57.0, 90.0),
+        velocity_mm_s=ZoneBoundaries(2.3, 4.5, 7.1),
+    ),
+    ("group_1", "flexible"): MachineZoneLimits(
+        displacement_um=ZoneBoundaries(45.0, 90.0, 140.0),
+        velocity_mm_s=ZoneBoundaries(3.5, 7.1, 11.0),
+    ),
+    ("group_2", "rigid"): MachineZoneLimits(
+        displacement_um=ZoneBoundaries(22.0, 45.0, 71.0),
+        velocity_mm_s=ZoneBoundaries(1.4, 2.8, 4.5),
+    ),
+    ("group_2", "flexible"): MachineZoneLimits(
+        displacement_um=ZoneBoundaries(37.0, 71.0, 113.0),
+        velocity_mm_s=ZoneBoundaries(2.3, 4.5, 7.1),
+    ),
+}
+
+#: The fraction of the upper limit of zone B that 5.3 calls a significant
+#: change, and that 5.4.1 adds to the baseline to set an ALARM.
+SIGNIFICANT_CHANGE_FRACTION = 0.25
+#: The multiple of a zone's upper limit that 5.4.1 and 5.4.2 recommend an
+#: ALARM and a TRIP should not exceed.
+OPERATIONAL_LIMIT_HEADROOM = 1.25
+
+
+def industrial_machine_zone(
+    group: str,
+    support: str,
+    *,
+    displacement_um: float | None = None,
+    velocity_mm_s: float | None = None,
+) -> EvaluationZone:
+    """Grade an industrial machine against Table A.1 or A.2.
+
+    Give whichever quantities were measured. With both, 5.2.3 applies and the
+    result is the more restrictive of the two gradings, which is the whole
+    reason the tables state each class twice.
+
+    :param group: ``"group_1"`` (above 300 kW and not more than 50 MW, or an
+        electrical machine of shaft height 315 mm or more) or ``"group_2"``
+        (above 15 kW up to and including 300 kW, or shaft height from 160 mm
+        up to but not including 315 mm), from 4.2.
+    :param support: ``"rigid"`` or ``"flexible"``; rigid means the lowest
+        natural frequency of the support in the measuring direction is at
+        least 25 % above the main excitation frequency (4.3).
+    :param displacement_um: Measured broad-band r.m.s. displacement of the
+        bearing, pedestal or housing, in micrometres.
+    :param velocity_mm_s: Measured broad-band r.m.s. velocity, in millimetres
+        per second.
+    :return: ``"A"``, ``"B"``, ``"C"`` or ``"D"``.
+    :raises ValueError: If the group or support class is unknown, or neither
+        measured quantity is given.
+    """
+    key = (
+        require_choice(group, "group", ("group_1", "group_2")),
+        require_choice(support, "support", ("rigid", "flexible")),
+    )
+    limits = INDUSTRIAL_MACHINE_ZONES[key]
+    graded = [
+        str(evaluation_zone(value, boundaries))
+        for value, boundaries in (
+            (displacement_um, limits.displacement_um),
+            (velocity_mm_s, limits.velocity_mm_s),
+        )
+        if value is not None
+    ]
+    if not graded:
+        msg = (
+            "Give at least one of 'displacement_um' and 'velocity_mm_s'; the "
+            "tables grade a machine on whichever was measured."
+        )
+        raise ValueError(msg)
+    # "The severity zone which is most restrictive shall apply" (5.2.3), and
+    # the zone letters sort in the order of severity.
+    return cast("EvaluationZone", max(graded))
+
+
+def is_significant_change(change: float, zone_b_upper: float) -> bool:
+    """Whether a change from the baseline is significant (5.3).
+
+    A change exceeding a quarter of the upper limit of zone B, in either
+    direction, is one that 5.3 asks to be investigated even when zone C of
+    Criterion I has not been reached: the machine can go wrong well inside
+    zone B, and the criterion that catches it is the change rather than the
+    magnitude.
+
+    :param change: The change from the established baseline, in the unit the
+        boundaries are in; the sign is ignored.
+    :param zone_b_upper: The upper limit of zone B, which is the B/C boundary.
+    :return: Whether the change is significant.
+    :raises ValueError: If the change is not finite or the limit is not
+        positive.
+    """
+    if not math.isfinite(change):
+        msg = "'change' must be finite."
+        raise ValueError(msg)
+    upper = require_positive(zone_b_upper, "zone_b_upper")
+    return abs(change) > SIGNIFICANT_CHANGE_FRACTION * upper
+
+
+def alarm_limit(baseline: float, zone_b_upper: float) -> float:
+    """The ALARM setting a baseline and a zone B/C boundary imply (5.4.1).
+
+    The recommendation is two rules at once: set the ALARM a quarter of the
+    upper limit of zone B above the established baseline, and do not normally
+    let it exceed 1,25 times that limit. A machine with a low baseline
+    therefore alarms below zone C, which the clause says in as many words, and
+    one with a high baseline is capped rather than allowed to drift up with
+    it.
+
+    :param baseline: The steady-state baseline for that measurement position
+        and direction, in the unit the boundaries are in.
+    :param zone_b_upper: The upper limit of zone B, which is the B/C boundary.
+    :return: The ALARM setting.
+    :raises ValueError: If the baseline is negative or the limit is not
+        positive.
+    """
+    base = require_non_negative(baseline, "baseline")
+    upper = require_positive(zone_b_upper, "zone_b_upper")
+    return min(
+        base + SIGNIFICANT_CHANGE_FRACTION * upper,
+        OPERATIONAL_LIMIT_HEADROOM * upper,
+    )
+
+
+def trip_limit(zone_c_upper: float) -> float:
+    """The largest TRIP setting 5.4.2 recommends.
+
+    Unlike an ALARM, a TRIP is not set from a baseline: it relates to the
+    mechanical integrity of the machine and is the same for every machine of
+    a design. The clause declines to give absolute values and gives a ceiling
+    instead, 1,25 times the upper limit of zone C.
+
+    :param zone_c_upper: The upper limit of zone C, which is the C/D boundary.
+    :return: The recommended maximum TRIP setting.
+    :raises ValueError: If the limit is not positive.
+    """
+    return OPERATIONAL_LIMIT_HEADROOM * require_positive(zone_c_upper, "zone_c_upper")

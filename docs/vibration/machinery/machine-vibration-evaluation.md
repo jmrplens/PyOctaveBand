@@ -182,18 +182,118 @@ They are a starting point for agreement between supplier and customer, and the
 standard says plainly that the values assigned to zone boundaries are not
 themselves intended to serve as acceptance specifications (6.3.2.5).
 
+## 6. The numbers, for the machines a plant is full of
+
+Part 1 fixes the shape of the judgement and declines to give boundaries.
+**ISO 10816-3** gives them, for the machines an industrial site is actually
+made of: rotary compressors, generators, electric motors of any type, blowers
+and fans, steam turbines up to 50 MW and industrial gas turbines up to 3 MW,
+all measured in situ on the non-rotating parts.
+
+Two questions place a machine in one of four classes.
+
+**How big it is** (4.2). *Group 1* is a large machine with rated power above
+300 kW and not more than 50 MW, or an electrical machine of shaft height
+315 mm or more. *Group 2* is a medium-sized machine above 15 kW and up to and
+including 300 kW, or an electrical machine of shaft height from 160 mm up to
+but not including 315 mm.
+
+**What it stands on** (4.3). If the lowest natural frequency of the combined
+machine and support system, *in the direction being measured*, is at least
+25 % above the main excitation frequency, which is usually the running speed,
+the support is **rigid** in that direction. Every other support is
+**flexible**. The clause is explicit that the two can differ within one
+machine: a foundation stiff vertically and soft horizontally is judged by the
+rigid table in one direction and the flexible table in the other.
+
+Each of the four classes is then stated **twice**, once in displacement and
+once in velocity, and 5.2.3 settles the disagreement: the more restrictive
+severity zone applies.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/industrial_machine_zones_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/industrial_machine_zones.svg" alt="Two bar panels, velocity in millimetres per second on the left and displacement in micrometres on the right. Each panel shows four stacked bars, one per machine class: group 1 rigid, group 1 flexible, group 2 rigid and group 2 flexible. Every bar is divided into four coloured bands, zone A at the bottom through zone D at the top, with the boundary value printed beside each division. A dashed line with a marker crosses the group 2 rigid bar at 2.0 millimetres per second in the left panel, inside zone B, and at 50 micrometres in the right panel, inside zone C" width="100%"></picture>
+
+*The same machine, read two ways. Velocity says zone B; displacement says zone
+C; the grade is C.*
+
+```python
+from phonometry import vibration
+
+print(vibration.industrial_machine_zone("group_2", "rigid", velocity_mm_s=2.0))
+# B
+print(vibration.industrial_machine_zone("group_2", "rigid", displacement_um=50.0))
+# C
+print(
+    vibration.industrial_machine_zone(
+        "group_2", "rigid", displacement_um=50.0, velocity_mm_s=2.0
+    )
+)  # C
+```
+
+Give whichever quantities were measured. Annex A says velocity alone is enough
+in most cases, and that a machine whose spectrum is expected to carry
+low-frequency components should be judged on both. The limits are broad-band
+r.m.s. values between 10 Hz and 1 kHz, or from 2 Hz for a machine running
+below 600 r/min.
+
+The edition implemented here is ISO 10816-3:2009, which ISO 20816-3:2022 has
+since replaced. Part 3 is the one part of the series not held here, so the
+boundaries come from its direct predecessor, and this page says so rather than
+implying a currency it does not have.
+
+## 7. ALARM and TRIP, with numbers behind them
+
+Part 1 describes the two operational limits and leaves their values to the
+parts. Part 3 gives them, and the two are set from different things.
+
+**A significant change** (5.3) is an increase *or a decrease* of more than
+25 % of the upper limit of zone B, measured at the same transducer location
+and orientation and under the same operating conditions. That is Criterion II
+made arithmetic.
+
+**An ALARM** (5.4.1) sits 25 % of the upper limit of zone B above the
+established baseline for that position, and should not normally exceed 1.25
+times that limit. Both halves matter. Set from the baseline, an alarm on a
+quiet machine can fall well inside zone B, which is the point of it. Capped at
+1.25 times the limit, an alarm on a machine whose baseline has crept up cannot
+follow it indefinitely.
+
+**A TRIP** (5.4.2) relates to the mechanical integrity of the machine, so it
+is generally the same for every machine of a design and is *not* tied to the
+baseline. It will normally lie within zone C or D, and should not exceed 1.25
+times the upper limit of zone C.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/machine_alarm_trip_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/machine_alarm_trip.svg" alt="A velocity axis in millimetres per second banded into the four evaluation zones. Two bars mark baselines, one at 0.9 millimetres per second inside zone A and one at 2.9 inside zone C, with an arrow rising from each to its ALARM setting: 1.6 for the first and 3.5 for the second. A dotted line at 3.5 marks the cap of 1.25 times the upper limit of zone B, which the second ALARM has run into, and a dash-dotted line at 5.62 marks the TRIP of 1.25 times the upper limit of zone C" width="100%"></picture>
+
+*The quiet machine gets an alarm inside zone B. The one that has drifted runs
+into the cap.*
+
+```python
+from phonometry import vibration
+
+limits = vibration.INDUSTRIAL_MACHINE_ZONES["group_2", "rigid"].velocity_mm_s
+
+print(vibration.is_significant_change(0.8, limits.b_c))   # True
+print(vibration.is_significant_change(0.6, limits.b_c))   # False
+print(round(vibration.alarm_limit(0.9, limits.b_c), 3))   # 1.6
+print(round(vibration.alarm_limit(2.9, limits.b_c), 3))   # 3.5, at the cap
+print(round(vibration.trip_limit(limits.c_d), 3))         # 5.625
+```
+
 ## Covered and not covered
 
 Covered: the four evaluation zones and the grading, the frequency-shaped
 criterion of Figure 9 with the zone factors of Annex C.2, the typical ranges
-and ladder of Table C.1, and the vector reading of a change from Annex D.
+and ladder of Table C.1, and the vector reading of a change from Annex D. For
+industrial machines, the boundaries of Tables A.1 and A.2 in both quantities,
+the most-restrictive rule of 5.2.3, the significant change of 5.3 and the
+ALARM and TRIP settings of 5.4.
 
-Not covered: the numeric zone boundaries of the machine-specific parts, which
-this page takes as inputs; the ALARM and TRIP settings of 6.4, which the
-standard describes without numbers and leaves to the parts; and the shaft
-criterion of Figure 10, whose values Annex C.1 declines to give for machines no
-part covers, on the grounds that such machines are not normally fitted with
-shaft transducers.
+Not covered: the zone boundaries of the other machine-specific parts, which
+this page takes as inputs; the shaft criterion of Figure 10, whose values
+Annex C.1 declines to give for machines no part covers, on the grounds that
+such machines are not normally fitted with shaft transducers; and the current
+third edition of Part 3, ISO 20816-3:2022, which is not held here, so its
+predecessor supplies the industrial boundaries.
 
 ## See also
 
@@ -215,6 +315,15 @@ shaft transducers.
   Formula (C.1)), the typical boundary ranges of Table C.1 and the vector
   analysis of a change (Annex D). This first edition cancelled and replaced
   ISO 7919-1:1996 and ISO 10816-1:1995.
+- International Organization for Standardization. (2009). *Mechanical
+  vibration — Evaluation of machine vibration by measurements on non-rotating
+  parts — Part 3: Industrial machines with nominal power above 15 kW and
+  nominal speeds between 120 r/min and 15 000 r/min when measured in situ*
+  (ISO 10816-3:2009).
+  The machine groups (4.2), the support classification (4.3), the zone
+  boundaries of Tables A.1 and A.2, the most-restrictive rule (5.2.3), the
+  significant change (5.3) and the ALARM and TRIP settings (5.4). Superseded
+  by ISO 20816-3:2022, which is not held here.
 
 ## Standards
 
@@ -224,3 +333,11 @@ vibration severity of 4.3.3, the four evaluation zones of 6.3.2.3, Criterion II
 of 6.3.3, the velocity criterion of Figure 9 as Formula (C.1) with the zone
 factors of Annex C.2, the typical boundary ranges of Table C.1, and the vector
 change of Annex D.
+
+ISO 10816-3:2009, *Mechanical vibration — Evaluation of machine vibration by
+measurements on non-rotating parts — Part 3: Industrial machines with nominal
+power above 15 kW and nominal speeds between 120 r/min and 15 000 r/min when
+measured in situ*: the machine groups of 4.2, the support classification of
+4.3, the zone boundaries of Tables A.1 and A.2 in both quantities with the
+measurement band of A.1, the most-restrictive rule of 5.2.3, the significant
+change of 5.3, and the ALARM and TRIP settings of 5.4.

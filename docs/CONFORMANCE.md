@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**718/718 conformance checks pass** across 66 domains and 389 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**731/731 conformance checks pass** across 66 domains and 390 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -513,7 +513,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>Machine vibration evaluation (ISO 20816)</b>: 100% (15/15)</summary>
+<summary><b>Machine vibration evaluation (ISO 20816)</b>: 100% (28/28)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -532,6 +532,19 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 20816-1:2016 Figure 9 | Criterion is flat between the corner frequencies, worst deviation, mm/s | 0 mm/s (+/-0.000000001 mm/s) | 0 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
 | ISO 20816-1:2016 Figure 9 | Constant-displacement slope below the lower corner, dB per octave | 6.0206 dB (+/-0.001 dB) | 6.0206 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 20816-1:2016 Figure 9 | Constant-acceleration slope above the upper corner, dB per octave | 6.0206 dB (+/-0.001 dB) | 6.0206 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 10816-3:2009 Table A.1 | Zone boundaries, group 1 on rigid supports, displacement, worst deviation | 0 µm (+/-0.0005 µm) | 0 µm | 0 µm | 0 % | ![Pass][cv-pass] Pass |
+| ISO 10816-3:2009 Table A.1 | Zone boundaries, group 1 on rigid supports, velocity, worst deviation | 0 mm/s (+/-0.0005 mm/s) | 0 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 10816-3:2009 Table A.1 | Zone boundaries, group 1 on flexible supports, displacement, worst deviation | 0 µm (+/-0.0005 µm) | 0 µm | 0 µm | 0 % | ![Pass][cv-pass] Pass |
+| ISO 10816-3:2009 Table A.1 | Zone boundaries, group 1 on flexible supports, velocity, worst deviation | 0 mm/s (+/-0.0005 mm/s) | 0 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 10816-3:2009 Table A.2 | Zone boundaries, group 2 on rigid supports, displacement, worst deviation | 0 µm (+/-0.0005 µm) | 0 µm | 0 µm | 0 % | ![Pass][cv-pass] Pass |
+| ISO 10816-3:2009 Table A.2 | Zone boundaries, group 2 on rigid supports, velocity, worst deviation | 0 mm/s (+/-0.0005 mm/s) | 0 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 10816-3:2009 Table A.2 | Zone boundaries, group 2 on flexible supports, displacement, worst deviation | 0 µm (+/-0.0005 µm) | 0 µm | 0 µm | 0 % | ![Pass][cv-pass] Pass |
+| ISO 10816-3:2009 Table A.2 | Zone boundaries, group 2 on flexible supports, velocity, worst deviation | 0 mm/s (+/-0.0005 mm/s) | 0 mm/s | 0 mm/s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 10816-3:2009 5.2.3 | The more restrictive of the two quantities decides the zone | 3 (+/-0.5) | 3 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 10816-3:2009 5.4.1 | ALARM above a baseline, as a fraction of the zone B/C boundary | 0.25 (+/-0.0005) | 0.25 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 10816-3:2009 5.4.1 | ALARM ceiling, as a multiple of the zone B/C boundary | 1.25 (+/-0.0005) | 1.25 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 10816-3:2009 5.4.2 | TRIP ceiling, as a multiple of the zone C/D boundary | 1.25 (+/-0.0005) | 1.25 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 10816-3:2009 5.3 | Threshold of a significant change, as a fraction of the zone B/C boundary | 0.25 (+/-0.0005) | 0.25 | 0 | 0 % | ![Pass][cv-pass] Pass |
 
 </details>
 

@@ -555,10 +555,12 @@ from .vibration import (
     generate_envelope_chain_steps,
     generate_experimental_sea_clf,
     generate_hav_vwf_lifetime,
+    generate_industrial_machine_zones,
     generate_infinite_mobilities,
     generate_junction_kij_thickness,
     generate_junction_plate_geometry,
     generate_junction_transmission,
+    generate_machine_alarm_trip,
     generate_machine_fault_families,
     generate_machine_vector_change,
     generate_machine_vibration_zones,
@@ -706,6 +708,10 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # curve, and the vector change a broad-band magnitude cannot express.
     generate_machine_vibration_zones,
     generate_machine_vector_change,
+    # Industrial machines (ISO 10816-3): the printed boundaries in both
+    # quantities, and the operational limits set from them.
+    generate_industrial_machine_zones,
+    generate_machine_alarm_trip,
     generate_experimental_sea_clf,
     generate_plateau_transmission_loss,
     generate_orthotropic_transmission_loss,
