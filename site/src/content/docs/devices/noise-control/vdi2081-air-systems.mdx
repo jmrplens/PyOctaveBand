@@ -170,8 +170,11 @@ nothing else left to hear. VDI 2081 gives it in closed form.
 - **A straight run** (Section 5.2.1, Equations (16) and (17) with Figure 16),
   through `flow_noise_straight_duct_overall` for the two overall levels and
   `flow_noise_straight_duct` for the octave spectrum, which is the first of
-  them with the relative shape of Figure 16 on it. That shape is a fit and not
-  a partition, so the bands do not sum back to the overall.
+  them with the relative shape of Figure 16 on it. What that figure prints is a
+  level difference, not a share: it tends to $-2{,}5$ dB as $f_\mathrm{m}/v$
+  falls, so the bands do not sum back to the overall and the shortfall depends
+  on how many octaves are taken. Over the range the figure is drawn for it
+  lands within half a decibel of the overall.
 - **A bend or a branch** (Section 5.2.2, Equation (18) with Figures 17 and 18),
   through `flow_noise_bend`. It is written on a Strouhal number built from the
   element's own diameter and the flow speed through it, and both figures state

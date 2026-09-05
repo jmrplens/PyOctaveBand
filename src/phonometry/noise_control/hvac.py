@@ -1008,18 +1008,22 @@ def flow_noise_straight_duct(
     flow_velocity: float,
     area: float,
 ) -> HvacSpectrumResult:
-    r"""Flow-generated octave-band sound power of a straight duct (Bies Eq. (8.251)).
+    r"""Flow-generated octave-band sound power of a straight duct (VDI 2081-1, 5.2.1).
 
     .. math::
 
-       L_{W\mathrm{B}} = 7 + 50 \log_{10}(U) + 10 \log_{10}(S) - 2
-       - 26 \log_{10}(1.14 + 0.02 f / U)
+       L_{W\mathrm{B}} = \underbrace{7 + 50 \log_{10}(v) + 10 \log_{10}(S)}_{(16)}
+       \underbrace{- 2 - 26 \log_{10}(1.14 + 0.02 f_\mathrm{m} / v)}_{\text{Figure 16}}
 
-    in dB re 1e-12 W (VDI 2081-1), for airflow speed ``U`` in a duct of area
-    ``S``.
+    in dB re 1e-12 W, for airflow speed ``v`` in a duct of area ``S``. The two
+    halves come from two places on the same page of VDI 2081 Part 1: Equation
+    (16) is the overall level, and the level difference
+    :math:`\Delta L_W = L_{W\mathrm{Okt}} - L_W` is printed inside Figure 16,
+    whose abscissa is :math:`f_\mathrm{m}/v`. Bies, Hansen & Howard 5e
+    Eq. (8.251) prints the two as one line and credits the same guideline.
 
-    :param frequencies: Octave-band centre frequencies ``f``, Hz (1-D array).
-    :param flow_velocity: Mean flow speed ``U``, m/s.
+    :param frequencies: Octave-band centre frequencies ``f_m``, Hz (1-D array).
+    :param flow_velocity: Mean flow speed ``v`` in the duct, m/s.
     :param area: Duct cross-sectional area ``S``, m2.
     :return: A :class:`HvacSpectrumResult` of the band sound power level,
         dB re 1e-12 W.
@@ -1067,10 +1071,13 @@ def flow_noise_straight_duct_overall(
     also moves the spectrum up into the part of the curve the weighting stops
     attenuating. Faster air is worse than the unweighted number says.
 
-    :func:`flow_noise_straight_duct` is the same law spread over the octaves,
-    Equation (16) with the relative spectrum of Figure 16; the band levels do
-    not sum back to this overall, because that figure is a shape and not a
-    partition.
+    :func:`flow_noise_straight_duct` is this level with the relative spectrum
+    of Figure 16 on it. The band levels do not sum back here, and not by a
+    fixed amount either: the difference the figure prints tends to
+    :math:`-2 - 26 \lg 1{,}14 = -2{,}5` dB as :math:`f_\mathrm{m}/v` falls, so
+    the energy sum grows with however many octaves are taken. Over the range
+    the figure is drawn for it lands within half a decibel of this number, and
+    outside it the sum means nothing.
 
     :param flow_velocity: Mean flow speed ``v`` in the duct, m/s.
     :param area: Duct cross-sectional area ``S``, m2.

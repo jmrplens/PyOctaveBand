@@ -170,8 +170,11 @@ menudo no queda otra cosa que oír. La VDI 2081 lo da en forma cerrada.
 - **Un tramo recto** (apartado 5.2.1, Ecuaciones (16) y (17) con la Figura 16),
   con `flow_noise_straight_duct_overall` para los dos niveles globales y
   `flow_noise_straight_duct` para el espectro por octavas, que es el primero de
-  ellos con la forma relativa de la Figura 16 encima. Esa forma es un ajuste y
-  no un reparto, así que las bandas no suman el nivel global.
+  ellos con la forma relativa de la Figura 16 encima. Lo que esa figura imprime
+  es una diferencia de nivel, no un reparto: tiende a $-2{,}5$ dB cuando
+  $f_\mathrm{m}/v$ baja, así que las bandas no suman el nivel global y lo que
+  falta depende de cuántas octavas se tomen. En el rango para el que la figura
+  está dibujada se queda a medio decibelio del global.
 - **Un codo o una ramificación** (apartado 5.2.2, Ecuación (18) con las
   Figuras 17 y 18), con `flow_noise_bend`. Está escrito sobre un número de
   Strouhal construido con el diámetro del propio elemento y la velocidad que lo
