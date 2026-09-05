@@ -21901,8 +21901,10 @@ it.
   value is only reached when the duct is anechoically terminated at both ends,
   and a gradual change through a long tapered adapter reflects nothing worth
   counting.
-- **Branch** (Section 6.4, Equation (35)): the share of the flow the branch
-  takes, through `split_loss`.
+- **Branch** (Section 6.4, Equation (35)): the share of the cross section the
+  branch takes, `10 lg (S1 / sum Si)`, through `split_loss`. It is written on
+  area and not on flow, and the same page says the reduction does not depend
+  on frequency.
 
 ```python
 from phonometry import noise_control
@@ -22060,10 +22062,10 @@ Equations (16) and (17), the splitter silencer and its self-noise, the end
 reflection of Section 6.6, the room step of Equation (36) and the assessment
 curve of Part 2 Section 1.1, all against the worked sheet of Part 2 Table 1.
 
-Not covered: The air-handling unit and the outdoor-propagation chapters the 2019 revision
-added, which are in the editions not held here; the room acoustics VDI 2081
-leaves to VDI 2569; and the vibration isolation of the plant, which is a
-different guideline again.
+Not covered: The air-handling unit and the outdoor-propagation chapters the
+superseding editions added, which are not held here; the room acoustics VDI
+2081 leaves to VDI 2569; and the vibration isolation of the plant, which
+Section 7.6 of Blatt 1 does cover and this library does not.
 
 ## See also
 
@@ -24767,7 +24769,7 @@ against the exact half-plane and coherent-ground models.
 
 - [Spherical ground effect and advanced barriers](https://jmrplens.github.io/phonometry/environment/propagation/ground-barriers/): the wave acoustics underneath the Table 3 ground fit and the Eq. (14) screening curve.
 - [Atmospheric refraction](https://jmrplens.github.io/phonometry/environment/propagation/atmospheric-refraction/): what the favourable-condition assumption and $C_\mathrm{met}$ stand in for.
-- [CNOSSOS-EU road emission](https://jmrplens.github.io/phonometry/environment/sources/cnossos-road-emission/) and [CNOSSOS-EU rail emission](https://jmrplens.github.io/phonometry/environment/sources/cnossos-rail-emission/): the source strengths the comparison in section 3 refers to.
+- [CNOSSOS-EU road emission](https://jmrplens.github.io/phonometry/environment/sources/cnossos-road-emission/) and [CNOSSOS-EU rail emission](https://jmrplens.github.io/phonometry/environment/sources/cnossos-rail-emission/): the source strengths the comparison in section 4 refers to.
 - [Environmental noise levels](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/): what happens to the predicted level once it becomes an assessed one.
 - API reference: [`environment.propagation.outdoor_propagation`](https://jmrplens.github.io/phonometry/reference/api/environment/outdoor-propagation/) and [`environment.propagation.air_absorption`](https://jmrplens.github.io/phonometry/reference/api/environment/air-absorption/).
 - Theory: [Outdoor propagation](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/#outdoor-propagation-general-method-iso-9613-2): the ISO 9613-2 attenuation terms derived one by one, and the atmospheric absorption of Part 1.
@@ -24795,7 +24797,7 @@ against the exact half-plane and coherent-ground models.
   Office of the European Union.
   [doi:10.2788/31776](https://doi.org/10.2788/31776),
   [JRC repository](https://publications.jrc.ec.europa.eu/repository/handle/JRC72550).
-  The common EU framework contrasted with ISO 9613-2 in section 3.
+  The common EU framework contrasted with ISO 9613-2 in section 4.
 - International Organization for Standardization. (1993). *Acoustics —
   Attenuation of sound during propagation outdoors — Part 1: Calculation of
   the absorption of sound by the atmosphere* (ISO 9613-1:1993).
@@ -56796,11 +56798,12 @@ different question: it grades a gear unit against a **rating number**, chosen
 for the unit at the start of negotiation, and the rating indexes a row of
 boundaries.
 
-There are three ratings, one per quantity, and Table 1 fixes the vocabulary of
-each: `DR` for shaft relative peak-to-peak displacement in micrometres, `VR`
-for housing r.m.s. velocity in millimetres per second, and `AR` for housing
-true peak acceleration in metres per second squared. Tables 2, 3 and 4 give
-the boundaries.
+There are three ratings, one per quantity: `DR` for shaft relative
+peak-to-peak displacement, `VR` for housing r.m.s. velocity and `AR` for
+housing true peak acceleration. Table 1 fixes the unit each is stated in,
+micrometres, millimetres per second and metres per second squared; the three
+names are spelled out under Table 5 and defined in Annex A. Tables 2, 3 and 4
+give the boundaries.
 
 Those three tables are one ladder seen three times. Every printed row is three
 consecutive rungs of 2, 3.15, 5, 8, 12.5, 20, 31.5, 50, 80, 125, 200, 315, with

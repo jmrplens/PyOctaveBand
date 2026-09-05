@@ -697,7 +697,7 @@ against the exact half-plane and coherent-ground models.
 
 - [Spherical ground effect and advanced barriers](ground-barriers.md): the wave acoustics underneath the Table 3 ground fit and the Eq. (14) screening curve.
 - [Atmospheric refraction](atmospheric-refraction.md): what the favourable-condition assumption and $C_\mathrm{met}$ stand in for.
-- [CNOSSOS-EU road emission](../sources/cnossos-road-emission.md) and [CNOSSOS-EU rail emission](../sources/cnossos-rail-emission.md): the source strengths the comparison in section 3 refers to.
+- [CNOSSOS-EU road emission](../sources/cnossos-road-emission.md) and [CNOSSOS-EU rail emission](../sources/cnossos-rail-emission.md): the source strengths the comparison in section 4 refers to.
 - [Environmental noise levels](../assessment/environmental-levels.md): what happens to the predicted level once it becomes an assessed one.
 - API reference: [`environment.propagation.outdoor_propagation`](https://jmrplens.github.io/phonometry/reference/api/environment/outdoor-propagation/) and [`environment.propagation.air_absorption`](https://jmrplens.github.io/phonometry/reference/api/environment/air-absorption/).
 - Theory: [Outdoor propagation](../../reference/theory/environment-transport.md#outdoor-propagation-general-method-iso-9613-2): the ISO 9613-2 attenuation terms derived one by one, and the atmospheric absorption of Part 1.
@@ -725,7 +725,7 @@ against the exact half-plane and coherent-ground models.
   Office of the European Union.
   [doi:10.2788/31776](https://doi.org/10.2788/31776),
   [JRC repository](https://publications.jrc.ec.europa.eu/repository/handle/JRC72550).
-  The common EU framework contrasted with ISO 9613-2 in section 3.
+  The common EU framework contrasted with ISO 9613-2 in section 4.
 - International Organization for Standardization. (1993). *Acoustics —
   Attenuation of sound during propagation outdoors — Part 1: Calculation of
   the absorption of sound by the atmosphere* (ISO 9613-1:1993).

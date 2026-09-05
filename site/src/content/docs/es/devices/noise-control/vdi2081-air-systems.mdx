@@ -122,8 +122,10 @@ directriz detrás.
   valor impreso solo se alcanza con el conducto terminado anecoicamente por los
   dos extremos, y un cambio gradual con un cono largo no refleja nada que
   merezca contarse.
-- **Ramificación** (apartado 6.4, Ecuación (35)): la parte del caudal que se
-  lleva la rama, con `split_loss`.
+- **Ramificación** (apartado 6.4, Ecuación (35)): la parte de la sección que se
+  lleva la rama, `10 lg (S1 / suma Si)`, con `split_loss`. Está escrita sobre
+  área y no sobre caudal, y esa misma página dice que la reducción no depende
+  de la frecuencia.
 
 ```python
 from phonometry import noise_control
@@ -286,9 +288,10 @@ contra la hoja resuelta de la Tabla 1 de la Parte 2.
 </ScopeClaim>
 <ScopeClaim status="not-covered" label="No cubierto">
 Los capítulos de unidades de tratamiento de aire y de propagación al exterior
-que añadió la revisión de 2019, que están en las ediciones que no hay aquí; la
+que añadieron las ediciones que sustituyen a estas, que no hay aquí; la
 acústica de salas que la VDI 2081 deja a la VDI 2569; y el aislamiento de
-vibraciones de la instalación, que es otra directriz distinta.
+vibraciones de la instalación, que el apartado 7.6 del Blatt 1 sí cubre y esta
+biblioteca no.
 </ScopeClaim>
 </Scope>
 
