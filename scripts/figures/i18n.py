@@ -56,6 +56,16 @@ _ES_EXACT = {
     "a sudden reduction: every band": "un estrechamiento súbito: todas las bandas",
     "a sudden increase: below the limit frequency only": "una ampliación súbita: solo bajo la frecuencia límite",
     "0.5 m² and 0.2 m² either way about, in a 0.8 m duct": "0,5 m² y 0,2 m² en los dos sentidos, en un conducto de 0,8 m",
+    # VDI 2081 Section 5.2.1, the flow noise of a straight run.
+    "How Fast the Air May Go, in a 0.2 m$^2$ Duct": "Hasta dónde puede correr el aire, en un conducto de 0,2 m$^2$",
+    "Duct velocity $v$ (m/s)": "Velocidad en el conducto $v$ (m/s)",
+    "Overall sound power level (dB)": "Nivel de potencia acústica global (dB)",
+    "$10\\,\\lg\\,v$": "$10\\,\\lg\\,v$",
+    "Eq. (16): $7 + 50\\,\\lg v + 10\\,\\lg S$": "Ec. (16): $7 + 50\\,\\lg v + 10\\,\\lg S$",
+    "Eq. (17): $-25 + 70\\,\\lg v + 10\\,\\lg S$": "Ec. (17): $-25 + 70\\,\\lg v + 10\\,\\lg S$",
+    "Faster Air Is Louder, and Flatter": "Cuanto más rápido el aire, más ruido y más plano",
+    "Band sound power level (dB)": "Nivel de potencia acústica por banda (dB)",
+    "the bands do not sum back to the overall:\nFigure 16 is a shape, not a partition": "las bandas no suman el nivel global:\nla Figura 16 es una forma, no un reparto",
     # Gear-unit rating curves (ISO 20816-9 Annex A).
     "Shaft Displacement: Flat, Then 10 dB per Decade": "Desplazamiento del eje: plano y luego 10 dB por década",
     "Peak-to-peak displacement (µm)": "Desplazamiento pico a pico (µm)",
@@ -3805,6 +3815,14 @@ _ES_EXACT = {
 }
 
 _ES_PATTERNS = [
+    # vdi2081_flow_noise: the annotation and the legend carry the duty point.
+    (
+        r"^the worked example runs at (\d+)\.(\d+) m/s;\nhalving that is worth "
+        r"15 dB unweighted\nand 21 dB A-weighted$",
+        "el ejemplo trabaja a \\1,\\2 m/s;\\nreducir eso a la mitad vale 15 dB sin "
+        "ponderar\\ny 21 dB en ponderación A",
+    ),
+    (r"^\$v\$ = (\d+)\.(\d+) m/s$", r"$v$ = \1,\2 m/s"),
     # machine_alarm_trip: the readouts carry the computed limits.
     # machine_vibration_trend: the legend carries the computed baseline and ALARM.
     (

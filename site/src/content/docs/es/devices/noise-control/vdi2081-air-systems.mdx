@@ -167,20 +167,41 @@ la medida del fabricante, según la ISO 7235, y la directriz lo dice.
 El aire que se mueve por un conducto hace ruido, y pasado el silenciador a
 menudo no queda otra cosa que oír. La VDI 2081 lo da en forma cerrada.
 
-- **Un tramo recto** (apartado 5.2.1, Ecuaciones (16) y (17) con la Figura 16)
-  y **un codo o una ramificación** (apartado 5.2.2, Ecuación (18) con las
-  Figuras 17 y 18), con `flow_noise_straight_duct` y `flow_noise_bend`. El
-  segundo par está escrito sobre un número de Strouhal construido con el
-  diámetro del propio elemento y la velocidad que lo atraviesa, y las dos
-  figuras declaran que solo valen por encima de $St = 1$, así que la biblioteca
-  no da nivel por debajo en lugar de extrapolar una curva que la directriz no
-  dibuja.
+- **Un tramo recto** (apartado 5.2.1, Ecuaciones (16) y (17) con la Figura 16),
+  con `flow_noise_straight_duct_overall` para los dos niveles globales y
+  `flow_noise_straight_duct` para las octavas sobre las que la Figura 16
+  reparte el primero de ellos.
+- **Un codo o una ramificación** (apartado 5.2.2, Ecuación (18) con las
+  Figuras 17 y 18), con `flow_noise_bend`. Está escrito sobre un número de
+  Strouhal construido con el diámetro del propio elemento y la velocidad que lo
+  atraviesa, y las dos figuras declaran que solo valen por encima de $St = 1$,
+  así que la biblioteca no da nivel por debajo en lugar de extrapolar una curva
+  que la directriz no dibuja.
 - **El ruido propio de un silenciador de bafles** (Ecuación (49)), con
   `silencer_self_noise`, que depende de la velocidad en los huecos entre bafles
   y de la pérdida de carga. Es la razón de que un silenciador tenga un tamaño
   óptimo: si se estrechan los huecos sube la pérdida de inserción, pero también
   la velocidad, y pasado un punto el silenciador suena más que lo que quitaba.
 - **La propia boca**, con `diffuser_sound_power`.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_flow_noise_es.svg" alt="Dos paneles. A la izquierda, el nivel de potencia acústica global de un tramo recto frente a la velocidad en el conducto, de 1 a 15 metros por segundo, para una sección de 0,2 metros cuadrados: una curva continua para la Ecuación 16 que sube de 0 a 59 decibelios y otra discontinua para la Ecuación 17 ponderada A que sube de menos 32 a 50, la segunda más inclinada porque lleva una potencia setenta de la velocidad. Una línea vertical de puntos marca el ejemplo resuelto en 5,83 metros por segundo, donde los marcadores dan 38 y 22 decibelios. A la derecha, el espectro por octavas del mismo conducto a 3, 5,83 y 10 metros por segundo, tres curvas que caen de 63 hercios a 8 kilohercios, la más rápida a la vez la más alta y la más plana." width="100%" />
+
+*La quinta potencia de la velocidad es toda la regla de diseño: un conducto
+dimensionado para la mitad de velocidad suena quince decibelios menos, y veintiuno
+en el número ponderado A.*
+
+```python
+from phonometry import noise_control
+
+area = 0.5 * 0.4                      # un tramo de impulsión de 500 x 400 mm
+velocity = (4200.0 / 3600.0) / area   # con 4200 m3/h
+overall = noise_control.flow_noise_straight_duct_overall(velocity, area)
+weighted = noise_control.flow_noise_straight_duct_overall(
+    velocity, area, weighting="A"
+)
+print(round(overall), round(weighted))
+# 38 22
+```
 
 ## 5. El paso a la sala, y las dos áreas que no son el mismo número
 

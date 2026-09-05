@@ -167,13 +167,15 @@ maker's measurement, to ISO 7235, and the guideline says so.
 Air moving through a duct makes noise, and past the silencer there is often
 nothing else left to hear. VDI 2081 gives it in closed form.
 
-- **A straight run** (Section 5.2.1, Equations (16) and (17) with Figure 16)
-  and **a bend or a branch** (Section 5.2.2, Equation (18) with Figures 17 and
-  18), through `flow_noise_straight_duct` and `flow_noise_bend`. The second
-  pair is written on a Strouhal number built from the element's own diameter
-  and the flow speed through it, and both figures state that they hold only
-  above $St = 1$, so the library gives no level below it rather than
-  extrapolating a curve the guideline does not draw.
+- **A straight run** (Section 5.2.1, Equations (16) and (17) with Figure 16),
+  through `flow_noise_straight_duct_overall` for the two overall levels and
+  `flow_noise_straight_duct` for the octaves Figure 16 spreads the first of
+  them over.
+- **A bend or a branch** (Section 5.2.2, Equation (18) with Figures 17 and 18),
+  through `flow_noise_bend`. It is written on a Strouhal number built from the
+  element's own diameter and the flow speed through it, and both figures state
+  that they hold only above $St = 1$, so the library gives no level below it
+  rather than extrapolating a curve the guideline does not draw.
 - **A splitter silencer's own noise** (Equation (49)), through
   `silencer_self_noise`, which depends on the speed in the gaps between the
   baffles and on the pressure drop across them. It is the reason a silencer
@@ -181,6 +183,24 @@ nothing else left to hear. VDI 2081 gives it in closed form.
   does the speed through them, and past a point the silencer is louder than
   what it removed.
 - **The outlet itself**, through `diffuser_sound_power`.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vdi2081_flow_noise.svg" alt="Two panels. On the left, the overall sound power level of a straight run against duct velocity from 1 to 15 metres per second, for a 0.2 square metre section: a solid curve for Equation 16 rising from 0 to 59 decibels and a dashed one for the A-weighted Equation 17 rising from minus 32 to 50, the second steeper because it carries a seventieth power of the speed. A dotted vertical line marks the worked example at 5.83 metres per second, where markers read 38 and 22 decibels. On the right, the octave spectrum of the same duct at 3, 5.83 and 10 metres per second, three curves falling from 63 hertz to 8 kilohertz, the fastest one both the highest and the flattest." width="100%" />
+
+*The fifth power of the speed is the whole design rule: a duct sized for half the
+velocity is fifteen decibels quieter, and twenty-one on the A-weighted number.*
+
+```python
+from phonometry import noise_control
+
+area = 0.5 * 0.4                      # a 500 x 400 mm supply run
+velocity = (4200.0 / 3600.0) / area   # 4200 m3/h through it
+overall = noise_control.flow_noise_straight_duct_overall(velocity, area)
+weighted = noise_control.flow_noise_straight_duct_overall(
+    velocity, area, weighting="A"
+)
+print(round(overall), round(weighted))
+# 38 22
+```
 
 ## 5. The room step, and the two areas that are not the same number
 

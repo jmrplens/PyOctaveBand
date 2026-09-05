@@ -192,9 +192,21 @@ def _chk_round_run() -> Outcome:
     "Limit frequency of a 160 mm round duct, Hz",
 )
 def _chk_limit_frequency() -> Outcome:
-    """``f_G = 0,586 c / d``, printed beside element 14 as 1245 Hz."""
+    """``f_G = 0,586 c / d``, printed beside element 14 as 1245 Hz.
+
+    Checked against the library's own first cut-on frequency rather than
+    against the printed constant recomputed: 0,586 is the guideline's rounding
+    of the first circular mode's 1,8412 over pi, so the two agree to the
+    resolution the value is printed at and the row exercises the code.
+    """
     return numeric(
-        1245.0, 0.586 * _EXAMPLE_SPEED / _BEND_DIAMETER, 0.5, unit="Hz", places=1
+        1245.0,
+        ph.noise_control.plane_wave_limit(
+            diameter=_BEND_DIAMETER, speed_of_sound=_EXAMPLE_SPEED
+        ),
+        0.5,
+        unit="Hz",
+        places=1,
     )
 
 
@@ -270,8 +282,8 @@ _PRINTED_BEND_NOISE = (26.9, 23.0, 18.1, 12.5, 6.5, -0.1, -7.0, -14.4)
 )
 def _chk_straight_flow_noise() -> Outcome:
     """Element 5 of Table 1, printed as 38 dB."""
-    overall = (
-        7.0 + 50.0 * math.log10(_STRAIGHT_VELOCITY) + 10.0 * math.log10(_STRAIGHT_AREA)
+    overall = ph.noise_control.flow_noise_straight_duct_overall(
+        _STRAIGHT_VELOCITY, _STRAIGHT_AREA
     )
     return numeric(38.0, overall, 0.5, unit="dB", places=2)
 
@@ -283,10 +295,8 @@ def _chk_straight_flow_noise() -> Outcome:
 )
 def _chk_straight_flow_noise_a() -> Outcome:
     """The same element, printed as 22 dB."""
-    weighted = (
-        -25.0
-        + 70.0 * math.log10(_STRAIGHT_VELOCITY)
-        + 10.0 * math.log10(_STRAIGHT_AREA)
+    weighted = ph.noise_control.flow_noise_straight_duct_overall(
+        _STRAIGHT_VELOCITY, _STRAIGHT_AREA, weighting="A"
     )
     return numeric(22.0, weighted, 0.5, unit="dB", places=2)
 
