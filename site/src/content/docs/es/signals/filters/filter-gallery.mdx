@@ -61,7 +61,7 @@ se cruzan. Lo que cambia entre esas dos vistas es que Chebyshev I riza *dentro*
 de la banda, Chebyshev II riza *fuera*, el elíptico hace las dos cosas y es el
 que más rápido cae, y Bessel es el más suave y el más lento.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_type_comparison_es.svg" alt="Comparación de la respuesta en magnitud de las cinco arquitecturas para la banda de octava de 1 kHz, con zoom en el cruce a -3 dB" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_type_comparison.svg" alt="Comparación de la respuesta en magnitud de las cinco arquitecturas para la banda de octava de 1 kHz, con zoom en el cruce a -3 dB" width="80%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -111,7 +111,7 @@ plt.show()
 | `ellip` | **Elíptico** | `octave_filter(x, fs, design=FilterDesign(filter_type='ellip', ripple=0.1))` | Máxima selectividad. |
 | `bessel` | **Bessel** | `octave_filter(x, fs, design=FilterDesign(filter_type='bessel'))` | Preservar la forma de los transitorios (ver la figura de retardo de grupo de [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/#el-retardo-de-grupo-cuantificado)). |
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/architecture_tradeoff_es.svg" alt="Dos paneles para la banda de octava de 1 kHz a 48 kHz, orden 6. A la izquierda, barras agrupadas con la atenuación relativa una y dos octavas por encima de la frecuencia central de banda para cada una de las cinco arquitecturas: Bessel es la más suave, con menos 16 y menos 60 decibelios; Butterworth, menos 40 y menos 88; Chebyshev I, menos 50 y menos 102; Chebyshev II, menos 55 y menos 73; y el elíptico es el más abrupto, con menos 72 y menos 81. A la derecha, el retardo de grupo en la frecuencia central de banda en milisegundos: Bessel 1,22; Chebyshev II 1,58; Butterworth 1,74; elíptico 1,75 y Chebyshev I 1,97" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/architecture_tradeoff.svg" alt="Dos paneles para la banda de octava de 1 kHz a 48 kHz, orden 6. A la izquierda, barras agrupadas con la atenuación relativa una y dos octavas por encima de la frecuencia central de banda para cada una de las cinco arquitecturas: Bessel es la más suave, con menos 16 y menos 60 decibelios; Butterworth, menos 40 y menos 88; Chebyshev I, menos 50 y menos 102; Chebyshev II, menos 55 y menos 73; y el elíptico es el más abrupto, con menos 72 y menos 81. A la derecha, el retardo de grupo en la frecuencia central de banda en milisegundos: Bessel 1,22; Chebyshev II 1,58; Butterworth 1,74; elíptico 1,75 y Chebyshev I 1,97" width="92%" />
 
 *La elección, cuantificada. La selectividad y el retardo de grupo se mueven en
 sentidos contrarios, y la columna de clase de la tabla de abajo dice cuáles de
@@ -181,11 +181,11 @@ Vista espectral completa de los bancos para octava (1/1) y tercio de octava (1/3
 
 | Arquitectura | Octava (`fraction=1`) | Tercio de octava (`fraction=3`) |
 | :--- | :--- | :--- |
-| **Butterworth** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_1_order_6_es.svg" alt="Respuesta en frecuencia del banco de filtros Butterworth de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Butterworth de tercio de octava" width="100%" /> |
-| **Chebyshev I** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_1_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev I de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev I de tercio de octava" width="100%" /> |
-| **Chebyshev II** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_1_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev II de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev II de tercio de octava" width="100%" /> |
-| **Elíptico** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_1_order_6_es.svg" alt="Respuesta en frecuencia del banco elíptico de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco elíptico de tercio de octava" width="100%" /> |
-| **Bessel** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_1_order_6_es.svg" alt="Respuesta en frecuencia del banco Bessel de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Bessel de tercio de octava" width="100%" /> |
+| **Butterworth** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_1_order_6.svg" alt="Respuesta en frecuencia del banco de filtros Butterworth de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6.svg" alt="Respuesta en frecuencia del banco Butterworth de tercio de octava" width="100%" /> |
+| **Chebyshev I** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_1_order_6.svg" alt="Respuesta en frecuencia del banco Chebyshev I de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6.svg" alt="Respuesta en frecuencia del banco Chebyshev I de tercio de octava" width="100%" /> |
+| **Chebyshev II** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_1_order_6.svg" alt="Respuesta en frecuencia del banco Chebyshev II de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6.svg" alt="Respuesta en frecuencia del banco Chebyshev II de tercio de octava" width="100%" /> |
+| **Elíptico** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_1_order_6.svg" alt="Respuesta en frecuencia del banco elíptico de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6.svg" alt="Respuesta en frecuencia del banco elíptico de tercio de octava" width="100%" /> |
+| **Bessel** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_1_order_6.svg" alt="Respuesta en frecuencia del banco Bessel de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6.svg" alt="Respuesta en frecuencia del banco Bessel de tercio de octava" width="100%" /> |
 
 *Compara las filas fijándote solo en dos cosas y las diferencias dejan de ser
 sutiles. **Las mesetas:** Chebyshev I pone su rizado *dentro* de cada banda,
@@ -235,7 +235,7 @@ spl, freq = filters.octave_filter(x, fs, fraction=3,
                                   design=filters.FilterDesign(filter_type='butter'))
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Butterworth de tercio de octava" width="60%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6.svg" alt="Respuesta en frecuencia del banco Butterworth de tercio de octava" width="60%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -271,7 +271,7 @@ spl, freq = filters.octave_filter(
     design=filters.FilterDesign(filter_type='cheby1', ripple=0.1))
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev I de tercio de octava" width="60%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6.svg" alt="Respuesta en frecuencia del banco Chebyshev I de tercio de octava" width="60%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -314,7 +314,7 @@ spl, freq = filters.octave_filter(x, fs, fraction=3,
                                   design=filters.FilterDesign(filter_type='cheby2'))
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev II de tercio de octava" width="60%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6.svg" alt="Respuesta en frecuencia del banco Chebyshev II de tercio de octava" width="60%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -350,7 +350,7 @@ spl, freq = filters.octave_filter(
     design=filters.FilterDesign(filter_type='ellip', ripple=0.1))
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco elíptico de tercio de octava" width="60%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6.svg" alt="Respuesta en frecuencia del banco elíptico de tercio de octava" width="60%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -392,7 +392,7 @@ spl, freq = filters.octave_filter(x, fs, fraction=3,
                                   design=filters.FilterDesign(filter_type='bessel'))
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Bessel de tercio de octava" width="60%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6.svg" alt="Respuesta en frecuencia del banco Bessel de tercio de octava" width="60%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -450,7 +450,7 @@ low, high = filters.linkwitz_riley(recording, fs, freq=1000, order=order)
 recombined = low + high if (order // 2) % 2 == 0 else low - high
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4_es.svg" alt="Crossover Linkwitz-Riley de 4.º orden: paso bajo, paso alto y su suma plana" width="60%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4.svg" alt="Crossover Linkwitz-Riley de 4.º orden: paso bajo, paso alto y su suma plana" width="60%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>

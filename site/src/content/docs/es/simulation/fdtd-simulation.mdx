@@ -91,7 +91,7 @@ $\Delta x = \min(\text{apertura más pequeña}/4,\ \lambda/8)$ permite hasta
   description="Un frente de onda plano de 800 Hz recorre una sala de 4 m de paredes rígidas llena de una columnata al tresbolillo de columnas rígidas de 10 a 17 cm de diámetro, simulada a 2,5 mm; cada columna difracta el frente y desprende una ondícula dispersada, y las ondículas interfieren hasta que toda la sala se llena de energía estructurada que después se drena por los extremos absorbentes."
 />
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_fdtd_es.svg" alt="Flujo desde la definición del dominio (mapas de velocidad del sonido y densidad con el paso de malla dx) y la geometría (máscara de obstáculos y condiciones de contorno por lado), pasando por las fuentes inyectadas en celdas, la actualización leapfrog en malla escalonada de velocidad y presión y la condición de estabilidad de Courant, hasta el FDTDResult congelado con historias de sonda, instantáneas del campo y un método plot" width="86%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_fdtd.svg" alt="Flujo desde la definición del dominio (mapas de velocidad del sonido y densidad con el paso de malla dx) y la geometría (máscara de obstáculos y condiciones de contorno por lado), pasando por las fuentes inyectadas en celdas, la actualización leapfrog en malla escalonada de velocidad y presión y la condición de estabilidad de Courant, hasta el FDTDResult congelado con historias de sonda, instantáneas del campo y un método plot" width="86%" loading="eager" />
 
 ## 1. El esquema: una ecuación de onda sobre una malla
 
@@ -219,7 +219,7 @@ línea la presión está apenas unos 26 dB por debajo de la onda que avanza.
 Aleja la línea de su esponja, u olvídate de la esponja, y esos 26 dB son lo
 que se te viene de vuelta.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_plane_wave_launch_es.webp" alt="Tres paneles de un lanzador unidireccional de onda plana. Izquierda: el campo de presión asentado de una onda continua de 1 kilohercio en un dominio de 0,8 por 1,6 metros, con la línea de inyección marcada cerca de la parte superior, bandas de esponja rayadas a lo largo de los bordes superior e inferior, y frentes de onda horizontales planos que llenan toda la región de avance. Centro: un corte transversal del frente, una línea perfectamente plana con la dispersión de pico a pico anotada como cero. Derecha: el nivel de cada fila respecto al campo que avanza, plano en 0 decibelios por delante de la línea, con una caída de unos 26 decibelios justo detrás de ella y por debajo de menos 60 decibelios al atravesar la esponja." width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_plane_wave_launch.webp" alt="Tres paneles de un lanzador unidireccional de onda plana. Izquierda: el campo de presión asentado de una onda continua de 1 kilohercio en un dominio de 0,8 por 1,6 metros, con la línea de inyección marcada cerca de la parte superior, bandas de esponja rayadas a lo largo de los bordes superior e inferior, y frentes de onda horizontales planos que llenan toda la región de avance. Centro: un corte transversal del frente, una línea perfectamente plana con la dispersión de pico a pico anotada como cero. Derecha: el nivel de cada fila respecto al campo que avanza, plano en 0 decibelios por delante de la línea, con una caída de unos 26 decibelios justo detrás de ella y por debajo de menos 60 decibelios al atravesar la esponja." width="94%" />
 
 *Qué aspecto tiene un lanzador unidireccional bien configurado: el frente es
 plano hasta el último bit de un float64 (centro), el campo que avanza
@@ -388,7 +388,7 @@ dominio configurado: bordes, esponjas, obstáculos, fuentes y las sondas que
 piensas registrar. Pillar una esponja en el lado equivocado o una sonda mal
 colocada cuesta segundos aquí y una ejecución entera después.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_domain_geometry_es.svg" alt="Dibujo de configuración de un dominio FDTD de 4,5 por 3 metros antes de cualquier paso de tiempo: capas de esponja azul pálido a lo largo de los bordes izquierdo y derecho, un borde de impedancia naranja a lo largo del borde superior, un obstáculo rectangular gris justo a la izquierda del centro, la estrella de la fuente en (0.5, 1.5) y dos círculos de sonda en (3, 1.5) y (4, 2), con una leyenda que nombra la capa de esponja, el borde de impedancia, el borde rígido, la fuente y la sonda" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_domain_geometry.svg" alt="Dibujo de configuración de un dominio FDTD de 4,5 por 3 metros antes de cualquier paso de tiempo: capas de esponja azul pálido a lo largo de los bordes izquierdo y derecho, un borde de impedancia naranja a lo largo del borde superior, un obstáculo rectangular gris justo a la izquierda del centro, la estrella de la fuente en (0.5, 1.5) y dos círculos de sonda en (3, 1.5) y (4, 2), con una leyenda que nombra la capa de esponja, el borde de impedancia, el borde rígido, la fuente y la sonda" width="88%" />
 
 *Todo lo que la simulación verá, antes de correrla: las capas de esponja se
 comen los contornos izquierdo y derecho, el borde superior lleva la
@@ -593,7 +593,7 @@ Nada de eso se ve en la aritmética de índices que hacen los fragmentos, así
 que aquí está la escena que construye de verdad la ejecución del metadifusor
 de abajo, en su proporción real.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ntff_contour_es.svg" alt="Dibujo de configuración de una escena FDTD de dispersión con transformación de campo cercano a lejano, en proporciones reales: un dominio de 980 por 346 celdas a medio milímetro por celda, bandas de esponja rayadas de sesenta celdas de grosor en los cuatro lados, una línea de inyección de onda plana justo dentro de la esponja superior con flechas hacia abajo, el panel metadifusor de cinco celdas como un bloque gris que cruza el centro, un contorno de captura rojo que lo encierra con normales salientes en los cuatro lados y sus holguras acotadas en celdas, y un arco de campo lejano discontinuo dibujado fuera del dominio con rayos a menos sesenta, cero y más sesenta grados respecto a la normal del panel, en torno a un origen situado en el centro de la cara del panel" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ntff_contour.svg" alt="Dibujo de configuración de una escena FDTD de dispersión con transformación de campo cercano a lejano, en proporciones reales: un dominio de 980 por 346 celdas a medio milímetro por celda, bandas de esponja rayadas de sesenta celdas de grosor en los cuatro lados, una línea de inyección de onda plana justo dentro de la esponja superior con flechas hacia abajo, el panel metadifusor de cinco celdas como un bloque gris que cruza el centro, un contorno de captura rojo que lo encierra con normales salientes en los cuatro lados y sus holguras acotadas en celdas, y un arco de campo lejano discontinuo dibujado fuera del dominio con rayos a menos sesenta, cero y más sesenta grados respecto a la normal del panel, en torno a un origen situado en el centro de la cara del panel" width="94%" />
 
 ```python
 import numpy as np
@@ -641,7 +641,7 @@ reflexión de reacción local e ignora el acoplamiento evanescente entre
 bocas vecinas, así que la estructura de lóbulos coincide mientras algunos
 nulos se desplazan unos grados.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_ntff_polar_es.svg" alt="Diagrama polar semicircular a 2 kilohercios que superpone la respuesta en campo lejano del metadifusor de la Tabla 1 mallado, calculada por FDTD más la integral de campo cercano a lejano de Kirchhoff-Helmholtz, en trazo continuo, sobre la predicción TMM más Fraunhofer de la biblioteca, en trazo discontinuo: los lóbulos especular y de red coinciden en el arco de menos 90 a más 90 grados con pequeños desplazamientos de los nulos profundos" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_ntff_polar.svg" alt="Diagrama polar semicircular a 2 kilohercios que superpone la respuesta en campo lejano del metadifusor de la Tabla 1 mallado, calculada por FDTD más la integral de campo cercano a lejano de Kirchhoff-Helmholtz, en trazo continuo, sobre la predicción TMM más Fraunhofer de la biblioteca, en trazo discontinuo: los lóbulos especular y de red coinciden en el arco de menos 90 a más 90 grados con pequeños desplazamientos de los nulos profundos" width="92%" />
 
 *Dos rutas independientes al mismo campo lejano: el panel mallado por
 onda completa en el dominio del tiempo (continuo) frente a
@@ -724,7 +724,7 @@ Por qué se desplazan los nulos es una pregunta sobre geometría, y merece la
 pena poner las dos geometrías una al lado de la otra: el panel que el modelo
 tasa y el panel sobre el que avanza el esquema.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_meshed_panel_es.webp" alt="Tres dibujos apilados del mismo panel metadifusor de cinco celdas. Arriba: la celda unidad idealizada sobre la que trabaja la matriz de transferencia, dibujada a escala con el paso de 70 milímetros, la profundidad de 20 milímetros y la anchura de panel de 350 milímetros acotados. En medio: ese mismo panel como la máscara booleana de obstáculos sobre la que avanza la ejecución FDTD a medio milímetro por celda, con la quinta celda recuadrada. Abajo: esa quinta celda ampliada, con la ranura de 20,3 milímetros, los dos resonadores escalonados, el fondo rígido de 3 milímetros y el cuello de 3,2 milímetros que abarca seis celdas, todos etiquetados" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_meshed_panel.webp" alt="Tres dibujos apilados del mismo panel metadifusor de cinco celdas. Arriba: la celda unidad idealizada sobre la que trabaja la matriz de transferencia, dibujada a escala con el paso de 70 milímetros, la profundidad de 20 milímetros y la anchura de panel de 350 milímetros acotados. En medio: ese mismo panel como la máscara booleana de obstáculos sobre la que avanza la ejecución FDTD a medio milímetro por celda, con la quinta celda recuadrada. Abajo: esa quinta celda ampliada, con la ranura de 20,3 milímetros, los dos resonadores escalonados, el fondo rígido de 3 milímetros y el cuello de 3,2 milímetros que abarca seis celdas, todos etiquetados" width="94%" />
 
 *Lo que homogeneiza la matriz de transferencia, frente a lo que ve de verdad
 el esquema. El modelo convierte cada celda de 70 mm en un único coeficiente
@@ -773,7 +773,7 @@ La ejecución de la barrera de abajo es el arquetipo. Nada en su entrada dice
 «difracción»: la barrera son cuatro columnas de un array booleano, la fuente
 es un pulso, y la llegada a la zona de sombra está ahí de todas formas.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_simulation_es.webp" alt="Dos paneles. Izquierda: una instantánea del campo de presión en un dominio de 3 por 2 metros con una barrera rígida vertical delgada, mostrando el frente directo, la reflexión que vuelve hacia la fuente y la onda difractada en el borde de la barrera, con la fuente marcada con una estrella y dos sondas con puntos. Derecha: la historia de presión en ambas sondas; la sonda con visión directa muestra el pulso directo y la reflexión de la barrera, la sonda en sombra una llegada difractada más débil y retardada" width="96%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_simulation.webp" alt="Dos paneles. Izquierda: una instantánea del campo de presión en un dominio de 3 por 2 metros con una barrera rígida vertical delgada, mostrando el frente directo, la reflexión que vuelve hacia la fuente y la onda difractada en el borde de la barrera, con la fuente marcada con una estrella y dos sondas con puntos. Derecha: la historia de presión en ambas sondas; la sonda con visión directa muestra el pulso directo y la reflexión de la barrera, la sonda en sombra una llegada difractada más débil y retardada" width="96%" />
 
 *Una ejecución, dos vistas. La instantánea (izquierda, a los 6,5 ms) recoge
 el frente directo, la reflexión que vuelve pasando junto a la fuente y la
@@ -970,7 +970,7 @@ print(round(0.5 * 343.0 * float(np.hypot(1 / lx, 1 / ly)), 1))  # 299.1  modo (1
 print(round(float(freqs[sel][np.argmax(spec[sel])]), 1))        # 298.9  medido
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_room_modes_es.svg" alt="Espectro de la presión en la sonda de una caja FDTD rígida de 1,0 por 0,7 metros entre 100 y 450 Hz: cinco picos agudos que caen sobre las frecuencias modales analíticas punteadas de los modos (1,0), (0,1), (1,1), (2,0) y (2,1)" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_room_modes.svg" alt="Espectro de la presión en la sonda de una caja FDTD rígida de 1,0 por 0,7 metros entre 100 y 450 Hz: cinco picos agudos que caen sobre las frecuencias modales analíticas punteadas de los modos (1,0), (0,1), (1,1), (2,0) y (2,1)" width="88%" />
 
 *El espectro en la sonda del ensayo de caja rígida presenta sus picos sobre
 las frecuencias modales analíticas

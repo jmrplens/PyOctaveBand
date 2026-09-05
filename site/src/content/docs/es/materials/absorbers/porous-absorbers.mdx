@@ -182,7 +182,7 @@ print(np.round(jca.normalized_impedance[0], 3))   # (2.321-2.075j)
 db.plot()   # componentes normalizadas de Zc y k frente a la frecuencia
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/porous_medium_model_es.svg" alt="Impedancia característica y número de onda normalizados de un material poroso con resistividad al flujo de 20 kPa s/m2 predichos por el modelo de Miki en una rejilla log-log: las componentes reales e imaginarias caen hacia la unidad y hacia cero al subir la frecuencia" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/porous_medium_model.svg" alt="Impedancia característica y número de onda normalizados de un material poroso con resistividad al flujo de 20 kPa s/m2 predichos por el modelo de Miki en una rejilla log-log: las componentes reales e imaginarias caen hacia la unidad y hacia cero al subir la frecuencia" width="80%" />
 
 *La presentación clásica de un modelo de fluido equivalente (Cox y D'Antonio
 3.ª ed., figs. 6.19–6.20): a baja frecuencia dominan las fuerzas viscosas y
@@ -228,7 +228,7 @@ $k$ recuperados por la
 [reducción de matriz de transferencia ASTM E2611](/phonometry/es/materials/absorbers/impedance-tube/))
 se conecta al modelo de capas exactamente igual que uno modelado.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/porous_model_comparison_es.svg" alt="Panel izquierdo: la impedancia característica normalizada de un material de 20 kPa s por metro cuadrado con Delany-Bazley, Miki y Johnson-Champoux-Allard de 20 hercios a 20 kilohercios en ejes log-log, con la ventana de ajuste de 0,01 a 1 en la variable del absorbente sombreada; las tres curvas se superponen dentro de la ventana y se separan por debajo. Panel derecho: la parte real de la impedancia de entrada de una capa de 50 mm con respaldo rígido con los mismos tres modelos, donde la curva de Delany-Bazley se hace negativa por debajo de 74,6 hercios mientras que Miki y JCA siguen positivas" width="90%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/porous_model_comparison.svg" alt="Panel izquierdo: la impedancia característica normalizada de un material de 20 kPa s por metro cuadrado con Delany-Bazley, Miki y Johnson-Champoux-Allard de 20 hercios a 20 kilohercios en ejes log-log, con la ventana de ajuste de 0,01 a 1 en la variable del absorbente sombreada; las tres curvas se superponen dentro de la ventana y se separan por debajo. Panel derecho: la parte real de la impedancia de entrada de una capa de 50 mm con respaldo rígido con los mismos tres modelos, donde la curva de Delany-Bazley se hace negativa por debajo de 74,6 hercios mientras que Miki y JCA siguen positivas" width="90%" />
 
 *Los tres modelos, y lo que cuesta salirse del rango de ajuste. Dentro de la
 ventana $0{,}01 < X < 1$ las curvas son prácticamente el mismo material, que es
@@ -389,7 +389,7 @@ merece la pena conocer como física:
 `limp_frame` recibe un `PorousMediumResult` y devuelve otro, así que encaja
 directamente en un `PorousLayer` de la pila.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/limp_frame_effective_density_es.svg" alt="Densidad efectiva normalizada frente a la frecuencia de 0 a 2000 hercios para una capa fibrosa blanda, comparando los modelos de esqueleto rígido y flexible. La parte real del esqueleto rígido es una línea discontinua plana en 1,2 mientras su parte imaginaria se hunde por debajo del borde inferior del gráfico bajo la frecuencia de desacoplo de 127 hercios, marcada con una línea vertical punteada. La parte real del esqueleto flexible parte de la densidad total aparente de 25,9 en cero hercios y cae suavemente hasta la línea del esqueleto rígido hacia los 1500 hercios, mientras su parte imaginaria baja hasta menos 12 cerca de 130 hercios y luego se confunde con la curva de esqueleto rígido" width="88%" loading="lazy" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/limp_frame_effective_density.svg" alt="Densidad efectiva normalizada frente a la frecuencia de 0 a 2000 hercios para una capa fibrosa blanda, comparando los modelos de esqueleto rígido y flexible. La parte real del esqueleto rígido es una línea discontinua plana en 1,2 mientras su parte imaginaria se hunde por debajo del borde inferior del gráfico bajo la frecuencia de desacoplo de 127 hercios, marcada con una línea vertical punteada. La parte real del esqueleto flexible parte de la densidad total aparente de 25,9 en cero hercios y cae suavemente hasta la línea del esqueleto rígido hacia los 1500 hercios, mientras su parte imaginaria baja hasta menos 12 cerca de 130 hercios y luego se confunde con la curva de esqueleto rígido" width="88%" loading="lazy" />
 
 *La misma capa fibrosa blanda de 50 mm con ambos modelos (Allard & Atalla,
 tabla 11.2, el juego de datos de entrada de su fig. 11.2). Por encima de la
@@ -518,7 +518,7 @@ cada onda. La onda cuyo $|\mu|$ es grande es la onda **del aire**, la que un
 fluido equivalente ya modela; la otra es la onda **del esqueleto**, que no tiene
 ningún equivalente en un fluido.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/biot_waves_es.svg" alt="Panel superior: las partes real e imaginaria de los dos números de onda de compresión de Biot y la parte real del número de onda de cizalla frente a la frecuencia de 50 a 1500 hercios para una capa de lana de vidrio, con el intercambio de raíces de 495 hercios marcado por una línea vertical punteada. Panel inferior: los módulos de las dos razones de velocidad en eje logarítmico, la del aire plana por encima de 42 y la del esqueleto sobre la línea de la unidad" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/biot_waves.svg" alt="Panel superior: las partes real e imaginaria de los dos números de onda de compresión de Biot y la parte real del número de onda de cizalla frente a la frecuencia de 50 a 1500 hercios para una capa de lana de vidrio, con el intercambio de raíces de 495 hercios marcado por una línea vertical punteada. Panel inferior: los módulos de las dos razones de velocidad en eje logarítmico, la del aire plana por encima de 42 y la del esqueleto sobre la línea de la unidad" width="88%" />
 
 *Las tres ondas que predice la teoría de Biot donde un fluido equivalente
 predice una, para la lana de vidrio de la tabla 6.1 de Allard & Atalla. El
@@ -572,7 +572,7 @@ esqueleto **en el vacío** y $\rho_1$ su densidad aparente.
 `frame_quarter_wave_resonance` la evalúa. Nada en los modelos de esqueleto
 rígido o flexible puede producir ese pico.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/biot_frame_resonance_es.svg" alt="Impedancia superficial normalizada frente a la frecuencia de 200 a 1500 hercios para una capa de lana de vidrio de 100 milímetros pegada a una pared rígida, comparando el fluido equivalente de esqueleto rígido con la capa poroelástica de Biot completa. La parte real del esqueleto rígido cae suavemente de 3 a 1,5 como línea discontinua y su parte imaginaria sube suavemente de menos 3 a menos 0,9 como línea punteada. La parte real de Biot, en cambio, baja hasta 1,5 cerca de 450 hercios y rebota hasta 2,6 cerca de 520 hercios, mientras que la parte imaginaria de Biot alcanza un máximo agudo de menos 0,7 cerca de 480 hercios, ambos rasgos a ambos lados de la resonancia de cuarto de onda del esqueleto de 460 hercios marcada con una línea vertical punteada, y ambas curvas vuelven a las del esqueleto rígido por encima de 700 hercios" width="88%" loading="lazy" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/biot_frame_resonance.svg" alt="Impedancia superficial normalizada frente a la frecuencia de 200 a 1500 hercios para una capa de lana de vidrio de 100 milímetros pegada a una pared rígida, comparando el fluido equivalente de esqueleto rígido con la capa poroelástica de Biot completa. La parte real del esqueleto rígido cae suavemente de 3 a 1,5 como línea discontinua y su parte imaginaria sube suavemente de menos 3 a menos 0,9 como línea punteada. La parte real de Biot, en cambio, baja hasta 1,5 cerca de 450 hercios y rebota hasta 2,6 cerca de 520 hercios, mientras que la parte imaginaria de Biot alcanza un máximo agudo de menos 0,7 cerca de 480 hercios, ambos rasgos a ambos lados de la resonancia de cuarto de onda del esqueleto de 460 hercios marcada con una línea vertical punteada, y ambas curvas vuelven a las del esqueleto rígido por encima de 700 hercios" width="88%" loading="lazy" />
 
 *La lana de vidrio de la tabla 6.1 de Allard & Atalla, 100 mm pegada a una pared
 rígida, con ambos modelos. Lejos de la resonancia las dos son indistinguibles,
@@ -726,7 +726,7 @@ código que sigue pasa la misma capa por el ajuste de Miki de un parámetro,
 que queda algo más alto (0,937), una imagen honesta de la separación entre
 ambos modelos.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_porous_layer_es.svg" alt="Sección de un absorbente poroso: una capa de lana mineral de 50 mm contra una terminación rígida, una onda plana en incidencia normal llegando por la izquierda, una pequeña flecha reflejada con el 9 % de la energía y la onda transmitida decayendo dentro de la capa, un círculo ampliado con el esqueleto de fibras y los poros llenos de aire, y el juego de parámetros JCA anotado con resistividad al flujo de 20 kPa s/m2, porosidad 0,98, tortuosidad 1,0 y longitudes características de 87 micrómetros, que da un coeficiente de absorción de 0,91 a 1 kHz" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_porous_layer.svg" alt="Sección de un absorbente poroso: una capa de lana mineral de 50 mm contra una terminación rígida, una onda plana en incidencia normal llegando por la izquierda, una pequeña flecha reflejada con el 9 % de la energía y la onda transmitida decayendo dentro de la capa, un círculo ampliado con el esqueleto de fibras y los poros llenos de aire, y el juego de parámetros JCA anotado con resistividad al flujo de 20 kPa s/m2, porosidad 0,98, tortuosidad 1,0 y longitudes características de 87 micrómetros, que da un coeficiente de absorción de 0,91 a 1 kHz" width="92%" />
 
 ```python
 import numpy as np
@@ -784,7 +784,7 @@ extremadamente atenuantes) y aun así expone la matriz de cadena completa
 la [maquinaria ASTM E2611](/phonometry/es/materials/absorbers/impedance-tube/)
 (`TransferMatrix`).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/porous_absorber_designs_es.svg" alt="Absorción predicha en incidencia normal de cuatro construcciones de 50 mm: una capa porosa absorbe en banda ancha desde frecuencias medias, un panel microperforado sobre cámara presenta su pico cerca de 700 Hz, un panel perforado sobre poroso cerca de 500 Hz y una membrana sobre cámara con poroso cerca de 175 Hz; las líneas verticales punteadas marcan las resonancias de forma cerrada de Helmholtz y de membrana" width="80%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/porous_absorber_designs.svg" alt="Absorción predicha en incidencia normal de cuatro construcciones de 50 mm: una capa porosa absorbe en banda ancha desde frecuencias medias, un panel microperforado sobre cámara presenta su pico cerca de 700 Hz, un panel perforado sobre poroso cerca de 500 Hz y una membrana sobre cámara con poroso cerca de 175 Hz; las líneas verticales punteadas marcan las resonancias de forma cerrada de Helmholtz y de membrana" width="80%" loading="eager" />
 
 *Cuatro construcciones, un mismo presupuesto de 50 mm: la capa porosa
 funciona en banda ancha pero decae a baja frecuencia; los diseños
@@ -831,7 +831,7 @@ física, y un resultado resuelto retiene sus capas, así que
 `materials.layered_absorber(f, layers).plot_geometry()` dibuja la misma
 sección desde el propio resultado.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorber_stack_geometry_es.svg" alt="Sección a escala de un absorbente de tres capas: una placa microperforada de 1 mm al frente, una cámara de aire de 30 mm y una capa porosa de 50 mm contra el respaldo rígido a la derecha, con cada espesor acotado y el sonido incidente llegando desde la izquierda" width="80%" loading="lazy" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorber_stack_geometry.svg" alt="Sección a escala de un absorbente de tres capas: una placa microperforada de 1 mm al frente, una cámara de aire de 30 mm y una capa porosa de 50 mm contra el respaldo rígido a la derecha, con cada espesor acotado y el sonido incidente llegando desde la izquierda" width="80%" loading="lazy" />
 
 *La lista de capas tal y como la encuentra la onda: placa microperforada,
 cámara de aire, capa porosa, respaldo rígido. Dibujar el apilado a escala
@@ -956,7 +956,7 @@ print(f"alpha máximo = {res.absorption[i]:.2f} a {f[i]:.0f} Hz")
 res.plot()   # alpha(f) con |R| superpuesto: el pico resonante del MPP
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mpp_absorption_peak_es.svg" alt="Absorción predicha del panel microperforado de Maa sobre una cámara de 6 cm: un pico resonante ancho que alcanza alpha 0,96 cerca de 677 Hz, con el módulo del factor de reflexión como su imagen especular, y un rasgo secundario estrecho cerca de la resonancia de media onda de la cámara a 2,9 kHz" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mpp_absorption_peak.svg" alt="Absorción predicha del panel microperforado de Maa sobre una cámara de 6 cm: un pico resonante ancho que alcanza alpha 0,96 cerca de 677 Hz, con el módulo del factor de reflexión como su imagen especular, y un rasgo secundario estrecho cerca de la resonancia de media onda de la cámara a 2,9 kHz" width="80%" />
 
 *El propio diseño de la fig. 5 de Maa, sin material poroso alguno: las
 pérdidas viscosas de los orificios submilimétricos amortiguan la resonancia
@@ -1045,7 +1045,7 @@ print(np.round(materials.membrane_impedance(f_peak, surface_density=2.0), 1))
 print(round(materials.perforation_end_correction(0.05), 3))   # 0.575 frente a 0.85
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sheet_transfer_impedance_es.svg" alt="Resistencia y reactancia normalizadas del panel microperforado de Maa frente a la frecuencia de 100 hercios a 4 kilohercios, con la reactancia de cotangente negativa de su cámara de 60 mm dibujada como una segunda curva. Las dos reactancias se cruzan cerca de 677 hercios, donde la resistencia vale 1,53, y un eje acompañante muestra la absorción alcanzando 0,96 exactamente a esa frecuencia" width="84%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sheet_transfer_impedance.svg" alt="Resistencia y reactancia normalizadas del panel microperforado de Maa frente a la frecuencia de 100 hercios a 4 kilohercios, con la reactancia de cotangente negativa de su cámara de 60 mm dibujada como una segunda curva. Las dos reactancias se cruzan cerca de 677 hercios, donde la resistencia vale 1,53, y un eje acompañante muestra la absorción alcanzando 0,96 exactamente a esa frecuencia" width="84%" />
 
 *Toda la regla de diseño de esta sección en una imagen. La reactancia del panel
 $x(f)$ y la de la cámara $-\cot(\omega D/c_0)$ se cruzan en 677 Hz: ese cruce es
@@ -1153,7 +1153,7 @@ print(np.round(truncated.absorption - diffuse.absorption, 3))
 # [-0.001  0.01   0.019  0.018]  unas centésimas, y van en el sentido correcto
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuse_field_absorption_es.svg" alt="Absorción de incidencia aleatoria de una capa porosa de 50 mm por la integral de Paris comparada con su coeficiente a incidencia normal: la curva de campo difuso queda claramente por encima de la de incidencia normal por debajo de 700 Hz y ambas convergen hacia 0,95 a alta frecuencia" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuse_field_absorption.svg" alt="Absorción de incidencia aleatoria de una capa porosa de 50 mm por la integral de Paris comparada con su coeficiente a incidencia normal: la curva de campo difuso queda claramente por encima de la de incidencia normal por debajo de 700 Hz y ambas convergen hacia 0,95 a alta frecuencia" width="80%" />
 
 *Por qué la cámara reverberante lee más alto que el tubo: la integral de
 Paris pondera los ángulos oblicuos, cuyas ondas recorren un camino más largo
@@ -1203,7 +1203,7 @@ tratamiento antes de que exista y para alimentar un cálculo de sala que espera
 entrada de incidencia aleatoria; una especificación escrita contra un
 $\alpha_\mathrm{s}$ medido sigue teniendo que cerrarse con una medida.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/oblique_absorption_es.svg" alt="Panel izquierdo: coeficiente de absorción frente al ángulo de incidencia de 0 a 90 grados para una capa porosa de 50 mm con respaldo rígido a 250, 500, 1000 y 2000 hercios, cada curva continua de reacción volumétrica acompañada por una discontinua de reacción local, con el truncamiento de 78 grados marcado. Panel derecho: el coeficiente de campo difuso integrado frente al coeficiente estadístico de reacción local a lo largo de la frecuencia, con el techo de 0,951 de la forma cerrada dibujado como línea punteada" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/oblique_absorption.svg" alt="Panel izquierdo: coeficiente de absorción frente al ángulo de incidencia de 0 a 90 grados para una capa porosa de 50 mm con respaldo rígido a 250, 500, 1000 y 2000 hercios, cada curva continua de reacción volumétrica acompañada por una discontinua de reacción local, con el truncamiento de 78 grados marcado. Panel derecho: el coeficiente de campo difuso integrado frente al coeficiente estadístico de reacción local a lo largo de la frecuencia, con el techo de 0,951 de la forma cerrada dibujado como línea punteada" width="88%" />
 
 *El integrando que consume el promedio de Paris, y las dos maneras de
 promediarlo. Izquierda: $\alpha(\theta)$ de la misma capa de 50 mm a cuatro

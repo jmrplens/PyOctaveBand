@@ -198,7 +198,7 @@ polar = materials.metadiffuser_polar_response(2000.0, pozos, depth=0.02,
 print(round(polar.coefficient, 2))                           # 0.32
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_geometry_es.svg" alt="Sección a escala del metadifusor de residuo cuadrático publicado: un panel de 350 por 20 milímetros sobre respaldo rígido con cinco ranuras numeradas que se abren en la cara, cada una cargada con dos resonadores de Helmholtz cuyos cuellos y cavidades se alojan lateralmente en el tabique entre ranuras; las cotas marcan los 350 milímetros de anchura, el paso de 70 milímetros, la primera ranura de 14,7 milímetros y los 20 milímetros de espesor, con el sonido incidente llegando desde arriba" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_geometry.svg" alt="Sección a escala del metadifusor de residuo cuadrático publicado: un panel de 350 por 20 milímetros sobre respaldo rígido con cinco ranuras numeradas que se abren en la cara, cada una cargada con dos resonadores de Helmholtz cuyos cuellos y cavidades se alojan lateralmente en el tabique entre ranuras; las cotas marcan los 350 milímetros de anchura, el paso de 70 milímetros, la primera ranura de 14,7 milímetros y los 20 milímetros de espesor, con el sonido incidente llegando desde arriba" width="92%" loading="eager" />
 
 *Un periodo a escala: cinco ranuras de 14,7 mm a 30,9 mm de alto con paso de
 70 mm dentro de un panel de 350 mm × 20 mm, cada una cargada con dos
@@ -232,7 +232,7 @@ absorción de 0,99, así que dos quintas partes de la superficie del panel se
 convierten por un momento en un absorbente casi perfecto y la media de la cara
 llega a 0,25. El `.plot()` del resultado dibuja exactamente eso.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_absorption_es.svg" alt="Coeficiente de absorción frente a la frecuencia de 1800 a 2600 hercios para las cinco ranuras del metadifusor publicado y su media de cara: las ranuras 2, 3 y 5 se quedan en el rango de pocos por ciento en toda la banda, mientras que la ranura 4 alcanza 0,99 cerca de 2260 hercios y la ranura 1, 0,99 cerca de 2305 hercios, lo que sube la media de cara desde 0,03 en la frecuencia de diseño de 2 kilohercios hasta unos 0,25 entre las dos resonancias" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_absorption.svg" alt="Coeficiente de absorción frente a la frecuencia de 1800 a 2600 hercios para las cinco ranuras del metadifusor publicado y su media de cara: las ranuras 2, 3 y 5 se quedan en el rango de pocos por ciento en toda la banda, mientras que la ranura 4 alcanza 0,99 cerca de 2260 hercios y la ranura 1, 0,99 cerca de 2305 hercios, lo que sube la media de cara desde 0,03 en la frecuencia de diseño de 2 kilohercios hasta unos 0,25 entre las dos resonancias" width="88%" />
 
 *Un metadifusor no es sin pérdidas, y la pérdida no es plana. En la frecuencia
 de diseño la media de cara es 0,03, algo que un modelo de sala normalmente
@@ -254,7 +254,7 @@ plt.show()
 
 </details>
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_polar_es.svg" alt="Diagrama polar semicircular a 2 kilohercios que compara la respuesta en campo lejano del panel metadifusor de 2 centímetros, en trazo continuo, con el difusor de residuo cuadrático de 27,4 centímetros de profundidad al que imita, en trazo discontinuo: los dos patrones de lóbulos de red se superponen casi exactamente en todo el arco de menos 90 a más 90 grados" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_polar.svg" alt="Diagrama polar semicircular a 2 kilohercios que compara la respuesta en campo lejano del panel metadifusor de 2 centímetros, en trazo continuo, con el difusor de residuo cuadrático de 27,4 centímetros de profundidad al que imita, en trazo discontinuo: los dos patrones de lóbulos de red se superponen casi exactamente en todo el arco de menos 90 a más 90 grados" width="92%" />
 
 *La afirmación de toda la guía, en una superposición: los mismos lóbulos de red
 en las mismas direcciones y a los mismos niveles, con un panel 13,7 veces más
@@ -352,7 +352,7 @@ objetivos = np.degrees(np.angle(np.exp(-2j * k * profundidades)))
 print(np.round(objetivos))                          # [ 72. -72. -72.  72.   0.]
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_phase_match_es.svg" alt="Dos paneles: a la izquierda, la fase de reflexión de cada una de las cinco ranuras a 2 kilohercios frente al índice de ranura, con los cuadrados del metadifusor asentados sobre los círculos huecos de los objetivos del difusor de residuo cuadrático y el módulo de reflexión anotado junto a cada punto; a la derecha, el error de fase de cada ranura respecto a su objetivo de 1600 a 2600 hercios, con las cinco curvas pasando por cero a 2 kilohercios y saliendo de una banda sombreada de más menos diez grados a un par de cientos de hercios a cada lado" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_phase_match.svg" alt="Dos paneles: a la izquierda, la fase de reflexión de cada una de las cinco ranuras a 2 kilohercios frente al índice de ranura, con los cuadrados del metadifusor asentados sobre los círculos huecos de los objetivos del difusor de residuo cuadrático y el módulo de reflexión anotado junto a cada punto; a la derecha, el error de fase de cada ranura respecto a su objetivo de 1600 a 2600 hercios, con las cinco curvas pasando por cero a 2 kilohercios y saliendo de una banda sombreada de más menos diez grados a un par de cientos de hercios a cada lado" width="92%" />
 
 *Izquierda: todo el truco. Cinco ranuras de 20 mm de profundidad caen sobre las
 fases de pozos de hasta 27,4 cm, con menos de 3° de error, y siguen reflejando
@@ -485,7 +485,7 @@ print(np.round(qrd.normalized, 2))
 # [-0.    0.    0.02  0.39  0.29  0.09  0.32 -0.    0.04  0.14  0.  ]
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_spectrum_es.svg" alt="Coeficiente de difusión normalizado sobre las bandas de tercio de octava de 500 a 5000 hercios para el panel metadifusor de 2 centímetros y el difusor de residuo cuadrático de 27,4 centímetros de profundidad al que imita, los dos con seis periodos: la región por debajo de 980 hercios aparece sombreada porque ahí no existe ningún lóbulo de red, las dos curvas se encuentran en 0,32 en la frecuencia de sintonía de 2 kilohercios, y en el resto siguen caminos distintos" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_spectrum.svg" alt="Coeficiente de difusión normalizado sobre las bandas de tercio de octava de 500 a 5000 hercios para el panel metadifusor de 2 centímetros y el difusor de residuo cuadrático de 27,4 centímetros de profundidad al que imita, los dos con seis periodos: la región por debajo de 980 hercios aparece sombreada porque ahí no existe ningún lóbulo de red, las dos curvas se encuentran en 0,32 en la frecuencia de sintonía de 2 kilohercios, y en el resto siguen caminos distintos" width="88%" />
 
 *La equivalencia es un punto, no una banda. A 2 kHz los dos paneles puntúan 0,32
 y 0,32; a un tercio de octava a cada lado son superficies distintas, y el

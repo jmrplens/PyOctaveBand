@@ -110,7 +110,7 @@ décadas de 50 Hz a 10 kHz y, al fijar la humedad la $f_\mathrm{rO}$, barrer la 
 desplaza un pico de relajación por la banda, así que el aire más seco no siempre
 es el que menos absorbe.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/air_absorption_alpha_es.svg" alt="Coeficiente de atenuación atmosférica de tono puro alfa de la ISO 9613-1 en dB/km frente a la frecuencia en ejes log-log, para cuatro combinaciones de temperatura y humedad, mostrando el crecimiento f-cuadrado en baja frecuencia y el decaimiento de relajación dependiente de la humedad" width="80%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/air_absorption_alpha.svg" alt="Coeficiente de atenuación atmosférica de tono puro alfa de la ISO 9613-1 en dB/km frente a la frecuencia en ejes log-log, para cuatro combinaciones de temperatura y humedad, mostrando el crecimiento f-cuadrado en baja frecuencia y el decaimiento de relajación dependiente de la humedad" width="80%" loading="eager" />
 
 *La curva seca de 20 °C / 10 % absorbe más a frecuencias medias, pero las curvas
 húmedas la superan por debajo de ~200 Hz: la firma de la relajación.*
@@ -207,7 +207,7 @@ res = environment.atmospheric_attenuation(
 res.plot(language="es")   # alpha en dB/km frente a la frecuencia (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_attenuation_es.svg" alt="Coeficiente de atenuación atmosférica de tono puro alfa de la ISO 9613-1 en dB/km frente a la frecuencia, con ordenada lineal en decibelios sobre un eje de frecuencia logarítmico, para la atmósfera de referencia de 20 grados Celsius y 50 por ciento de humedad relativa, producido por el método plot del resultado AtmosphericAttenuation" width="80%" loading="lazy" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_attenuation.svg" alt="Coeficiente de atenuación atmosférica de tono puro alfa de la ISO 9613-1 en dB/km frente a la frecuencia, con ordenada lineal en decibelios sobre un eje de frecuencia logarítmico, para la atmósfera de referencia de 20 grados Celsius y 50 por ciento de humedad relativa, producido por el método plot del resultado AtmosphericAttenuation" width="80%" loading="lazy" />
 
 *En una ordenada lineal de decibelios el coeficiente permanece cerca de cero
 hasta alrededor de 1 kHz y luego sube con fuerza, superando 20 dB/km cerca de
@@ -303,7 +303,7 @@ aplicándose con $K_\mathrm{met} = 1$: $D_z$ cae de forma continua desde
 $10 \log_{10} 3 \approx 4{,}8$ dB en incidencia rasante hasta cero al aumentar el
 margen libre, sin bajar nunca de cero.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_outdoor_geometry_es.svg" alt="Geometría fuente-barrera-receptor de la ISO 9613-2: una fuente puntual a altura hs, una barrera cuyo borde superior divide el recorrido en dss y dsr, y un receptor a altura hr, con el rayo directo bloqueado y el rayo difractado sobre el borde, la diferencia de camino z y la fórmula de Dz" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_outdoor_geometry.svg" alt="Geometría fuente-barrera-receptor de la ISO 9613-2: una fuente puntual a altura hs, una barrera cuyo borde superior divide el recorrido en dss y dsr, y un receptor a altura hr, con el rayo directo bloqueado y el rayo difractado sobre el borde, la diferencia de camino z y la fórmula de Dz" width="92%" />
 
 ### Los cuatro términos de atenuación
 
@@ -344,7 +344,7 @@ lo que quede entre ambas. La cubierta dura (pavimento, agua, hielo, hormigón,
 tierra apisonada) es $G = 0$; la cubierta porosa (hierba, arbolado, cultivos) es
 $G = 1$; una región mixta toma la fracción de su longitud que sea porosa.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ground_regions_es.svg" alt="Sección a escala de un recorrido de 200 m con fuente y receptor a 1,5 m del suelo: la región de la fuente sombreada sobre los primeros 45 m como 30 por hs, la región del receptor sombreada sobre los últimos 45 m como 30 por hr, y la región media de 110 m entre ellas rayada en 70 m de hierba y 40 m de asfalto con Gm = 70/110 = 0,64; un recuadro de fórmula da q = 1 menos 30 por (hs más hr) partido por dp, y un recuadro secundario repite el mismo recorrido a 60 m, donde las regiones de fuente y receptor se solapan, q = 0 y la región media no existe" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ground_regions.svg" alt="Sección a escala de un recorrido de 200 m con fuente y receptor a 1,5 m del suelo: la región de la fuente sombreada sobre los primeros 45 m como 30 por hs, la región del receptor sombreada sobre los últimos 45 m como 30 por hr, y la región media de 110 m entre ellas rayada en 70 m de hierba y 40 m de asfalto con Gm = 70/110 = 0,64; un recuadro de fórmula da q = 1 menos 30 por (hs más hr) partido por dp, y un recuadro secundario repite el mismo recorrido a 60 m, donde las regiones de fuente y receptor se solapan, q = 0 y la región media no existe" width="92%" />
 
 En el ejemplo de 200 m de esta sección ($h_\mathrm{s} = h_\mathrm{r} = 1,5$ m, así que
 $d_\mathrm{p} \approx d$) eso son 45 m de región de fuente, 45 m de región de receptor y
@@ -375,7 +375,7 @@ ayuda más a alta frecuencia (longitud de onda corta) hasta saturar en el límit
 la absorción atmosférica solo muerde a 8 kHz y la caída del suelo vive en las
 bandas medias.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/outdoor_attenuation_breakdown_es.svg" alt="Desglose por bandas de octava de la atenuación ISO 9613-2 como barra apilada de Adiv, Aatm, Agr y Abar con el total A superpuesto, para un recorrido de 200 m sobre suelo poroso con una barrera de 4 m" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/outdoor_attenuation_breakdown.svg" alt="Desglose por bandas de octava de la atenuación ISO 9613-2 como barra apilada de Adiv, Aatm, Agr y Abar con el total A superpuesto, para un recorrido de 200 m sobre suelo poroso con una barrera de 4 m" width="80%" />
 
 *Los cuatro términos llevan signo y suman el total: la divergencia son 57,0 dB
 planos a 200 m, la barrera satura en su tope de 20 dB desde 2 kHz, el aire solo
@@ -470,7 +470,7 @@ print(np.round(dz, 2))            # [ 9.13 11.24 13.73 16.45 19.31 20.   20.   2
 print(np.allclose(att.a_bar, np.maximum(dz - att.a_gr, 0.0)))   # True
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/outdoor_level_cascade_es.svg" alt="Diagrama de cascada sobre las ocho bandas de octava desde un nivel de potencia acústica de fuente plano de 95 dB hasta el nivel predicho en el receptor a favor del viento, con un escalón descendente por cada término de atenuación: divergencia, absorción atmosférica, efecto del suelo y apantallamiento por barrera, con el escalón del suelo subiendo en lugar de bajar a 63 Hz, y el nivel final marcado en cada banda" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/outdoor_level_cascade.svg" alt="Diagrama de cascada sobre las ocho bandas de octava desde un nivel de potencia acústica de fuente plano de 95 dB hasta el nivel predicho en el receptor a favor del viento, con un escalón descendente por cada término de atenuación: divergencia, absorción atmosférica, efecto del suelo y apantallamiento por barrera, con el escalón del suelo subiendo en lugar de bajar a 63 Hz, y el nivel final marcado en cada banda" width="88%" />
 
 *Adónde van los 95 dB de potencia de la fuente, banda a banda: la divergencia
 gasta los mismos 57,0 dB en todas, la barrera no vale nada a 250 Hz y vale 20 dB
@@ -619,7 +619,7 @@ diferencia de camino $\delta = r_2 - r_1$ (aproximadamente $2 h_\mathrm{s} h_\ma
 para un recorrido rasante en campo lejano): en fase suman hasta $+6$ dB; con
 $\delta = \lambda/2$ sobre un plano rígido se cancelan en un mínimo abrupto.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ground_reflection_es.svg" alt="Una fuente puntual a altura hs y un micrófono receptor a altura hr sobre un plano de suelo rayado; un rayo directo r1 los conecta y un rayo reflejado rebota en el punto especular con ángulos rasantes iguales; la reflexión se despliega como un rayo recto discontinuo r2 desde una fuente imagen fantasma reflejada bajo el suelo, y las anotaciones dan la diferencia de camino delta = r2 menos r1, la fase de interferencia 2 pi delta entre lambda más la fase de la reflexión, la ganancia en fase de hasta +6 dB y el mínimo profundo a media longitud de onda sobre suelo duro" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ground_reflection.svg" alt="Una fuente puntual a altura hs y un micrófono receptor a altura hr sobre un plano de suelo rayado; un rayo directo r1 los conecta y un rayo reflejado rebota en el punto especular con ángulos rasantes iguales; la reflexión se despliega como un rayo recto discontinuo r2 desde una fuente imagen fantasma reflejada bajo el suelo, y las anotaciones dan la diferencia de camino delta = r2 menos r1, la fase de interferencia 2 pi delta entre lambda más la fase de la reflexión, la ganancia en fase de hasta +6 dB y el mínimo profundo a media longitud de onda sobre suelo duro" width="92%" />
 
 Sobre suelo acústicamente duro ($G = 0$) el coeficiente de reflexión se
 mantiene próximo a $+1$ en todas las octavas, la suma a longitudes de onda
@@ -744,7 +744,7 @@ receptor a 4 m sobre el suyo, 194,16 m de separación en proyección sobre el su
 y 93 dB planos en todas las octavas para que la forma del espectro impreso sea
 la propagación y nada más. Lo que cambia entre ellos es el suelo.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases_es.svg" alt="Dos paneles. A la izquierda, el nivel por bandas de octava en el receptor para el mismo camino de 194 metros sobre tres suelos: sobre suelo reflectante cae suavemente de 40 a 25 decibelios, sobre suelo mixto baja hasta 33 decibelios en torno a 250 y 500 hercios y luego se recupera, y sobre suelo poroso el valle llega a 26 decibelios; los anillos marcan los niveles que imprime el documento y caen sobre las curvas. A la derecha, una barra por caso de prueba, de T01 a T07, con la peor desviación del espectro calculado frente al impreso, entre 0,008 y 0,012 decibelios, todas muy por debajo de la línea discontinua del margen de 0,05 decibelios que declara el documento" width="100%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso17534_qa_cases.svg" alt="Dos paneles. A la izquierda, el nivel por bandas de octava en el receptor para el mismo camino de 194 metros sobre tres suelos: sobre suelo reflectante cae suavemente de 40 a 25 decibelios, sobre suelo mixto baja hasta 33 decibelios en torno a 250 y 500 hercios y luego se recupera, y sobre suelo poroso el valle llega a 26 decibelios; los anillos marcan los niveles que imprime el documento y caen sobre las curvas. A la derecha, una barra por caso de prueba, de T01 a T07, con la peor desviación del espectro calculado frente al impreso, entre 0,008 y 0,012 decibelios, todas muy por debajo de la línea discontinua del margen de 0,05 decibelios que declara el documento" width="100%" />
 
 *Aquí el efecto de suelo lo es todo: sobre suelo poroso la banda de 250 Hz
 llega 13 dB más baja que sobre uno reflectante. A la derecha, todos los casos
@@ -836,7 +836,7 @@ deciden si una barrera real entrega su $D_z$ calculado:
   ganancia *neta* de construir la barrera es proporcionalmente menor que su
   $D_z$ nominal; los dos efectos no se apilan.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso9613_screening_anatomy_es.svg" alt="Dos paneles sobre el término de apantallamiento de ISO 9613-2. Izquierda: la pérdida por inserción debida a la difracción Dz a 500 Hz frente a la altura de barrera para un recorrido de 200 m, una curva para borde simple, otra para doble borde con una separación de bordes de 2 m y otra para el borde simple con el factor meteorológico Kmet, con los topes de 20 dB y 25 dB dibujados como techos horizontales contra los que chocan las curvas. Derecha: Dz frente a la frecuencia de banda de octava para una pantalla de 4 m junto a Abar = Dz menos Agr sobre suelo poroso, siendo la separación entre las dos curvas el efecto del suelo que la barrera tiene que gastarse antes de comprar nada, y con Abar recortado a cero en la banda de 250 Hz" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/iso9613_screening_anatomy.svg" alt="Dos paneles sobre el término de apantallamiento de ISO 9613-2. Izquierda: la pérdida por inserción debida a la difracción Dz a 500 Hz frente a la altura de barrera para un recorrido de 200 m, una curva para borde simple, otra para doble borde con una separación de bordes de 2 m y otra para el borde simple con el factor meteorológico Kmet, con los topes de 20 dB y 25 dB dibujados como techos horizontales contra los que chocan las curvas. Derecha: Dz frente a la frecuencia de banda de octava para una pantalla de 4 m junto a Abar = Dz menos Agr sobre suelo poroso, siendo la separación entre las dos curvas el efecto del suelo que la barrera tiene que gastarse antes de comprar nada, y con Abar recortado a cero en la banda de 250 Hz" width="88%" />
 
 *Izquierda: más altura deja de pagar en cuanto $D_z$ toca su tope; más allá de
 unos 7 m de pantalla en este recorrido, la curva de borde simple es plana en

@@ -67,7 +67,7 @@ Los cuatro métodos están anclados de modo que un **tono de 1 kHz a 40 dB SPL
 es ≈ 1 sonio**; los valores no son intercambiables dígito a dígito porque los
 modelos difieren en sus filtros auditivos y en su suma de sonoridad.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison_es.svg" alt="Sonoridad de un tono de 1 kHz en función del nivel para los modelos de Zwicker, Moore-Glasberg y Sottek, todos pasando cerca de 1 sonio a 40 dB SPL" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison.svg" alt="Sonoridad de un tono de 1 kHz en función del nivel para los modelos de Zwicker, Moore-Glasberg y Sottek, todos pasando cerca de 1 sonio a 40 dB SPL" width="80%" />
 
 *Los tres modelos pasan por aproximadamente 1 sonio en el ancla de 40 dB (el
 front-end de Sottek devuelve ahí 0,9845 sone_HMS) y divergen con el nivel:
@@ -151,7 +151,7 @@ inversa exacta. No son auxiliares privados del modelo de sonoridad:
 rejilla `MooreGlasbergLoudness.erb_number` y un eje Cam construido por ti no
 pueden separarse.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/erb_bandwidth_es.svg" alt="Ancho de banda del filtro auditivo frente a la frecuencia central en ejes log-log: la recta ERB_N de Glasberg y Moore desde unos 30 Hz a 50 Hz hasta más de 1 kHz a 16 kHz, el ancho de banda de tercio de octava a porcentaje constante cruzándola cerca de 500 Hz, el punto de 1 kHz anotado en 15,59 Cam y un segundo eje superior con la escala Cam" width="85%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/erb_bandwidth.svg" alt="Ancho de banda del filtro auditivo frente a la frecuencia central en ejes log-log: la recta ERB_N de Glasberg y Moore desde unos 30 Hz a 50 Hz hasta más de 1 kHz a 16 kHz, el ancho de banda de tercio de octava a porcentaje constante cruzándola cerca de 500 Hz, el punto de 1 kHz anotado en 15,59 Cam y un segundo eje superior con la escala Cam" width="85%" />
 
 *El filtro del oído no es una fracción constante de la frecuencia. Por debajo
 de unos 500 Hz es bastante más estrecho que un tercio de octava, y por eso la
@@ -219,7 +219,7 @@ el apartado 8.1 fija qué hacen con el resultado los dos oídos.
 | Un micrófono de sonda a menos de 10 mm del tímpano (5 mm cuando hay componentes fuertes por encima de 3 kHz) | `'eardrum'` | Apartado 7.2.4: el espectro ya está en la membrana, así que no se aplica ninguna función de transferencia |
 | Un simulador de cabeza y torso | `'eardrum'`, pero solo si el simulador es un modelo acústico fiel de un adulto medio | Apartado 7.2.5; si no, necesita su propio fichero de corrección, que esta API no sabe expresar — ecualiza antes la grabación a campo libre o a campo difuso y usa la opción que corresponda |
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_mg_capture_routes_es.svg" alt="Cuatro vías de captación y los argumentos que implica cada una: un único micrófono donde estaría la cabeza de quien escucha con una sola fuente frontal, que da field free; el mismo micrófono en un campo reverberante, que da field diffuse; un micrófono de sonda a menos de 10 mm de la membrana timpánica, que da field eardrum sin ninguna función de transferencia; y un simulador de cabeza y torso, que da field eardrum solo si es un modelo fiel de un adulto medio; un pie indica que un sonido diótico suena alrededor de 1,5 veces más sonoro que el mismo sonido en un solo oído" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_mg_capture_routes.svg" alt="Cuatro vías de captación y los argumentos que implica cada una: un único micrófono donde estaría la cabeza de quien escucha con una sola fuente frontal, que da field free; el mismo micrófono en un campo reverberante, que da field diffuse; un micrófono de sonda a menos de 10 mm de la membrana timpánica, que da field eardrum sin ninguna función de transferencia; y un simulador de cabeza y torso, que da field eardrum solo si es un modelo fiel de un adulto medio; un pie indica que un sonido diótico suena alrededor de 1,5 veces más sonoro que el mismo sonido en un solo oído" width="92%" />
 
 *Las cuatro situaciones del apartado 7.2, con la geometría que las decide. Las
 distancias de la escena 3 son las de la propia norma: 10 mm desde la membrana
@@ -277,7 +277,7 @@ res = psychoacoustics.loudness_moore_glasberg(x, fs, field="free", presentation=
 res.plot()   # sonoridad específica N'(i) sobre la escala del número ERB (Cam)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/moore_glasberg_specific_loudness_es.svg" alt="Sonoridad específica de ISO 532-2 sobre la escala del número ERB para un tono de 1 kHz a 40 dB SPL: un único pico redondeado cerca de 15 Cam cuya área es la sonoridad total de 1 sonio" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/moore_glasberg_specific_loudness.svg" alt="Sonoridad específica de ISO 532-2 sobre la escala del número ERB para un tono de 1 kHz a 40 dB SPL: un único pico redondeado cerca de 15 Cam cuya área es la sonoridad total de 1 sonio" width="80%" />
 
 *El patrón de ISO 532-2 del ancla definitoria de 1 sonio. El pico no es una
 línea espectral sino la excitación que producen los filtros roex alrededor del
@@ -406,7 +406,7 @@ un percentil de la sonoridad de largo plazo (típicamente el valor al 5 %) es el
 estadístico estable, mientras que $N_\text{max}$ lo fijaría el único peor
 instante.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/moore_glasberg_time_loudness_es.svg" alt="Trazas de sonoridad de corto plazo y de largo plazo de Moore-Glasberg para un pulso de 200 ms a 1 kHz y 60 dB SPL dentro de un registro de 0,8 s: la traza de corto plazo sube hasta un máximo de 4,8 sonios dentro de la ventana sombreada del pulso y se relaja deprisa, mientras la de largo plazo integra hasta 3,6 sonios y decae lentamente tras el final del pulso" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/moore_glasberg_time_loudness.svg" alt="Trazas de sonoridad de corto plazo y de largo plazo de Moore-Glasberg para un pulso de 200 ms a 1 kHz y 60 dB SPL dentro de un registro de 0,8 s: la traza de corto plazo sube hasta un máximo de 4,8 sonios dentro de la ventana sombreada del pulso y se relaja deprisa, mientras la de largo plazo integra hasta 3,6 sonios y decae lentamente tras el final del pulso" width="80%" />
 
 *Un pulso de 200 ms a 1 kHz y 60 dB SPL: la sonoridad de corto plazo alcanza
 4,8 sonios en unas pocas decenas de milisegundos y se relaja deprisa, mientras
@@ -489,7 +489,7 @@ print(res.specific_loudness.shape)          # (53,) sonoridad específica media 
 res.plot()   # sonoridad específica media N'(z) + N(l) dependiente del tiempo a 187.5 Hz
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sottek_specific_loudness_es.svg" alt="Sonoridad específica media N'(z) del modelo de Sottek sobre las 53 bandas Bark_HMS para un tono de 1 kHz a 60 dB SPL que totaliza 2,8 sone_HMS, con máximo en la banda crítica del tono cerca de 9 Bark_HMS y caída a ambos lados" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sottek_specific_loudness.svg" alt="Sonoridad específica media N'(z) del modelo de Sottek sobre las 53 bandas Bark_HMS para un tono de 1 kHz a 60 dB SPL que totaliza 2,8 sone_HMS, con máximo en la banda crítica del tono cerca de 9 Bark_HMS y caída a ambos lados" width="80%" />
 
 *El tono de 1 kHz a 60 dB SPL, N = 2,8 sone_HMS: un tono más sonoro que el
 ancla de 40 dB del fragmento de arriba, que da 0,98 sone_HMS. La sonoridad es

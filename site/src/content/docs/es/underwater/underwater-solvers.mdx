@@ -49,7 +49,7 @@ además inclinar el fondo con un perfil de profundidad lineal a trozos
 
 ## 1. Los cuatro métodos de un vistazo
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_underwater_waveguide_es.svg" alt="La guía de ondas distancia-profundidad que los cuatro métodos toman como entrada: la distancia creciendo hacia la derecha y la profundidad hacia abajo, una superficie del mar de presión nula, un fondo de presión nula o rígido, el perfil de velocidad del sonido dibujado junto a la columna con su eje de canal, una fuente a la profundidad z_s, un receptor a la profundidad z y la distancia r, y un rayo que gira donde la velocidad del sonido local cumple la condición de Snell, anotada con lo que calcula cada uno de los cuatro métodos en ese mismo marco" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_underwater_waveguide.svg" alt="La guía de ondas distancia-profundidad que los cuatro métodos toman como entrada: la distancia creciendo hacia la derecha y la profundidad hacia abajo, una superficie del mar de presión nula, un fondo de presión nula o rígido, el perfil de velocidad del sonido dibujado junto a la columna con su eje de canal, una fuente a la profundidad z_s, un receptor a la profundidad z y la distancia r, y un rayo que gira donde la velocidad del sonido local cumple la condición de Snell, anotada con lo que calcula cada uno de los cuatro métodos en ese mismo marco" width="92%" />
 
 - **`normal_modes`** resuelve el problema de autovalores de Sturm-Liouville
   separado en profundidad por diferencias finitas y suma los modos
@@ -75,7 +75,7 @@ además inclinar el fondo con un perfil de profundidad lineal a trozos
   libre; coincide en tendencia con la pérdida de propagación de los modos
   normales.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation_es.webp" alt="Un perfil de velocidad del sonido de Munk, trayectorias de rayos formando zonas de convergencia, y la pérdida de propagación de modos normales frente a la ecuación parabólica coincidiendo en tendencia" width="100%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation.webp" alt="Un perfil de velocidad del sonido de Munk, trayectorias de rayos formando zonas de convergencia, y la pérdida de propagación de modos normales frente a la ecuación parabólica coincidiendo en tendencia" width="100%" loading="eager" />
 
 *Tres paneles, tres preguntas distintas sobre la misma agua. A la izquierda,
 rayos en un perfil de Munk cuyo mínimo es de 1500,0 m/s a 1271 m frente a los
@@ -224,7 +224,7 @@ print(round(float(modes.wavenumbers[0]), 5))    # 0.20885  kr1 calculado
 print(round(np.sqrt(k**2 - (np.pi / 200.0) ** 2), 5))   # 0.20885  exacto
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/normal_modes_es.svg" alt="A la izquierda, las cuatro primeras funciones modales de una guía de ondas isovelocidad de 200 metros a 50 hercios dibujadas frente a la profundidad, cada una rotulada con su número de onda horizontal calculado y exacto, con la profundidad de fuente de 50 metros marcada; en el centro, el número de modos propagantes frente a la frecuencia de 10 a 200 hercios como una escalera que sigue la recta kD partido por pi; a la derecha, la pérdida de propagación modal frente a la distancia a la profundidad de receptor de 100 metros" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/normal_modes.svg" alt="A la izquierda, las cuatro primeras funciones modales de una guía de ondas isovelocidad de 200 metros a 50 hercios dibujadas frente a la profundidad, cada una rotulada con su número de onda horizontal calculado y exacto, con la profundidad de fuente de 50 metros marcada; en el centro, el número de modos propagantes frente a la frecuencia de 10 a 200 hercios como una escalera que sigue la recta kD partido por pi; a la derecha, la pérdida de propagación modal frente a la distancia a la profundidad de receptor de 100 metros" width="92%" />
 
 *El modo $m$ tiene $m-1$ ceros interiores, y la profundidad de la fuente decide
 qué modos existen siquiera en el campo: el cuarto modo tiene un cero justo a
@@ -341,7 +341,7 @@ traced = np.interp(r_turn, rays.ranges[0], rays.travel_times[0])
 print(round(float(traced), 3))                                 # 6.171  trazado
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ray_turning_point_es.svg" alt="A la izquierda, un gradiente lineal de velocidad del sonido que sube desde 1490 metros por segundo en superficie; a la derecha, cinco rayos lanzados a 2, 4, 6, 8 y 10 grados hacia abajo desde una fuente a 100 metros, cada uno girando a su propia profundidad de giro analítica marcada con un aspa, con el arco de círculo exacto del gradiente lineal superpuesto en trazo discontinuo sobre el rayo de 6 grados y sus profundidades de giro analítica y trazada anotadas" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ray_turning_point.svg" alt="A la izquierda, un gradiente lineal de velocidad del sonido que sube desde 1490 metros por segundo en superficie; a la derecha, cinco rayos lanzados a 2, 4, 6, 8 y 10 grados hacia abajo desde una fuente a 100 metros, cada uno girando a su propia profundidad de giro analítica marcada con un aspa, con el arco de círculo exacto del gradiente lineal superpuesto en trazo discontinuo sobre el rayo de 6 grados y sus profundidades de giro analítica y trazada anotadas" width="92%" />
 
 *Cuanto más empinado es el lanzamiento, más hondo gira el rayo: en la misma agua
 el rayo de 2° gira a 154 m y el de 10° a 1454 m. El rayo de 6° lleva la
@@ -497,7 +497,7 @@ print(round(float(arr.launch_angles[1]), 2))            # -9.31 grados: arriba
 arr.plot(language="es")   # el esqueleto de la respuesta al impulso
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/eigenray_arrivals_es.svg" alt="La estructura de llegadas en un receptor de un canal isovelocidad de 100 metros: once barras verticales frente al tiempo de propagación de 333 a 480 milisegundos, cada cabeza marcando la pérdida de propagación de su propio camino sobre un eje invertido, el camino directo dibujado el primero y el más fuerte en azul, los caminos reflejados coloreados según su número de reflexiones en los contornos de uno a cinco, llegando más tarde, más empinados y algo más débiles a lo largo de la escalera de imágenes, con una barra de color que da el número" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/eigenray_arrivals.svg" alt="La estructura de llegadas en un receptor de un canal isovelocidad de 100 metros: once barras verticales frente al tiempo de propagación de 333 a 480 milisegundos, cada cabeza marcando la pérdida de propagación de su propio camino sobre un eje invertido, el camino directo dibujado el primero y el más fuerte en azul, los caminos reflejados coloreados según su número de reflexiones en los contornos de uno a cinco, llegando más tarde, más empinados y algo más débiles a lo largo de la escalera de imágenes, con una barra de color que da el número" width="92%" />
 
 *El canal del propio fragmento, dibujado: una barra por eigenrayo, con la
 cabeza en la pérdida de ese único camino. El camino directo llega el primero y
@@ -613,7 +613,7 @@ print(round(float(beams.initial_beam_widths[0]), 1))  # 35,9 m: W0, Ec. (3.86)
 beams.plot(language="es")   # el campo de PL, en el marco de parabolic_equation
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/gaussian_beam_caustic_es.svg" alt="Un campo de pérdida de propagación sobre 2,5 kilómetros de distancia y 1000 metros de profundidad a 600 hercios: una cúpula luminosa de nivel que asciende desde una fuente cercana al fondo, limitada por arriba por un arco nítido donde el abanico de rayos ascendentes se pliega sobre sí mismo, con el nivel finito sobre ese arco y desvaneciéndose de forma gradual hacia la zona de sombra oscura que hay encima y a la que no llega ningún rayo, con los rayos trazados dibujados como líneas grises finas sobre el campo" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/gaussian_beam_caustic.svg" alt="Un campo de pérdida de propagación sobre 2,5 kilómetros de distancia y 1000 metros de profundidad a 600 hercios: una cúpula luminosa de nivel que asciende desde una fuente cercana al fondo, limitada por arriba por un arco nítido donde el abanico de rayos ascendentes se pliega sobre sí mismo, con el nivel finito sobre ese arco y desvaneciéndose de forma gradual hacia la zona de sombra oscura que hay encima y a la que no llega ningún rayo, con los rayos trazados dibujados como líneas grises finas sobre el campo" width="92%" />
 
 *El agua del propio fragmento, sobre una malla más fina: 600 Hz sobre el
 perfil $n^2$-lineal, la fuente a 7,5 m del fondo, 439 haces entre ±45°. El
@@ -908,7 +908,7 @@ y lo hace hasta unos $10^{-4}$ dB con el paso de distancia por defecto. Esa es
 la comprobación que la PE no puede fallar: campo libre, sin contornos, sin
 energía empinada. El límite paraxial solo se ve donde faltan esas tres cosas.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pe_paraxial_error_es.svg" alt="A la izquierda, la pérdida de propagación frente a la distancia en un receptor a 60 metros en una guía de ondas de 100 metros a 50 hercios, calculada con modos normales y con la ecuación parabólica, ambas dibujadas tenues en su estructura fina y marcadas en sus promedios en distancia, con la ecuación parabólica dando 1,6 decibelios más de pérdida a cualquier distancia; a la derecha, los ángulos rasantes modales de los seis modos propagantes como barras frente a la banda paraxial de más menos 20 grados, con cuatro de ellos fuera" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pe_paraxial_error.svg" alt="A la izquierda, la pérdida de propagación frente a la distancia en un receptor a 60 metros en una guía de ondas de 100 metros a 50 hercios, calculada con modos normales y con la ecuación parabólica, ambas dibujadas tenues en su estructura fina y marcadas en sus promedios en distancia, con la ecuación parabólica dando 1,6 decibelios más de pérdida a cualquier distancia; a la derecha, los ángulos rasantes modales de los seis modos propagantes como barras frente a la banda paraxial de más menos 20 grados, con cuatro de ellos fuera" width="92%" />
 
 *En una guía de ondas de 100 m a 50 Hz, cuatro de los seis modos propagantes
 salen de la fuente a 27°, 37°, 49° y 64°: fuera de la banda para la que está
@@ -1146,7 +1146,7 @@ print(round(float(underwater.detection_range(
     transition_range=1000.0, **env).detection_range) / 1000.0, 1))       # 5.9 km
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_budget_es.svg" alt="Pérdida de propagación frente a la distancia para tres casos: 10 kilohercios con divergencia solo esférica, 10 kilohercios con la ley práctica y una distancia de transición de un kilómetro, y 20 kilohercios con la misma ley práctica, cruzados por dos rectas horizontales de figura de mérito a 87 y 79,5 decibelios, con cada uno de los seis cruces proyectado sobre el eje de distancias y rotulado, y un recuadro con el nivel de fuente, el nivel de ruido, el índice de directividad y el umbral de detección" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_budget.svg" alt="Pérdida de propagación frente a la distancia para tres casos: 10 kilohercios con divergencia solo esférica, 10 kilohercios con la ley práctica y una distancia de transición de un kilómetro, y 20 kilohercios con la misma ley práctica, cruzados por dos rectas horizontales de figura de mérito a 87 y 79,5 decibelios, con cada uno de los seis cruces proyectado sobre el eje de distancias y rotulado, y un recuadro con el nivel de fuente, el nivel de ruido, el índice de directividad y el umbral de detección" width="92%" />
 
 *La misma fuente y el mismo mar, seis respuestas entre 4,1 y 15,8 km. La ley de
 divergencia es la palanca mayor: elegir la esférica sola en lugar de la práctica

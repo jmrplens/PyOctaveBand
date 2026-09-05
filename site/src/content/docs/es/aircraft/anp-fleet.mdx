@@ -121,7 +121,7 @@ por cada combinación de reglaje de potencia y distancia oblicua. Entre los nodo
 tabulados la interpolación de Doc 29 es logarítmica en distancia y lineal en
 potencia, que es lo que dibujan las curvas de abajo.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_npd_es.svg" alt="Curvas nivel-potencia-distancia de un Boeing 747-100 para tres reglajes de empuje tabulados, con el nivel cayendo con la distancia oblicua en eje logarítmico y marcadores en los nodos tabulados" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_npd.svg" alt="Curvas nivel-potencia-distancia de un Boeing 747-100 para tres reglajes de empuje tabulados, con el nivel cayendo con la distancia oblicua en eje logarítmico y marcadores en los nodos tabulados" width="82%" />
 
 *Los tres reglajes de empuje tabulados van casi paralelos: la potencia sobre todo
 desplaza el nivel, mientras que la distancia fija la forma. La caída es cercana a
@@ -183,7 +183,7 @@ ruta, lateral y vertical más el reglaje de potencia y la velocidad verdadera,
 con máscaras booleanas que marcan qué segmentos son el recorrido de despegue o
 el de aterrizaje.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_profile_es.svg" alt="Perfil de despegue por defecto de un Boeing 747-100: altitud frente a distancia sobre la ruta, subiendo desde la pista a lo largo de once puntos fijos, con los puntos del recorrido de despegue marcados a altitud cero" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_profile.svg" alt="Perfil de despegue por defecto de un Boeing 747-100: altitud frente a distancia sobre la ruta, subiendo desde la pista a lo largo de once puntos fijos, con los puntos del recorrido de despegue marcados a altitud cero" width="82%" />
 
 *Los primeros puntos están a altitud cero y son el recorrido de despegue. Lo que
 sigue es el gradiente de subida, y es el gradiente, y no el nivel, lo que decide
@@ -290,7 +290,7 @@ print(len(flown.points), round(flown.distance_ft[-1]), flown.altitude_ft[-1])
 flown.plot(language="es")
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_procedural_profile_es.svg" alt="Perfil de despegue de un Airbus A320-211 sintetizado a partir de sus pasos de procedimiento publicados: la altura sube hasta 10 000 ft frente a la distancia sobre la ruta, con el empuje neto corregido en un segundo eje cayendo durante la carrera de despegue y escalonándose en el cambio a empuje de ascenso" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_procedural_profile.svg" alt="Perfil de despegue de un Airbus A320-211 sintetizado a partir de sus pasos de procedimiento publicados: la altura sube hasta 10 000 ft frente a la distancia sobre la ruta, con el empuje neto corregido en un segundo eje cayendo durante la carrera de despegue y escalonándose en el cambio a empuje de ascenso" width="82%" />
 
 *El A320-211 no distribuye ningún perfil de despegue de punto fijo, así que esta
 es la única forma de volarlo. La banda sombreada es la carrera de despegue; la
@@ -415,7 +415,7 @@ no al revés. La comprobación más barata de que la malla y la trayectoria est�
 el mismo sistema es que el máximo del array coincida con una llamada a
 `event_level` en el punto de malla donde ocurre.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_contour_es.svg" alt="Contorno de nivel de exposición sonora de evento único de un despegue de Boeing 747-100 calculado a partir de la base ANP distribuida, sobre una malla de 14 km a lo largo de la traza por 6 km de ancho. El recorrido de despegue se dibuja como una barra gruesa sobre la pista y la traza en tierra por defecto como una línea a trazos a lo largo de y igual a cero; la huella es más intensa sobre el recorrido y la primera parte de la subida y se estira traza abajo, hasta unos 8 km en el contorno de 95 dB y 12 km en el más exterior, y el receptor de event_level a 3 km a lo largo de la traza y 500 m a un costado está marcado con su nivel de evento único de 100,4 dB" width="90%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_contour.svg" alt="Contorno de nivel de exposición sonora de evento único de un despegue de Boeing 747-100 calculado a partir de la base ANP distribuida, sobre una malla de 14 km a lo largo de la traza por 6 km de ancho. El recorrido de despegue se dibuja como una barra gruesa sobre la pista y la traza en tierra por defecto como una línea a trazos a lo largo de y igual a cero; la huella es más intensa sobre el recorrido y la primera parte de la subida y se estira traza abajo, hasta unos 8 km en el contorno de 95 dB y 12 km en el más exterior, y el receptor de event_level a 3 km a lo largo de la traza y 500 m a un costado está marcado con su nivel de evento único de 100,4 dB" width="90%" />
 
 *La huella real del 747-100, a partir de las propias tablas NPD y del perfil de
 despegue por defecto de la base: cuatro líneas de código y nada escrito a mano.

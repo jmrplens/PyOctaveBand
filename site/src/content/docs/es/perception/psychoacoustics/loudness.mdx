@@ -82,7 +82,7 @@ pendientes de enmascaramiento dependientes del nivel) y produce la
 que 2 sonios. Por definición, un tono de 1 kHz a 40 dB SPL es 1 sonio, y cada
 +10 fonios duplica el valor en sonios.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_zwicker_es.svg" alt="Cadena de sonoridad de Zwicker ISO 532-1: 28 niveles de banda de tercio de octava, transmisión y agrupación de bandas críticas inferiores, sonoridad de núcleo de las 20 bandas críticas, sonoridad específica sobre Bark, integrada en la sonoridad total N en sonios y el nivel de sonoridad en fonios" width="78%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_zwicker.svg" alt="Cadena de sonoridad de Zwicker ISO 532-1: 28 niveles de banda de tercio de octava, transmisión y agrupación de bandas críticas inferiores, sonoridad de núcleo de las 20 bandas críticas, sonoridad específica sobre Bark, integrada en la sonoridad total N en sonios y el nivel de sonoridad en fonios" width="78%" loading="eager" />
 
 La animación de abajo muestra esa integración en acción: al subir el nivel
 de banda de un sonido de banda estrecha de 1 kHz, el patrón de sonoridad
@@ -136,7 +136,7 @@ posición de observador de ECMA-74 — 1,00 m desde la caja de referencia, 1,50 
 sobre el plano reflectante — porque ISO 532-1 no prescribe distancia propia y
 la toma de la norma de emisión que corresponda.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_loudness_capture_es.svg" alt="Tres disposiciones de captación para una medición de sonoridad ISO 532-1: el panel A, una cámara semianecoica con el equipo en ensayo en su caja de referencia y un micrófono 1,00 m por delante a 1,50 m de altura, donde estaría la cabeza de la persona ausente; el panel B, el mismo equipo en una sala reverberante con el campo reflejado llegando al micrófono en la posición de escucha; el panel C, un simulador de cabeza y torso cuyos dos canales pasan por una ecualización de campo libre, de campo difuso o ID antes de dos cadenas de Zwicker independientes" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_loudness_capture.svg" alt="Tres disposiciones de captación para una medición de sonoridad ISO 532-1: el panel A, una cámara semianecoica con el equipo en ensayo en su caja de referencia y un micrófono 1,00 m por delante a 1,50 m de altura, donde estaría la cabeza de la persona ausente; el panel B, el mismo equipo en una sala reverberante con el campo reflejado llegando al micrófono en la posición de escucha; el panel C, un simulador de cabeza y torso cuyos dos canales pasan por una ecualización de campo libre, de campo difuso o ID antes de dos cadenas de Zwicker independientes" width="92%" />
 
 *Las tres vías hacia una entrada válida. El panel A da $N_\mathrm{F}$ y el panel B
 $N_\mathrm{D}$; el tipo de campo forma parte del resultado, no es una preferencia.*
@@ -206,7 +206,7 @@ res = psychoacoustics.loudness_zwicker_from_spectrum(levels_28, field="diffuse")
 res.plot()   # N'(z) sobre la escala Bark — el patrón de sonoridad específica (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern_es.svg" alt="Patrones de sonoridad específica sobre la escala Bark para un sonido de banda estrecha de 1 kHz y un sonido de banda ancha con el mismo nivel de banda" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern.svg" alt="Patrones de sonoridad específica sobre la escala Bark para un sonido de banda estrecha de 1 kHz y un sonido de banda ancha con el mismo nivel de banda" width="80%" />
 
 *Mismo nivel de banda, sonoridad muy distinta: la energía repartida entre
 muchas bandas críticas (rojo) suma muchos más sonios que el mismo nivel
@@ -286,7 +286,7 @@ el compañero más benévolo para sonidos con picos breves, y `res.loudness` es
 $N_\text{max}$: la magnitud correcta para buscar el peor instante, y la
 equivocada para citarla como «la sonoridad».
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zwicker_time_varying_es.svg" alt="A la izquierda, la traza de sonoridad frente al tiempo de ISO 532-1 de cinco ráfagas de 1 kHz que suben de 45 a 85 dB, con líneas horizontales en Nmax 22,5 sonios, N5 14,5 sonios, N10 11,4 sonios y la media aritmética 4,1 sonios. A la derecha, el mismo registro como curva de excedencia de la sonoridad frente al porcentaje de tiempo superado, con N5 y N10 marcados en el 5 % y el 10 %" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zwicker_time_varying.svg" alt="A la izquierda, la traza de sonoridad frente al tiempo de ISO 532-1 de cinco ráfagas de 1 kHz que suben de 45 a 85 dB, con líneas horizontales en Nmax 22,5 sonios, N5 14,5 sonios, N10 11,4 sonios y la media aritmética 4,1 sonios. A la derecha, el mismo registro como curva de excedencia de la sonoridad frente al porcentaje de tiempo superado, con N5 y N10 marcados en el 5 % y el 10 %" width="92%" />
 
 *Qué es un percentil de una traza de sonoridad. La ráfaga breve de 85 dB fija
 $N_\text{max}$ y casi nada más: ocupa menos del 6 % del registro, así que $N_5$
@@ -389,7 +389,7 @@ res = psychoacoustics.equal_loudness_contours()
 res.plot()   # el clásico gráfico de ISO 226 (necesita matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/equal_loudness_contours_es.svg" alt="Líneas isofónicas normales de ISO 226:2023 de 20 a 90 fonios con la curva del umbral de audición" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/equal_loudness_contours.svg" alt="Líneas isofónicas normales de ISO 226:2023 de 20 a 90 fonios con la curva del umbral de audición" width="80%" />
 
 ISO 226:2023 define las curvas de 20 a 90 fonios; por encima de 80 fonios la fórmula solo es válida hasta 4 kHz, por lo que la curva de 90 fonios se detiene ahí y no se define ninguna curva superior.
 

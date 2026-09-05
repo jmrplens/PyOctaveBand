@@ -131,7 +131,7 @@ eleva todos los máximos, pero las caídas permanecen en 0 dB y los máximos
 permanecen en las mismas frecuencias, fijadas solo por la longitud de la
 cámara.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_expansion_chamber_es.svg" alt="Pérdida de transmisión de la cámara de expansión frente a la frecuencia para relaciones de áreas m = 2, 4, 8 y 16, con máximos periódicos que crecen con m en los múltiplos impares de la frecuencia de cuarto de onda y caídas que vuelven a 0 dB en cada media longitud de onda de la cámara" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_expansion_chamber.svg" alt="Pérdida de transmisión de la cámara de expansión frente a la frecuencia para relaciones de áreas m = 2, 4, 8 y 16, con máximos periódicos que crecen con m en los múltiplos impares de la frecuencia de cuarto de onda y caídas que vuelven a 0 dB en cada media longitud de onda de la cámara" width="88%" />
 
 *Dos palancas de diseño, y solo una es barata. El máximo,
 $10\log_{10}[1 + \tfrac14(m - 1/m)^2]$, crece solo con el logaritmo de la
@@ -177,7 +177,7 @@ Los números que se pasan a `expansion_chamber` describen un dispositivo real,
 y `.plot_geometry()` lo dibuja: la misma cámara de 0,3 m con su relación de
 áreas 4:1, a escala y acotada.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/expansion_chamber_geometry_es.svg" alt="Sección a escala del silenciador de cámara de expansión del ejemplo de pérdida de transmisión: una cámara de 300 mm de longitud y 225,7 mm de diámetro equivalente insertada entre tubos de entrada y salida de 112,8 mm de diámetro equivalente, con la longitud de la cámara y ambos diámetros acotados" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/expansion_chamber_geometry.svg" alt="Sección a escala del silenciador de cámara de expansión del ejemplo de pérdida de transmisión: una cámara de 300 mm de longitud y 225,7 mm de diámetro equivalente insertada entre tubos de entrada y salida de 112,8 mm de diámetro equivalente, con la longitud de la cámara y ambos diámetros acotados" width="88%" />
 
 *La cámara detrás de las curvas de arriba, a escala: las áreas entran en el
 método de cuatro polos solo a través de la relación $m$, y el dibujo usa los
@@ -241,7 +241,7 @@ un ventilador o de un motor, en cambio, rara vez se conoce y depende mucho de la
 frecuencia, que es precisamente por lo que en la práctica la pérdida por
 inserción es una magnitud *medida*.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_insertion_loss_es.svg" alt="Atenuación frente a la frecuencia de 20 a 880 Hz de una cámara de expansión de 0,3 m y relación de áreas 4. Una curva gruesa da la pérdida de transmisión, una joroba suave entre 0 y 6,5 dB con un cero en 572 Hz. Dos curvas más finas dan la pérdida por inserción de esa misma cámara descargando por la impedancia de radiación de su extremo abierto, una para una fuente adaptada al tubo y otra para una fuente veinte veces más rígida: las dos bajan muy por debajo de cero cerca de 180 Hz, hasta menos 9,3 y menos 22,6 dB, vuelven a bajar cerca de 645 Hz hasta menos 2,9 y menos 8,5 dB, y se reencuentran con la pérdida de transmisión en la parte alta de la banda" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_insertion_loss.svg" alt="Atenuación frente a la frecuencia de 20 a 880 Hz de una cámara de expansión de 0,3 m y relación de áreas 4. Una curva gruesa da la pérdida de transmisión, una joroba suave entre 0 y 6,5 dB con un cero en 572 Hz. Dos curvas más finas dan la pérdida por inserción de esa misma cámara descargando por la impedancia de radiación de su extremo abierto, una para una fuente adaptada al tubo y otra para una fuente veinte veces más rígida: las dos bajan muy por debajo de cero cerca de 180 Hz, hasta menos 9,3 y menos 22,6 dB, vuelven a bajar cerca de 645 Hz hasta menos 2,9 y menos 8,5 dB, y se reencuentran con la pérdida de transmisión en la parte alta de la banda" width="88%" />
 
 *La misma cámara, tres respuestas. La pérdida de transmisión nunca baja de cero,
 porque está definida contra una terminación que no refleja nada. La pérdida
@@ -387,7 +387,7 @@ extensión de salida de 0,2 m ($L/2$) es la sintonizada en 429 Hz, y el par
 cubre las dos. El precio se ve en la misma figura: por sí sola, la extensión de
 entrada no elimina la caída que no le toca, la desplaza, a 444 Hz.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_extended_tube_es.svg" alt="Pérdida de transmisión de 20 a 880 Hz de una cámara de expansión de 0,4 m en tres configuraciones: la cámara simple como pareja de jorobas discontinuas que llegan a 6,5 dB y caen a cero en 429 y en 858 Hz, esa misma cámara con una extensión de entrada de 0,10 m que se sale por arriba del gráfico en 858 Hz pero solo marca 0,6 dB en 429 Hz y conserva ahí una caída, desplazada a 444 Hz, y la cámara con extensión de entrada de 0,10 m y de salida de 0,20 m, que se sale por arriba en 429 y en 858 Hz y no deja ninguna caída en la banda" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_extended_tube.svg" alt="Pérdida de transmisión de 20 a 880 Hz de una cámara de expansión de 0,4 m en tres configuraciones: la cámara simple como pareja de jorobas discontinuas que llegan a 6,5 dB y caen a cero en 429 y en 858 Hz, esa misma cámara con una extensión de entrada de 0,10 m que se sale por arriba del gráfico en 858 Hz pero solo marca 0,6 dB en 429 Hz y conserva ahí una caída, desplazada a 444 Hz, y la cámara con extensión de entrada de 0,10 m y de salida de 0,20 m, que se sale por arriba en 429 y en 858 Hz y no deja ninguna caída en la banda" width="88%" />
 
 *Lo que aporta una extensión interior, y lo que cuesta. Las caídas a 0 dB de la
 cámara simple en cada media longitud de onda son su defecto fatal, y cada
@@ -428,7 +428,7 @@ plt.show()
 La extensión es un trozo de tubo real metido en la cámara, y `.plot_geometry()`
 la dibuja a escala como a todos los demás dispositivos de esta página.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/extended_tube_geometry_es.svg" alt="Sección a escala de la cámara de tubo extendido: una cámara de 400 mm y 225,7 mm de diámetro equivalente entre tubos de entrada y salida de 112,8 mm de diámetro equivalente, con el tubo de entrada metido 100 mm en la cámara y el de salida 200 mm, ambos acotados" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/extended_tube_geometry.svg" alt="Sección a escala de la cámara de tubo extendido: una cámara de 400 mm y 225,7 mm de diámetro equivalente entre tubos de entrada y salida de 112,8 mm de diámetro equivalente, con el tubo de entrada metido 100 mm en la cámara y el de salida 200 mm, ambos acotados" width="88%" />
 
 *La misma cámara de 0,4 m de arriba, con el tubo de entrada metido 100 mm y el
 de salida 200 mm. Por fuera no se añade nada: las dos ramas de cuarto de onda
@@ -448,7 +448,7 @@ plt.show()
 
 </details>
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_side_branch_es.svg" alt="Pérdida de transmisión de un resonador de Helmholtz y de un tubo de cuarto de onda cerrado sobre el mismo conducto de 10 cm2: cada rama lateral produce un pico agudo en su propia frecuencia de sintonía, cerca de 120 Hz para el volumen de Helmholtz y cerca de 285 Hz para el tubo de 0,3 m, y es transparente en el resto" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_side_branch.svg" alt="Pérdida de transmisión de un resonador de Helmholtz y de un tubo de cuarto de onda cerrado sobre el mismo conducto de 10 cm2: cada rama lateral produce un pico agudo en su propia frecuencia de sintonía, cerca de 120 Hz para el volumen de Helmholtz y cerca de 285 Hz para el tubo de 0,3 m, y es transparente en el resto" width="88%" />
 
 *Cada rama lateral cortocircuita el conducto en su propia frecuencia de
 sintonía y es casi transparente en el resto: el pico estrecho es la razón de
@@ -536,7 +536,7 @@ Las dos ramas son piezas pequeñas, y `.plot_geometry()` enseña hasta qué punt
 resonador del pico de 120 Hz es una cavidad de 1 L alimentada por un cuello
 de 1 cm² de solo 2 cm de longitud.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_branch_geometry_es.svg" alt="Sección a escala del resonador de Helmholtz en rama lateral: un conducto de 112,8 mm de diámetro equivalente con un cuello estrecho de 11,3 mm y 20 mm de longitud que se abre a una cavidad de 1 litro dibujada como su cubo de igual volumen sobre el conducto, con el diámetro del cuello, la longitud del cuello y el diámetro del conducto acotados" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_branch_geometry.svg" alt="Sección a escala del resonador de Helmholtz en rama lateral: un conducto de 112,8 mm de diámetro equivalente con un cuello estrecho de 11,3 mm y 20 mm de longitud que se abre a una cavidad de 1 litro dibujada como su cubo de igual volumen sobre el conducto, con el diámetro del cuello, la longitud del cuello y el diámetro del conducto acotados" width="88%" />
 
 *Toda la muesca de 120 Hz cuelga de una caja de 1 L y un cuello de 2 cm: la
 cavidad se dibuja como su cubo de igual volumen, y la sintonía se mueve como
@@ -566,7 +566,7 @@ El tubo de cuarto de onda no necesita cavidad alguna: el pico de 285 Hz de
 la figura de arriba sale de un simple tubo cerrado de la longitud correcta
 plantado sobre el mismo conducto.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry_es.svg" alt="Sección a escala de la rama lateral de cuarto de onda: un tubo cerrado de 300 mm de longitud y 50,5 mm de diámetro equivalente plantado sobre un conducto de 112,8 mm de diámetro equivalente, con la longitud del tubo, el diámetro del tubo y el diámetro del conducto acotados" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry.svg" alt="Sección a escala de la rama lateral de cuarto de onda: un tubo cerrado de 300 mm de longitud y 50,5 mm de diámetro equivalente plantado sobre un conducto de 112,8 mm de diámetro equivalente, con la longitud del tubo, el diámetro del tubo y el diámetro del conducto acotados" width="88%" />
 
 *Un tubo de cuarto de onda es solo un tubo cerrado de la longitud correcta:
 0,3 m de tubo colocan el pico en $c/4l_\mathrm{e} \approx 285\ \text{Hz}$, y el área de
@@ -717,7 +717,7 @@ se dibujan. Una cadena sin ningún conducto de longitud positiva no tiene
 geometría ni escala a la que dibujarse, así que lanza un error en vez de
 dibujar una.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_chain_geometry_es.svg" alt="Sección a escala de una cadena de silenciador construida a mano: tramos de 100 mm y 200 mm de conducto de 200 mm que desembocan en una envolvente de 400 mm y 600 mm de longitud y vuelven a 300 mm de conducto de 200 mm, con la longitud de cada tramo, ambos diámetros y la longitud total de 1200 mm acotados, y dos ramales laterales marcados con líneas de referencia en las estaciones donde se conectan, uno rotulado como ramal de cuarto de onda con impedancia mínima en 125 Hz y el otro como resonador de Helmholtz en 242 Hz" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_chain_geometry.svg" alt="Sección a escala de una cadena de silenciador construida a mano: tramos de 100 mm y 200 mm de conducto de 200 mm que desembocan en una envolvente de 400 mm y 600 mm de longitud y vuelven a 300 mm de conducto de 200 mm, con la longitud de cada tramo, ambos diámetros y la longitud total de 1200 mm acotados, y dos ramales laterales marcados con líneas de referencia en las estaciones donde se conectan, uno rotulado como ramal de cuarto de onda con impedancia mínima en 125 Hz y el otro como resonador de Helmholtz en 242 Hz" width="88%" />
 
 *Toda medida de la página sale de lo que se le dio a la cadena: las cuatro
 longitudes de conducto y su suma son los números mismos, y los dos diámetros
@@ -807,7 +807,7 @@ Son tres afirmaciones que dependen de la frecuencia, así que aquí están sobre
 mismo eje, con todas las curvas calculadas con los modelos que se distribuyen y
 no dibujadas a mano.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_selection_es.svg" alt="Atenuación de 40 Hz a 8 kHz de cinco dispositivos. En azul, la familia reactiva: la cámara de expansión de 0,3 m, una joroba ancha que llega a 6,5 dB con un cero en 572 Hz, y una rama de Helmholtz sintonizada a 100 Hz, un pico de unos pocos hercios de ancho que llega a 18 dB y nada en el resto. En verde, 1,5 m de conducto revestido de 36 por 24 pulgadas con 25 mm y con 50 mm de revestimiento, que suben por las bandas medias hasta 12,6 y 13,6 dB y caen despacio por encima. En rojo, una unidad de bafles de cinco pasos, de 10,7 dB a 63 Hz a 40 dB a 500 Hz y de vuelta a 12,1 dB a 8 kHz. Una línea vertical de puntos en 891 Hz marca el primer corte del conducto, más allá del cual no se dibujan las curvas azules de cuatro polos" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_selection.svg" alt="Atenuación de 40 Hz a 8 kHz de cinco dispositivos. En azul, la familia reactiva: la cámara de expansión de 0,3 m, una joroba ancha que llega a 6,5 dB con un cero en 572 Hz, y una rama de Helmholtz sintonizada a 100 Hz, un pico de unos pocos hercios de ancho que llega a 18 dB y nada en el resto. En verde, 1,5 m de conducto revestido de 36 por 24 pulgadas con 25 mm y con 50 mm de revestimiento, que suben por las bandas medias hasta 12,6 y 13,6 dB y caen despacio por encima. En rojo, una unidad de bafles de cinco pasos, de 10,7 dB a 63 Hz a 40 dB a 500 Hz y de vuelta a 12,1 dB a 8 kHz. Una línea vertical de puntos en 891 Hz marca el primer corte del conducto, más allá del cual no se dibujan las curvas azules de cuatro polos" width="88%" />
 
 *La regla de selección, dibujada. El resonador solo gana donde está el tono, y
 es transparente dos semitonos más allá. La cámara vale unos pocos decibelios en
@@ -868,7 +868,7 @@ ISO 7235:2003 (publicada en Europa como EN ISO 7235:2009) es el método que hay
 detrás. Leer la ficha de esta página sin saberlo es la forma de acabar poniendo
 en la misma frase unos 8,9 dB calculados y los «25 dB» de un catálogo.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_silencer_iso7235_es.svg" alt="Dos montajes apilados sobre un mismo eje de conducto. En el de arriba, la serie uno: una caja de altavoces estanca y revestida alimenta un filtro modal, después una transición, después el objeto de ensayo, y después un conducto de ensayo con terminación anecoica de cuñas que lleva tres posiciones de micrófono sobre una recta inclinada respecto al eje del conducto. El montaje de abajo, la serie dos, es idéntico salvo que el objeto de ensayo se sustituye por un conducto de sustitución vacío. Se marcan con trazo discontinuo los planos de cualificación en el objeto de ensayo y en el conducto receptor. Debajo, la pérdida por inserción se da como la diferencia de los dos niveles del lado receptor, tercio de octava a tercio de octava, con la atenuación del filtro modal, el límite del coeficiente de reflexión, la tolerancia del conducto de sustitución y la regla de relación señal-ruido de fondo enumerados con los números de apartado de la propia norma" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_silencer_iso7235.svg" alt="Dos montajes apilados sobre un mismo eje de conducto. En el de arriba, la serie uno: una caja de altavoces estanca y revestida alimenta un filtro modal, después una transición, después el objeto de ensayo, y después un conducto de ensayo con terminación anecoica de cuñas que lleva tres posiciones de micrófono sobre una recta inclinada respecto al eje del conducto. El montaje de abajo, la serie dos, es idéntico salvo que el objeto de ensayo se sustituye por un conducto de sustitución vacío. Se marcan con trazo discontinuo los planos de cualificación en el objeto de ensayo y en el conducto receptor. Debajo, la pérdida por inserción se da como la diferencia de los dos niveles del lado receptor, tercio de octava a tercio de octava, con la atenuación del filtro modal, el límite del coeficiente de reflexión, la tolerancia del conducto de sustitución y la regla de relación señal-ruido de fondo enumerados con los números de apartado de la propia norma" width="92%" />
 
 El banco tiene cuatro partes y cada una lleva su requisito. La **fuente** es un
 generador de ruido aleatorio y un amplificador que atacan unos altavoces

@@ -33,16 +33,13 @@ import type { HomeContent } from '../../data/home';
 
 interface Props {
 	content: HomeContent;
-	lang: 'en' | 'es';
 }
 
-const { content, lang } = Astro.props;
+const { content } = Astro.props;
 const IMAGES = 'https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images';
-// The Spanish build points at the localized figure variant, exactly as the
-// guides do; ThemeImage derives the dark file from whichever it is given.
-const spectrum = lang === 'es'
-	? `${IMAGES}/signal_response_fraction_3_es.svg`
-	: `${IMAGES}/signal_response_fraction_3.svg`;
+// The plain figure: ThemeImage adds the language and the palette, from the
+// page's own language and the theme, exactly as it does on the guides.
+const spectrum = `${IMAGES}/signal_response_fraction_3.svg`;
 ---
 
 <div class="home">

@@ -132,7 +132,7 @@ externo, porque entonces el disparo puede llegar tarde.
   description="La energía de la cola de la respuesta al impulso al cuadrado se rellena desde el final mientras la integral inversa avanza hacia t = 0, y la curva de decaimiento de Schroeder emerge en un eje inferior, terminando con las rectas de regresión T20 y T30."
 />
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/schroeder_decay_es.webp" alt="Respuesta al impulso al cuadrado con su curva de decaimiento por integración inversa de Schroeder, y las ventanas de regresión EDT, T20 y T30 marcadas" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/schroeder_decay.webp" alt="Respuesta al impulso al cuadrado con su curva de decaimiento por integración inversa de Schroeder, y las ventanas de regresión EDT, T20 y T30 marcadas" width="80%" />
 
 *La RI al cuadrado dentada (gris) se integra hasta la curva suave de
 Schroeder (azul); las ventanas EDT, T20 y T30 se ajustan sobre esa curva y
@@ -229,7 +229,7 @@ bandas es el resumen de trabajo de toda la medición: los tiempos de caída
 como barras agrupadas por octava (bandas no válidas rayadas) sobre un
 segundo panel con C50 y C80.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_parameters_bands_es.svg" alt="Parámetros por banda ISO 3382 de una respuesta al impulso sintética de sala: barras agrupadas de EDT, T20 y T30 por banda de octava que caen de unos 1,4 s a 125 Hz a 0,7 s a 4 kHz, sobre un segundo panel donde C50 y C80 suben con la frecuencia" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_parameters_bands.svg" alt="Parámetros por banda ISO 3382 de una respuesta al impulso sintética de sala: barras agrupadas de EDT, T20 y T30 por banda de octava que caen de unos 1,4 s a 125 Hz a 0,7 s a 4 kHz, sobre un segundo panel donde C50 y C80 suben con la frecuencia" width="92%" />
 
 *Una sala cuyo tiempo de reverberación cae de 1,4 s a 125 Hz a 0,7 s a
 4 kHz, la firma típica de una sala amueblada cuya absorción crece con la
@@ -305,7 +305,7 @@ distintas, así que su desacuerdo lleva información:
 Los tres casos son tres formas, y merece la pena verlas una al lado de la otra
 antes de tener que diagnosticar alguna.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/decay_signatures_es.svg" alt="Tres paneles que comparten el eje de nivel, cada uno con la curva de decaimiento de Schroeder de una respuesta al impulso sintética y con su EDT, T20, T30 y curvatura impresos: un decaimiento recto de pendiente única con curvatura cercana a cero, un decaimiento combado de dos exponenciales con un codo visible y una curvatura muy por encima del diez por ciento, y un decaimiento precedido de un sonido directo fuerte y una reflexión temprana cuyo tiempo de decaimiento inicial cae muy por debajo del T30" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/decay_signatures.svg" alt="Tres paneles que comparten el eje de nivel, cada uno con la curva de decaimiento de Schroeder de una respuesta al impulso sintética y con su EDT, T20, T30 y curvatura impresos: un decaimiento recto de pendiente única con curvatura cercana a cero, un decaimiento combado de dos exponenciales con un codo visible y una curvatura muy por encima del diez por ciento, y un decaimiento precedido de un sonido directo fuerte y una reflexión temprana cuyo tiempo de decaimiento inicial cae muy por debajo del T30" width="92%" />
 
 *Tres decaimientos, un mismo eje, todos leídos por `room_parameters`. A la
 izquierda, una única exponencial con $T$ = 1,0 s: EDT, T20 y T30 devuelven todos
@@ -399,7 +399,7 @@ firma de una cola de ruido ausente.
 
 Todo el balance cabe en un dibujo, y el sesgo que controla también.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_decay_range_es.svg" alt="Nivel frente al tiempo de una respuesta al impulso filtrada en una banda: el pico en 0 dB, la respuesta al impulso al cuadrado cayendo como una recta, una meseta horizontal de ruido de fondo en menos 55 decibelios, una acotación vertical entre ambos etiquetada INR, el cruce de la recta ajustada con la estimación de ruido marcado como punto de truncado y la región posterior sombreada como cola compensada, y a la derecha una regla apilada con las ventanas de evaluación de EDT, T20 y T30, cada una con una prolongación rayada de margen de 15 decibelios y los umbrales de indicador de 46 y 54 decibelios marcados frente a la acotación de INR" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_decay_range.svg" alt="Nivel frente al tiempo de una respuesta al impulso filtrada en una banda: el pico en 0 dB, la respuesta al impulso al cuadrado cayendo como una recta, una meseta horizontal de ruido de fondo en menos 55 decibelios, una acotación vertical entre ambos etiquetada INR, el cruce de la recta ajustada con la estimación de ruido marcado como punto de truncado y la región posterior sombreada como cola compensada, y a la derecha una regla apilada con las ventanas de evaluación de EDT, T20 y T30, cada una con una prolongación rayada de margen de 15 decibelios y los umbrales de indicador de 46 y 54 decibelios marcados frente a la acotación de INR" width="92%" />
 
 *El balance de niveles de una banda. La INR es todo el espacio vertical del que
 dispones; la ventana de evaluación más el margen de 15 dB del apartado 5.3.3 de la
@@ -409,7 +409,7 @@ de fondo, y la cola posterior se sustituye por la continuación exponencial del
 ajuste: una compensación cuyo sesgo residual es positivo, y por eso phonometry
 añade otros 11 dB y 9 dB de holgura antes de dar una banda por válida.*
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/decay_range_bias_es.svg" alt="Error porcentual del T20 y del T30 ajustados frente al rango dinámico devuelto, de 25 a 80 decibelios, para un decaimiento sintético de un segundo: ambos errores son positivos y crecen al reducirse el rango dinámico, el T30 sale de la banda sombreada de más menos cinco por ciento por debajo de unos 54 decibelios y el T20 por debajo de unos 46 decibelios, con marcas verticales en los mínimos ISO de 35 y 45 decibelios y la región marcada como no válida rayada" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/decay_range_bias.svg" alt="Error porcentual del T20 y del T30 ajustados frente al rango dinámico devuelto, de 25 a 80 decibelios, para un decaimiento sintético de un segundo: ambos errores son positivos y crecen al reducirse el rango dinámico, el T30 sale de la banda sombreada de más menos cinco por ciento por debajo de unos 54 decibelios y el T20 por debajo de unos 46 decibelios, con marcas verticales en los mínimos ISO de 35 y 45 decibelios y la región marcada como no válida rayada" width="88%" />
 
 *Un decaimiento sintético de $T$ = 1,0 s con su suelo de ruido barrido, medido con
 `room_parameters`. El sesgo es siempre **positivo** — la cola plana de ruido solo

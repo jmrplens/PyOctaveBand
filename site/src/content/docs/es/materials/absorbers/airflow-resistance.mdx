@@ -86,7 +86,7 @@ es una de las razones habituales de que un espectro medido en tubo de
 impedancia se niegue a coincidir con un modelo ajustado a partir de un valor de
 catálogo.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_airflow_resistance_es.svg" alt="Bancos de medición de la resistencia al flujo de aire. A la izquierda, el método estático de ISO 9053-1: una probeta sellada por su borde dentro de una celda de medición, apoyada sobre una rejilla de soporte perforada, con al menos un diámetro de espacio libre por encima, un comparador de espesor en contacto con la probeta ya colocada, una fuente de flujo que alimenta un caudalímetro debajo y un manómetro diferencial a través de la probeta, ambos instrumentos anotados con su tolerancia del cinco por ciento. A la derecha, el método alterno de ISO 9053-2: un pistón oscilante que acciona una cavidad terminada bien por la celda de medición que lleva la probeta, bien por un tapón hermético, cada una con su propia carrera, y un micrófono que lee el nivel de la cavidad" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_airflow_resistance.svg" alt="Bancos de medición de la resistencia al flujo de aire. A la izquierda, el método estático de ISO 9053-1: una probeta sellada por su borde dentro de una celda de medición, apoyada sobre una rejilla de soporte perforada, con al menos un diámetro de espacio libre por encima, un comparador de espesor en contacto con la probeta ya colocada, una fuente de flujo que alimenta un caudalímetro debajo y un manómetro diferencial a través de la probeta, ambos instrumentos anotados con su tolerancia del cinco por ciento. A la derecha, el método alterno de ISO 9053-2: un pistón oscilante que acciona una cavidad terminada bien por la celda de medición que lleva la probeta, bien por un tapón hermético, cada una con su propia carrera, y un micrófono que lee el nivel de la cavidad" width="92%" />
 
 
 ## 2. Método estático (ISO 9053-1)
@@ -116,7 +116,7 @@ resistividad *distinta*, y mayor, así que una cifra de permeabilidad de hoja de
 datos nunca puede sustituir a una $\sigma$ medida en los modelos de la
 sección 4.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airflow_resistance_es.svg" alt="Resistencia al flujo de aire por el método estático de ISO 9053-1: la caída de presión medida frente a la velocidad lineal del flujo, ajustada con una cuadrática que pasa por el origen, con la resistencia específica al flujo de aire evaluada a la velocidad de referencia de 0,5 mm/s" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airflow_resistance.svg" alt="Resistencia al flujo de aire por el método estático de ISO 9053-1: la caída de presión medida frente a la velocidad lineal del flujo, ajustada con una cuadrática que pasa por el origen, con la resistencia específica al flujo de aire evaluada a la velocidad de referencia de 0,5 mm/s" width="80%" />
 
 *La caída de presión, ligeramente superlineal, se ajusta pasando por el origen;
 la resistencia específica al flujo de aire es el ajuste leído a 0,5 mm/s.*
@@ -391,7 +391,7 @@ Pasa el resultado de `effective_kappa` a `alternating_airflow_resistance` para
 una cifra conforme al Anexo A; en caso contrario, su argumento `kappa_prime`
 adopta por defecto el adiabático sin corregir 1,4.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/effective_kappa_es.svg" alt="Relación efectiva de calores específicos frente a la frecuencia del pistón en la banda normativa de 1 a 4 Hz para tres cavidades de relación superficie-volumen 30, 60 y 120 por metro, todas por debajo del valor adiabático discontinuo 1,4008, con el punto del Anexo A.3 de ISO 9053-2 marcado a 2 hercios y un eje a la derecha que lee el error porcentual en R que causaría usar el valor adiabático" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/effective_kappa.svg" alt="Relación efectiva de calores específicos frente a la frecuencia del pistón en la banda normativa de 1 a 4 Hz para tres cavidades de relación superficie-volumen 30, 60 y 120 por metro, todas por debajo del valor adiabático discontinuo 1,4008, con el punto del Anexo A.3 de ISO 9053-2 marcado a 2 hercios y un eje a la derecha que lee el error porcentual en R que causaría usar el valor adiabático" width="80%" />
 
 *La corrección del Anexo A en toda la banda de pistón de 1 a 4 Hz. Cae al caer
 la frecuencia (una capa límite más gruesa alcanza a más aire) y sube con la
@@ -521,7 +521,7 @@ manta de 50 mm quiere por tanto una resistividad de entre unos 8 kPa·s/m² y
 33 kPa·s/m², que es exactamente donde se agrupan los productos absorbentes
 comerciales.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/flow_resistivity_window_es.svg" alt="Panel izquierdo: absorción a incidencia normal frente a la frecuencia para una capa porosa de 50 mm con respaldo rígido, con resistividades al flujo de 2, 8, 20, 33 y 100 kPa s por metro cuadrado, que muestra una capa transparente en el valor más bajo y una reflectante en el más alto. Panel derecho: la absorción a 500 Hz y a 1 kHz y el valor en campo difuso frente al cociente adimensional sigma d entre rho0 c0 en eje logarítmico, con la región entre 1 y 4 sombreada" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/flow_resistivity_window.svg" alt="Panel izquierdo: absorción a incidencia normal frente a la frecuencia para una capa porosa de 50 mm con respaldo rígido, con resistividades al flujo de 2, 8, 20, 33 y 100 kPa s por metro cuadrado, que muestra una capa transparente en el valor más bajo y una reflectante en el más alto. Panel derecho: la absorción a 500 Hz y a 1 kHz y el valor en campo difuso frente al cociente adimensional sigma d entre rho0 c0 en eje logarítmico, con la región entre 1 y 4 sombreada" width="88%" />
 
 *La ventana, dibujada. Izquierda: la misma capa de 50 mm con respaldo rígido a
 cinco resistividades. La capa de 2 kPa·s/m² es demasiado transparente en todas

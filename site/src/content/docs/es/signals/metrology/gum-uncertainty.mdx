@@ -49,7 +49,7 @@ distribuciones de probabilidad completas. Coinciden para modelos lineales y
 divergen, de forma reveladora, cuando el modelo es no lineal o las entradas se
 alejan de la gaussiana.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_uncertainty_es.svg" alt="Desde un modelo de medida compartido y sus estimaciones de entrada e incertidumbres típicas, dos vías paralelas: la ley de propagación de la GUM (coeficientes de sensibilidad, combinación en cuadratura, grados de libertad efectivos de Welch-Satterthwaite, incertidumbre expandida U igual a k por uc) y el método de Monte Carlo (muestrear cada entrada de su PDF, propagar M ensayos, tomar el intervalo de cobertura simétrico en probabilidad al 95 por ciento)" width="88%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_uncertainty.svg" alt="Desde un modelo de medida compartido y sus estimaciones de entrada e incertidumbres típicas, dos vías paralelas: la ley de propagación de la GUM (coeficientes de sensibilidad, combinación en cuadratura, grados de libertad efectivos de Welch-Satterthwaite, incertidumbre expandida U igual a k por uc) y el método de Monte Carlo (muestrear cada entrada de su PDF, propagar M ensayos, tomar el intervalo de cobertura simétrico en probabilidad al 95 por ciento)" width="88%" loading="eager" />
 
 ## 1. La ley de propagación de la incertidumbre (GUM, apartado 5)
 
@@ -177,7 +177,7 @@ meteorológicos y de muestreo. Cualquier cosa muy por debajo de medio decibelio
 debería llevar a buscar el término que se dejó fuera antes que a darse por
 satisfecho.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_uncertainty_sources_es.svg" alt="Una medición exterior de nivel ponderado A dibujada a escala: una fuente, un sonómetro sobre trípode con el micrófono a 1,5 m del suelo y a 4 m de una fachada, tres posiciones alternativas de micrófono con una llave de dispersión, el calibrador junto al sonómetro y una estación meteorológica; unas líneas de guía conectan cada elemento con las filas de una tabla de balance que nombran su tipo de evaluación, su distribución y sus grados de libertad, con el término del calibrador marcado como el que comparten los dos canales" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_uncertainty_sources.svg" alt="Una medición exterior de nivel ponderado A dibujada a escala: una fuente, un sonómetro sobre trípode con el micrófono a 1,5 m del suelo y a 4 m de una fachada, tres posiciones alternativas de micrófono con una llave de dispersión, el calibrador junto al sonómetro y una estación meteorológica; unas líneas de guía conectan cada elemento con las filas de una tabla de balance que nombran su tipo de evaluación, su distribución y sus grados de libertad, con el término del calibrador marcado como el que comparten los dos canales" width="92%" />
 
 Cada fila de un balance es una pieza de equipo o una decisión sobre la geometría,
 y los balances se equivocan por omisión mucho más a menudo que por aritmética: el
@@ -228,7 +228,7 @@ combinarlas en cuadratura como si no estuvieran correlacionadas suele subestimar
 $u_\mathrm{c}$. Con sensibilidades de signo opuesto el sesgo apunta al revés, y una
 pareja totalmente correlacionada puede cancelarse por completo.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_correlation_es.svg" alt="Izquierda: la incertidumbre típica combinada de dos términos de 0,3 dB frente a su coeficiente de correlación, subiendo desde cero en menos uno, pasando por el valor en cuadratura 0,424 en cero, hasta 0,600 en más uno para sensibilidades del mismo signo, y la curva reflejada para signos opuestos. Derecha: el mismo balance como dos barras, 0,424 dB suponiendo independencia frente a 0,600 dB con trazabilidad al mismo calibrador, anotado como un 41 por ciento subestimado" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_correlation.svg" alt="Izquierda: la incertidumbre típica combinada de dos términos de 0,3 dB frente a su coeficiente de correlación, subiendo desde cero en menos uno, pasando por el valor en cuadratura 0,424 en cero, hasta 0,600 en más uno para sensibilidades del mismo signo, y la curva reflejada para signos opuestos. Derecha: el mismo balance como dos barras, 0,424 dB suponiendo independencia frente a 0,600 dB con trazabilidad al mismo calibrador, anotado como un 41 por ciento subestimado" width="92%" />
 
 *Dos términos de 0,3 dB cada uno, combinados con `combine_uncertainty` y una
 matriz de correlación. Tratar como independiente una pareja totalmente
@@ -331,7 +331,7 @@ Merece la pena ver esos tres regímenes en lugar de que se los cuenten a uno,
 porque quien nunca ha visto fallar un intervalo de la GUM no reconoce ese fallo
 en un balance propio:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_gum_vs_mc_es.svg" alt="Tres paneles apilados, cada uno con un histograma de Monte Carlo, la gaussiana de la GUM superpuesta, el intervalo de cobertura de Monte Carlo sombreado y el intervalo Y más o menos U de la GUM como líneas discontinuas. Arriba: una entrada rectangular dominante da una salida casi rectangular que el intervalo gaussiano sobrecubre. En medio: la suma energética de dos niveles da una distribución asimétrica cuya media queda desplazada respecto al valor de la GUM. Abajo: un coeficiente de absorción saturado en uno da un intervalo asimétrico que ninguna declaración simétrica puede representar" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_gum_vs_mc.svg" alt="Tres paneles apilados, cada uno con un histograma de Monte Carlo, la gaussiana de la GUM superpuesta, el intervalo de cobertura de Monte Carlo sombreado y el intervalo Y más o menos U de la GUM como líneas discontinuas. Arriba: una entrada rectangular dominante da una salida casi rectangular que el intervalo gaussiano sobrecubre. En medio: la suma energética de dos niveles da una distribución asimétrica cuya media queda desplazada respecto al valor de la GUM. Abajo: un coeficiente de absorción saturado en uno da un intervalo asimétrico que ninguna declaración simétrica puede representar" width="88%" />
 
 *Los tres regímenes, cada uno calculado con `combine_uncertainty` y
 `monte_carlo` sobre las mismas entradas. **Arriba**, un término rectangular
@@ -348,7 +348,7 @@ asimétrico y ninguna declaración $Y \pm U$ puede expresarlo. En los tres, el
 apartado 8 del Suplemento 1 dice que la referencia es el resultado de Monte
 Carlo.*
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget_es.svg" alt="Dos paneles para el ejemplo del nivel ponderado A. Izquierda: el balance de incertidumbre de la GUM, un diagrama de barras horizontales de la contribución de cada entrada a la incertidumbre combinada con una línea discontinua en uc de 0,407 dB. Derecha: el histograma de salida de Monte Carlo superpuesto con la gaussiana de la GUM y el intervalo de cobertura del 95 por ciento sombreado; el título indica Y igual a 74,00 dB, U igual a 0,86 dB, k igual a 2,11" width="96%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget.svg" alt="Dos paneles para el ejemplo del nivel ponderado A. Izquierda: el balance de incertidumbre de la GUM, un diagrama de barras horizontales de la contribución de cada entrada a la incertidumbre combinada con una línea discontinua en uc de 0,407 dB. Derecha: el histograma de salida de Monte Carlo superpuesto con la gaussiana de la GUM y el intervalo de cobertura del 95 por ciento sombreado; el título indica Y igual a 74,00 dB, U igual a 0,86 dB, k igual a 2,11" width="96%" />
 
 *A la izquierda está adónde se va el dinero: las diez posiciones se llevan por sí
 solas el 73,9 % de la varianza, el instrumento el 18,1 % y el calibrador el

@@ -108,7 +108,7 @@ distintos, de modo que la base de coeficientes lleva cinco filas: 1, 2, 3, 4a y
 coeficientes en el Apéndice F y aquí no se modeliza.
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_emission_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_emission.svg"
   alt="Potencia por metro de línea fuente en bandas de octava de una vía urbana: barras grises para el total y líneas con marcadores para las aportaciones de ligeros, pesados medios, pesados y motocicletas, con los pesados por encima de los ligeros de 125 Hz a 500 Hz y los ligeros recuperando la delantera a 1 kHz"
   width="88%"
   loading="eager"
@@ -161,7 +161,7 @@ que puede hacer cualquier lector sobre las dos: `a_weighted_line_power` tiene qu
 coincidir con la suma energética ponderada A de los valores por banda impresos,
 usando la `CNOSSOS_A_WEIGHTING` por bandas de octava de la sección 6.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_cnossos_road_es.svg" alt="Planta y sección de una arteria urbana de dos carriles modelizada con CNOSSOS-EU. En planta, una línea fuente recorre el centro de cada carril, una de las líneas está dividida en tramos de 20 m con el tramo central rotulado con su potencia de línea más diez log de la longitud del tramo y su fuente puntual equivalente marcada en el centro, un cruce regulado por semáforo queda con la distancia x de 60 m acotada hacia atrás a lo largo de la vía y un pequeño gráfico en línea del decaimiento max(1 menos x partido por 100, 0) al lado, y una fachada de vivienda se sitúa a 25 m del carril más próximo con el receptor marcado sobre ella. En sección, la fuente puntual queda a 0,05 m sobre el pavimento, el receptor a 4 m del suelo en la fachada, y la pendiente s de la vía está dibujada con las mitades ascendente y descendente de un flujo bidireccional rotuladas por separado" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_cnossos_road.svg" alt="Planta y sección de una arteria urbana de dos carriles modelizada con CNOSSOS-EU. En planta, una línea fuente recorre el centro de cada carril, una de las líneas está dividida en tramos de 20 m con el tramo central rotulado con su potencia de línea más diez log de la longitud del tramo y su fuente puntual equivalente marcada en el centro, un cruce regulado por semáforo queda con la distancia x de 60 m acotada hacia atrás a lo largo de la vía y un pequeño gráfico en línea del decaimiento max(1 menos x partido por 100, 0) al lado, y una fachada de vivienda se sitúa a 25 m del carril más próximo con el receptor marcado sobre ella. En sección, la fuente puntual queda a 0,05 m sobre el pavimento, el receptor a 4 m del suelo en la fachada, y la pendiente s de la vía está dibujada con las mitades ascendente y descendente de un flujo bidireccional rotuladas por separado" width="92%" />
 
 ### De dónde sale cada dato de entrada
 
@@ -232,7 +232,7 @@ por igual a todas las bandas de octava. Los coeficientes de rodadura $C_\mathrm{
 $C_\mathrm{P}$ positivos (va acelerando), y la norma declara explícitamente que los dos
 son nulos a partir de $|x| \ge 100$ m.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_corrections_es.svg" alt="Tres paneles que dan el cambio ponderado A de la potencia de línea fuente que produce cada corrección de la sección 3, todos calculados sobre un flujo de 1000 vehículos por hora. Izquierda: la temperatura del aire barrida de menos 10 a más 40 grados Celsius, una recta que vale unos 2,1 dB a menos 10 para los vehículos ligeros y unos 0,5 dB para los pesados, cruzando el cero en la referencia de 20 grados. Centro: la corrección por neumáticos con clavos frente a la velocidad para dos cuotas de flota, plana por debajo de 50 km/h, con máximo cerca de 50 km/h y plana otra vez por encima de 90 km/h. Derecha: la corrección por cruce frente a la distancia al cruce de 0 a 120 m, negativa tanto para un cruce con semáforo como para una glorieta, más profunda para la glorieta en el propio cruce, e idénticamente nula a partir de 100 m" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_corrections.svg" alt="Tres paneles que dan el cambio ponderado A de la potencia de línea fuente que produce cada corrección de la sección 3, todos calculados sobre un flujo de 1000 vehículos por hora. Izquierda: la temperatura del aire barrida de menos 10 a más 40 grados Celsius, una recta que vale unos 2,1 dB a menos 10 para los vehículos ligeros y unos 0,5 dB para los pesados, cruzando el cero en la referencia de 20 grados. Centro: la corrección por neumáticos con clavos frente a la velocidad para dos cuotas de flota, plana por debajo de 50 km/h, con máximo cerca de 50 km/h y plana otra vez por encima de 90 km/h. Derecha: la corrección por cruce frente a la distancia al cruce de 0 a 120 m, negativa tanto para un cruce con semáforo como para una glorieta, más profunda para la glorieta en el propio cruce, e idénticamente nula a partir de 100 m" width="92%" />
 
 *Las tres correcciones de esta sección, cada una dibujada como lo que de verdad
 le hace a la potencia de línea. El término de temperatura es el único exactamente
@@ -307,7 +307,7 @@ comportamiento: por debajo del cruce la fuente es un motor, por encima es un
 neumático.
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_speed_law_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_speed_law.svg"
   alt="Potencia acústica ponderada A de un solo vehículo frente a la velocidad de 20 a 130 km/h para ligeros y pesados, con las componentes de rodadura y propulsión en trazo discontinuo y punteado y la velocidad de cruce marcada en cada par"
   width="88%"
 />
@@ -361,7 +361,7 @@ La categoría 4 no lleva corrección por pendiente. La pendiente se satura en el
 de la carga, así que las dos ramas son positivas. Para un flujo bidireccional,
 divide el flujo en dos y corrige una mitad en subida y la otra en bajada.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_gradient_es.svg" alt="La corrección ponderada A por pendiente de la vía al ruido de propulsión frente a la pendiente con signo de menos 14 a más 14 por ciento, a 50 y 80 km/h, para las categorías de vehículo 1, 2 y 3. Cada curva es plana dentro de su propia banda muerta, sube con pendiente pronunciada por el lado de bajada y menos pronunciada por el de subida, y deja de cambiar más allá de más o menos 12 por ciento, donde la pendiente satura; la rama de bajada de los vehículos ligeros es la única que no se mueve con la velocidad" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_gradient.svg" alt="La corrección ponderada A por pendiente de la vía al ruido de propulsión frente a la pendiente con signo de menos 14 a más 14 por ciento, a 50 y 80 km/h, para las categorías de vehículo 1, 2 y 3. Cada curva es plana dentro de su propia banda muerta, sube con pendiente pronunciada por el lado de bajada y menos pronunciada por el de subida, y deja de cambiar más allá de más o menos 12 por ciento, donde la pendiente satura; la rama de bajada de los vehículos ligeros es la única que no se mueve con la velocidad" width="88%" />
 
 *La asimetría es una forma, no una errata. Cada categoría tiene su propia banda
 plana (de −6 % a +2 % para los ligeros, de −4 % a 0 % para las dos clases de
@@ -447,7 +447,7 @@ row.alpha["1"]           # alpha por banda de octava para vehículos ligeros
 row.beta["1"]            # -0.1, el coeficiente de velocidad
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_surfaces_es.svg" alt="Coeficiente de pavimento alpha por banda de octava para vehículos ligeros frente a la frecuencia, para cinco filas de la Tabla F-4 que cubren todo el rango, más el pavimento de referencia todo ceros dibujado como una línea plana en 0 dB. Las dos filas de mezcla bituminosa porosa de doble capa quedan varios decibelios por debajo de la referencia en las bandas medias y altas, las capas finas algo por debajo, y el pavimento de elementos rígidos bastante por encima, con el rango de velocidad declarado de cada curva impreso en la leyenda" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_surfaces.svg" alt="Coeficiente de pavimento alpha por banda de octava para vehículos ligeros frente a la frecuencia, para cinco filas de la Tabla F-4 que cubren todo el rango, más el pavimento de referencia todo ceros dibujado como una línea plana en 0 dB. Las dos filas de mezcla bituminosa porosa de doble capa quedan varios decibelios por debajo de la referencia en las bandas medias y altas, las capas finas algo por debajo, y el pavimento de elementos rígidos bastante por encima, con el rango de velocidad declarado de cada curva impreso en la leyenda" width="88%" />
 
 *El pavimento de referencia es la línea cero, así que cada curva se lee
 directamente como «más ruidoso o más silencioso que la referencia de CNOSSOS»: la

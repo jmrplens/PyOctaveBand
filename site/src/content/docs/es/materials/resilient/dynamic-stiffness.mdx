@@ -36,7 +36,7 @@ modelo de impacto de EN 12354-2 tratado en
 ISO 16251-1 no aplica aquí: su alcance se limita a revestimientos blandos de
 reacción local y excluye expresamente los suelos flotantes.)
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness_es.svg" alt="Frecuencia natural del suelo flotante frente a la rigidez dinámica por unidad de superficie de la capa elástica para un suelo flotante ligero y uno pesado, con un punto de diseño" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness.svg" alt="Frecuencia natural del suelo flotante frente a la rigidez dinámica por unidad de superficie de la capa elástica para un suelo flotante ligero y uno pesado, con un punto de diseño" width="82%" loading="eager" />
 
 *Todo el problema de diseño en un gráfico: $f_0 = (1/2\pi)\sqrt{s'/m'}$, así
 que la frecuencia natural cae con la raíz cuadrada de la rigidez dinámica de la
@@ -88,7 +88,7 @@ $$
 s'_\mathrm{t} = 4\pi^2\,m'_\mathrm{t}\,f_\mathrm{r}^2 .
 $$
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig_es.svg" alt="Banco de resonancia de EN 29052-1 en tres paneles: las tres disposiciones de excitación de las figuras 1 a 3, una sobre cimentación rígida con la placa de carga excitada y medida, y dos sobre una placa base aislada de al menos 100 kg donde se miden las dos placas y el excitador ataca o la placa de carga o la placa base; debajo, los requisitos de probeta y de carga con el lecho de yeso, la placa de carga de acero y el cordón de vaselina, y el modelo masa-resorte cuyo pico de respuesta da la frecuencia de resonancia" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig.svg" alt="Banco de resonancia de EN 29052-1 en tres paneles: las tres disposiciones de excitación de las figuras 1 a 3, una sobre cimentación rígida con la placa de carga excitada y medida, y dos sobre una placa base aislada de al menos 100 kg donde se miden las dos placas y el excitador ataca o la placa de carga o la placa base; debajo, los requisitos de probeta y de carga con el lecho de yeso, la placa de carga de acero y el cordón de vaselina, y el modelo masa-resorte cuyo pico de respuesta da la frecuencia de resonancia" width="92%" />
 
 En la disposición de ensayo la probeta queda entre una placa base y una placa
 de carga cuya masa total por unidad de superficie, placa más carga añadida, es de
@@ -211,7 +211,7 @@ Ese oscilador es lo bastante pequeño para dibujarlo a escala real.
 `plot_dynamic_stiffness_rig` coloca la probeta estándar de 200 mm bajo la
 placa de carga de 8 kg con el excitador y el acelerómetro en su sitio.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness_rig_geometry_es.svg" alt="Sección a escala del banco de rigidez dinámica: la probeta resiliente punteada de 200 mm y 20 mm de espesor sobre la base rígida rayada, la placa de carga gris de 8 kg encima con el acelerómetro en su borde, y el bloque del excitador arriba atacando la placa con una flecha vertical roja, con el lado y el espesor de la probeta acotados" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness_rig_geometry.svg" alt="Sección a escala del banco de rigidez dinámica: la probeta resiliente punteada de 200 mm y 20 mm de espesor sobre la base rígida rayada, la placa de carga gris de 8 kg encima con el acelerómetro en su borde, y el bloque del excitador arriba atacando la placa con una flecha vertical roja, con el lado y el espesor de la probeta acotados" width="92%" />
 
 *El sistema masa-muelle detrás de $s'$ a escala real: 20 mm de capa
 elástica bajo la placa de 8 kg bastan para reproducir la precarga de 2 kPa
@@ -251,7 +251,7 @@ Ese término no es una corrección de redondeo. A 20 mm ya es mayor que la
 rigidez de esqueleto que midió el banco, y por debajo de unos 22 mm el resorte
 es el aire de los poros y no el material.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_gas_stiffness_es.svg" alt="Gráfico log-log de la rigidez dinámica por unidad de área frente al espesor bajo carga de 5 a 60 milímetros: la rigidez del esqueleto es una línea horizontal en 4,94 meganewtons por metro cúbico, el término del gas encerrado cae como 111 partido por el espesor y la cruza cerca de 22 milímetros, y su suma es la rigidez instalada, con la determinación resuelta marcada en 20 milímetros y un eje a la derecha que da la frecuencia natural de un recrecido de 120 kilogramos por metro cuadrado" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_gas_stiffness.svg" alt="Gráfico log-log de la rigidez dinámica por unidad de área frente al espesor bajo carga de 5 a 60 milímetros: la rigidez del esqueleto es una línea horizontal en 4,94 meganewtons por metro cúbico, el término del gas encerrado cae como 111 partido por el espesor y la cruza cerca de 22 milímetros, y su suma es la rigidez instalada, con la determinación resuelta marcada en 20 milímetros y un eje a la derecha que da la frecuencia natural de un recrecido de 120 kilogramos por metro cuadrado" width="88%" />
 
 *La inversión que decide si una capa delgada puede llegar a ser blanda. La
 rigidez de esqueleto $s'_\mathrm{t}$ es una propiedad del material y le da igual el
@@ -440,7 +440,7 @@ mitad compra unos 9 dB en toda la banda, que es la razón de ser de todo el
 método. El objetivo práctico es mantener $f_0$ por debajo de la banda de interés
 más baja.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floating_floor_transmissibility_es.svg" alt="Dos paneles: a la izquierda, la respuesta de la placa de carga del banco frente a la frecuencia, con un pico en 25 hercios para una excitación pequeña y en 22 hercios, con un pico más bajo, cuando se sobreexcita; a la derecha, la mejora del aislamiento a impactos frente a la frecuencia para dos capas resilientes, creciendo como treinta veces el logaritmo de la frecuencia partida por la frecuencia natural desde 47 hercios y desde 32 hercios, con la curva de aislamiento masa-resorte ideal que muestra en rojo sombreado la amplificación por debajo de raíz de dos veces la frecuencia natural" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floating_floor_transmissibility.svg" alt="Dos paneles: a la izquierda, la respuesta de la placa de carga del banco frente a la frecuencia, con un pico en 25 hercios para una excitación pequeña y en 22 hercios, con un pico más bajo, cuando se sobreexcita; a la derecha, la mejora del aislamiento a impactos frente a la frecuencia para dos capas resilientes, creciendo como treinta veces el logaritmo de la frecuencia partida por la frecuencia natural desde 47 hercios y desde 32 hercios, con la curva de aislamiento masa-resorte ideal que muestra en rojo sombreado la amplificación por debajo de raíz de dos veces la frecuencia natural" width="92%" />
 
 *Izquierda: el pico que lee quien maneja el banco, y lo que le hace
 sobreexcitarlo: la resonancia se desplaza hacia abajo en frecuencia y se

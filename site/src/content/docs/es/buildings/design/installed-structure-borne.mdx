@@ -49,7 +49,7 @@ $L_{W\mathrm{s,inst}} = L_{W\mathrm{s,n}} + 10\log_{10}(Y_{\infty,i} / Y_{\infty
 con $Y_{\infty,\mathrm{rec}} = 5\cdot 10^{-6}\ \text{m/(N·s)}$;
 con la movilidad de la fuente en su lugar da $L_{W\mathrm{s,c}}$ (Anexo I.3, Tabla I.8).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/installed_structure_borne_es.svg" alt="La cascada de EN 12354-5 por banda de octava: potencia característica, potencia instalada tras el término de acoplamiento, niveles de presión acústica por trayectoria y su total energético" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/installed_structure_borne.svg" alt="La cascada de EN 12354-5 por banda de octava: potencia característica, potencia instalada tras el término de acoplamiento, niveles de presión acústica por trayectoria y su total energético" width="82%" loading="eager" />
 
 *Toda la cadena sobre un mismo eje, por banda de octava. El término de
 acoplamiento no es un peaje fijo: se lleva 6,6 dB de la potencia característica
@@ -166,7 +166,7 @@ print(round(float(building.coupling_term_force_source(2e-4 + 1e-4j, 3e-5 + 1e-5j
 print(round(float(building.coupling_term_velocity_source(2e-4 + 1e-4j, 1 / (3e-5 + 1e-5j))), 2))  # -8.27
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/coupling_term_regimes_es.svg" alt="Término de acoplamiento frente a la relación de movilidades fuente-receptor: la curva exacta de la Fórmula 19b con sus asíntotas de fuente de fuerza y de fuente de velocidad, el mínimo con las movilidades igualadas, el ejemplo de la bomba marcado, y dos curvas con apoyo elástico que muestran los decibelios que compra un soporte" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/coupling_term_regimes.svg" alt="Término de acoplamiento frente a la relación de movilidades fuente-receptor: la curva exacta de la Fórmula 19b con sus asíntotas de fuente de fuerza y de fuente de velocidad, el mínimo con las movilidades igualadas, el ejemplo de la bomba marcado, y dos curvas con apoyo elástico que muestran los decibelios que compra un soporte" width="92%" />
 
 *Toda la Fórmula 19b sobre un mismo eje. Muy a la derecha la fuente es una fuente
 de fuerza y $D_\mathrm{C}$ sigue a $10\lg(|Y_\mathrm{s}|/\mathrm{Re}\{Y_i\})$; muy a la izquierda
@@ -394,7 +394,7 @@ que la vibración llega a través de las uniones. Cada par elemento
 excitado/elemento radiante $i \to j$ es una trayectoria de transmisión con su propio
 término de ajuste y su índice de flancos:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_installed_paths_es.svg" alt="Trayectorias de instalación EN 12354-5: una bomba sobre apoyos resilientes inyecta potencia estructural en el forjado, el forjado excitado radia al recinto receptor de abajo, una segunda trayectoria recorre el forjado hasta la pared de flanco, y la cascada de predicción va de la potencia característica al nivel de presión acústica normalizado" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_installed_paths.svg" alt="Trayectorias de instalación EN 12354-5: una bomba sobre apoyos resilientes inyecta potencia estructural en el forjado, el forjado excitado radia al recinto receptor de abajo, una segunda trayectoria recorre el forjado hasta la pared de flanco, y la cascada de predicción va de la potencia característica al nivel de presión acústica normalizado" width="92%" />
 
 El diagrama dibuja el caso simple, con una unión entre el elemento excitado y el
 radiante. En las partes 1 y 2 los dos recintos comparten siempre el elemento

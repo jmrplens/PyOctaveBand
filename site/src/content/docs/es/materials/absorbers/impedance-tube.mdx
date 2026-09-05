@@ -57,7 +57,7 @@ muestra incluida, dentro del
 [simulación FDTD](/phonometry/es/simulation/fdtd-simulation/) y recupera la respuesta
 analítica con las mismas cadenas de reducción.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impedance_tube_es.svg" alt="Tubo de impedancia de dos micrófonos de ISO 10534-2: un altavoz radiando una onda plana por el tubo, dos micrófonos enrasados en la pared a la separación s y a la distancia x1 de la cara de la probeta, la probeta de ensayo contra un respaldo rígido, y las ondas incidente y reflejada" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impedance_tube.svg" alt="Tubo de impedancia de dos micrófonos de ISO 10534-2: un altavoz radiando una onda plana por el tubo, dos micrófonos enrasados en la pared a la separación s y a la distancia x1 de la cara de la probeta, la probeta de ensayo contra un respaldo rígido, y las ondas incidente y reflejada" width="92%" />
 
 ## 1. El rango de frecuencia de trabajo
 
@@ -97,7 +97,7 @@ f_l, f_u = materials.plane_wave_frequency_range(0.020, 343.2, diameter=0.029)
 print(round(f_l, 1), round(f_u, 1))     # 858.0 6864.0
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tube_working_ranges_es.svg" alt="Barras horizontales sobre un eje de frecuencia logarítmico compartido de 100 Hz a 8 kHz con la rejilla de tercios de octava marcada: un tubo de 100 mm con separaciones de micrófono de 100 mm y 50 mm, un tubo de 29 mm con separación de 20 mm, y el mismo tubo de 100 mm bajo los límites de ASTM E2611; cada barra lleva rotulado el límite que la restringe en cada extremo, y el solape entre el tubo grande y el pequeño va rayado" width="86%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tube_working_ranges.svg" alt="Barras horizontales sobre un eje de frecuencia logarítmico compartido de 100 Hz a 8 kHz con la rejilla de tercios de octava marcada: un tubo de 100 mm con separaciones de micrófono de 100 mm y 50 mm, un tubo de 29 mm con separación de 20 mm, y el mismo tubo de 100 mm bajo los límites de ASTM E2611; cada barra lleva rotulado el límite que la restringe en cada extremo, y el solape entre el tubo grande y el pequeño va rayado" width="86%" />
 
 *Qué tubo ve qué bandas. Cada barra es una geometría, y cada extremo lleva
 rotulada la restricción que lo limita: el extremo bajo es siempre el suelo de
@@ -133,7 +133,7 @@ plana ya calculada, y un resultado medido de `two_microphone_impedance` al
 que se le dio su geometría (`spacing`, `x1`, `diameter`) redibuja su propio
 montaje con `result.plot_geometry()`.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_geometry_es.svg" alt="Vista lateral a escala de un tubo de impedancia ISO 10534-2 de 100 mm: el altavoz en el extremo izquierdo, los micrófonos 1 y 2 enrasados en la pared con separación s = 50 mm y el micrófono 1 a x1 = 150 mm de la cara de la probeta, la probeta contra el respaldo rígido a la derecha, la sección transversal circular junto al tubo y el rango de trabajo de onda plana de 343 a 1991 Hz que fija esta geometría" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_geometry.svg" alt="Vista lateral a escala de un tubo de impedancia ISO 10534-2 de 100 mm: el altavoz en el extremo izquierdo, los micrófonos 1 y 2 enrasados en la pared con separación s = 50 mm y el micrófono 1 a x1 = 150 mm de la cara de la probeta, la probeta contra el respaldo rígido a la derecha, la sección transversal circular junto al tubo y el rango de trabajo de onda plana de 343 a 1991 Hz que fija esta geometría" width="92%" />
 
 *Todo lo que cuentan las desigualdades del rango de trabajo, en una vista
 lateral a escala: el diámetro de 100 mm fija el extremo superior de
@@ -217,7 +217,7 @@ cadena de reducción.
 
 ## 2. Método de la razón de onda estacionaria (ISO 10534-1)
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_standing_wave_tube_es.svg" alt="Aparato de onda estacionaria de ISO 10534-1 en vista lateral: un altavoz sellado al extremo izquierdo excitado con un tono puro cada vez a través de un analizador de banda estrecha, un micrófono de sonda sobre un carro graduado que recorre el eje del tubo, la probeta de ensayo contra el respaldo rígido a la derecha con su cara marcada como x = 0, la envolvente de onda estacionaria dibujada dentro del tubo con sus máximos decayendo al alejarse de la probeta, la diferencia de nivel entre el primer máximo y el primer mínimo, y el primer mínimo acotado desde la cara de la probeta" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_standing_wave_tube.svg" alt="Aparato de onda estacionaria de ISO 10534-1 en vista lateral: un altavoz sellado al extremo izquierdo excitado con un tono puro cada vez a través de un analizador de banda estrecha, un micrófono de sonda sobre un carro graduado que recorre el eje del tubo, la probeta de ensayo contra el respaldo rígido a la derecha con su cara marcada como x = 0, la envolvente de onda estacionaria dibujada dentro del tubo con sus máximos decayendo al alejarse de la probeta, la diferencia de nivel entre el primer máximo y el primer mínimo, y el primer mínimo acotado desde la cara de la probeta" width="92%" />
 
 Una sonda recorre la
 onda estacionaria y lee la diferencia de nivel
@@ -233,7 +233,7 @@ s = 10^{\Delta L/20}, \qquad |r| = \frac{s-1}{s+1}, \qquad
 \alpha = 1 - |r|^2.
 $$
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_es.svg" alt="Método de la razón de onda estacionaria de ISO 10534-1: el coeficiente de absorción y la magnitud del factor de reflexión en función de la diferencia de nivel de la onda estacionaria, mostrando que una diferencia de 9,54 dB corresponde a una razón de onda estacionaria de 3, una magnitud de reflexión de 0,5 y una absorción de 0,75" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube.svg" alt="Método de la razón de onda estacionaria de ISO 10534-1: el coeficiente de absorción y la magnitud del factor de reflexión en función de la diferencia de nivel de la onda estacionaria, mostrando que una diferencia de 9,54 dB corresponde a una razón de onda estacionaria de 3, una magnitud de reflexión de 0,5 y una absorción de 0,75" width="80%" />
 
 *Una diferencia de nivel pequeña significa un absorbente casi perfecto; una
 diferencia de nivel de 9,54 dB da $s = 3$, $|r| = 0{,}5$ y $\alpha = 0{,}75$.*
@@ -307,7 +307,7 @@ el mismo $r$ complejo, y por tanto la misma impedancia normalizada
 $Z/\rho c_0 = (1+r)/(1-r)$, que el método de la función de transferencia de
 la sección 3 calcula de una vez a partir de $H_{12}$.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/standing_wave_envelope_es.svg" alt="El nivel de la envolvente de onda estacionaria en decibelios a lo largo del primer metro de un tubo de 100 mm a 500 Hz para tres terminaciones: una pared rígida cuyos mínimos se hunden fuera del eje, con el primero en la cara de la probeta; la muestra resuelta de magnitud de reflexión 0,5, cuyo primer mínimo queda a 12 centímetros y a menos 6 decibelios; y una terminación casi anecoica que es casi plana. Una copia punteada del caso 0,5 lleva la atenuación de tubo de ISO 10534-2, y se anotan los niveles de sus tres primeros mínimos" width="84%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/standing_wave_envelope.svg" alt="El nivel de la envolvente de onda estacionaria en decibelios a lo largo del primer metro de un tubo de 100 mm a 500 Hz para tres terminaciones: una pared rígida cuyos mínimos se hunden fuera del eje, con el primero en la cara de la probeta; la muestra resuelta de magnitud de reflexión 0,5, cuyo primer mínimo queda a 12 centímetros y a menos 6 decibelios; y una terminación casi anecoica que es casi plana. Una copia punteada del caso 0,5 lleva la atenuación de tubo de ISO 10534-2, y se anotan los niveles de sus tres primeros mínimos" width="84%" />
 
 *Lo que recorre de verdad el carro, dibujado como el nivel que muestra el
 analizador a 500 Hz en un tubo de 100 mm. La pared rígida ($|r| = 1$) tiene sus
@@ -575,7 +575,7 @@ cualificar el tubo, no un número del que fiarse. Y la norma prefiere la vía
 medida: determinar la atenuación con el tubo vacío en frecuencias medias y altas
 (Ecs. (A.13)/(A.14), tras cada modificación del tubo) y extrapolar hacia abajo.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_result_es.svg" alt="Resultado del tubo de dos micrófonos ISO 10534-2 para un absorbente poroso de 50 mm: el coeficiente de absorción a incidencia normal sube desde unos 0,2 a 200 Hz hasta 0,97 por encima de 1 kHz, con el módulo del factor de reflexión cayendo como su imagen especular" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_result.svg" alt="Resultado del tubo de dos micrófonos ISO 10534-2 para un absorbente poroso de 50 mm: el coeficiente de absorción a incidencia normal sube desde unos 0,2 a 200 Hz hasta 0,97 por encima de 1 kHz, con el módulo del factor de reflexión cayendo como su imagen especular" width="80%" />
 
 *Un absorbente poroso de 50 mm medido en la banda de trabajo de un tubo de
 100 mm: la absorción sube a medida que el espesor de la capa crece frente a
@@ -751,14 +751,14 @@ usa dos cargas. Si crees que es simétrica, ejecuta los dos métodos y
 compara. Nada de esto afecta a la vía de absorción con respaldo rígido de la
 sección 3, que solo necesita la impedancia superficial.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_astm_tube_es.svg" alt="Tubo de pérdida por transmisión de cuatro micrófonos de ASTM E2611: una fuente sonora, dos micrófonos aguas arriba y dos aguas abajo de la probeta de ensayo a las separaciones s1 y s2 y los desplazamientos l1 y l2, una terminación ajustable para el método de dos cargas, las ondas viajeras A y B aguas arriba y C y D aguas abajo, y las relaciones de matriz de transferencia y pérdida por transmisión" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_astm_tube.svg" alt="Tubo de pérdida por transmisión de cuatro micrófonos de ASTM E2611: una fuente sonora, dos micrófonos aguas arriba y dos aguas abajo de la probeta de ensayo a las separaciones s1 y s2 y los desplazamientos l1 y l2, una terminación ajustable para el método de dos cargas, las ondas viajeras A y B aguas arriba y C y D aguas abajo, y las relaciones de matriz de transferencia y pérdida por transmisión" width="92%" />
 
 A escala tiene este aspecto. Una `TransferMatrix` recuperada por los
 métodos de dos cargas o de una carga retiene `l1`, `s1`, `l2`, `s2` y
 el espesor de la probeta, así que `tm.plot_geometry()` redibuja el tubo en
 el que se midió.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transmission_tube_geometry_es.svg" alt="Vista lateral a escala de un tubo de transmisión ASTM E2611 de 100 mm: el altavoz a la izquierda, los micrófonos 1 y 2 aguas arriba con separación s1 = 50 mm y a l1 = 100 mm de la probeta, la probeta de 50 mm en el centro del tubo, los micrófonos 3 y 4 aguas abajo con separación s2 = 50 mm y a l2 = 200 mm, la terminación intercambiable del método de dos cargas a la derecha, la sección transversal circular junto al tubo y el rango de trabajo de onda plana de 69 a 2011 Hz" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transmission_tube_geometry.svg" alt="Vista lateral a escala de un tubo de transmisión ASTM E2611 de 100 mm: el altavoz a la izquierda, los micrófonos 1 y 2 aguas arriba con separación s1 = 50 mm y a l1 = 100 mm de la probeta, la probeta de 50 mm en el centro del tubo, los micrófonos 3 y 4 aguas abajo con separación s2 = 50 mm y a l2 = 200 mm, la terminación intercambiable del método de dos cargas a la derecha, la sección transversal circular junto al tubo y el rango de trabajo de onda plana de 69 a 2011 Hz" width="92%" />
 
 *Dónde se sitúan de verdad los cuatro micrófonos del método de la matriz de
 transferencia alrededor de una probeta de 50 mm en un tubo de 100 mm:
@@ -829,7 +829,7 @@ print(np.round(float(tm.transmission_loss(407.0)[-1]), 1))   # 9.7 dB a 1,6 kHz
 tm.plot(f, 407.0)   # TL(f) con la absorción con respaldo rígido superpuesta
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transfer_matrix_tl_es.svg" alt="Magnitudes de la matriz de transferencia ASTM E2611 de una capa porosa de 50 mm: la pérdida de transmisión a incidencia normal sube desde unos 6,6 dB a 200 Hz hasta más de 9 dB a 1,6 kHz en el eje izquierdo, y el coeficiente de absorción con respaldo rígido sube de 0,19 a 0,97 en el eje derecho" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transfer_matrix_tl.svg" alt="Magnitudes de la matriz de transferencia ASTM E2611 de una capa porosa de 50 mm: la pérdida de transmisión a incidencia normal sube desde unos 6,6 dB a 200 Hz hasta más de 9 dB a 1,6 kHz en el eje izquierdo, y el coeficiente de absorción con respaldo rígido sube de 0,19 a 0,97 en el eje derecho" width="80%" />
 
 *Los mismos cuatro polos responden dos preguntas distintas: cuánto sonido
 deja pasar la capa exenta (la pérdida de transmisión, Ec. (26)) y cuánto

@@ -142,7 +142,7 @@ print(round(float(se.l_xy), 1), round(float(se.l_xy_nt), 1))   # 32.8 29.8
 res.plot()   # DnT vs curva de referencia ISO 717-1 desplazada (necesita matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_insulation_es.svg" alt="Aislamiento a ruido aéreo por el método de control: la diferencia de niveles bruta D y la estandarizada DnT en las cinco bandas de octava, con la corrección por índice de reverberación k sombreada entre ambas" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_insulation.svg" alt="Aislamiento a ruido aéreo por el método de control: la diferencia de niveles bruta D y la estandarizada DnT en las cinco bandas de octava, con la corrección por índice de reverberación k sombreada entre ambas" width="80%" />
 
 *El índice de reverberación $k = 10\log_{10}(T/T_0)$ desplaza la diferencia de
 niveles bruta $D$ hacia la estandarizada $D_\mathrm{nT}$: hacia arriba donde la sala
@@ -207,7 +207,7 @@ postura del cuerpo, un barrido y un cronómetro en lugar de cinco posiciones
 fijas de micrófono por recinto. El procedimiento es lo bastante corto para
 citarlo entero.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_survey_sweep_es.svg" alt="Planta de una habitación de vivienda con el altavoz en la esquina opuesta al elemento separador, a 0,5 m como mínimo de las dos paredes y orientado hacia la esquina, el operador cerca del centro y de espaldas, y el micrófono sostenido con el brazo extendido barriendo un arco de 180 grados cuatro veces en unos 30 segundos, con un alzado al lado que muestra el brazo subiendo y bajando en cada pasada" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_survey_sweep.svg" alt="Planta de una habitación de vivienda con el altavoz en la esquina opuesta al elemento separador, a 0,5 m como mínimo de las dos paredes y orientado hacia la esquina, el operador cerca del centro y de espaldas, y el micrófono sostenido con el brazo extendido barriendo un arco de 180 grados cuatro veces en unos 30 segundos, con un alzado al lado que muestra el brazo subiendo y bajando en cada pasada" width="92%" loading="eager" />
 
 **El instrumento (apartado 5).** Un sonómetro de clase 1 o de clase 2 según
 IEC 61672-1, con filtros según IEC 61260, ajustado con un calibrador antes de
@@ -363,7 +363,7 @@ facade = building.survey_facade_insulation(l1_2m, l2, k, volume=40.0)
 facade.report("D2mnTw_survey.pdf")                       # D2m,nT,w (C; Ctr)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_impact_insulation_es.svg" alt="Aislamiento a impactos por el método de control: el nivel de impactos medido Li en bandas de octava y el L'nT estandarizado con la corrección por índice de reverberación sombreada entre ambos, el índice L'nT,w anotado y una nota de que una sala viva reduce el nivel de impactos estandarizado" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_impact_insulation.svg" alt="Aislamiento a impactos por el método de control: el nivel de impactos medido Li en bandas de octava y el L'nT estandarizado con la corrección por índice de reverberación sombreada entre ambos, el índice L'nT,w anotado y una nota de que una sala viva reduce el nivel de impactos estandarizado" width="80%" />
 
 *El control de impactos aplica el índice de reverberación con el signo
 contrario, $L'_\mathrm{nT} = L_\mathrm{i} - k$: un recinto receptor vivo ($T > T_0$)

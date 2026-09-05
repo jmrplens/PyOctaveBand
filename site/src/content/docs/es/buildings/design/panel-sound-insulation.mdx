@@ -98,7 +98,7 @@ Hopkins para el $m'$ que usan las guías de ISO 12354; $m$ a secas está reserva
 en el resto del sitio para el coeficiente de atenuación de potencia del aire de
 las fórmulas de reverberación, en 1/m.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept_es.svg" alt="Cuatro paneles: la ley de masas de panel simple con su caída de aislamiento en la coincidencia, la pared doble con la resonancia masa-muelle-masa y la ganancia de cámara, la eficiencia de radiación de la placa creciendo hasta la unidad por encima de la frecuencia crítica, y una pared compuesta cuya rendija abierta del 1 % limita R al límite de área abierta" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept.svg" alt="Cuatro paneles: la ley de masas de panel simple con su caída de aislamiento en la coincidencia, la pared doble con la resonancia masa-muelle-masa y la ganancia de cámara, la eficiencia de radiación de la placa creciendo hasta la unidad por encima de la frecuencia crítica, y una pared compuesta cuya rendija abierta del 1 % limita R al límite de área abierta" width="92%" loading="eager" />
 
 *Los cuatro modelos de esta página como un mapa, cada panel una sección de más
 abajo. Arriba a la izquierda, la hoja simple: 6 dB por octava hasta que el
@@ -192,7 +192,7 @@ $R(f)$ predicho sube con la ley de masas hasta la coincidencia. Una
 placa de yeso laminado de 12,5 mm sitúa $f_\mathrm{c}$ cerca de 2,6 kHz y puntúa
 $R_\mathrm{w} = 27$ dB.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_panel_insulation_es.svg" alt="Sección de un ensayo de aislamiento: un panel de yeso laminado de 12,5 mm montado entre muros de relleno pesados, flechas verdes de incidencia difusa que llegan con varios ángulos desde el recinto emisor, flechas azules más finas transmitidas hacia el recinto receptor, una onda de flexión dibujada a lo largo de la placa y un recuadro con el índice de reducción acústica predicho subiendo 6 dB por octava hasta la coincidencia en fc = 2,6 kHz, con la masa de 8,8 kg por metro cuadrado y la valoración Rw = 27 dB anotadas" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_panel_insulation.svg" alt="Sección de un ensayo de aislamiento: un panel de yeso laminado de 12,5 mm montado entre muros de relleno pesados, flechas verdes de incidencia difusa que llegan con varios ángulos desde el recinto emisor, flechas azules más finas transmitidas hacia el recinto receptor, una onda de flexión dibujada a lo largo de la placa y un recuadro con el índice de reducción acústica predicho subiendo 6 dB por octava hasta la coincidencia en fc = 2,6 kHz, con la masa de 8,8 kg por metro cuadrado y la valoración Rw = 27 dB anotadas" width="92%" />
 
 ```python
 import numpy as np
@@ -235,7 +235,7 @@ Conviene saber qué hay en juego: la profundidad del valle lleva $10\lg\eta$, as
 que un factor de tres en $\eta$ mueve la región de coincidencia 4,8 dB y no
 cambia nada por debajo de $f_\mathrm{c}/2$.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/single_panel_rating_es.svg" alt="Índice de reducción acústica previsto de un vidrio flotado de 6 mm por banda de tercio de octava frente a la curva de referencia ISO 717-1 desplazada, con la caída del aislamiento en la coincidencia, hacia 2100 Hz, marcada, las desviaciones desfavorables sombreadas y el índice Rw anotado" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/single_panel_rating.svg" alt="Índice de reducción acústica previsto de un vidrio flotado de 6 mm por banda de tercio de octava frente a la curva de referencia ISO 717-1 desplazada, con la caída del aislamiento en la coincidencia, hacia 2100 Hz, marcada, las desviaciones desfavorables sombreadas y el índice Rw anotado" width="80%" />
 
 *El espectro de Sharp previsto se evalúa exactamente como una medición: la
 caída del aislamiento en $f_\mathrm{c} \approx 2{,}1$ kHz concentra la mayor parte
@@ -337,7 +337,7 @@ No necesita ni la rigidez a flexión ni el factor de pérdidas (la meseta
 tabulada absorbe ambos) y supone campo difuso a ambos lados de un panel cuya
 longitud y anchura sean al menos veinte veces su espesor.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plateau_transmission_loss_es.svg" alt="Pérdida por transmisión en decibelios frente a las bandas de tercio de octava de 100 hercios a 10 kilohercios para un panel de vidrio float de 6 mm, comparando dos curvas. Ambas suben juntas a 6 decibelios por octava desde unos 15,5 decibelios en 100 hercios hasta 25,5 decibelios en 315 hercios. Por encima, el modelo físico sigue subiendo hasta un máximo próximo a 35,5 decibelios en 1 kilohercio, cae hasta unos 28,5 decibelios en la frecuencia crítica de 2033 hercios marcada por una línea vertical punteada, y luego trepa hasta 49 decibelios en 10 kilohercios, mientras que la estimación por meseta se aplana en la altura de coincidencia tabulada de 27 decibelios a lo largo de una banda sombreada desde el punto A en 374 hercios hasta el punto B en 3742 hercios y después se recupera a 10 decibelios por octava hasta 41 decibelios." width="88%" loading="lazy" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plateau_transmission_loss.svg" alt="Pérdida por transmisión en decibelios frente a las bandas de tercio de octava de 100 hercios a 10 kilohercios para un panel de vidrio float de 6 mm, comparando dos curvas. Ambas suben juntas a 6 decibelios por octava desde unos 15,5 decibelios en 100 hercios hasta 25,5 decibelios en 315 hercios. Por encima, el modelo físico sigue subiendo hasta un máximo próximo a 35,5 decibelios en 1 kilohercio, cae hasta unos 28,5 decibelios en la frecuencia crítica de 2033 hercios marcada por una línea vertical punteada, y luego trepa hasta 49 decibelios en 10 kilohercios, mientras que la estimación por meseta se aplana en la altura de coincidencia tabulada de 27 decibelios a lo largo de una banda sombreada desde el punto A en 374 hercios hasta el punto B en 3742 hercios y después se recupera a 10 decibelios por octava hasta 41 decibelios." width="88%" loading="lazy" />
 
 *Las dos curvas son la misma recta por debajo del punto A. Por encima, la
 estimación por meseta sustituye toda la región de coincidencia por un único
@@ -509,7 +509,7 @@ Las cuatro frecuencias propias son las respuestas impresas por Vigran (4,9 Hz y
 grecada es lo que demuestra que el factor de masa pertenece ahí: con los
 7,8 kg/m² planos las mismas fórmulas devuelven 26,7 Hz y 106,7 Hz.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/orthotropic_transmission_loss_es.svg" alt="Pérdida por transmisión en decibelios frente a bandas de tercio de octava de 100 hercios a 16 kilohercios para una chapa de acero de 1 mm, plana y grecada. Ambas curvas suben juntas a 6 decibelios por octava desde unos 11 decibelios a 100 hercios hasta 28 decibelios a 800 hercios. Por encima de 1 kilohercio la chapa plana sigue subiendo hasta un máximo cercano a 45 decibelios a 6,3 kilohercios antes de su propia caída por coincidencia, mientras la chapa grecada se desploma a 22 decibelios a 1,6 kilohercios dentro de una banda sombreada que va de 1165 hercios a 13,1 kilohercios y luego recupera lentamente, quedando unos 13 decibelios por debajo de la plana a 2,5 kilohercios. Una línea discontinua muestra la aproximación en forma cerrada de Heckl siguiendo el mismo desplome de forma más suave" width="88%" loading="lazy" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/orthotropic_transmission_loss.svg" alt="Pérdida por transmisión en decibelios frente a bandas de tercio de octava de 100 hercios a 16 kilohercios para una chapa de acero de 1 mm, plana y grecada. Ambas curvas suben juntas a 6 decibelios por octava desde unos 11 decibelios a 100 hercios hasta 28 decibelios a 800 hercios. Por encima de 1 kilohercio la chapa plana sigue subiendo hasta un máximo cercano a 45 decibelios a 6,3 kilohercios antes de su propia caída por coincidencia, mientras la chapa grecada se desploma a 22 decibelios a 1,6 kilohercios dentro de una banda sombreada que va de 1165 hercios a 13,1 kilohercios y luego recupera lentamente, quedando unos 13 decibelios por debajo de la plana a 2,5 kilohercios. Una línea discontinua muestra la aproximación en forma cerrada de Heckl siguiendo el mismo desplome de forma más suave" width="88%" loading="lazy" />
 
 *El intercambio que hace el grecado, sobre la propia geometría de Vigran. Por
 debajo de $f_{\mathrm{c}1}$ los dos paneles quedan a unos 2 dB uno del otro (el grecado
@@ -622,7 +622,7 @@ El caso ligero clásico merece dibujarse a escala: dos placas de yeso de
 de `double_wall_transmission_loss` que retuvo su geometría redibuja su propia
 sección con `dw.plot_geometry()`.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/double_wall_geometry_es.svg" alt="Sección a escala de una doble hoja ligera: dos placas de yeso grises de 8,8 kg/m2 cada una, dibujadas con 12,6 mm de espesor, separadas por la cámara de 100 mm, con la flecha de sonido incidente llegando por la izquierda y la resonancia masa-muelle-masa f0 = 90 Hz anotada en la cámara" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/double_wall_geometry.svg" alt="Sección a escala de una doble hoja ligera: dos placas de yeso grises de 8,8 kg/m2 cada una, dibujadas con 12,6 mm de espesor, separadas por la cámara de 100 mm, con la flecha de sonido incidente llegando por la izquierda y la resonancia masa-muelle-masa f0 = 90 Hz anotada en la cámara" width="80%" />
 
 *Todo el modelo en una sección: las dos hojas delgadas son las masas, la
 cámara de aire de 100 mm es el muelle, y $f_0$ = 90 Hz es donde cae el valle
@@ -657,7 +657,7 @@ un muelle mecánico en paralelo con el muelle de aire, lo que sube la frecuencia
 de resonancia masa-muelle-masa, y abren un camino estructural de una hoja a la
 otra.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/masonry_wall_ties_es.svg" alt="Dos paneles: el factor de pérdidas por acoplamiento de un conjunto de llaves frente a la frecuencia para tres tipos de llave con el techo de unión rígida en línea discontinua, y el índice de reducción acústica previsto de un muro de fábrica con cámara con y sin llaves mostrando la banda sombreada entre las dos resonancias masa-muelle-masa" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/masonry_wall_ties.svg" alt="Dos paneles: el factor de pérdidas por acoplamiento de un conjunto de llaves frente a la frecuencia para tres tipos de llave con el techo de unión rígida en línea discontinua, y el índice de reducción acústica previsto de un muro de fábrica con cámara con y sin llaves mostrando la banda sombreada entre las dos resonancias masa-muelle-masa" width="92%" />
 
 *Izquierda: una llave blanda hace caer el acoplamiento estructural como
 $1/f^3$; una rígida se mantiene sobre el techo rígido dos octavas más.
@@ -787,7 +787,7 @@ La fuga que arruina una pared pesada es casi invisible, y `.plot_geometry()`
 lo deja claro dibujándola a escala: un hueco de 2 mm a través de 100 mm de
 fábrica.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aperture_slit_geometry_es.svg" alt="Sección a escala de una rendija de 2 mm a través de una pared de 100 mm: la pared rayada dibujada en sección con el estrecho hueco de aire horizontal a media altura, una flecha de sonido incidente apuntando al hueco desde la izquierda, el fondo de pared de 100 mm y el ancho de rendija de 2 mm acotados, y frentes de onda transmitidos circulares esbozados extendiéndose desde la salida de la rendija a la derecha" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aperture_slit_geometry.svg" alt="Sección a escala de una rendija de 2 mm a través de una pared de 100 mm: la pared rayada dibujada en sección con el estrecho hueco de aire horizontal a media altura, una flecha de sonido incidente apuntando al hueco desde la izquierda, el fondo de pared de 100 mm y el ancho de rendija de 2 mm acotados, y frentes de onda transmitidos circulares esbozados extendiéndose desde la salida de la rendija a la derecha" width="80%" />
 
 *La geometría minúscula detrás de una fuga grande: el hueco es 50 veces más
 profundo que ancho, y por eso se comporta como un tubo corto con resonancias
@@ -874,7 +874,7 @@ coincidencia de $\sigma$ son el mismo suceso visto por los dos lados — la mism
 $\sigma$ reaparece en el factor de transmisión del modelo detallado de
 EN 12354 y como el factor de radiación que mide ISO 7849.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiation_efficiency_panels_es.svg" alt="Izquierda: eficiencia de radiación frente a la frecuencia para un vidrio de 1,5 por 1,25 metros y otro de 0,5 por 0,4 metros del mismo vidrio, los dos con la frecuencia crítica y la línea de la unidad marcadas, que muestra que el vidrio pequeño radia tres veces mejor por debajo de la coincidencia. Derecha: la placa simplemente apoyada y con bafle que supone el modelo, dibujada a escala" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiation_efficiency_panels.svg" alt="Izquierda: eficiencia de radiación frente a la frecuencia para un vidrio de 1,5 por 1,25 metros y otro de 0,5 por 0,4 metros del mismo vidrio, los dos con la frecuencia crítica y la línea de la unidad marcadas, que muestra que el vidrio pequeño radia tres veces mejor por debajo de la coincidencia. Derecha: la placa simplemente apoyada y con bafle que supone el modelo, dibujada a escala" width="92%" />
 
 *Tres regímenes en un mismo eje. Por debajo de $f_\mathrm{c}$ los dos vidrios se
 diferencian en un factor de tres en $\sigma$ aunque son el mismo vidrio — el más

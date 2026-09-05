@@ -139,7 +139,7 @@ especificar sea la suma y no el índice a secas. Para leerlos:
   reglamentación lo diga) entre viviendas, los dos requisitos de ejemplo de
   ISO 717-1, 5.3.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_adaptation_terms_es.svg" alt="Izquierda: el índice de reducción acústica de un muro de hormigón denso de 150 mm y el de una doble hoja de 12 kg por metro cuadrado sobre montantes metálicos con cámara de 90 mm, ambos frente a la misma curva de referencia ISO 717-1 desplazada a Rw = 49 dB. Derecha: un diagrama de barras agrupadas de Rw, Rw + C y Rw + Ctr para las dos construcciones, idénticas en Rw y separadas 6 dB en Rw + Ctr" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_adaptation_terms.svg" alt="Izquierda: el índice de reducción acústica de un muro de hormigón denso de 150 mm y el de una doble hoja de 12 kg por metro cuadrado sobre montantes metálicos con cámara de 90 mm, ambos frente a la misma curva de referencia ISO 717-1 desplazada a Rw = 49 dB. Derecha: un diagrama de barras agrupadas de Rw, Rw + C y Rw + Ctr para las dos construcciones, idénticas en Rw y separadas 6 dB en Rw + Ctr" width="92%" />
 
 *Dos construcciones, un mismo índice. Los dos espectros salen de los propios
 modelos de panel de la biblioteca, el método de Sharp para la hoja de hormigón
@@ -223,7 +223,7 @@ del tope, y el siguiente es válido pero lee un decibelio menos sin motivo, que
 es lo que excluye el «lo mayor posible» del apartado 4.4 de
 ISO 717-1:2020 y del 4.3.1 de ISO 717-2:2020.*
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating_es.svg" alt="Índice de reducción acústica medido en tercios de octava con la curva de referencia de ISO 717-1 desplazada y el índice ponderado resultante a 500 Hz" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating.svg" alt="Índice de reducción acústica medido en tercios de octava con la curva de referencia de ISO 717-1 desplazada y el índice ponderado resultante a 500 Hz" width="80%" />
 
 *La referencia desplazada se ha detenido donde el área desfavorable sombreada
 suma 31,8 dB: un paso hacia atrás se pasaría del tope, con 44,1 dB, y un paso
@@ -319,7 +319,7 @@ pasos de 0,1 dB usado en las declaraciones de incertidumbre (reproduce los
 valores impresos $L_\mathrm{n,r,0,w} = 77{,}6$ dB y $C_\mathrm{I,r,0} = -10{,}3$ dB de
 A.2.2).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating_es.svg" alt="Nivel de presión acústica de impactos normalizado medido en tercios de octava con la curva de referencia de ISO 717-2 desplazada y el índice ponderado resultante leído a 500 Hz" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating.svg" alt="Nivel de presión acústica de impactos normalizado medido en tercios de octava con la curva de referencia de ISO 717-2 desplazada y el índice ponderado resultante leído a 500 Hz" width="80%" />
 
 *La misma regla de ajuste con el signo invertido: el área sombreada es donde la
 medición se eleva **por encima** de la referencia, y la curva se desplaza hacia
@@ -445,7 +445,7 @@ print(one_dp.rating)   # 30.0, el índice en pasos de 0,1 dB para incertidumbres
 ext.plot()   # curva del rango ampliado frente a la referencia desplazada, términos del Anexo B en el título (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/extended_insulation_rating_es.svg" alt="Índice de reducción acústica medido sobre el rango ampliado de 50 Hz a 5 kHz con la curva de referencia ISO 717-1 desplazada sobre las 16 bandas básicas, las desviaciones desfavorables sombreadas y las bandas del rango ampliado marcadas en ambos extremos" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/extended_insulation_rating.svg" alt="Índice de reducción acústica medido sobre el rango ampliado de 50 Hz a 5 kHz con la curva de referencia ISO 717-1 desplazada sobre las 16 bandas básicas, las desviaciones desfavorables sombreadas y las bandas del rango ampliado marcadas en ambos extremos" width="80%" />
 
 *El índice se sigue evaluando sobre las 16 bandas básicas (100–3150 Hz);
 las bandas ampliadas solo entran en los términos de adaptación del Anexo B,

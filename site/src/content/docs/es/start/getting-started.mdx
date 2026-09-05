@@ -76,7 +76,7 @@ Todo análisis con phonometry es un subconjunto de una misma cadena: tomar la
 señal en bruto, convertirla a unidades físicas, ponderarla en frecuencia, dividirla
 en bandas normalizadas, suavizarla en el tiempo y reducirla a métricas:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_signal_chain_es.svg" alt="Cadena de procesado de phonometry: señal, calibración, ponderación frecuencial, banco de filtros de octava, ponderación temporal y métricas, con la norma verificada en cada etapa" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_signal_chain.svg" alt="Cadena de procesado de phonometry: señal, calibración, ponderación frecuencial, banco de filtros de octava, ponderación temporal y métricas, con la norma verificada en cada etapa" width="92%" loading="eager" />
 
 Léela como una secuencia de decisiones y no como una receta fija. **La
 calibración va primero** porque todo lo que viene después es un cociente
@@ -169,7 +169,7 @@ la señal nunca tuvo escala física, pide `LevelCalibration(dbfs=True)` y lee
 niveles referidos a fondo de escala digital, que salen negativos y no se pueden
 confundir con un SPL.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3_es.svg" alt="Análisis espectral en tercios de octava de una señal de seis tonos con la PSD en bruto de fondo" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3.svg" alt="Análisis espectral en tercios de octava de una señal de seis tonos con la PSD en bruto de fondo" width="80%" />
 
 *Un ejemplo más rico que el fragmento de arriba: seis tonos (20, 100, 500, 2000,
 4000 y 15000 Hz) de amplitud 100, así que los niveles de banda llegan a unos
@@ -217,7 +217,7 @@ para lo que sirve el extra `[plot]`: pasa
 `response_plot=filters.ResponsePlot(show=True)` y los 33 filtros de banda
 aparecen en un mismo eje antes de que vuelvan los niveles.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco de filtros Butterworth de tercio de octava, 33 bandas de 12,5 Hz a 20 kHz con orden 6" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6.svg" alt="Respuesta en frecuencia del banco de filtros Butterworth de tercio de octava, 33 bandas de 12,5 Hz a 20 kHz con orden 6" width="80%" />
 
 *El banco por defecto: Butterworth, orden 6, tercio de octava. Cada curva cruza
 −3 dB en sus propios bordes de banda, que es de donde salen las faldas del
@@ -377,7 +377,7 @@ hacen deciden lo que valen los niveles:
   y después es la cota de deriva de todo lo capturado en medio, y un criterio
   habitual invalida la serie cuando supera 0,5 dB.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_setup_es.svg" alt="Cadena de calibración: calibrador acústico acoplado en el micrófono a 94,0 dB y 1 kHz, preamplificador, interfaz de audio y la sensibilidad que convierte unidades digitales en pascales" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_setup.svg" alt="Cadena de calibración: calibrador acústico acoplado en el micrófono a 94,0 dB y 1 kHz, preamplificador, interfaz de audio y la sensibilidad que convierte unidades digitales en pascales" width="92%" />
 
 *La primera de las dos grabaciones: el calibrador acoplado sobre la cápsula a
 94,0 dB / 1 kHz, por el mismo preamplificador e interfaz que la medición que

@@ -80,7 +80,7 @@ Tras un escalón, la envolvente alcanza el 63 % de su valor final en un $\tau$
 y ~99,97 % tras $8\tau$; por eso los análisis de nivel descartan los primeros
 instantes de una grabación.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_time_weighting_es.svg" alt="La cadena del detector exponencial: la presión de banda se eleva al cuadrado, se suaviza con un paso bajo RC de un polo con constante de tiempo tau y se convierte a decibelios, con las constantes de tiempo Fast, Slow e Impulse indicadas" width="88%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_time_weighting.svg" alt="La cadena del detector exponencial: la presión de banda se eleva al cuadrado, se suaviza con un paso bajo RC de un polo con constante de tiempo tau y se convierte a decibelios, con las constantes de tiempo Fast, Slow e Impulse indicadas" width="88%" loading="eager" />
 
 ## 2. Las tres ponderaciones temporales
 
@@ -100,7 +100,7 @@ instantes de una grabación.
   description="Una ráfaga tonal excita el detector exponencial RC: el condensador se carga y se descarga mientras las agujas de los sonómetros Fast, Slow e Impulse siguen cada una su propia balística, y las tres trazas de nivel se construyen debajo mostrando el ataque rápido, el promedio lento y la retención asimétrica del modo Impulse."
 />
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis_es.svg" alt="Respuestas de las ponderaciones temporales Fast, Slow e Impulse a una ráfaga de ruido" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis.svg" alt="Respuestas de las ponderaciones temporales Fast, Slow e Impulse a una ráfaga de ruido" width="80%" />
 
 *Los tres detectores sobre una misma ráfaga de ruido de 0,5 s: Fast sube y baja
 con ella, Slow no llega nunca a su nivel, e Impulse sube con Fast y luego
@@ -207,7 +207,7 @@ $L_\mathrm{eq}$ sí.
   y por eso `mode='impulse'` es aquí una opción de pleno derecho y no un parche
   de compatibilidad.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ballistics_vs_duration_es.svg" alt="Nivel de pico de la envolvente respecto a la lectura estacionaria, en decibelios, frente a la duración de la ráfaga tonal de un milisegundo a dos segundos en eje logarítmico, con una curva medida por detector: Impulse la más alta, después Fast y después Slow. Las tres se acercan a cero decibelios para ráfagas de un segundo o más y caen con fuerza para las cortas, hasta menos 18, menos 21 y menos 30 decibelios a un milisegundo. Los círculos huecos de la ecuación 7 de la Tabla 4 de IEC 61672-1 caen exactamente sobre las curvas de Fast y Slow, un marcador vertical en 100 milisegundos anota la diferencia de 7,6 decibelios entre Fast y Slow en ese punto, y una anotación señala que incluso Impulse pierde 18 decibelios en una ráfaga de un milisegundo" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ballistics_vs_duration.svg" alt="Nivel de pico de la envolvente respecto a la lectura estacionaria, en decibelios, frente a la duración de la ráfaga tonal de un milisegundo a dos segundos en eje logarítmico, con una curva medida por detector: Impulse la más alta, después Fast y después Slow. Las tres se acercan a cero decibelios para ráfagas de un segundo o más y caen con fuerza para las cortas, hasta menos 18, menos 21 y menos 30 decibelios a un milisegundo. Los círculos huecos de la ecuación 7 de la Tabla 4 de IEC 61672-1 caen exactamente sobre las curvas de Fast y Slow, un marcador vertical en 100 milisegundos anota la diferencia de 7,6 decibelios entre Fast y Slow en ese punto, y una anotación señala que incluso Impulse pierde 18 decibelios en una ráfaga de un milisegundo" width="88%" />
 
 *Cuánto conserva cada detector de un evento, en función de lo que dure el
 evento. Las curvas medidas caen sobre los puntos de referencia de la Tabla 4,
@@ -291,7 +291,7 @@ tres filas de la Tabla 4 dibujadas en la figura; la batería de CI cubre la tabl
 completa, de 1 s a 1 ms en F y de 1 s a 2 ms en S, con límites de aceptación de
 clase 1:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_iec_es.svg" alt="Respuestas de la envolvente Fast a ráfagas de 200, 50 y 10 ms alcanzando exactamente los valores de la Tabla 4 de IEC 61672-1" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_iec.svg" alt="Respuestas de la envolvente Fast a ráfagas de 200, 50 y 10 ms alcanzando exactamente los valores de la Tabla 4 de IEC 61672-1" width="80%" />
 
 *Los picos de la envolvente Fast quedan en −1,0, −4,8 y −11,1 dB respecto al
 tono estacionario para las ráfagas de 200, 50 y 10 ms de la Tabla 4; la batería

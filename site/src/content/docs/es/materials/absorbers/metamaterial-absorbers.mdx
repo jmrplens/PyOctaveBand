@@ -148,7 +148,7 @@ print(round(float(np.abs(res.reflection[0])), 3))   # 0.0   (cero de reflexión)
 Esos dos números impresos son toda la prueba de la adaptación, y es una
 lástima, porque el equilibrio se ve mejor de lo que se lee:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/critical_coupling_impedance_es.svg" alt="Panel izquierdo: las partes real e imaginaria de la impedancia superficial normalizada a 300 hercios frente a la altura de ranura, entre la mitad y dos veces y media el valor resuelto, con guías horizontales en uno y en cero y la altura resuelta marcada donde se cumplen las dos, y un eje acompañante que muestra la absorción a 300 hercios alcanzando su máximo exactamente ahí. Panel derecho: el lugar geométrico de la impedancia en el plano complejo de 150 a 500 hercios para las ranuras subamortiguada, con acoplamiento crítico y sobreamortiguada, con el punto adaptado uno más cero j marcado; el lazo del acoplamiento crítico pasa por él y los otros dos lo esquivan por lados opuestos" width="90%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/critical_coupling_impedance.svg" alt="Panel izquierdo: las partes real e imaginaria de la impedancia superficial normalizada a 300 hercios frente a la altura de ranura, entre la mitad y dos veces y media el valor resuelto, con guías horizontales en uno y en cero y la altura resuelta marcada donde se cumplen las dos, y un eje acompañante que muestra la absorción a 300 hercios alcanzando su máximo exactamente ahí. Panel derecho: el lugar geométrico de la impedancia en el plano complejo de 150 a 500 hercios para las ranuras subamortiguada, con acoplamiento crítico y sobreamortiguada, con el punto adaptado uno más cero j marcado; el lazo del acoplamiento crítico pasa por él y los otros dos lo esquivan por lados opuestos" width="90%" />
 
 *Lo que resuelve `critical_coupling_design`. Izquierda: se barre la altura de
 ranura a la frecuencia de diseño y las dos condiciones de adaptación se cruzan
@@ -255,7 +255,7 @@ La geometría resuelta merece un vistazo antes que la curva de absorción. El
 resonador se dibuja con `.plot()` y el resultado del panel con
 `.plot_geometry()`, ambos acotados y a escala.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_resonator_geometry_es.svg" alt="Sección a escala del resonador de Helmholtz de sección cuadrada del que parte el diseño con acoplamiento crítico a 300 Hz: un cuello de 3 mm de ancho y 1 mm de largo que se abre a una cavidad de paredes rígidas de 27 mm de ancho y 30 mm de profundidad, con las cuatro dimensiones que lo definen acotadas" width="80%" loading="lazy" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_resonator_geometry.svg" alt="Sección a escala del resonador de Helmholtz de sección cuadrada del que parte el diseño con acoplamiento crítico a 300 Hz: un cuello de 3 mm de ancho y 1 mm de largo que se abre a una cavidad de paredes rígidas de 27 mm de ancho y 30 mm de profundidad, con las cuatro dimensiones que lo definen acotadas" width="80%" loading="lazy" />
 
 *Los cuatro números que definen el resonador: el lado y la longitud del
 cuello fijan la masa móvil y la mayor parte de la pérdida, y el lado y la
@@ -280,7 +280,7 @@ plt.show()
 
 </details>
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slit_absorber_geometry_es.svg" alt="Sección a escala de un periodo del panel ranurado con acoplamiento crítico: una ranura de aproximadamente 1 mm de altura que recorre los 30 mm de profundidad del panel, cargada por la cavidad del resonador de Helmholtz ajustado que llena el resto del periodo de 50 mm, con el respaldo rígido detrás y el sonido incidente llegando desde la izquierda" width="80%" loading="lazy" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slit_absorber_geometry.svg" alt="Sección a escala de un periodo del panel ranurado con acoplamiento crítico: una ranura de aproximadamente 1 mm de altura que recorre los 30 mm de profundidad del panel, cargada por la cavidad del resonador de Helmholtz ajustado que llena el resto del periodo de 50 mm, con el respaldo rígido detrás y el sonido incidente llegando desde la izquierda" width="80%" loading="lazy" />
 
 *Un periodo del diseño resuelto, a escala: el panel entero tiene 30 mm de
 profundidad, $\lambda/38$ a 300 Hz, y la ranura submilimétrica que hace toda
@@ -314,7 +314,7 @@ plt.show()
 
 </details>
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_absorber_es.svg" alt="Absorción de un panel ranurado con un resonador de Helmholtz: el diseño con acoplamiento crítico alcanza alpha = 1 a 300 Hz, mientras que estrechar la ranura (más pérdida) o ensancharla (menos pérdida) rompe el equilibrio y baja el pico; la profundidad del panel es lambda/38" width="80%" loading="lazy" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_absorber.svg" alt="Absorción de un panel ranurado con un resonador de Helmholtz: el diseño con acoplamiento crítico alcanza alpha = 1 a 300 Hz, mientras que estrechar la ranura (más pérdida) o ensancharla (menos pérdida) rompe el equilibrio y baja el pico; la profundidad del panel es lambda/38" width="80%" loading="lazy" />
 
 *Un resonador, una ranura, un equilibrio entre pérdida y fuga. El diseño con
 acoplamiento crítico alcanza $\alpha = 1$ a 300 Hz en un panel de solo
@@ -443,7 +443,7 @@ perfectamente absorbente.
 Cuatro escalares son un relato pobre de una relación de dispersión, así que
 aquí está:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_dispersion_es.svg" alt="Velocidad de fase dentro de la ranura cargada dividida por la velocidad en aire libre, frente a la frecuencia de 50 a 3000 hercios, cayendo desde unos 0,2 hasta un mínimo de 0,08 cerca de 380 hercios y subiendo después con fuerza al pasar la resonancia del resonador en 484 hercios, por encima de la cual la región queda en gris como rama cerrada. Una línea plana en la unidad marca la ranura vacía, la frecuencia de diseño de 300 hercios está marcada en 0,11, y un segundo eje lee la frecuencia de cuarto de onda de la profundidad fija de 30 mm construida con esa velocidad de fase, que cruza la frecuencia de diseño donde resuena el panel" width="86%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_dispersion.svg" alt="Velocidad de fase dentro de la ranura cargada dividida por la velocidad en aire libre, frente a la frecuencia de 50 a 3000 hercios, cayendo desde unos 0,2 hasta un mínimo de 0,08 cerca de 380 hercios y subiendo después con fuerza al pasar la resonancia del resonador en 484 hercios, por encima de la cual la región queda en gris como rama cerrada. Una línea plana en la unidad marca la ranura vacía, la frecuencia de diseño de 300 hercios está marcada en 0,11, y un segundo eje lee la frecuencia de cuarto de onda de la profundidad fija de 30 mm construida con esa velocidad de fase, que cruza la frecuencia de diseño donde resuena el panel" width="86%" />
 
 *El mecanismo que da nombre a la guía, en frecuencia. La ranura vacía se queda
 en 1 por definición; la cargada cae a un mínimo de 0,08 $c_0$ cerca de 379 Hz y
@@ -551,7 +551,7 @@ La respuesta habitual es dejar de pedirle todo el trabajo a una sola celda.
 Encadenar $N$ resonadores a lo largo de una ranura es justo para lo que está el
 argumento de lista de la biblioteca:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/graded_slit_absorber_es.svg" alt="Absorción frente a la frecuencia de 120 a 700 hercios para tres paneles: una única celda con acoplamiento crítico y un pico estrecho que llega a 1,0 cerca de 320 hercios, una cadena de cuatro resonadores graduados a lo largo de una ranura con dos lóbulos que llegan a 1,0 cerca de 150 hercios y a 0,95 cerca de 295 hercios, y una cadena de cuatro resonadores idénticos con dos lóbulos más bajos. Bajo cada curva, unas barras sombreadas marcan dónde supera cada una 0,8, sumando 38, 51 y 22 hercios respectivamente" width="86%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/graded_slit_absorber.svg" alt="Absorción frente a la frecuencia de 120 a 700 hercios para tres paneles: una única celda con acoplamiento crítico y un pico estrecho que llega a 1,0 cerca de 320 hercios, una cadena de cuatro resonadores graduados a lo largo de una ranura con dos lóbulos que llegan a 1,0 cerca de 150 hercios y a 0,95 cerca de 295 hercios, y una cadena de cuatro resonadores idénticos con dos lóbulos más bajos. Bajo cada curva, unas barras sombreadas marcan dónde supera cada una 0,8, sumando 38, 51 y 22 hercios respectivamente" width="86%" />
 
 *Lo que compra una cadena, y lo que cuesta. Medido como el intervalo total de
 frecuencia por encima de $\alpha = 0{,}8$, y no como la distancia entre los

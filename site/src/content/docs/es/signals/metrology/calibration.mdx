@@ -83,7 +83,7 @@ del tono de calibración grabado, en unidades digitales.
 `sensitivity()` es exactamente esa ecuación. El factor vale mientras
 nada cambie en la cadena: si tocas la ganancia, recalibra.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_setup_es.svg" alt="Cadena de calibración: calibrador acústico acoplado al micrófono, preamplificador, ADC y sensitivity produciendo pascales por unidad digital" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_setup.svg" alt="Cadena de calibración: calibrador acústico acoplado al micrófono, preamplificador, ADC y sensitivity produciendo pascales por unidad digital" width="92%" loading="eager" />
 
 ## Calibrar una grabación de principio a fin
 
@@ -94,7 +94,7 @@ entre medias. El mismo factor funciona en toda la biblioteca: `octave_filter` y
 `OctaveFilterBank` lo reciben dentro de `LevelCalibration(factor=...)`, y `leq`,
 `laeq` y `ln_levels` como `calibration_factor=`.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_dataflow_es.svg" alt="Flujo de datos de la calibración: la grabación del calibrador y la grabación de medición proceden de la misma cadena sin tocar, sensitivity() convierte la primera en el factor S en pascales por unidad digital y, si se le pasa fs, comprueba la estabilidad a corto plazo de IEC 60942, toda función de nivel acepta ese factor como calibration_factor y el resultado son niveles en dB SPL re 20 µPa; sin calibrador el factor vale 1 y las muestras se leen como pascales, así que es dbfs=True lo que da niveles referidos al fondo de escala digital" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_dataflow.svg" alt="Flujo de datos de la calibración: la grabación del calibrador y la grabación de medición proceden de la misma cadena sin tocar, sensitivity() convierte la primera en el factor S en pascales por unidad digital y, si se le pasa fs, comprueba la estabilidad a corto plazo de IEC 60942, toda función de nivel acepta ese factor como calibration_factor y el resultado son niveles en dB SPL re 20 µPa; sin calibrador el factor vale 1 y las muestras se leen como pascales, así que es dbfs=True lo que da niveles referidos al fondo de escala digital" width="92%" />
 
 ```python
 import numpy as np
@@ -191,7 +191,7 @@ medición y no un preliminar. Seis pasos:
    converja, y la comprobación de estabilidad de más abajo es la que dice si el
    tono estaba de verdad estabilizado.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_coupling_es.svg" alt="Media sección de la cavidad de un calibrador acústico con un micrófono de medición de media pulgada insertado hasta el plano de referencia, el volumen de carga efectivo sombreado entre el diafragma y el plano de referencia, un adaptador de un cuarto de pulgada dibujado como parte del calibrador, la pantalla antiviento retirada a un lado, y un segundo panel que muestra la comprobación del nivel de fondo con el calibrador apagado" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_coupling.svg" alt="Media sección de la cavidad de un calibrador acústico con un micrófono de medición de media pulgada insertado hasta el plano de referencia, el volumen de carga efectivo sombreado entre el diafragma y el plano de referencia, un adaptador de un cuarto de pulgada dibujado como parte del calibrador, la pantalla antiviento retirada a un lado, y un segundo panel que muestra la comprobación del nivel de fondo con el calibrador apagado" width="92%" />
 
 **Campo de presión en la cavidad, campo libre en la medición.** El acoplador
 excita el diafragma con una excitación de presión: la cavidad es mucho menor que
@@ -295,7 +295,7 @@ límite con `max_fluctuation_db` o desactiva con `validate=False`.
 La comprobación caza justo lo que arruina las calibraciones de campo (un acoplador flojo,
 viento, ruido de manipulación):
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibration_stability_es.webp" alt="Nivel con ponderación F de un tono de calibración estable frente a otro con AM del 3 % contra el límite de ±0,07 dB de clase 1 de IEC 60942" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibration_stability.webp" alt="Nivel con ponderación F de un tono de calibración estable frente a otro con AM del 3 % contra el límite de ±0,07 dB de clase 1 de IEC 60942" width="80%" />
 
 *La comprobación es una decisión, y la figura enseña lo lejos que queda de ser
 apurada. El tono estable oscila entre +0,003 y −0,004 dB alrededor de su media,
@@ -346,7 +346,7 @@ tono y el ruido de la grabación. Pasar `narrowband=True` sustituye el valor
 eficaz de banda completa por un detector coherente de Goertzel enganchado al
 tono, que rechaza la parte incoherente:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibration_narrowband_bias_es.svg" alt="Error de sensibilidad frente a la relación señal-ruido en el acoplador: el estimador del valor eficaz de banda completa sigue a menos diez log de uno más uno entre SNR y se sale de la banda de aceptación de clase 1 por debajo de 12,3 dB de SNR, mientras que el estimador de Goertzel se mantiene dentro de centésimas de decibelio" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibration_narrowband_bias.svg" alt="Error de sensibilidad frente a la relación señal-ruido en el acoplador: el estimador del valor eficaz de banda completa sigue a menos diez log de uno más uno entre SNR y se sale de la banda de aceptación de clase 1 por debajo de 12,3 dB de SNR, mientras que el estimador de Goertzel se mantiene dentro de centésimas de decibelio" width="88%" />
 
 *Error de sensibilidad frente a la relación señal-ruido de la toma del
 calibrador, medido llamando a `sensitivity()` sobre un tono de 1 kHz más ruido de
@@ -623,7 +623,7 @@ veredictos de conformidad de la biblioteca. Ninguna de esas funciones rechaza
 muestras sin calibrar (no pueden saberlo), así que el marco es una decisión que el
 analista tiene que anotar junto al resultado.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dbfs_versus_spl_es.svg" alt="Izquierda: el mismo espectro en bandas de tercio de octava calculado con un factor de calibración y con dbfs=True, superpuestos una vez añadido el desplazamiento constante. Derecha: los primeros ciclos de una ráfaga tonal filtrada por bandas que sobrepasa la amplitud de excitación en 1,32 decibelios, que es lo que lee mode='peak'" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dbfs_versus_spl.svg" alt="Izquierda: el mismo espectro en bandas de tercio de octava calculado con un factor de calibración y con dbfs=True, superpuestos una vez añadido el desplazamiento constante. Derecha: los primeros ciclos de una ráfaga tonal filtrada por bandas que sobrepasa la amplitud de excitación en 1,32 decibelios, que es lo que lee mode='peak'" width="92%" />
 
 *Izquierda: un registro, dos marcos. El espectro en dBFS es el espectro en dB SPL
 desplazado una constante, aquí 106,04 dB, que es exactamente el nivel del

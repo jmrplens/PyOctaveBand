@@ -58,7 +58,7 @@ que encierra la fuente, informando de la intensidad normal con signo promediada
 por segmento $\langle I_{n,i} \rangle$ — una fila por segmento, una columna por
 banda.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_es.svg" alt="Una sonda de intensidad acústica p-p de dos micrófonos: dos micrófonos de presión separados por un espaciador, a partir de los cuales se estima el gradiente de presión y, por tanto, la intensidad normal" width="70%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe.svg" alt="Una sonda de intensidad acústica p-p de dos micrófonos: dos micrófonos de presión separados por un espaciador, a partir de los cuales se estima el gradiente de presión y, por tanto, la intensidad normal" width="70%" />
 
 Las potencias parciales suman el total:
 
@@ -193,7 +193,7 @@ print(list(res.achieved_grade))                         # grado por banda
 res.plot()   # espectro LW; bandas no positivas (indeterminables) con trama (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_intensity_result_es.svg" alt="El espectro de nivel de potencia acústica por barrido de intensidad del ejemplo de ISO 9614-2, una barra por banda de octava de 125 Hz a 4 kHz todas cerca de 85 dB, con el total ponderado A de 90,9 dB(A) en el título" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_intensity_result.svg" alt="El espectro de nivel de potencia acústica por barrido de intensidad del ejemplo de ISO 9614-2, una barra por banda de octava de 125 Hz a 4 kHz todas cerca de 85 dB, con el total ponderado A de 90,9 dB(A) en el título" width="88%" />
 
 *Las potencias parciales $\langle I_{n,i} \rangle\,S_i$ de los seis segmentos
 suman el $L_W$ de cada banda; aquí todas las bandas tienen potencia neta
@@ -354,7 +354,7 @@ presión devuelve un número por banda; un barrido de intensidad devuelve uno po
 segmento *y* banda, con signo, de modo que el resultado dice **por dónde** sale
 la potencia de la máquina y por dónde vuelve a entrar:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/partial_power_map_es.svg" alt="Las cinco caras de una caja de medición desplegadas en plano como un desarrollo, cada una teselada en cuatro segmentos y sombreada según su nivel de potencia parcial en decibelios re 1 pW. La cara frontal es la más sonora, con 73 a 74 dB, los laterales cerca de 68 dB, y un segmento de la cara trasera aparece rayado y con signo negativo porque su potencia neta fluye hacia dentro. Debajo, un gráfico de barras con los totales de las cinco caras frente al nivel de potencia acústica de banda" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/partial_power_map.svg" alt="Las cinco caras de una caja de medición desplegadas en plano como un desarrollo, cada una teselada en cuatro segmentos y sombreada según su nivel de potencia parcial en decibelios re 1 pW. La cara frontal es la más sonora, con 73 a 74 dB, los laterales cerca de 68 dB, y un segmento de la cara trasera aparece rayado y con signo negativo porque su potencia neta fluye hacia dentro. Debajo, un gráfico de barras con los totales de las cinco caras frente al nivel de potencia acústica de banda" width="92%" />
 
 *La caja de medición desplegada, una tesela por segmento. La cara frontal se
 lleva la mayor parte de la emisión; el segmento rayado de la cara a la sombra da
@@ -410,7 +410,7 @@ intensidad normal sobre una superficie que encierra la fuente, pero con un barri
 continuo, criterios de indicadores de campo más estrictos y un presupuesto de
 incertidumbre explícito.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_intensity_scan_es.svg" alt="Barrido de intensidad acústica de precisión de ISO 9614-3: una fuente encerrada por una superficie de medición dividida en segmentos, una sonda de intensidad de dos micrófonos barrida a lo largo de un recorrido en serpentina sobre cada segmento, y la potencia acústica formada sumando la intensidad normal por el área del segmento, sujeta a los criterios de aceptación de los indicadores de campo" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_intensity_scan.svg" alt="Barrido de intensidad acústica de precisión de ISO 9614-3: una fuente encerrada por una superficie de medición dividida en segmentos, una sonda de intensidad de dos micrófonos barrida a lo largo de un recorrido en serpentina sobre cada segmento, y la potencia acústica formada sumando la intensidad normal por el área del segmento, sujeta a los criterios de aceptación de los indicadores de campo" width="92%" />
 
 **Potencia y nivel (apartado 7).** La potencia parcial de cada segmento es
 $P_i = I_{n,i}\,S_i$; el total $P = \sum_i P_i$ da
@@ -458,7 +458,7 @@ print(round(result.sound_power_level_a, 1))   # 80.6
 result.plot()   # espectro LW; la banda no aplicable con trama (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_scan_power_es.svg" alt="El espectro de nivel de potencia acústica del barrido de intensidad de precisión sobre cinco bandas de tercio de octava, cuatro barras determinadas y una banda de 250 Hz con trama y en gris marcada como no aplicable porque su intensidad neta es negativa, con el total ponderado A de 80,6 dB(A) en el título" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_scan_power.svg" alt="El espectro de nivel de potencia acústica del barrido de intensidad de precisión sobre cinco bandas de tercio de octava, cuatro barras determinadas y una banda de 250 Hz con trama y en gris marcada como no aplicable porque su intensidad neta es negativa, con el total ponderado A de 80,6 dB(A) en el título" width="88%" />
 
 *La banda de 250 Hz da un neto negativo (más energía entrando que saliendo), así que
 ISO 9614-3 la declara no aplicable; la figura la trama y la agrisa mientras las

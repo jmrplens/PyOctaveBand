@@ -68,7 +68,7 @@ Toda la Recomendación es una cadena de medición, y cada sección de abajo
 detalla uno de sus bloques. El diagrama la despliega primero, con los
 números de los ejemplos de esta página.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_program_loudness_es.svg" alt="Diagrama de bloques de la cadena de sonoridad de programa de BS.1770 y EBU R 128: el programa ponderado por canal, anclado para que una sinusoide de 997 hercios a plena escala en un canal frontal marque menos 3,01 LKFS, pasa la ponderación K de realce de cabeza esférica de más 4 decibelios y paso alto RLB, se mide en bloques de media cuadrática de 400 milisegundos con 75 por ciento de solape, se filtra con la puerta absoluta de menos 70 LUFS y la relativa 10 unidades de sonoridad bajo los supervivientes, menos 39,0 LUFS en el ejemplo de 10 segundos de programa más 30 segundos de silencio, y da una sonoridad integrada de menos 23,1 LUFS frente al objetivo de menos 23,0; sendas ramas muestran el rango de sonoridad de 10,0 unidades en el caso de dos escalones de Tech 3342 y el pico verdadero de más 0,12 dBTP donde el pico muestral marca menos 3,01 decibelios, bajo el techo de producción de menos 1 dBTP" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_program_loudness.svg" alt="Diagrama de bloques de la cadena de sonoridad de programa de BS.1770 y EBU R 128: el programa ponderado por canal, anclado para que una sinusoide de 997 hercios a plena escala en un canal frontal marque menos 3,01 LKFS, pasa la ponderación K de realce de cabeza esférica de más 4 decibelios y paso alto RLB, se mide en bloques de media cuadrática de 400 milisegundos con 75 por ciento de solape, se filtra con la puerta absoluta de menos 70 LUFS y la relativa 10 unidades de sonoridad bajo los supervivientes, menos 39,0 LUFS en el ejemplo de 10 segundos de programa más 30 segundos de silencio, y da una sonoridad integrada de menos 23,1 LUFS frente al objetivo de menos 23,0; sendas ramas muestran el rango de sonoridad de 10,0 unidades en el caso de dos escalones de Tech 3342 y el pico verdadero de más 0,12 dBTP donde el pico muestral marca menos 3,01 decibelios, bajo el techo de producción de menos 1 dBTP" width="92%" />
 
 ## 1. La ponderación K y la medida de sonoridad (Anexo 1)
 
@@ -148,7 +148,7 @@ dibuja la respuesta, con el realce de cabeza esférica de +4 dB y la caída
 del paso alto RLB:
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/k_weighting_response_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/k_weighting_response.svg"
   alt="Respuesta en frecuencia de magnitud de la ponderación K en un eje de frecuencia logarítmico: la curva azul combinada cae por debajo de unos pocos cientos de hercios a través del paso alto RLB y sube hasta una meseta de +4 dB por encima de 2 kHz fijada por el realce de cabeza esférica, con las dos etapas dibujadas como curvas acompañantes tenues"
   width="96%"
 />
@@ -258,7 +258,7 @@ La figura hace visible la puerta sobre un programa de ruido conformado con una
 cola silenciosa larga:
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_gating_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_gating.svg"
   alt="Medición EBU R 128 de 20 segundos de programa sobre el objetivo de -23 LUFS seguidos de 40 segundos de ambiente silencioso unos 29 LU más bajo: las trazas momentánea y de corto plazo bajan un escalón a los 20 segundos, la línea integrada discontinua se mantiene en -23,0 LUFS porque la puerta relativa descarta la cola, y una línea de trazo y punto marca la media sin puerta hundiéndose hasta -27,7 LUFS"
   width="96%"
 />
@@ -338,7 +338,7 @@ picos verdaderos por canal y las ponderaciones de canal; su `.plot()` dibuja
 la traza de sonoridad del programa:
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/program_loudness_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/program_loudness.svg"
   alt="Medición EBU R 128 de un programa sintético de un minuto con secciones de ambiente, diálogo, música y fundido: la sonoridad momentánea gris respira alrededor de la traza azul de corto plazo, la sonoridad integrada discontinua roja cae exactamente sobre el objetivo de -23 LUFS y una banda sombreada marca el rango de sonoridad entre sus percentiles 10 y 95"
   width="96%"
   loading="eager"
@@ -411,7 +411,7 @@ res.plot()   # la banda sombreada de LRA abarca la separación P10-P95 (necesita
 ```
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_range_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_range.svg"
   alt="Medición EBU R 128 del caso de referencia de Tech 3342 de 20 segundos a -20 dBFS seguidos de 20 segundos a -30 dBFS: la traza de corto plazo escalona entre dos mesetas separadas 10 LU, la banda sombreada del rango de sonoridad abarca exactamente esas mesetas para un LRA igual a 10,0 LU, y la línea integrada queda entre ambas"
   width="96%"
 />
@@ -481,7 +481,7 @@ muestreo perdió (el residuo de +0,12 dB es rizado de interpolación de los
 bordes abruptos del tono, dentro de la tolerancia de +0,2/−0,4 dB que deben
 cumplir los medidores en modo EBU).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/true_peak_intersample_es.svg" alt="Dos paneles. A la izquierda, doce muestras del tono de 12 kHz a plena escala con un desfase de un cuarto de ciclo: cada punto de muestra se sitúa en 0,707 de la escala completa sobre la línea discontinua de pico muestral en menos 3,01 dBFS, mientras que la reconstrucción de banda limitada trazada a través de ellos toca más y menos uno, y la rejilla sobremuestreada 4 veces se marca en la parte inferior. A la derecha, la infravaloración de peor caso 20 log cos de pi f_norm entre n frente a la frecuencia normalizada para razones de sobremuestreo de 1, 2, 4 y 8, con el mínimo de 4 que pide BS.1770 marcado en f_norm igual a un cuarto, donde quedan menos 0,17 decibelios" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/true_peak_intersample.svg" alt="Dos paneles. A la izquierda, doce muestras del tono de 12 kHz a plena escala con un desfase de un cuarto de ciclo: cada punto de muestra se sitúa en 0,707 de la escala completa sobre la línea discontinua de pico muestral en menos 3,01 dBFS, mientras que la reconstrucción de banda limitada trazada a través de ellos toca más y menos uno, y la rejilla sobremuestreada 4 veces se marca en la parte inferior. A la derecha, la infravaloración de peor caso 20 log cos de pi f_norm entre n frente a la frecuencia normalizada para razones de sobremuestreo de 1, 2, 4 y 8, con el mínimo de 4 que pide BS.1770 marcado en f_norm igual a un cuarto, donde quedan menos 0,17 decibelios" width="92%" />
 
 *Izquierda: el mecanismo. Muestrear un tono a $f_\mathrm{s}/4$ a plena escala con la fase
 equivocada deja **todas** las muestras en $1/\sqrt{2}$, así que un medidor de
@@ -552,7 +552,7 @@ Son dos desigualdades que describen un dibujo, y el dibujo responde a la pregunt
 que se hace de verdad quien monta la sala: qué altavoces de *esta* disposición
 caen dentro de la zona:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/channel_weight_map_es.svg" alt="Un mapa de la ponderación de canal del Anexo 3 de BS.1770 sobre el acimut de menos 180 a 180 grados y la elevación de menos 90 a 90 grados. Dos rectángulos sombreados entre 60 y 120 grados de acimut a cada lado y dentro de más menos 30 grados de elevación llevan la ponderación 1,41, más 1,5 decibelios; todo lo demás vale 1,0. Los altavoces L, R y C de un 5.1 quedan en la ponderación 1,00, Ls y Rs a 110 grados caen dentro de las zonas sombreadas en 1,41, y el altavoz de la capa superior U más 110 a 45 grados de elevación queda fuera, en 1,00" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/channel_weight_map.svg" alt="Un mapa de la ponderación de canal del Anexo 3 de BS.1770 sobre el acimut de menos 180 a 180 grados y la elevación de menos 90 a 90 grados. Dos rectángulos sombreados entre 60 y 120 grados de acimut a cada lado y dentro de más menos 30 grados de elevación llevan la ponderación 1,41, más 1,5 decibelios; todo lo demás vale 1,0. Los altavoces L, R y C de un 5.1 quedan en la ponderación 1,00, Ls y Rs a 110 grados caen dentro de las zonas sombreadas en 1,41, y el altavoz de la capa superior U más 110 a 45 grados de elevación queda fuera, en 1,00" width="92%" />
 
 *La ponderación es una propiedad de la **posición** del altavoz, no del nombre
 del canal. Ls y Rs de una disposición 5.1 caen dentro de la zona lateral de la

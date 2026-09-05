@@ -54,7 +54,7 @@ determinista reproducida por un altavoz y *deconvolucionada* recupera la
 misma RI con 20–30 dB más de relación señal-ruido efectiva (ISO 18233,
 apartado 6.2.3). Se proporcionan dos excitaciones.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/deconvolution_snr_gain_es.svg" alt="Tres recuperaciones de la misma respuesta al impulso sintética de sala frente al mismo ruido de fondo, representadas como envolventes logarítmicas suavizadas frente al tiempo: un disparo de pistola grabado directamente alcanza 46 dB entre su pico y el suelo de ruido, un barrido deconvolucionado de 1 segundo alcanza 75 dB y uno de 4 segundos alcanza 83 dB, con el suelo leído en una ventana acotada de 1,0 a 1,6 segundos, cuando el decaimiento de la sala ya se ha extinguido" width="90%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/deconvolution_snr_gain.svg" alt="Tres recuperaciones de la misma respuesta al impulso sintética de sala frente al mismo ruido de fondo, representadas como envolventes logarítmicas suavizadas frente al tiempo: un disparo de pistola grabado directamente alcanza 46 dB entre su pico y el suelo de ruido, un barrido deconvolucionado de 1 segundo alcanza 75 dB y uno de 4 segundos alcanza 83 dB, con el suelo leído en una ventana acotada de 1,0 a 1,6 segundos, cuando el decaimiento de la sala ya se ha extinguido" width="90%" />
 
 *La misma sala, el mismo ruido de fondo, tres excitaciones. La pistola recupera
 46 dB de rango; un barrido deconvolucionado de 1 s recupera 75 dB, los 29 dB que
@@ -154,7 +154,7 @@ análisis de distorsión por barrido sinusoidal, que es la razón de que exista
 altavoz llevado cerca de su límite, mientras que la MLS reparte esa misma
 distorsión por toda la RI en forma de ruido.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sweep_distortion_separation_es.svg" alt="La secuencia deconvolucionada completa de un barrido de 3 segundos a través de una cadena ligeramente no lineal, representada en un eje de tiempo envuelto con el cero en el centro: la respuesta al impulso lineal en t = 0 con la ventana causal sombreada a su derecha, y los paquetes de armónicos segundo, tercero y cuarto como grupos separados en menos 0,30, menos 0,48 y menos 0,60 segundos, cada uno marcado con su adelanto previsto" width="90%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sweep_distortion_separation.svg" alt="La secuencia deconvolucionada completa de un barrido de 3 segundos a través de una cadena ligeramente no lineal, representada en un eje de tiempo envuelto con el cero en el centro: la respuesta al impulso lineal en t = 0 con la ventana causal sombreada a su derecha, y los paquetes de armónicos segundo, tercero y cuarto como grupos separados en menos 0,30, menos 0,48 y menos 0,60 segundos, cada uno marcado con su adelanto previsto" width="90%" />
 
 *`return_full=True` sobre ese mismo barrido de 3 s de 20 Hz a 20 kHz, con una no
 linealidad sin memoria suave en la cadena. Los grupos H2, H3 y H4 caen en
@@ -243,7 +243,7 @@ suelo de nivel sube y $T$ sale corto, sin ningún síntoma visible. Descarta el
 primer periodo como calentamiento, que es lo que hace el patrón de abajo de
 reproducir cuatro periodos y conservar tres.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sweep_budget_es.svg" alt="Tres carriles temporales para una sala con T = 1,2 s. El primero muestra el barrido reproducido de 4,0 segundos, tres veces y un tercio T, seguido de un hueco de silencio de aproximadamente un T y una ventana de grabación acotada de 5,2 segundos. El segundo muestra una MLS periódica de orden 17, de periodo 2,73 segundos, con el primer periodo marcado como calentamiento y descartado y el segundo conservado, y debajo un periodo corto de orden 15 de 0,68 segundos marcado como más corto que T, de modo que la cola se pliega sobre la cabeza. El tercero muestra lo que devuelve la deconvolución: la respuesta al impulso lineal y su cola en el tiempo cero con la parte causal conservada, los paquetes de armónicos segundo, tercero y cuarto en tiempos de llegada negativos, y la propia cola de ruido decreciente de la deconvolución" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sweep_budget.svg" alt="Tres carriles temporales para una sala con T = 1,2 s. El primero muestra el barrido reproducido de 4,0 segundos, tres veces y un tercio T, seguido de un hueco de silencio de aproximadamente un T y una ventana de grabación acotada de 5,2 segundos. El segundo muestra una MLS periódica de orden 17, de periodo 2,73 segundos, con el primer periodo marcado como calentamiento y descartado y el segundo conservado, y debajo un periodo corto de orden 15 de 0,68 segundos marcado como más corto que T, de modo que la cola se pliega sobre la cabeza. El tercero muestra lo que devuelve la deconvolución: la respuesta al impulso lineal y su cola en el tiempo cero con la parte causal conservada, los paquetes de armónicos segundo, tercero y cuarto en tiempos de llegada negativos, y la propia cola de ruido decreciente de la deconvolución" width="94%" />
 
 ```python
 import numpy as np
@@ -261,7 +261,7 @@ print(excitation_budget(1.2))    # (3.6, 1.2, 16, 1.37)
 print(excitation_budget(1.5))    # (4.5, 1.5, 17, 2.73)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/excitation_robustness_es.svg" alt="Cuatro envolventes de respuesta al impulso recuperadas de la misma sala sintética: el barrido recuperado en condiciones estacionarias y con un calentamiento lento de 0,3 kelvin se superponen y llegan a 90 dB por debajo del pico, la MLS estacionaria los sigue hasta unos 75 dB, y la MLS con deriva se derrumba en un suelo plano 15 dB por debajo del pico sin decaimiento alguno" width="90%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/excitation_robustness.svg" alt="Cuatro envolventes de respuesta al impulso recuperadas de la misma sala sintética: el barrido recuperado en condiciones estacionarias y con un calentamiento lento de 0,3 kelvin se superponen y llegan a 90 dB por debajo del pico, la MLS estacionaria los sigue hasta unos 75 dB, y la MLS con deriva se derrumba en un suelo plano 15 dB por debajo del pico sin decaimiento alguno" width="90%" />
 
 *Lo que cuesta ser «más sensible a la varianza temporal». Un calentamiento lento
 de unos 0,3 K a lo largo de la toma — un remuestreo de 500 partes por millón, que
@@ -308,7 +308,7 @@ plt.show()
 
 </details>
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ir_measurement_es.svg" alt="Cadena de medición indirecta ISO 18233: una excitación (barrido ESS o MLS) alimenta un altavoz en la sala, un micrófono capta la respuesta y la deconvolución (correlación o filtro inverso) recupera la respuesta al impulso" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ir_measurement.svg" alt="Cadena de medición indirecta ISO 18233: una excitación (barrido ESS o MLS) alimenta un altavoz en la sala, un micrófono capta la respuesta y la deconvolución (correlación o filtro inverso) recupera la respuesta al impulso" width="92%" loading="eager" />
 
 ```python
 import numpy as np
@@ -356,7 +356,7 @@ frecuencias altas a lo largo de toda la señal, mientras que la MLS es una
 secuencia de dos niveles con espectro plano, visible como la magnitud
 casi constante de la derecha.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/excitation_signals_es.webp" alt="Señales de excitación ISO 18233: la forma de onda del barrido sinusoidal exponencial y su espectrograma con el ascenso exponencial de frecuencia, y una secuencia de longitud máxima con su espectro de magnitud plano" width="96%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/excitation_signals.webp" alt="Señales de excitación ISO 18233: la forma de onda del barrido sinusoidal exponencial y su espectrograma con el ascenso exponencial de frecuencia, y una secuencia de longitud máxima con su espectro de magnitud plano" width="96%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -405,7 +405,7 @@ reverberación en la
   description="Un barrido exponencial cruza una sala dibujada mientras se construye el espectrograma de la grabación, con las reflexiones discretas apareciendo como copias retardadas de la cresta principal; después el filtro inverso colapsa toda la grabación en la respuesta al impulso."
 />
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulse_response_es.webp" alt="Respuesta al impulso de la sala recuperada: la forma de onda normalizada con el sonido directo y las reflexiones etiquetadas, y debajo la envolvente log-magnitud en dB con la curva de decaimiento de energía de Schroeder" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulse_response.webp" alt="Respuesta al impulso de la sala recuperada: la forma de onda normalizada con el sonido directo y las reflexiones etiquetadas, y debajo la envolvente log-magnitud en dB con la curva de decaimiento de energía de Schroeder" width="88%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -529,7 +529,7 @@ con **al menos dos** posiciones de fuente. Los micrófonos se sitúan a **1,2 m*
 altura de oído sentado, al menos a un cuarto de longitud de onda — «normalmente en
 torno a 1 m» — de la superficie reflectante más cercana, **incluido el suelo**.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_measurement_section_es.svg" alt="Sección de una sala de 10 por 6 por 3,5 metros: un dodecaedro sobre un soporte con su centro acústico acotado a 1,5 metros sobre el suelo y su círculo de exclusión d_min de 2,0 metros recortado por la sala, dos micrófonos sobre soportes a 1,2 metros con la separación mínima de 2 metros y las holguras de 1 metro al techo, al suelo y a la pared del fondo, y bajo la sección las tolerancias de omnidireccionalidad de la Tabla 1 de ISO 3382-1 de más menos 1, 1, 1, 3, 5 y 6 decibelios de 125 Hz a 4 kHz junto con los requisitos de nivel y de cadena de recepción" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_measurement_section.svg" alt="Sección de una sala de 10 por 6 por 3,5 metros: un dodecaedro sobre un soporte con su centro acústico acotado a 1,5 metros sobre el suelo y su círculo de exclusión d_min de 2,0 metros recortado por la sala, dos micrófonos sobre soportes a 1,2 metros con la separación mínima de 2 metros y las holguras de 1 metro al techo, al suelo y a la pared del fondo, y bajo la sección las tolerancias de omnidireccionalidad de la Tabla 1 de ISO 3382-1 de más menos 1, 1, 1, 3, 5 y 6 decibelios de 125 Hz a 4 kHz junto con los requisitos de nivel y de cadena de recepción" width="94%" />
 
 Esos mismos 45 dB son lo que comprueba aguas abajo la marca de validez de T30: la
 [guía de acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) rechaza
@@ -547,7 +547,7 @@ fuente, de micrófono y de combinaciones fuente–micrófono según el grado de
 exactitud (control / ingeniería / precisión) y pide posiciones de micrófono
 que eviten las colocaciones simétricas.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_measurement_es.svg" alt="Configuración de medición de acústica de salas: una planta de la sala en vista superior con dos posiciones de fuente (altavoz) y seis posiciones de micrófono con las reglas de separación de ISO 3382-1, y la tabla de ISO 3382-2 con el número mínimo de posiciones para los grados de control, ingeniería y precisión" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_measurement.svg" alt="Configuración de medición de acústica de salas: una planta de la sala en vista superior con dos posiciones de fuente (altavoz) y seis posiciones de micrófono con las reglas de separación de ISO 3382-1, y la tabla de ISO 3382-2 con el número mínimo de posiciones para los grados de control, ingeniería y precisión" width="94%" />
 
 **Promediar entre posiciones.** El parámetro por banda que se informa es la
 media aritmética sobre todas las combinaciones fuente-micrófono, y la
@@ -598,7 +598,7 @@ Cuatro errores de colocación sesgan la propia media:
 El tercer error es el que merece dibujarse, porque no parece un error en el
 resultado:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/source_distance_bias_es.svg" alt="Dos paneles apilados que comparten un eje de distancia fuente-receptor de 0,6 a 7 metros, en la misma sala de 10 por 6 por 3,5 metros de los dibujos de configuración. Arriba, el T30 medio de 500 a 1000 Hz se mantiene entre 0,54 y 0,66 segundos a lo largo de todo el barrido mientras el EDT sube de 0,18 a unos 0,45 segundos; abajo, la claridad C80 baja de 17,5 a unos 10,5 decibelios. La región interior a d_min = 2,0 metros aparece sombreada como excluida y la distancia crítica de 1,5 metros está marcada con una línea de puntos" width="90%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/source_distance_bias.svg" alt="Dos paneles apilados que comparten un eje de distancia fuente-receptor de 0,6 a 7 metros, en la misma sala de 10 por 6 por 3,5 metros de los dibujos de configuración. Arriba, el T30 medio de 500 a 1000 Hz se mantiene entre 0,54 y 0,66 segundos a lo largo de todo el barrido mientras el EDT sube de 0,18 a unos 0,45 segundos; abajo, la claridad C80 baja de 17,5 a unos 10,5 decibelios. La región interior a d_min = 2,0 metros aparece sombreada como excluida y la distancia crítica de 1,5 metros está marcada con una línea de puntos" width="90%" />
 
 *EDT, T30 y C80 de la sala de arriba frente a la distancia a la fuente, a partir
 de respuestas al impulso sintéticas. Dentro de $d_\mathrm{min}$, el EDT es corto por un
@@ -643,7 +643,7 @@ Y el cuarto merece contarse. La frecuencia de Schroeder es donde una sala deja d
 ser un puñado de resonancias y empieza a ser un campo estadístico, y el recuento
 es rotundo:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/modal_count_per_band_es.svg" alt="Diagrama de barras en ejes logarítmicos del número de modos de sala dentro de cada banda de octava de 63 Hz a 4 kHz para una sala de 7 por 5 por 3 metros y 105 metros cúbicos: 13 modos a 63 Hz y 77 a 125 Hz, ambas por debajo de la frecuencia de Schroeder marcada de 185 Hz, subiendo a 514 a 250 Hz, 28412 a 1 kHz y 1749162 a 4 kHz" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/modal_count_per_band.svg" alt="Diagrama de barras en ejes logarítmicos del número de modos de sala dentro de cada banda de octava de 63 Hz a 4 kHz para una sala de 7 por 5 por 3 metros y 105 metros cúbicos: 13 modos a 63 Hz y 77 a 125 Hz, ambas por debajo de la frecuencia de Schroeder marcada de 185 Hz, subiendo a 514 a 250 Hz, 28412 a 1 kHz y 1749162 a 4 kHz" width="88%" />
 
 *Por qué «más posiciones, no una excitación más larga». La octava de 4 kHz de esta
 sala contiene aproximadamente 1,75 millones de modos, así que el promedio en banda

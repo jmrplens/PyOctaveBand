@@ -106,7 +106,7 @@ herramienta preferida cuando la transmisión por flancos es alta, que es
 también, exactamente, para lo que existe el índice de intensidad modificado con
 $K_\mathrm{c}$: para volver a hacerla comparable.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_lab_es.svg" alt="Vista en planta de las cámaras de transmisión de laboratorio ISO 10140: recintos emisor y receptor reverberantes desacoplados estructuralmente de unos 59 y 51 metros cúbicos, el elemento de ensayo montado en la abertura de ensayo de 10 metros cuadrados entre ambos, un altavoz en esquina en el recinto emisor y un micrófono en movimiento continuo con radio de barrido de al menos 1 m en cada recinto" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_lab.svg" alt="Vista en planta de las cámaras de transmisión de laboratorio ISO 10140: recintos emisor y receptor reverberantes desacoplados estructuralmente de unos 59 y 51 metros cúbicos, el elemento de ensayo montado en la abertura de ensayo de 10 metros cuadrados entre ambos, un altavoz en esquina en el recinto emisor y un micrófono en movimiento continuo con radio de barrido de al menos 1 m en cada recinto" width="92%" />
 
 | | Campo (ISO 16283) | Laboratorio (ISO 10140) |
 | :--- | :--- | :--- |
@@ -139,7 +139,7 @@ por encima. Esos son los umbrales de **laboratorio**; ISO 16283-1 usa 6 dB y
 10 dB en campo, así que las dos reglas no son intercambiables; véase
 [Medición del aislamiento en campo](/phonometry/es/buildings/insulation/insulation-field/#correccion-por-ruido-de-fondo).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/background_correction_regimes_es.svg" alt="La corrección aplicada a un nivel del recinto receptor frente al margen señal-fondo: plana en la saturación de 1,3 dB por debajo de 6 dB, después la curva de resta energética, cayendo a cero en 15 dB con la regla de laboratorio de ISO 10140-4 y en 10 dB con la regla de campo de ISO 16283-1" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/background_correction_regimes.svg" alt="La corrección aplicada a un nivel del recinto receptor frente al margen señal-fondo: plana en la saturación de 1,3 dB por debajo de 6 dB, después la curva de resta energética, cayendo a cero en 15 dB con la regla de laboratorio de ISO 10140-4 y en 10 dB con la regla de campo de ISO 16283-1" width="88%" />
 
 *Una regla de tres ramas con dos umbrales, y los umbrales no son los mismos en
 las dos normas. La saturación de 1,3 dB no es una constante mágica: es el valor
@@ -237,7 +237,7 @@ es `None` en caso contrario). Un margen en 6 dB o por debajo emite un
 `LabInsulationWarning` y marca la banda como el límite de medición; captúralo
 con `warnings.simplefilter("error", LabInsulationWarning)`.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lab_insulation_result_es.svg" alt="Las dos magnitudes de laboratorio de ISO 10140 lado a lado: el índice de reducción acústica medido R frente a la referencia ISO 717-1 desplazada a la izquierda, y el nivel de presión acústica de impactos normalizado Ln frente a la referencia ISO 717-2 desplazada a la derecha, cada panel anotado con su índice de un solo número" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lab_insulation_result.svg" alt="Las dos magnitudes de laboratorio de ISO 10140 lado a lado: el índice de reducción acústica medido R frente a la referencia ISO 717-1 desplazada a la izquierda, y el nivel de presión acústica de impactos normalizado Ln frente a la referencia ISO 717-2 desplazada a la derecha, cada panel anotado con su índice de un solo número" width="92%" />
 
 *Las dos magnitudes de laboratorio de ISO 10140 con sus índices ISO 717: el
 $R$ aéreo se evalúa donde la referencia queda **por encima** de la medición,
@@ -290,7 +290,7 @@ plt.show()
 
 </details>
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lab_versus_field_insulation_es.svg" alt="Una misma partición de hormigón de 150 mm dibujada tres veces por banda de tercio de octava: el índice de reducción acústica R de laboratorio con Rw = 49 dB, el R' aparente de la misma pared en un edificio con uniones buenas con R'w = 47 dB, y el R' aparente donde dominan los flancos con R'w = 42 dB, con las dos brechas acotadas" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lab_versus_field_insulation.svg" alt="Una misma partición de hormigón de 150 mm dibujada tres veces por banda de tercio de octava: el índice de reducción acústica R de laboratorio con Rw = 49 dB, el R' aparente de la misma pared en un edificio con uniones buenas con R'w = 47 dB, y el R' aparente donde dominan los flancos con R'w = 42 dB, con las dos brechas acotadas" width="92%" />
 
 *La misma pared de hormigón de 150 mm, medida de tres maneras. Dos decibelios
 de pérdida es lo que cuesta una unión bien ejecutada y es el número que hay que

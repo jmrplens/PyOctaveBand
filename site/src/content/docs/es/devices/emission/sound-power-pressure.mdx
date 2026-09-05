@@ -141,7 +141,7 @@ de abajo es legítimo para una fuente de $d_0 \le 0{,}75$ m — un aparato de
 sobremesa o una bomba pequeña — y no para la máquina de 1,4 m recién calculada;
 el `radius=4.0` del ejemplo de informe de la sección 3 cubre $d_0$ hasta 2 m.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sound_power_surfaces_es.svg" alt="Superficies de medición de ISO 3744: una semiesfera de radio r envolviendo una fuente compacta sobre un plano reflectante, con las diez posiciones de micrófono del Anexo B marcadas, y un paralelepípedo recto (caja) a la distancia de medición d alrededor de una fuente grande" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sound_power_surfaces.svg" alt="Superficies de medición de ISO 3744: una semiesfera de radio r envolviendo una fuente compacta sobre un plano reflectante, con las diez posiciones de micrófono del Anexo B marcadas, y un paralelepípedo recto (caja) a la distancia de medición d alrededor de una fuente grande" width="88%" />
 
 La superficie de caja lleva su propio conjunto de posiciones, y no es el
 conjunto hemisférico del Anexo B: `measurement_positions` lanza un error a
@@ -157,7 +157,7 @@ dirección de referencia de cada micrófono es la normal a su cara, salvo en una
 esquina de la superficie, donde apunta al origen $O$ de la caja de referencia
 (apartado 7.2.2).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_box_array_es.svg" alt="Vista en planta y vista lateral de la superficie de medición en paralelepípedo de ISO 3744 alrededor de una caja de referencia de 1,4 por 0,9 por 1,1 metros a una distancia de medición de 1 m, que da 2a = 3,4 m, 2b = 2,9 m, c = 2,1 m y S = 36,3 metros cuadrados. Cada cara visible se divide con una línea discontinua en áreas parciales iguales porque el lado de 3,4 m supera el límite de 3d, las posiciones clave de micrófono se marcan en los centros de las áreas parciales y en sus esquinas salvo las del plano reflectante, una posición lleva una flecha normal a su cara y una posición de esquina una flecha apuntando al origen O de la caja de referencia" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_box_array.svg" alt="Vista en planta y vista lateral de la superficie de medición en paralelepípedo de ISO 3744 alrededor de una caja de referencia de 1,4 por 0,9 por 1,1 metros a una distancia de medición de 1 m, que da 2a = 3,4 m, 2b = 2,9 m, c = 2,1 m y S = 36,3 metros cuadrados. Cada cara visible se divide con una línea discontinua en áreas parciales iguales porque el lado de 3,4 m supera el límite de 3d, las posiciones clave de micrófono se marcan en los centros de las áreas parciales y en sus esquinas salvo las del plano reflectante, una posición lleva una flecha normal a su cara y una posición de esquina una flecha apuntando al origen O de la caja de referencia" width="92%" />
 
 ### Preparar la medición
 
@@ -221,7 +221,7 @@ print(np.round(res.sound_power_level, 1))               # LW por banda
 res.plot()   # barras de nivel de potencia acústica por banda; LWA en el título (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_pressure_result_es.svg" alt="El espectro de nivel de potencia acústica por superficie envolvente del ejemplo de semiesfera de ISO 3744, una barra por banda de octava de 63 Hz a 8 kHz con pico cerca de 500 Hz, con el total ponderado A de 92,4 dB(A) en el título" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_pressure_result.svg" alt="El espectro de nivel de potencia acústica por superficie envolvente del ejemplo de semiesfera de ISO 3744, una barra por banda de octava de 63 Hz a 8 kHz con pico cerca de 500 Hz, con el total ponderado A de 92,4 dB(A) en el título" width="88%" />
 
 *Una barra por banda: la presión superficial promediada en energía menos las
 correcciones de fondo ($K_1$) y ambiental ($K_2$) más el término de superficie
@@ -318,7 +318,7 @@ envolvente se remontan a uno de estos hábitos:
   la distancia de medición lo bastante pequeña para que $K_2$ quede
   holgadamente por debajo del límite.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/k1_k2_corrections_es.svg" alt="Dos paneles. A la izquierda, la corrección por ruido de fondo K1 frente al margen entre fuente y fondo, cayendo con fuerte pendiente desde 1,26 dB en el criterio de ingeniería de 6 dB hasta 0,46 dB en 10 dB y 0,14 dB en 15 dB, con la región por debajo de 6 dB sombreada y rotulada como acotada y el criterio de 3 dB de ISO 3746 marcado. A la derecha, la corrección ambiental K2 frente a 4S/A en eje logarítmico, con los límites de validez de 4 dB de ISO 3744 y 7 dB de ISO 3746 dibujados y anotados con el 60 % y el 80 % de la energía medida que es de la sala y no de la fuente, y una banda que muestra el desplazamiento cuando el área de absorción A solo se conoce con un más menos 20 por ciento" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/k1_k2_corrections.svg" alt="Dos paneles. A la izquierda, la corrección por ruido de fondo K1 frente al margen entre fuente y fondo, cayendo con fuerte pendiente desde 1,26 dB en el criterio de ingeniería de 6 dB hasta 0,46 dB en 10 dB y 0,14 dB en 15 dB, con la región por debajo de 6 dB sombreada y rotulada como acotada y el criterio de 3 dB de ISO 3746 marcado. A la derecha, la corrección ambiental K2 frente a 4S/A en eje logarítmico, con los límites de validez de 4 dB de ISO 3744 y 7 dB de ISO 3746 dibujados y anotados con el 60 % y el 80 % de la energía medida que es de la sala y no de la fuente, y una banda que muestra el desplazamiento cuando el área de absorción A solo se conoce con un más menos 20 por ciento" width="92%" />
 
 *Las dos correcciones tienen formas opuestas. $K_1$ es plana hasta que el margen
 se cierra y entonces sube con fuerte pendiente, que es la razón de que las
@@ -410,7 +410,7 @@ Esas coordenadas se dibujan directamente con `plot_microphone_positions`, que
 representa el array sobre su superficie de medición en 3-D, numerado como en
 la norma.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_positions_hemisphere_es.svg" alt="Vista tridimensional del array de micrófonos de ISO 3744: diez micrófonos numerados sobre un hemisferio de alambre de 2 m apoyado en un plano reflectante circular sombreado, con las posiciones 1 y 2 cerca del plano, las demás escalonadas en altura hasta las posiciones 9 y 10 cerca de la cúspide, y los ejes x, y y z graduados en metros" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_positions_hemisphere.svg" alt="Vista tridimensional del array de micrófonos de ISO 3744: diez micrófonos numerados sobre un hemisferio de alambre de 2 m apoyado en un plano reflectante circular sombreado, con las posiciones 1 y 2 cerca del plano, las demás escalonadas en altura hasta las posiciones 9 y 10 cerca de la cúspide, y los ejes x, y y z graduados en metros" width="88%" />
 
 *Dónde se colocan de verdad los diez micrófonos del Anexo B sobre el
 hemisferio de 2 m: las alturas se escalonan para que el array muestree toda
@@ -496,7 +496,7 @@ la contraparte de grado 1 del método de superficie envolvente de la Sección 1,
 coordenadas de micrófono normalizadas, una corrección por ruido de fondo por
 posición y una corrección meteorológica explícita.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_precision_anechoic_es.svg" alt="Potencia acústica de precisión de ISO 3745 en una cámara anecoica: paredes revestidas de cuñas, el dispositivo bajo ensayo en el centro y un conjunto hemisférico de micrófonos a un radio fijo, con el nivel de potencia acústica formado a partir de la presión promediada en la superficie más las correcciones de área, ruido de fondo y meteorológica" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_precision_anechoic.svg" alt="Potencia acústica de precisión de ISO 3745 en una cámara anecoica: paredes revestidas de cuñas, el dispositivo bajo ensayo en el centro y un conjunto hemisférico de micrófonos a un radio fijo, con el nivel de potencia acústica formado a partir de la presión promediada en la superficie más las correcciones de área, ruido de fondo y meteorológica" width="92%" />
 
 El panel izquierdo del clip de abajo es para lo que sirve esa sala. Con los
 contornos absorbiendo, un micrófono solo ve lo que la fuente le manda, así que
@@ -581,7 +581,7 @@ print(round(res.surface_area, 3))                 # 6.283  (2*pi*1^2)
 print(np.round(res.sound_power_level, 2))         # [81.85]
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/precision_positions_arrays_es.svg" alt="Dos paneles tridimensionales de los conjuntos de micrófonos de ISO 3745 sobre un radio de 1 m. A la izquierda, la semiesfera de 40 posiciones de la Tabla E.1 sobre su plano reflectante, con las posiciones 1 a 20 de un color y las 21 a 40 de otro para marcar la ampliación. A la derecha, la esfera completa de 20 posiciones de la Tabla D.1 para el caso anecoico, sin plano reflectante" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/precision_positions_arrays.svg" alt="Dos paneles tridimensionales de los conjuntos de micrófonos de ISO 3745 sobre un radio de 1 m. A la izquierda, la semiesfera de 40 posiciones de la Tabla E.1 sobre su plano reflectante, con las posiciones 1 a 20 de un color y las 21 a 40 de otro para marcar la ampliación. A la derecha, la esfera completa de 20 posiciones de la Tabla D.1 para el caso anecoico, sin plano reflectante" width="92%" />
 
 *Los conjuntos de precisión, dibujados desde la misma llamada a
 `precision_positions` que hace el fragmento de arriba. Las veinte primeras
@@ -709,7 +709,7 @@ print(round(float(result.uncertainty), 1))    # 4.1  dB
 result.plot()   # espectro LW, LWA en el título (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/precision_anechoic_power_es.svg" alt="El espectro de nivel de potencia acústica de precisión de una máquina con pico en frecuencias medias medida sobre el conjunto hemisférico de ISO 3745, una barra por banda con pico cerca de 1 kHz, con el total ponderado A de 89,3 dB(A) en el título" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/precision_anechoic_power.svg" alt="El espectro de nivel de potencia acústica de precisión de una máquina con pico en frecuencias medias medida sobre el conjunto hemisférico de ISO 3745, una barra por banda con pico cerca de 1 kHz, con el total ponderado A de 89,3 dB(A) en el título" width="88%" />
 
 *Una barra por banda: la presión promediada en la superficie más las correcciones
 de área, ruido de fondo y meteorológica dan $L_W(f)$, y la suma energética
@@ -905,7 +905,7 @@ emitido $L_J = 100$ dB. Esa identidad es lo que dibuja la figura de abajo, y
 aquello a lo que los propios tests de la biblioteca anclan la cadena de energía
 acústica, campo a campo.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_energy_burst_es.svg" alt="Dos paneles. A la izquierda, el nivel de suceso aislado acumulado de una ráfaga de impacto y de una fuente estacionaria de 80 dB a lo largo de una ventana de 10 s: la ráfaga empieza a los 2 s y su curva queda plana en 90 dB en cosa de un segundo, la fuente estacionaria sube como 10 lg(t/T0) y alcanza los mismos 90 dB en la línea discontinua T = 10 s; dos rótulos dicen que todos los 90 dB de la ráfaga están en el primer segundo y que el L_E de la fuente estacionaria es L_p más 10 lg(T/T0), 80 más 10. A la derecha, siete barras de banda de octava de 125 Hz a 8 kHz del nivel de energía acústica de la ráfaga sobre una semiesfera de 2 m, que suben de 95 dB a 125 Hz hasta 103,5 dB a 1 kHz y bajan a 91 dB a 8 kHz, con el total ponderado A de 107,7 dB(A) en el título" width="96%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_energy_burst.svg" alt="Dos paneles. A la izquierda, el nivel de suceso aislado acumulado de una ráfaga de impacto y de una fuente estacionaria de 80 dB a lo largo de una ventana de 10 s: la ráfaga empieza a los 2 s y su curva queda plana en 90 dB en cosa de un segundo, la fuente estacionaria sube como 10 lg(t/T0) y alcanza los mismos 90 dB en la línea discontinua T = 10 s; dos rótulos dicen que todos los 90 dB de la ráfaga están en el primer segundo y que el L_E de la fuente estacionaria es L_p más 10 lg(T/T0), 80 más 10. A la derecha, siete barras de banda de octava de 125 Hz a 8 kHz del nivel de energía acústica de la ráfaga sobre una semiesfera de 2 m, que suben de 95 dB a 125 Hz hasta 103,5 dB a 1 kHz y bajan a 91 dB a 8 kHz, con el total ponderado A de 107,7 dB(A) en el título" width="96%" />
 
 *A la izquierda, el nivel de suceso aislado acumulado de una ráfaga de impacto
 y de una fuente estacionaria de 80 dB a lo largo de una ventana de 10 s: los

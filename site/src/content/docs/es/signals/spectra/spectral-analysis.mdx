@@ -102,7 +102,7 @@ fijados, cada cifra de calidad se deriva de la decisión principal de diseño,
 la longitud del segmento. El diagrama la recorre con los números del ejemplo
 de esta página.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spectral_analysis_es.svg" alt="Diagrama de bloques de la cadena de la PSD de Welch: un registro de ruido rosa de 20 segundos a 48 kilohercios se divide en segmentos de 4096 muestras con 50 por ciento de solape dando 467 segmentos y una separación de bins de 11,7 hercios, cada segmento se enventana con Hann para un ancho de banda de resolución de 17,6 hercios, los periodogramas unilaterales del cuadrado de la FFT se promedian en 442 promedios efectivos, y el resultado es Gxx de f con intervalo de confianza chi-cuadrado, un error aleatorio de 1 entre la raíz de n d igual al 4,8 por ciento y unos 885 grados de libertad; una nota final enuncia el compromiso de que los segmentos largos compran resolución pero gastan promedios" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spectral_analysis.svg" alt="Diagrama de bloques de la cadena de la PSD de Welch: un registro de ruido rosa de 20 segundos a 48 kilohercios se divide en segmentos de 4096 muestras con 50 por ciento de solape dando 467 segmentos y una separación de bins de 11,7 hercios, cada segmento se enventana con Hann para un ancho de banda de resolución de 17,6 hercios, los periodogramas unilaterales del cuadrado de la FFT se promedian en 442 promedios efectivos, y el resultado es Gxx de f con intervalo de confianza chi-cuadrado, un error aleatorio de 1 entre la raíz de n d igual al 4,8 por ciento y unos 885 grados de libertad; una nota final enuncia el compromiso de que los segmentos largos compran resolución pero gastan promedios" width="92%" />
 
 Promediar $n_\mathrm{d}$ segmentos independientes da al estimador $2 n_\mathrm{d}$ grados de
 libertad chi-cuadrado (ec. 8.162), de donde sale todo lo demás:
@@ -187,7 +187,7 @@ record_s = q * 0.5 * nperseg / 48000   # nd = 100 promedios con solape del 50 %
 print(round(b_e, 2), int(nperseg), round(record_s))     # 0.49 146969 153
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psd_segment_tradeoff_es.svg" alt="Izquierda: la estimación de Welch de una resonancia de 25 hercios de ancho en 1 kilohercio calculada con longitudes de segmento de 512, 1024, 4096 y 16384 muestras; los segmentos cortos recortan y ensanchan el pico mientras que los largos lo resuelven. Derecha: el sesgo de resolución y el error aleatorio en decibelios frente a la longitud de segmento en eje logarítmico, con el sesgo cayendo abruptamente y el error aleatorio subiendo despacio, cruzándose cerca de 7400 muestras, y el déficit medido del pico siguiendo al sesgo" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psd_segment_tradeoff.svg" alt="Izquierda: la estimación de Welch de una resonancia de 25 hercios de ancho en 1 kilohercio calculada con longitudes de segmento de 512, 1024, 4096 y 16384 muestras; los segmentos cortos recortan y ensanchan el pico mientras que los largos lo resuelven. Derecha: el sesgo de resolución y el error aleatorio en decibelios frente a la longitud de segmento en eje logarítmico, con el sesgo cayendo abruptamente y el error aleatorio subiendo despacio, cruzándose cerca de 7400 muestras, y el déficit medido del pico siguiendo al sesgo" width="92%" />
 
 *La misma resonancia de 25 Hz de ancho vista con cuatro longitudes de segmento.
 Con `nperseg = 512` el ancho de banda de análisis es de 140,6 Hz, cinco veces la
@@ -229,7 +229,7 @@ multiplica por la separación entre bins) y divide por $p_0^2$;
 sustituto de esa integración, como detalla ese mismo apartado. El factor sale de
 [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psd_confidence_smoothing_es.svg" alt="Densidad espectral de potencia de Welch de ruido rosa en dB por Hz entre 20 Hz y 20 kHz, con la banda de confianza chi-cuadrado del 95 por ciento sombreada alrededor de la estimación, la curva suavizada en 1/3 de octava encima y la ley de potencias exacta de -3,01 dB por octava como línea discontinua de referencia" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psd_confidence_smoothing.svg" alt="Densidad espectral de potencia de Welch de ruido rosa en dB por Hz entre 20 Hz y 20 kHz, con la banda de confianza chi-cuadrado del 95 por ciento sombreada alrededor de la estimación, la curva suavizada en 1/3 de octava encima y la ley de potencias exacta de -3,01 dB por octava como línea discontinua de referencia" width="82%" loading="eager" />
 
 *Lo que compran 20 s de registro, leído sobre la figura. 467 segmentos de 4096
 muestras dan 442 promedios efectivos, un error aleatorio normalizado de 0,047 y
@@ -304,7 +304,7 @@ print(res.magnitude_random_error[100], res.phase_std[100])  # errores del bin 10
 res.plot()   # magnitud, fase con banda ±sigma, coherencia
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cross_spectral_density_es.svg" alt="Dos paneles para la densidad espectral cruzada de un camino de dos sensores con un retardo de 2 milisegundos: la estimación de magnitud de Welch fluctuando alrededor de un nivel plano, y debajo la fase desenrollada del espectro cruzado cayendo como una línea recta sobre un eje de frecuencia logarítmico, exactamente sobre la referencia discontinua de menos dos pi f tau con una banda estrecha de una sigma a su alrededor" width="86%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cross_spectral_density.svg" alt="Dos paneles para la densidad espectral cruzada de un camino de dos sensores con un retardo de 2 milisegundos: la estimación de magnitud de Welch fluctuando alrededor de un nivel plano, y debajo la fase desenrollada del espectro cruzado cayendo como una línea recta sobre un eje de frecuencia logarítmico, exactamente sobre la referencia discontinua de menos dos pi f tau con una banda estrecha de una sigma a su alrededor" width="86%" />
 
 *La densidad espectral cruzada de un camino con retardo de 2 ms: la fase
 desenrollada es exactamente la recta $-2\pi f\tau$, así que su pendiente lee el
@@ -396,7 +396,7 @@ print(np.median(res.snr_db))             # -> 10·lg(2.56) = 4.1 dB
 res.plot()                               # Gyy, Gvv, Gnn y el panel de SNR
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/coherent_output_snr_es.svg" alt="Dos paneles para el espectro de salida coherente de un sistema de ruido blanco con ruido aditivo: el espectro de salida medido con la parte coherente aproximadamente 1,5 decibelios por debajo y el suelo de ruido no correlacionado unos 6 decibelios más abajo, y debajo la relación señal-ruido espectral fluctuando alrededor de la línea discontinua de forma cerrada en 4,1 decibelios" width="86%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/coherent_output_snr.svg" alt="Dos paneles para el espectro de salida coherente de un sistema de ruido blanco con ruido aditivo: el espectro de salida medido con la parte coherente aproximadamente 1,5 decibelios por debajo y el suelo de ruido no correlacionado unos 6 decibelios más abajo, y debajo la relación señal-ruido espectral fluctuando alrededor de la línea discontinua de forma cerrada en 4,1 decibelios" width="86%" />
 
 *El reparto exacto del modelo del fragmento: $G_{vv} = \gamma^2 G_{yy}$ explica la
 salida salvo el resto de ruido plano $G_{nn}$, y la SNR espectral se dispersa
@@ -608,7 +608,7 @@ para cualquier comparación de densidad frente a banda en esta biblioteca; el §
 de arriba da la conversión exacta, y en
 [Niveles](/phonometry/es/signals/levels/levels/) vive el lado de las bandas.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/noise_colors_es.svg" alt="Densidades espectrales de Welch de los cinco colores de ruido entre 20 hercios y 20 kilohercios, cada una normalizada a su propio nivel en 1 kilohercio de modo que las cinco rectas se abren en abanico desde un único punto: el violeta subiendo a 6 dB por octava, el azul a 3, el blanco plano, el rosa cayendo a 3 y el rojo a 6, cada uno con su ley de potencias exacta discontinua debajo y la pendiente de regresión medida en la leyenda" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/noise_colors.svg" alt="Densidades espectrales de Welch de los cinco colores de ruido entre 20 hercios y 20 kilohercios, cada una normalizada a su propio nivel en 1 kilohercio de modo que las cinco rectas se abren en abanico desde un único punto: el violeta subiendo a 6 dB por octava, el azul a 3, el blanco plano, el rosa cayendo a 3 y el rojo a 6, cada uno con su ley de potencias exacta discontinua debajo y la pendiente de regresión medida en la leyenda" width="88%" />
 
 *Los cinco generadores a lo largo de tres décadas, cada uno normalizado a su
 propio nivel en 1 kHz para que las pendientes se abran en abanico desde un solo
@@ -659,7 +659,7 @@ rectangular, 3/2 para Hann, 1987/1458 para Hamming y 1523/882 para Blackman
 $20\log_{10}(N\sin(\pi/2N))$, el núcleo de Dirichlet evaluado medio bin fuera del
 centro.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/window_functions_tradeoff_es.svg" alt="Espectros de las ventanas rectangular, Hann, Hamming y Blackman a lo largo de 16 bins de la DFT, mostrando el compromiso entre anchura del lóbulo principal y nivel de los lóbulos laterales, con el ancho de banda equivalente de ruido y el lóbulo lateral máximo de cada ventana en la leyenda" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/window_functions_tradeoff.svg" alt="Espectros de las ventanas rectangular, Hann, Hamming y Blackman a lo largo de 16 bins de la DFT, mostrando el compromiso entre anchura del lóbulo principal y nivel de los lóbulos laterales, con el ancho de banda equivalente de ruido y el lóbulo lateral máximo de cada ventana en la leyenda" width="82%" />
 
 *El compromiso en una imagen, y 0,73 de bin cuestan 44,8 dB de suelo de fuga.
 Pasar de la rectangular a la Blackman baja el lóbulo lateral máximo de −13,3 dB
@@ -785,7 +785,7 @@ sus concentraciones reproducen la tabla en cuádruple precisión de Percival y
 Walden (tabla 382) hasta la precisión de máquina, que es el oráculo ancla de
 la batería de tests.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/multitaper_psd_confidence_es.svg" alt="Izquierda: la densidad espectral multitaper de un registro de ruido rosa de 171 milisegundos con su banda de confianza del 95 por ciento, frente a una estimación de Welch con solo 6,7 promedios efectivos y una banda visiblemente más ancha, una estimación de una sola ventana como línea gris dentada y la ley exacta de menos 3,01 dB por octava discontinua. Derecha: un tono de 60 dB sobre un suelo rosa, donde la estimación de Welch con ventana de Hann deja una falda más ancha alrededor del tono que la multitaper adaptativa, y los grados de libertad equivalentes bajan de unos nueve a cinco allí donde los pesos adaptativos los gastan" width="94%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/multitaper_psd_confidence.svg" alt="Izquierda: la densidad espectral multitaper de un registro de ruido rosa de 171 milisegundos con su banda de confianza del 95 por ciento, frente a una estimación de Welch con solo 6,7 promedios efectivos y una banda visiblemente más ancha, una estimación de una sola ventana como línea gris dentada y la ley exacta de menos 3,01 dB por octava discontinua. Derecha: un tono de 60 dB sobre un suelo rosa, donde la estimación de Welch con ventana de Hann deja una falda más ancha alrededor del tono que la multitaper adaptativa, y los grados de libertad equivalentes bajan de unos nueve a cinco allí donde los pesos adaptativos los gastan" width="94%" />
 
 *A la izquierda, el caso en el que el texto sostiene que gana la multitaper: un
 registro de 171 ms. Welch con un segmento de 2048 muestras solo mete

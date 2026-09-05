@@ -74,7 +74,7 @@ por el estimador $H_1 = G_{xy}/G_{xx}$ con una coherencia que lo vigila. La
 inversión regularizada del §3 trabaja después sobre la respuesta medida que
 salga de cualquiera de ellas.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_system_measurement_es.svg" alt="Cadena de medición de respuesta en frecuencia a dos canales: un generador de señal con ruido de banda ancha o un barrido alimenta un amplificador de potencia y el altavoz en ensayo, un micrófono de medición recoge la salida acústica, el canal 1 lleva la referencia eléctrica x(t) y el canal 2 la respuesta del micrófono y(t), el análisis FFT de dos canales con segmentos Hann promediados a la Welch con 50 por ciento de solape produce los espectros Gxx, Gyy y Gxy, y dos cajas de resultado dan el estimador H1 igual a Gxy entre Gxx, insesgado con ruido a la salida, y la coherencia gamma cuadrado igual al módulo al cuadrado de Gxy entre el producto Gxx por Gyy, que vale uno en un camino lineal sin ruido y cae con ruido, distorsión o un retardo que deriva o está desalineado" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_system_measurement.svg" alt="Cadena de medición de respuesta en frecuencia a dos canales: un generador de señal con ruido de banda ancha o un barrido alimenta un amplificador de potencia y el altavoz en ensayo, un micrófono de medición recoge la salida acústica, el canal 1 lleva la referencia eléctrica x(t) y el canal 2 la respuesta del micrófono y(t), el análisis FFT de dos canales con segmentos Hann promediados a la Welch con 50 por ciento de solape produce los espectros Gxx, Gyy y Gxy, y dos cajas de resultado dan el estimador H1 igual a Gxy entre Gxx, insesgado con ruido a la salida, y la coherencia gamma cuadrado igual al módulo al cuadrado de Gxy entre el producto Gxx por Gyy, que vale uno en un camino lineal sin ruido y cae con ruido, distorsión o un retardo que deriva o está desalineado" width="92%" />
 
 ## 1. Pares complementarios de Golay
 
@@ -121,7 +121,7 @@ print(ir.method, ir.size)                   # golay 16384
 ir.plot(language="es")
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/golay_ir_es.svg" alt="La respuesta al impulso de un sistema paso banda recuperada con un par de Golay durante los primeros seis milisegundos, dibujada encima de la respuesta verdadera discontinua sin diferencia visible, y una nota que dice máximo de recuperada menos verdadera igual a 2,1e-14, identidad exacta sin ruido" width="86%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/golay_ir.svg" alt="La respuesta al impulso de un sistema paso banda recuperada con un par de Golay durante los primeros seis milisegundos, dibujada encima de la respuesta verdadera discontinua sin diferencia visible, y una nota que dice máximo de recuperada menos verdadera igual a 2,1e-14, identidad exacta sin ruido" width="86%" />
 
 *La recuperación de Golay de la respuesta al impulso de un sistema paso
 banda: la suma de las correlaciones complementarias cae sobre la respuesta
@@ -253,7 +253,7 @@ print(round(sweep.crest_factor_db, 1))      # 4.2 (dB; el ideal es 3,02)
 sweep.plot(language="es")
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/shaped_sweep_es.svg" alt="Dos paneles para un barrido conformado rosa de 50 hercios a 5 kilohercios: la forma de onda temporal con una envolvente casi constante durante dos segundos y, debajo, el espectro de Welch del barrido cayendo tres decibelios por octava exactamente sobre la línea discontinua del objetivo rosa dentro de la banda sombreada del barrido" width="88%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/shaped_sweep.svg" alt="Dos paneles para un barrido conformado rosa de 50 hercios a 5 kilohercios: la forma de onda temporal con una envolvente casi constante durante dos segundos y, debajo, el espectro de Welch del barrido cayendo tres decibelios por octava exactamente sobre la línea discontinua del objetivo rosa dentro de la banda sombreada del barrido" width="88%" loading="eager" />
 
 *Los dos paneles son la misma afirmación vista dos veces. La envolvente es plana
 porque la forma se compró con tiempo de permanencia y no con amplitud, que es
@@ -440,7 +440,7 @@ print(round(inv.max_gain_db, 1))    # -6.0 (dB: refuerzo fuera de banda acotado)
 inv.plot(language="es")
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/regularized_inversion_es.svg" alt="Magnitudes sobre frecuencia logarítmica para una inversión regularizada de una respuesta paso banda: la respuesta medida en azul, el filtro inverso en rojo reflejándola dentro de la banda ecualizada sombreada de 200 hercios a 4 kilohercios, y el producto ecualizado en verde leyendo exactamente cero decibelios en la banda y cayendo fuera, donde la regularización limita la ganancia" width="88%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/regularized_inversion.svg" alt="Magnitudes sobre frecuencia logarítmica para una inversión regularizada de una respuesta paso banda: la respuesta medida en azul, el filtro inverso en rojo reflejándola dentro de la banda ecualizada sombreada de 200 hercios a 4 kilohercios, y el producto ecualizado en verde leyendo exactamente cero decibelios en la banda y cayendo fuera, donde la regularización limita la ganancia" width="88%" loading="eager" />
 
 *La curva verde es toda la prueba: dentro de la banda ecualizada se aparta de
 0 dB como mucho 9×10⁻⁶ dB, que es $\varepsilon/(|H|^2+\varepsilon)$ evaluada

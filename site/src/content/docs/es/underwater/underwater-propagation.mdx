@@ -212,7 +212,7 @@ por defecto y la referencia), **Ainslie-McColm** (`"ainslie-mccolm"`, 1998) o
 **Thorp** (`"thorp"`, 1967, solo frecuencia); los dos primeros coinciden
 dentro de un ~10 % entre 100 Hz y 1 MHz.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_propagation_loss_es.svg" alt="Pérdida de propagación submarina frente a la distancia a 10 kHz, con las contribuciones de divergencia geométrica y absorción de volumen dibujadas por separado, la pérdida creciente hacia abajo" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_propagation_loss.svg" alt="Pérdida de propagación submarina frente a la distancia a 10 kHz, con las contribuciones de divergencia geométrica y absorción de volumen dibujadas por separado, la pérdida creciente hacia abajo" width="82%" loading="eager" />
 
 *Los dos términos se intercambian los papeles con la distancia, y por eso se
 dibujan aparte. Hasta la transición de 1 km la pérdida es divergencia y casi
@@ -278,7 +278,7 @@ $R_0 = 1000$ m en 15,8 km: el mismo océano, siete kilómetros de diferencia.
 
 El modelo de absorción importa menos, y vale la pena ver cuánto menos.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/seawater_absorption_es.svg" alt="A la izquierda, el coeficiente de absorción de volumen de 10 hercios a 1 megahercio para los modelos de Francois-Garrison, Ainslie-McColm y Thorp a 10 grados Celsius, 35 partes por mil y 100 metros, con las regiones de relajación del ácido bórico, del sulfato de magnesio y del agua pura anotadas sobre la curva de referencia; a la derecha, la desviación de los otros dos modelos respecto a Francois-Garrison en tanto por ciento, con una banda sombreada de más menos diez por ciento" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/seawater_absorption.svg" alt="A la izquierda, el coeficiente de absorción de volumen de 10 hercios a 1 megahercio para los modelos de Francois-Garrison, Ainslie-McColm y Thorp a 10 grados Celsius, 35 partes por mil y 100 metros, con las regiones de relajación del ácido bórico, del sulfato de magnesio y del agua pura anotadas sobre la curva de referencia; a la derecha, la desviación de los otros dos modelos respecto a Francois-Garrison en tanto por ciento, con una banda sombreada de más menos diez por ciento" width="92%" />
 
 *Ainslie-McColm se queda dentro del ±10 % de la referencia de
 Francois-Garrison en toda la banda, que es lo que lo hace un sustituto legítimo.
@@ -355,7 +355,7 @@ promediado en profundidad (la diferencia entre las dos magnitudes de la
 ISO 18405 es la convención de distancia de referencia, no la física), y por eso
 ambas se dibujan en el mismo eje.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weston_regimes_es.svg" alt="Los cuatro regímenes de propagación de Weston en aguas someras a 250 Hz sobre arena media con 50 m de columna de agua: la pérdida compuesta sigue la divergencia esférica hasta unos 43 m, la cilíndrica hasta 412 m, la ley de descamado de modos 15 lg r hasta unos 20 km y después la caída exponencial de modo único, con cada ley individual dibujada para comparar" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weston_regimes.svg" alt="Los cuatro regímenes de propagación de Weston en aguas someras a 250 Hz sobre arena media con 50 m de columna de agua: la pérdida compuesta sigue la divergencia esférica hasta unos 43 m, la cilíndrica hasta 412 m, la ley de descamado de modos 15 lg r hasta unos 20 km y después la caída exponencial de modo único, con cada ley individual dibujada para comparar" width="82%" />
 
 *Aquí no se ha elegido nada: las tres transiciones en 42,7 m, 411,8 m y 20,1 km
 salen del lecho marino y de nada más, a través del ángulo crítico de 33,6° y del
@@ -432,7 +432,7 @@ $\partial c/\partial z \approx 0.016$ m/s por metro; está ajustada hasta unos
 casi 6 m/s, que es el único desacuerdo grande de la familia y es por entero
 cuestión de usarla fuera de su dominio.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_sound_speed_es.svg" alt="Perfil de velocidad del sonido en agua de mar con la ecuación UNESCO: capa de mezcla cálida, termoclina, eje del canal sonoro en el mínimo y la velocidad creciendo con la presión en profundidad" width="60%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_sound_speed.svg" alt="Perfil de velocidad del sonido en agua de mar con la ecuación UNESCO: capa de mezcla cálida, termoclina, eje del canal sonoro en el mínimo y la velocidad creciendo con la presión en profundidad" width="60%" />
 
 *Por encima del eje manda la temperatura y por debajo la presión, y el punto de
 retorno es el canal sonoro. En este perfil la velocidad cae de 1515,79 m/s en la
@@ -471,7 +471,7 @@ profile = underwater.sound_speed_profile(depths, temps, 35.0, model="unesco")
 profile.plot()   # velocidad del sonido frente a profundidad
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_speed_models_es.svg" alt="A la izquierda, el perfil de velocidad del sonido calculado con las ecuaciones UNESCO, Del Grosso, Mackenzie y Medwin sobre el mismo perfil de temperatura y salinidad desde la superficie hasta 5000 metros, con las cuatro curvas indistinguibles a esa escala; a la derecha, la diferencia de cada una respecto a UNESCO frente a la profundidad en un eje de más menos siete metros por segundo, con las profundidades más allá del límite de validez de mil metros de Medwin sombreadas y con Medwin apartándose casi seis metros por segundo a 5000 metros" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_speed_models.svg" alt="A la izquierda, el perfil de velocidad del sonido calculado con las ecuaciones UNESCO, Del Grosso, Mackenzie y Medwin sobre el mismo perfil de temperatura y salinidad desde la superficie hasta 5000 metros, con las cuatro curvas indistinguibles a esa escala; a la derecha, la diferencia de cada una respecto a UNESCO frente a la profundidad en un eje de más menos siete metros por segundo, con las profundidades más allá del límite de validez de mil metros de Medwin sombreadas y con Medwin apartándose casi seis metros por segundo a 5000 metros" width="92%" />
 
 *A la escala del perfil las cuatro ecuaciones son una sola curva. El panel de
 diferencias es el útil: Del Grosso y Mackenzie se quedan dentro de 0,85 m/s de
@@ -555,7 +555,7 @@ A escala oceánica real el eje del canal queda hacia los 1200 m, y las
 llegadas atrapadas son rayos que ciclan en torno al mínimo de velocidad a lo
 largo de decenas de kilómetros.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sofar_channel_es.svg" alt="El canal SOFAR: un perfil de velocidad del sonido del Atlántico Norte con 1524 m/s en superficie, un mínimo cercano a 1492 m/s en el eje del canal a 1200 m y 1527 m/s en el fondo a 4800 m, junto a trayectorias de rayos de una fuente en el eje que oscilan en torno al mínimo de velocidad y quedan atrapadas sin tocar la superficie ni el fondo" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sofar_channel.svg" alt="El canal SOFAR: un perfil de velocidad del sonido del Atlántico Norte con 1524 m/s en superficie, un mínimo cercano a 1492 m/s en el eje del canal a 1200 m y 1527 m/s en el fondo a 4800 m, junto a trayectorias de rayos de una fuente en el eje que oscilan en torno al mínimo de velocidad y quedan atrapadas sin tocar la superficie ni el fondo" width="92%" />
 
 <span id="ecuacion-del-sonar"></span>
 
@@ -583,9 +583,9 @@ el término $TS$. La reverberación no es ruido ambiental: es la propia emisión
 del sonar dispersada de vuelta por la superficie, el volumen y el fondo, así
 que escala con el nivel emitido y sustituye a $NL - DI$ en vez de sumarse a él.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sonar_equation_es.svg" alt="Las dos geometrías del sonar: la pasiva, con un blanco que radia, una pérdida de propagación de ida, un campo de ruido ambiental isótropo, un array receptor con su índice de directividad y un detector con su umbral de detección; y la activa monoestática, con emisor y receptor en un mismo punto, pérdidas de propagación de ida y de vuelta, una fuerza del blanco dibujada como un lóbulo retrodispersado, y dispersión en la superficie, el volumen y el fondo que alimenta un nivel de reverberación que sustituye al término de ruido" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sonar_equation.svg" alt="Las dos geometrías del sonar: la pasiva, con un blanco que radia, una pérdida de propagación de ida, un campo de ruido ambiental isótropo, un array receptor con su índice de directividad y un detector con su umbral de detección; y la activa monoestática, con emisor y receptor en un mismo punto, pérdidas de propagación de ida y de vuelta, una fuerza del blanco dibujada como un lóbulo retrodispersado, y dispersión en la superficie, el volumen y el fondo que alimenta un nivel de reverberación que sustituye al término de ruido" width="92%" />
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_equation_es.svg" alt="Ecuación del sonar pasivo: el exceso de señal cae con la pérdida de propagación y cruza el cero, el límite de detección, en la figura de mérito" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_equation.svg" alt="Ecuación del sonar pasivo: el exceso de señal cae con la pérdida de propagación y cruza el cero, el límite de detección, en la figura de mérito" width="82%" />
 
 *Una recta de pendiente −1, y su ordenada en el origen es todo el diseño. El
 exceso de señal cae decibelio a decibelio con la pérdida de propagación y cruza
@@ -742,7 +742,7 @@ es una elección que hay que tomar a propósito y no una que se hereda; y a
 pasan tampoco son decorativas. Echa mano de `detection_range_from_curve` siempre
 que la pérdida venga de un método numérico en vez de una ley.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/detection_range_es.svg" alt="A la izquierda, la pérdida de propagación en forma cerrada del ejemplo activo de 50 kilohercios de Ainslie cruzando una sola vez una figura de mérito de 82,7 decibelios, a 1319 metros; a la derecha, una pérdida de propagación de modos normales a 30 hercios en una guía de 100 metros cruzando ocho veces una figura de mérito de 60 decibelios entre 1 y 6 kilómetros, con el primer cruce y el último marcados" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/detection_range.svg" alt="A la izquierda, la pérdida de propagación en forma cerrada del ejemplo activo de 50 kilohercios de Ainslie cruzando una sola vez una figura de mérito de 82,7 decibelios, a 1319 metros; a la derecha, una pérdida de propagación de modos normales a 30 hercios en una guía de 100 metros cruzando ocho veces una figura de mérito de 60 decibelios entre 1 y 6 kilómetros, con el primer cruce y el último marcados" width="92%" />
 
 *La pérdida en forma cerrada crece monótonamente, así que el cruce es único y
 `detection_range` puede devolverlo. La pérdida de una guía real oscila: aquí la
@@ -798,7 +798,7 @@ de pérdida por reflexión $\eta$ de Weston. Lee las dos cosas juntas: la curva 
 Rayleigh para localizar el ángulo crítico y la forma de la pérdida por encima de
 él, y el gradiente de Weston cuando la pregunta es hasta dónde llega el sonido.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/seabed_reflection_es.svg" alt="Pérdida por reflexión en el fondo frente al ángulo rasante para un fondo arenoso rápido: pérdida nula por debajo del ángulo rasante crítico, creciendo bruscamente por encima" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/seabed_reflection.svg" alt="Pérdida por reflexión en el fondo frente al ángulo rasante para un fondo arenoso rápido: pérdida nula por debajo del ángulo rasante crítico, creciendo bruscamente por encima" width="82%" />
 
 *Un rayo que se mantiene rasante no paga nada, y uno empinado lo paga casi todo.
 Para este par de agua sobre arena el ángulo crítico es de 24,62°: por debajo la
@@ -844,7 +844,7 @@ su `magnitude` $|R|$, el `bottom_loss` (dB) y los parámetros de la interfase en
 de reflexión $|R|$ (unidad por debajo del ángulo crítico y decreciente hasta el
 valor de incidencia normal a $90°$).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/seabed_reflection_coefficient_es.svg" alt="Módulo del coeficiente de reflexión del fondo frente al ángulo rasante para un fondo arenoso rápido: reflexión total por debajo del ángulo rasante crítico, decreciendo hasta el valor de incidencia normal por encima" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/seabed_reflection_coefficient.svg" alt="Módulo del coeficiente de reflexión del fondo frente al ángulo rasante para un fondo arenoso rápido: reflexión total por debajo del ángulo rasante crítico, decreciendo hasta el valor de incidencia normal por encima" width="82%" />
 
 *La misma interfase que la pérdida de arriba, leída como amplitud. $|R|$ vale
 exactamente 1 hasta 24,62° y a partir de ahí cae deprisa: 0,403 a 45° y 0,353
@@ -954,7 +954,7 @@ térmico de Mellen, que fija el suelo absoluto de cualquier medida con hidrófon
 aproximadamente 30-100 dB re 1 µPa²/Hz entre 100 Hz y 100 kHz es un error de
 entrada y no un océano insólito.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ocean_ambient_noise_es.svg" alt="Niveles espectrales de ruido ambiental de Wenz para dos velocidades de viento, con el ruido de viento cayendo 5 dB por octava y el ruido térmico creciendo por encima de unos 50 kHz" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ocean_ambient_noise.svg" alt="Niveles espectrales de ruido ambiental de Wenz para dos velocidades de viento, con el ruido de viento cayendo 5 dB por octava y el ruido térmico creciendo por encima de unos 50 kHz" width="82%" />
 
 *La regla de los cincos, medida: entre 500 Hz y 5 kHz la rama de viento cae
 5,02 dB por octava, y pasar de 5 a 20 nudos la levanta 10,03 dB a 1 kHz, de
@@ -1003,7 +1003,7 @@ Cuando no hay espectro medido, el nivel de fuente de un buque puede
 (MacGillivray & de Jong 2021, por defecto, validado contra 1862 medidas),
 **RANDI 3.1** o **Wales & Heitmeyer** (2002).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ship_traffic_noise_es.svg" alt="Espectros de nivel de fuente predichos por JOMOPANS-ECHO para un portacontenedores, un crucero y un remolcador, con los buques de carga mostrando una joroba de baja frecuencia por debajo de 100 Hz" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ship_traffic_noise.svg" alt="Espectros de nivel de fuente predichos por JOMOPANS-ECHO para un portacontenedores, un crucero y un remolcador, con los buques de carga mostrando una joroba de baja frecuencia por debajo de 100 Hz" width="82%" />
 
 *La clase, la velocidad y la eslora son las únicas entradas, y abarcan 45 dB. El
 portacontenedores alcanza su máximo de 174,3 dB re 1 µPa²/Hz a 31,6 Hz, el

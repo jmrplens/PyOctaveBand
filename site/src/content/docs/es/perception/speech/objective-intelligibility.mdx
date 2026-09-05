@@ -117,7 +117,7 @@ Todo hasta los segmentos de 384 ms es común; las dos medidas solo se separan
 en la correlación. El diagrama despliega la cadena con los números del
 ejemplo del enmascarador plano.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_objective_intelligibility_es.svg" alt="Diagrama de bloques de la cadena de procesado de STOI y ESTOI: una referencia limpia y una versión degradada, en el ejemplo de la guía material tipo habla en un enmascarador plano a 0 dB de relación señal-ruido, se remuestrean a 10 kilohercios descartando las tramas silenciosas, pasan por una DFT de corto plazo de tramas Hann de 256 muestras con 50 por ciento de solape agrupada en 15 bandas de tercio de octava desde 150 hercios, y se comparan en segmentos de 384 milisegundos; la cadena se divide después en la correlación de envolventes con recorte de STOI y la correlación espectral normalizada por filas y columnas de ESTOI, y el ejemplo da STOI igual a 0,727, con la banda más baja conservando 0,27 de la correlación y las bandas por encima de 1,9 kilohercios llegando a 0,90" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_objective_intelligibility.svg" alt="Diagrama de bloques de la cadena de procesado de STOI y ESTOI: una referencia limpia y una versión degradada, en el ejemplo de la guía material tipo habla en un enmascarador plano a 0 dB de relación señal-ruido, se remuestrean a 10 kilohercios descartando las tramas silenciosas, pasan por una DFT de corto plazo de tramas Hann de 256 muestras con 50 por ciento de solape agrupada en 15 bandas de tercio de octava desde 150 hercios, y se comparan en segmentos de 384 milisegundos; la cadena se divide después en la correlación de envolventes con recorte de STOI y la correlación espectral normalizada por filas y columnas de ESTOI, y el ejemplo da STOI igual a 0,727, con la banda más baja conservando 0,27 de la correlación y las bandas por encima de 1,9 kilohercios llegando a 0,90" width="92%" />
 
 ### Conseguir un par válido
 
@@ -175,7 +175,7 @@ a ser responsabilidad de quien mide:
   número.
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_stoi_bench_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_stoi_bench.svg"
   alt="El banco para un par capturado acústicamente. Un archivo de habla limpia se bifurca en dos caminos: el superior va directo a la comparación, etiquetado como el archivo original y nunca una regrabación; el inferior pasa por un amplificador y un altavoz de reproducción calibrados hasta una caja de ensayo que aloja el equipo bajo ensayo, un audífono sobre un oído artificial o unos auriculares sobre un simulador de torso, y sale por un micrófono de captura y su preamplificador. Ambos caminos se encuentran en un bloque de alinear y recortar cuyas llamadas dicen correlacionar las envolventes, igual longitud y un solo reloj, y solo entonces entran en la cadena de STOI y ESTOI. Una llamada a trazos bajo el camino inferior dice que hay que recorrerlo una vez con el equipo puenteado, porque el altavoz, el ruido de la caja y el micrófono se puntúan también como degradación, y un pie dice que hay que reproducir al nivel de trabajo del equipo y repetir la captura"
   width="94%"
 />
@@ -229,7 +229,7 @@ vista por bandas antes de citar el índice: muestra *dónde* muerde la
 degradación, algo que el número único no puede indicar.
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stoi_band_scores_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stoi_band_scores.svg"
   alt="Correlación intermedia media por banda de tercio de octava de 150 Hz a 3810 Hz para material tipo habla en un enmascarador plano con relación señal-ruido de 0 dB: la banda más grave conserva solo unos 0,27 de la correlación de envolvente y el valor sube de forma sostenida hasta unos 0,9 en las bandas consonánticas por encima de 1,9 kHz, promediando un STOI de 0,727"
   width="88%"
 />
@@ -278,7 +278,7 @@ El perfil por bandas es una de las marginales del promedio; la otra es el tiempo
 y responde a una pregunta que la vista por bandas no puede responder:
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stoi_segment_scores_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stoi_segment_scores.svg"
   alt="Dos paneles apilados sobre cuatro segundos. Arriba: la forma de onda de la referencia limpia con pausas silábicas, tres de sus 311 tramas de corto plazo sombreadas porque caen más de 40 dB por debajo de la trama más intensa y se descartan, y una región de corte de señal de 0,35 segundos marcada. Abajo: las puntuaciones de STOI por segmento para dos degradaciones de la misma referencia. El ruido estacionario a 0 dB da una serie plana en torno a 0,77 para un STOI de 0,772; un corte de señal de 0,35 segundos deja la serie en 1,0 en todas partes salvo un hundimiento profundo por debajo de cero a lo largo del corte, y aun así promedia un STOI mayor, de 0,874"
   width="94%"
 />
@@ -340,7 +340,7 @@ es audible por instantes, recibe crédito por el habla vislumbrada ahí, algo qu
 el promedio por banda de STOI apenas capta.
 
 <ThemeImage
-  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stoi_intelligibility_es.svg"
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stoi_intelligibility.svg"
   alt="Dos paneles del índice de inteligibilidad frente al SNR de -15 a 20 dB. Izquierda (STOI): las curvas del enmascarador estacionario y del modulado casi se superponen, de modo que STOI apenas separa los dos enmascaradores. Derecha (ESTOI): la curva del enmascarador modulado queda claramente por encima de la del estacionario en todo el rango de SNR, de modo que ESTOI acredita el habla vislumbrada en los silencios del enmascarador"
   width="94%"
 />

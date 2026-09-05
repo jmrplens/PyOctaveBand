@@ -45,7 +45,7 @@ Un solo número gobierna todo en esta página: la longitud del segmento, que
 trocea el plano tiempo-frecuencia en celdas de área fija. El diagrama
 muestra el mismo registro teselado por una ventana corta y una larga.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_time_frequency_es.svg" alt="Dos teselados del plano tiempo-frecuencia del mismo registro a 16 kilohercios lado a lado: con una ventana corta de 256 muestras las celdas miden 16 milisegundos de ancho y 62,5 hercios de alto, así que un clic queda como una columna estrecha y nítida mientras un tono estable se emborrona en una banda alta; con una ventana larga de 1024 muestras las celdas miden 64 milisegundos de ancho y 15,6 hercios de alto, así que el tono se afila en una banda fina mientras el clic se emborrona en una columna ancha; los pies anotan que cada celda es una única estimación sin promediar con error aleatorio unidad y que el producto de resoluciones temporal y frecuencial se mantiene en torno a uno" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_time_frequency.svg" alt="Dos teselados del plano tiempo-frecuencia del mismo registro a 16 kilohercios lado a lado: con una ventana corta de 256 muestras las celdas miden 16 milisegundos de ancho y 62,5 hercios de alto, así que un clic queda como una columna estrecha y nítida mientras un tono estable se emborrona en una banda alta; con una ventana larga de 1024 muestras las celdas miden 64 milisegundos de ancho y 15,6 hercios de alto, así que el tono se afila en una banda fina mientras el clic se emborrona en una columna ancha; los pies anotan que cada celda es una única estimación sin promediar con error aleatorio unidad y que el producto de resoluciones temporal y frecuencial se mantiene en torno a uno" width="92%" />
 
 ## 1. El espectrograma calibrado
 
@@ -156,7 +156,7 @@ transitorios con un predisparo de al menos un segmento, fija la ganancia de
 antemano y verifica que ninguna muestra recorta; un impacto recortado dibuja una
 franja de altura completa que parece exactamente un evento de banda ancha.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibrated_spectrogram_es.webp" alt="Espectrograma calibrado en dB SPL de una escena exterior sintética de cuatro segundos: una sirena que barre sinusoidalmente entre 600 y 1200 hercios traza una cresta oscilante brillante a 70 decibelios, un impacto de banda ancha a los dos segundos y medio dibuja una franja vertical y un fondo de ruido rosa cuyo nivel de banda ancha es de 45 decibelios rellena la imagen con un nivel por celda mucho más bajo, con la barra de color leyendo el nivel de presión acústica absoluto" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibrated_spectrogram.webp" alt="Espectrograma calibrado en dB SPL de una escena exterior sintética de cuatro segundos: una sirena que barre sinusoidalmente entre 600 y 1200 hercios traza una cresta oscilante brillante a 70 decibelios, un impacto de banda ancha a los dos segundos y medio dibuja una franja vertical y un fondo de ruido rosa cuyo nivel de banda ancha es de 45 decibelios rellena la imagen con un nivel por celda mucho más bajo, con la barra de color leyendo el nivel de presión acústica absoluto" width="82%" loading="eager" />
 
 *Cómo leerla: la cresta de la sirena marca de verdad 70 dB SPL, porque un tono
 mete toda su potencia dentro de un ancho de banda de resolución y la celda
@@ -300,7 +300,7 @@ la máquina sí deriva, remuestrea angularmente contra el tacómetro (seguimient
 órdenes) para que las rayas queden estacionarias en orden en vez de en
 frecuencia.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zoom_fft_resolution_es.svg" alt="FFT con zoom de un registro de un segundo con tonos a 997 y 1000 hercios: la FFT gruesa de 1024 puntos con bins de 8 hercios muestra un único bulto ancho, mientras que la FFT con zoom entre 980 y 1016 hercios dibuja dos lóbulos principales separados cuyos picos caen exactamente sobre las frecuencias verdaderas punteadas" width="82%" loading="lazy" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zoom_fft_resolution.svg" alt="FFT con zoom de un registro de un segundo con tonos a 997 y 1000 hercios: la FFT gruesa de 1024 puntos con bins de 8 hercios muestra un único bulto ancho, mientras que la FFT con zoom entre 980 y 1016 hercios dibuja dos lóbulos principales separados cuyos picos caen exactamente sobre las frecuencias verdaderas punteadas" width="82%" loading="lazy" />
 
 *Lo que separa los dos tonos es el segundo de registro, no el zoom. La vista
 gruesa usa 1024 de las 8192 muestras, así que sus bins de 8 Hz no pueden
