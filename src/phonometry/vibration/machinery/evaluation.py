@@ -631,7 +631,10 @@ def gear_unit_zone_boundaries(quantity: str, rating: float) -> ZoneBoundaries:
 
     The tables are printed for the rating numbers they list and for no others,
     so a rating between two rows is refused rather than interpolated: the
-    ladder is a choice made with the manufacturer, not a continuum.
+    ladder is a choice made with the manufacturer, not a continuum. The
+    comparison is a relative one to a part in a thousand million, so a rating
+    that arrived through a computation and carries floating-point noise still
+    finds its row; nothing a reader would call a different rating does.
 
     :param quantity: ``"displacement"`` (Table 2, shaft relative peak-to-peak,
         µm), ``"velocity"`` (Table 3, housing r.m.s., mm/s) or

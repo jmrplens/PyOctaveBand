@@ -282,7 +282,10 @@ The three boundaries Table 2, 3 or 4 prints for one rating.
 
 The tables are printed for the rating numbers they list and for no others,
 so a rating between two rows is refused rather than interpolated: the
-ladder is a choice made with the manufacturer, not a continuum.
+ladder is a choice made with the manufacturer, not a continuum. The
+comparison is a relative one to a part in a thousand million, so a rating
+that arrived through a computation and carries floating-point noise still
+finds its row; nothing a reader would call a different rating does.
 
 **Parameters**
 

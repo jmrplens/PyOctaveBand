@@ -352,8 +352,8 @@ parts of the series share one curve rather than two implementations of it.
 ALARM and TRIP: 8.2 sends the reader to Part 1 for them, which is section 7 of
 this page. Acceptance criteria: 8.3 says they are agreed between manufacturer
 and customer, are historically specified inside zone A or B, and would normally
-not exceed 1,25 times the A/B boundary, which for a class II unit judged on
-velocity is 3,94 mm/s.
+not exceed 1.25 times the A/B boundary, which for a class II unit judged on
+velocity is 3.94 mm/s.
 
 Measurement is Clause 6. Shaft displacement is read relative to the housing by
 non-contacting probes in orthogonal pairs through the journal bearing housing,
