@@ -57,6 +57,22 @@ COLOR_GRID = "#e0e0e0"
 # into the one it is drawn on.
 COLOR_MUTED = "#9e9e9e"
 
+# Shading for an *ordered* scale, the evaluation zones of ISO 20816 and
+# ISO 10816 above all. The series colours were used for these, and a
+# categorical palette on an ordered scale tells the reader the opposite of
+# what the scale says: zone B, "unrestricted operation", came out red and
+# zone C, "limited operation", came out green, so the better of the two
+# looked like the alarming one and zone D, damage, was a neutral grey. These
+# run one way, calm to alarming, and the letter drawn in each band and the
+# order of the bands themselves repeat the same information for a reader who
+# does not separate red from green.
+COLOR_ZONE_A = "#2ca02c"
+COLOR_ZONE_B = "#b8a70b"
+COLOR_ZONE_C = "#e07b1f"
+COLOR_ZONE_D = "#d62728"
+#: The four in order, for a figure that zips them against its own band edges.
+COLOR_ZONES = (COLOR_ZONE_A, COLOR_ZONE_B, COLOR_ZONE_C, COLOR_ZONE_D)
+
 # Theme state: every figure is generated twice (light + "_dark" suffix).
 # COLOR_FG replaces literal black so annotations stay visible on dark bg.
 COLOR_FG = "black"

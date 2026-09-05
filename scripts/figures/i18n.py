@@ -65,7 +65,7 @@ _ES_EXACT = {
     "Eq. (17): $-25 + 70\\,\\lg v + 10\\,\\lg S$": "Ec. (17): $-25 + 70\\,\\lg v + 10\\,\\lg S$",
     "Faster Air Is Louder, and Flatter": "Cuanto más rápido el aire, más ruido y más plano",
     "Band sound power level (dB)": "Nivel de potencia acústica por banda (dB)",
-    "the bands do not sum back to the overall:\nFigure 16 is a shape, not a partition": "las bandas no suman el nivel global:\nla Figura 16 es una forma, no un reparto",
+    "Figure 16 prints a level difference, not a share:\nthe bands do not sum back to the overall": "la Figura 16 imprime una diferencia de nivel, no un reparto:\nlas bandas no suman el nivel global",
     # Gear-unit rating curves (ISO 20816-9 Annex A).
     "Shaft Displacement: Flat, Then 10 dB per Decade": "Desplazamiento del eje: plano y luego 10 dB por década",
     "Peak-to-peak displacement (µm)": "Desplazamiento pico a pico (µm)",

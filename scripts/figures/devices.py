@@ -6196,8 +6196,8 @@ def generate_vdi2081_flow_noise(output_dir: str) -> None:
     ax2.text(
         0.985,
         0.955,
-        "the bands do not sum back to the overall:\n"
-        "Figure 16 is a shape, not a partition",
+        "Figure 16 prints a level difference, not a share:\n"
+        "the bands do not sum back to the overall",
         transform=ax2.transAxes,
         ha="right",
         va="top",
