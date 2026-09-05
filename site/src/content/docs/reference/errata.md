@@ -2145,6 +2145,8 @@ in the same order.
   cross-reference, not in a number, and
   [`ground_attenuation`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/environment/propagation/outdoor_propagation.py)
   implements $q$ from footnote 2, which is what reproduces the printed 0,23.
+- **Status:** unreported.
+
 ## VDI 2081 Blatt 1:2001, Section 6.7.3 (the symbol list of Equation (36) sends A back to Equation (36))
 
 - **Location:** Section 6.7.3, the symbol list under Equation (36), the entry

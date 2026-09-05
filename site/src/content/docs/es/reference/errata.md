@@ -2325,6 +2325,8 @@ dos ediciones con las mismas entradas y en el mismo orden.
   [`ground_attenuation`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/environment/propagation/outdoor_propagation.py)
   implementa $q$ a partir de la nota 2, que es lo que reproduce el 0,23
   impreso.
+- **Estado:** sin notificar.
+
 ## VDI 2081 Blatt 1:2001, apartado 6.7.3 (la lista de símbolos de la ecuación (36) remite A a la propia ecuación (36))
 
 - **Ubicación:** apartado 6.7.3, la lista de símbolos bajo la ecuación (36), la
