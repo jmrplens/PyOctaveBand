@@ -253,11 +253,18 @@ _EFFICIENCY_CORRECTION: tuple[tuple[float, float], ...] = (
 # power level and a spectral parameter, so a fan is described by its assembly
 # and its duty rather than by a per-type band table.
 # ---------------------------------------------------------------------------
-#: Section 4.3.3 -- per assembly type: the representative specific sound power
-#: level ``L_WSM`` in dB, the spectral parameter ``c3`` of Equation (15), and
-#: the blade-frequency allowance ``dL_Wd`` in dB. The three ``L_WSM`` values
-#: are the printed representative ones, not ``71,6 - 10 lg psi + L_USM``
-#: recomputed: the guideline rounds each within its own stated tolerance.
+#: Per assembly type: the representative specific sound power level ``L_WSM``
+#: in dB, from Section 4.3.3, and the spectral parameter ``c3`` of Equation
+#: (15) with the blade-frequency allowance ``dL_Wd`` in dB, both from Section
+#: 4.3.4. The three ``L_WSM`` values are the printed representative ones, not
+#: ``71,6 - 10 lg psi + L_USM`` recomputed. Two of the three land inside the
+#: tolerance the guideline states beside the relation (RR: 34,6 against 34,
+#: within +/-1; AM: 41,6 against 42, within +/-2); assembly T does not, and
+#: which column is read decides it. The German prints ``67,3 +/-0,5`` and the
+#: English beside it ``67.3 +/-1``, so the representative 36 dB, 0,7 dB from
+#: the 35,3 the relation gives, is inside the English tolerance and outside the
+#: normative German one. The printed representative value is what is stored
+#: either way: it is what the guideline tells a planner to use.
 _VDI2081_ASSEMBLY: dict[str, tuple[float, float, float]] = {
     # radial fans with rearwards curved blades, psi = 0,63 to 1,0
     "rr": (34.0, 0.4, 0.0),
@@ -2074,7 +2081,7 @@ def section_change_loss(
 
     .. math::
 
-       \Delta L_{Wi} = 10 \log_{10} rac{(r + 1)^{2}}{4r}
+       \Delta L_{Wi} = 10 \log_{10} \frac{(r + 1)^{2}}{4r}
 
     and it applies differently on the two sides of unity. A **sudden
     reduction** (:math:`r > 1`) reflects at every frequency; the figure's own
@@ -2104,13 +2111,17 @@ def section_change_loss(
     :param shape: ``"rectangular"`` (default) or ``"round"``, which decides
         which limit-frequency equation the upstream duct takes.
     :param upstream_size: The largest side of the upstream duct, m, for a
-        rectangular one; its internal diameter for a round one. May be omitted
-        for a round duct, where it follows from the area.
+        rectangular one; its internal diameter for a round one. Needed only
+        for a sudden increase, which is the only case a limit frequency enters
+        the answer, and only for a rectangular duct, since a round one's
+        diameter follows from its area. Giving a round duct both is allowed
+        while the two agree.
     :param speed_of_sound: Speed of sound ``c``, m/s.
     :param cap: The largest reduction to take, dB (default 5).
     :return: An :class:`HvacSpectrumResult` of the reflection loss, dB.
     :raises ValueError: If an area, a size or the speed of sound is not
-        positive, the shape is unknown, or a rectangular duct is given no
+        positive, the shape is unknown, a round duct's size contradicts its
+        area, or a rectangular duct meeting a sudden increase is given no
         size.
     """
     f = _frequencies(frequencies)
@@ -2119,17 +2130,21 @@ def section_change_loss(
     c = require_positive(speed_of_sound, "speed_of_sound")
     ceiling = require_positive(cap, "cap")
     kind = require_choice(shape, "shape", ("rectangular", "round"))
-    if upstream_size is None:
-        if kind == "rectangular":
+    given = (
+        None
+        if upstream_size is None
+        else require_positive(upstream_size, "upstream_size")
+    )
+    if kind == "round" and given is not None:
+        # For a round duct the diameter and the area are one fact stated twice.
+        implied = equivalent_diameter(s_1)
+        if not math.isclose(given, implied, rel_tol=1e-6):
             msg = (
-                "'upstream_size' is the largest side of a rectangular duct and "
-                "cannot be recovered from its area; give it, or pass "
-                "shape='round'."
+                f"'upstream_size' is {given:g} m and 'upstream_area' "
+                f"{s_1:g} m2 implies a diameter of {implied:g} m; give one or "
+                "the other, or a pair that agrees."
             )
             raise ValueError(msg)
-        size = equivalent_diameter(s_1)
-    else:
-        size = require_positive(upstream_size, "upstream_size")
 
     ratio = s_1 / s_2
     reduction = min(10.0 * math.log10((ratio + 1.0) ** 2 / (4.0 * ratio)), ceiling)
@@ -2137,6 +2152,16 @@ def section_change_loss(
     if ratio < 1.0:
         # A sudden increase reflects only while the upstream duct carries
         # plane waves alone; Figure 26 prints "approximately 0" above that.
+        # It is also the only case that needs a size at all: the frequency
+        # column of a sudden reduction reads "no effect".
+        if kind == "rectangular" and given is None:
+            msg = (
+                "'upstream_size' is the largest side of a rectangular duct and "
+                "cannot be recovered from its area; a sudden increase needs it "
+                "for the limit frequency, so give it, or pass shape='round'."
+            )
+            raise ValueError(msg)
+        size = given if given is not None else equivalent_diameter(s_1)
         values = np.where(f <= _vdi2081_limit_frequency(kind, size, c), reduction, 0.0)
     direction = "reduction" if ratio > 1.0 else "increase"
     return HvacSpectrumResult(

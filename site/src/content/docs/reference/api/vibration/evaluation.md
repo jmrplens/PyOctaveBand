@@ -353,9 +353,9 @@ industrial_machine_zone(
     group: str,
     support: str,
     *,
-    displacement_um: float | None = None,
-    velocity_mm_s: float | None = None,
-) -> EvaluationZone
+    displacement_um: ArrayLike | None = None,
+    velocity_mm_s: ArrayLike | None = None,
+) -> EvaluationZone | NDArray[np.str_]
 ```
 
 Grade an industrial machine against Table A.1 or A.2.
@@ -370,10 +370,10 @@ reason the tables state each class twice.
 | :--- | :--- |
 | `group` | `"group_1"` (above 300 kW and not more than 50 MW, or an electrical machine of shaft height 315 mm or more) or `"group_2"` (above 15 kW up to and including 300 kW, or shaft height from 160 mm up to but not including 315 mm), from 4.2. |
 | `support` | `"rigid"` or `"flexible"`; rigid means the lowest natural frequency of the support in the measuring direction is at least 25 % above the main excitation frequency (4.3). |
-| `displacement_um` | Measured broad-band r.m.s. displacement of the bearing, pedestal or housing, in micrometres. |
-| `velocity_mm_s` | Measured broad-band r.m.s. velocity, in millimetres per second. |
+| `displacement_um` | Measured broad-band r.m.s. displacement of the bearing, pedestal or housing, in micrometres (scalar or array). |
+| `velocity_mm_s` | Measured broad-band r.m.s. velocity, in millimetres per second (scalar or array). |
 
-**Returns:** `"A"`, `"B"`, `"C"` or `"D"`.
+**Returns:** `"A"`, `"B"`, `"C"` or `"D"`; a string when every measurement given is a scalar, otherwise an array of them, broadcast over the two if both are arrays.
 
 **Raises**
 

@@ -287,7 +287,8 @@ def _chk_most_restrictive() -> Outcome:
     zone = ph.vibration.industrial_machine_zone(
         "group_1", "rigid", displacement_um=95.0, velocity_mm_s=2.0
     )
-    return numeric(3.0, float("ABCD".index(zone)), 0.5, places=1)
+    # Two scalars in, so one letter out; str() names that for the type checker.
+    return numeric(3.0, float("ABCD".index(str(zone))), 0.5, places=1)
 
 
 @register(

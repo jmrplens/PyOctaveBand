@@ -2819,3 +2819,136 @@ def generate_gear_unit_rating_curves(output_dir: str) -> None:
     plt.tight_layout()
     save_figure(output_dir, "gear_unit_rating_curves.svg")
     plt.close()
+
+
+def generate_machine_vibration_trend(output_dir: str) -> None:
+    """A year of monthly readings, graded in one call, and what catches it first."""
+    print("Generating machine_vibration_trend...")
+    from phonometry import vibration
+
+    limits = vibration.INDUSTRIAL_MACHINE_ZONES["group_2", "rigid"].velocity_mm_s
+    a_b, b_c, c_d = limits.as_tuple
+    ceiling = 6.0
+    # A group 2 machine on a rigid support, read once a month for a year. It
+    # sits in zone A, drifts through B and ends in D: the walk Criterion II
+    # exists to see before Criterion I does.
+    months = np.arange(1, 13, dtype=float)
+    readings = np.array(
+        [0.62, 0.66, 0.61, 0.70, 0.94, 1.32, 1.55, 1.84, 2.26, 2.95, 4.10, 5.20]
+    )
+    graded = vibration.industrial_machine_zone(
+        "group_2", "rigid", velocity_mm_s=readings
+    )
+    baseline = float(readings[:4].mean())
+    alarm = vibration.alarm_limit(baseline, b_c)
+    # The first month whose change from the baseline is the one 5.3 asks to be
+    # investigated. With a baseline this low it is also the first month past
+    # the ALARM, because 5.4.1 sets the ALARM a change above the baseline.
+    caught = int(
+        np.argmax(
+            np.abs(readings - baseline) > vibration.SIGNIFICANT_CHANGE_FRACTION * b_c
+        )
+    )
+
+    _fig, ax = plt.subplots(figsize=(9.6, 6.0))
+    for lower, upper, colour, letter in (
+        (0.0, a_b, COLOR_PRIMARY, "A"),
+        (a_b, b_c, COLOR_SECONDARY, "B"),
+        (b_c, c_d, COLOR_TERTIARY, "C"),
+        (c_d, ceiling, COLOR_MUTED, "D"),
+    ):
+        ax.axhspan(lower, upper, color=theme_fill(colour, ax), zorder=0)
+        # Chipped, because the baseline crosses zone A where its letter sits.
+        ax.text(
+            0.014,
+            0.5 * (lower + upper),
+            letter,
+            transform=ax.get_yaxis_transform(),
+            ha="left",
+            va="center",
+            fontsize=12,
+            color=COLOR_FG,
+            bbox={
+                "boxstyle": "round,pad=0.22",
+                "facecolor": COLOR_PANEL,
+                "edgecolor": COLOR_GRID,
+            },
+            zorder=3,
+        )
+
+    ax.axhline(
+        baseline,
+        color=COLOR_QUATERNARY,
+        linestyle="--",
+        linewidth=1.4,
+        zorder=2,
+        label=f"baseline: {baseline:.3g} mm/s, the first four months",
+    )
+    ax.axhline(
+        alarm,
+        color=COLOR_FG,
+        linestyle=":",
+        linewidth=1.5,
+        zorder=2,
+        label=f"ALARM: {alarm:.3g} mm/s, a change above the baseline",
+    )
+
+    ax.plot(
+        months,
+        readings,
+        color=COLOR_FG,
+        linewidth=1.8,
+        marker="o",
+        markersize=6,
+        markerfacecolor=COLOR_PANEL,
+        markeredgewidth=1.6,
+        zorder=4,
+        label="monthly r.m.s. velocity, with the zone it grades to",
+    )
+    for month, reading, zone in zip(months, readings, graded, strict=True):
+        ax.annotate(
+            str(zone),
+            xy=(month, reading),
+            xytext=(0, 11),
+            textcoords="offset points",
+            ha="center",
+            va="bottom",
+            fontsize=9.5,
+            color=COLOR_FG,
+            zorder=5,
+        )
+
+    ax.annotate(
+        # The clause numbers stay in the prose: a "5.3" drawn in a figure comes
+        # out of the Spanish pass as "5,3", which reads as a number.
+        "month 7: the change from the baseline passes 25 % of the\n"
+        "upper limit of zone B, and Criterion I still grades the machine B",
+        xy=(months[caught], readings[caught]),
+        xytext=(0.255, 0.50),
+        textcoords="axes fraction",
+        ha="left",
+        va="bottom",
+        fontsize=9,
+        color=COLOR_FG,
+        arrowprops={"arrowstyle": "->", "color": COLOR_FG, "linewidth": 1.2},
+        bbox={
+            "boxstyle": "round,pad=0.35",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=6,
+    )
+
+    ax.set_xlim(0.4, 12.6)
+    ax.set_ylim(0.0, ceiling)
+    ax.set_xticks(months)
+    ax.set_xlabel("Month of the survey")
+    ax.set_ylabel("R.m.s. velocity (mm/s)")
+    ax.set_title("A Year of Readings, Graded One by One", pad=12)
+    ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", bbox_to_anchor=(0.045, 0.985), fontsize=8.5)
+
+    plt.tight_layout()
+    save_figure(output_dir, "machine_vibration_trend.svg")
+    plt.close()

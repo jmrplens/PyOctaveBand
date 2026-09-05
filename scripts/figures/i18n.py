@@ -74,7 +74,7 @@ _ES_EXACT = {
     "anillos: los niveles que imprime el documento",
     "Every Case, Against Its Printed Table": "Cada caso, contra su tabla impresa",
     "Worst band deviation (dB)": "Peor desviación por banda (dB)",
-    "the envelope the document declares: 0.05 dB": "el sobre que declara el documento: 0,05 dB",
+    "the envelope the document declares: 0.05 dB": "el margen que declara el documento: 0,05 dB",
     # HVAC noise by the German method (VDI 2081): the fan its assembly type
     # describes, the worked sheet element by element, and the room step.
     "The Same Duty Point, Three Assemblies": "El mismo punto de trabajo, tres montajes",
@@ -396,6 +396,13 @@ _ES_EXACT = {
     "TRIP guards against damage, so it comes from the machine": "ALARMA = referencia + 25 % del límite superior de la zona B,\n"
     "y nunca más de 1,25 veces ese límite\n"
     "el DISPARO protege del daño, así que sale de la máquina",
+    # machine_vibration_trend: a run of readings graded in one call.
+    "A Year of Readings, Graded One by One": "Un año de lecturas, calificadas una a una",
+    "Month of the survey": "Mes del seguimiento",
+    "monthly r.m.s. velocity, with the zone it grades to": "velocidad eficaz mensual, con la zona a la que califica",
+    "month 7: the change from the baseline passes 25 % of the\n"
+    "upper limit of zone B, and Criterion I still grades the machine B": "mes 7: el cambio respecto de la referencia supera el 25 % del\n"
+    "límite superior de la zona B, y el Criterio I aún la califica como B",
     "envelope spectrum of the 2-4 kHz band": "espectro de envolvente de la banda 2-4 kHz",
     "predicted BPFO and harmonics": "BPFO previsto y sus armónicos",
     "predicted BPFI": "BPFI previsto",
@@ -3799,6 +3806,15 @@ _ES_EXACT = {
 
 _ES_PATTERNS = [
     # machine_alarm_trip: the readouts carry the computed limits.
+    # machine_vibration_trend: the legend carries the computed baseline and ALARM.
+    (
+        r"^baseline: (.+) mm/s, the first four months$",
+        r"referencia: \1 mm/s, los primeros cuatro meses",
+    ),
+    (
+        r"^ALARM: (.+) mm/s, a change above the baseline$",
+        r"ALARMA: \1 mm/s, un cambio por encima de la referencia",
+    ),
     (r"^ALARM: (.+) mm/s$", r"ALARMA: \1 mm/s"),
     (r"^ALARM \(capped\): (.+) mm/s$", r"ALARMA (topada): \1 mm/s"),
     (r"^the cap: (.+) mm/s$", r"el tope: \1 mm/s"),

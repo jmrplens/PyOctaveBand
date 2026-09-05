@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import math
 
+import numpy as np
 import pytest
 
 from phonometry import vibration
@@ -115,6 +116,42 @@ def test_the_more_restrictive_of_the_two_quantities_wins() -> None:
         vibration.industrial_machine_zone("group_1", "rigid", displacement_um=95.0)
         == "D"
     )
+
+
+def test_a_run_of_measurements_grades_one_by_one() -> None:
+    """A trend is a whole array, and it used to come back as its own repr.
+
+    ``evaluation_zone`` has always taken an array; this wrapper stringified
+    whatever it returned, so a machine measured over a month was graded
+    ``"['A' 'C' 'D']"`` -- a four-character answer of eighteen characters,
+    which compares equal to nothing and reads as a zone that does not exist.
+    """
+    graded = vibration.industrial_machine_zone(
+        "group_2", "rigid", velocity_mm_s=np.array([1.0, 3.0, 5.0])
+    )
+    assert list(graded) == ["A", "C", "D"]
+
+
+def test_the_most_restrictive_rule_holds_over_arrays() -> None:
+    """5.2.3 elementwise, and with one quantity a scalar against the other's run."""
+    both = vibration.industrial_machine_zone(
+        "group_1",
+        "rigid",
+        displacement_um=np.array([95.0, 10.0]),
+        velocity_mm_s=np.array([2.0, 8.0]),
+    )
+    assert list(both) == ["D", "D"]
+    broadcast = vibration.industrial_machine_zone(
+        "group_1", "rigid", displacement_um=95.0, velocity_mm_s=np.array([2.0, 8.0])
+    )
+    assert list(broadcast) == ["D", "D"]
+
+
+def test_a_scalar_is_still_a_string() -> None:
+    """The common call keeps returning a letter, not an array of one."""
+    graded = vibration.industrial_machine_zone("group_2", "rigid", velocity_mm_s=3.0)
+    assert graded == "C"
+    assert isinstance(graded, str)
 
 
 @pytest.mark.parametrize(

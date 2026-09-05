@@ -1057,10 +1057,8 @@ Figure 26 gives the reduction of the internal sound power level in closed
 form, for the area ratio $r = S_1/S_2$:
 
 $$
-\Delta L_{Wi} = 10 \log_{10}
+\Delta L_{Wi} = 10 \log_{10} \frac{(r + 1)^{2}}{4r}
 $$
-
-rac{(r + 1)^{2}}{4r}
 
 and it applies differently on the two sides of unity. A **sudden
 reduction** ($r > 1$) reflects at every frequency; the figure's own
