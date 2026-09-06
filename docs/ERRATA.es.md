@@ -4840,6 +4840,103 @@ dos ediciones con las mismas entradas y en el mismo orden.
   dando la vuelta al círculo. Su docstring dice que las tres son elecciones.
 - **Estado:** sin comunicar.
 
+## IEC 60534-8-3:2010, anexo A (el factor geométrico de tubería se imprime redondeado, y el anexo no calculó con el valor redondeado)
+
+- **Ubicación:** anexo A (informativo), A.2, el bloque «Given data» del folio
+  impreso 32 (página 34 del PDF) de BS EN 60534-8-3:2011, frente a la fila de
+  la Ecuación (2) de la Tabla A.1 en ese mismo folio.
+- **Lo impreso:** los datos de partida dicen «Piping geometry factor:
+  $F_\mathrm{p} = 0{,}98$», bajo el encabezado «The following values are used
+  in, or determined from, calculations based on IEC 60534-2-1». La Tabla A.1
+  imprime luego $p_{vc} = 567\,787$ Pa para el ejemplo 1, y cinco valores más
+  para las demás columnas, a partir de
+  $p_{vc} = p_1\left[1 - x/(F_{LP}/F_P)^2\right]$ con $F_{LP} = 0{,}792$.
+- **El problema:** las dos cosas no pueden ser ciertas a la vez. Despejar
+  $(F_{LP}/F_P)^2$ de la Ecuación (2) en cada pareja impresa da 0,647 829,
+  0,647 827, 0,647 821, 0,647 829 y 0,647 833 en las cinco columnas que
+  imprimen valor, que es $F_p = 0{,}984$ con cuatro cifras en todas ellas. Con
+  el 0,98 impreso sale 0,653 128 y $p_{vc} = 571\,294$ Pa, a 3 507 Pa de la
+  cifra impresa. El valor es calculado, no un dato: el propio anexo dice que
+  viene de la IEC 60534-2-1, y con el coeficiente de pérdida de carga que
+  imprime, $\Sigma\zeta = 0{,}86$, sale $F_p = 0{,}984$ para el caso DN 100.
+  Es decir, el anexo calculó con tres decimales e imprimió dos.
+- **Consecuencia:** se mueve todo lo que viene después. Con el 0,98 impreso
+  las cuatro fronteras de régimen salen $x_C = 0{,}287$, $\alpha = 0{,}786$ y
+  $x_B = 0{,}578$ frente a los 0,285, 0,784 y 0,576 impresos, y la potencia
+  acústica del ejemplo 1 sale 21,9 W frente a los 22,3 W impresos. Nada queda
+  muy lejos, y nada reproduce: quien contraste su implementación con el anexo
+  A usando el número que el anexo A imprime no cuadra ni una fila.
+- **Evidencia:** los datos de partida y los seis valores de $p_{vc}$ leídos de
+  la página impresa. Verificado en las páginas 33 y 34 del PDF (pp. impresas 31
+  y 32) de BS EN 60534-8-3:2011.
+- **Comportamiento de la biblioteca:**
+  [`valve_aerodynamic_noise`](../src/phonometry/noise_control/valves.py) toma
+  el cociente como argumento y no guarda ningún valor propio; las filas de
+  conformidad y `tests/noise_control/test_valves.py` pasan $0{,}792/0{,}984$ y
+  dicen por qué en el fixture.
+- **Estado:** sin comunicar.
+
+## IEC 60534-8-3:2010, Tabla A.1 (un diámetro de orificio equivalente diez veces menor, desmentido por la fila de debajo)
+
+- **Ubicación:** anexo A (informativo), Tabla A.1, la fila de la Ecuación (8c)
+  del folio impreso 33 (página 35 del PDF), frente a la fila de la Ecuación
+  (8a) impresa justo debajo.
+- **Lo impreso:** las seis columnas de la fila (8c) dicen $d_0 = 0.010$ m. Los
+  datos de partida del folio 31 dan $N_\mathrm{O} = 6$ aberturas de jaula y
+  $A = 0{,}00137$ m² para una de ellas, y la Ecuación (8c) es
+  $d_o = \sqrt{4 N_o A/\pi}$.
+- **El problema:** $\sqrt{4 \times 6 \times 0{,}00137/\pi} = 0{,}102$ m, no
+  0,010 m. Los dos numerales son las mismas tres cifras en otro orden. La fila
+  de debajo resuelve cuál es: la Ecuación (8a) es $F_d = d_H/d_o$, la fila
+  (8b) imprime $d_H = 0{,}030$ m y la fila (8a) imprime $F_d = 0{,}30$ en las
+  seis columnas. 0,030/0,102 es 0,30; 0,030/0,010 es 3,0.
+- **Consecuencia:** quien tome el $d_o$ impreso obtiene un modificador de
+  estilo de válvula de 3,0, un diámetro de chorro diez veces mayor por la
+  Ecuación (9) y una frecuencia de pico diez veces menor, lo que desplaza el
+  espectro interno de la Ecuación (19) más de tres octavas. El resto de la
+  tabla está calculado con 0,102 m, así que el error se queda en esa celda.
+- **Evidencia:** las filas (8b), (8c) y (8a) leídas de la página impresa.
+  Verificado en las páginas 33 y 35 del PDF (pp. impresas 31 y 33) de
+  BS EN 60534-8-3:2011.
+- **Comportamiento de la biblioteca:**
+  [`valve_style_modifier`](../src/phonometry/noise_control/valves.py)
+  implementa (8b) y (8c) tal como están impresas y devuelve 0,296 para la
+  jaula del anexo, que redondea al $F_d$ impreso; el test que lleva el nombre
+  de esta entrada fija las dos lecturas para que el $d_o$ impreso no vuelva.
+- **Estado:** sin comunicar.
+
+## IEC 60534-8-3:2010, Tabla A.2 (dos factores de frecuencia con el exponente equivocado en una potencia de diez)
+
+- **Ubicación:** anexo A (informativo), A.3, la columna $G_x$ de la Tabla A.2
+  del folio impreso 43 (página 45 del PDF), bandas 5 y 10 de 33.
+- **Lo impreso:** la columna va $G_{x,4} = 5.6 \times 10^{-9}$,
+  $G_{x,5} = 1.4 \times 10^{-9}$, $G_{x,6} = 3.6 \times 10^{-8}$, y más abajo
+  $G_{x,9} = 5.8 \times 10^{-7}$, $G_{x,10} = 1.4 \times 10^{-7}$,
+  $G_{x,11} = 3.5 \times 10^{-6}$.
+- **El problema:** por debajo de la frecuencia de coincidencia interna la
+  Tabla 6 hace $G_x$ proporcional a $f_i^4$, así que la columna tiene que
+  crecer de forma monótona, y lo hace en todas las bandas menos en esas dos,
+  donde baja. Recalcular la Tabla 6 para esta tubería da
+  $1{,}4 \times 10^{-8}$ en la banda 5 y $1{,}4 \times 10^{-6}$ en la 10: la
+  mantisa está bien en las dos y el exponente es una unidad menor.
+- **Consecuencia:** ninguna para el resto del anexo, y eso es lo que lo
+  resuelve. Las pérdidas por transmisión impresas dos filas más abajo,
+  $TL_5 = -86{,}1$ dB y $TL_{10} = -76{,}2$ dB, son las que da la Ecuación
+  (20a) con los factores corregidos; con los impresos saldrían $-96{,}1$ dB y
+  $-86{,}3$ dB. La Tabla A.2 calculó con los buenos e imprimió los malos, y
+  quien monte un oráculo sólo con la columna $G_x$ hereda un error de 10 dB en
+  dos bandas.
+- **Evidencia:** la columna $G_x$ leída de la página impresa. Verificado en las
+  páginas 45 y 46 del PDF (pp. impresas 43 y 44) de BS EN 60534-8-3:2011; las
+  24 pérdidas por transmisión impresas en la segunda son las que la biblioteca
+  reproduce con menos de 0,07 dB de diferencia.
+- **Comportamiento de la biblioteca:**
+  [`pipe_transmission_loss`](../src/phonometry/noise_control/valves.py)
+  calcula $G_x$ a partir de la Tabla 6, y la fila de conformidad «Pipe
+  transmission loss, example 7, 24 bands» reproduce todas las pérdidas
+  impresas, cosa que los $G_x$ impresos no permitirían.
+- **Estado:** sin comunicar.
+
 ## Propiedades de las fuentes, relacionadas, que no son erratas
 
 Registradas aquí para prevenir futuros «arreglos» que romperían la

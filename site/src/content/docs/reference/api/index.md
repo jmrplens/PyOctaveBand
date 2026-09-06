@@ -278,6 +278,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`noise_control.duct_modes`](/phonometry/reference/api/noise_control/duct-modes/) | Higher-order acoustic modes in ducts, with the mean-flow cut-on shift. |
 | [`noise_control.enclosures`](/phonometry/reference/api/noise_control/enclosures/) | Insertion loss of a close or free-standing machine enclosure. |
 | [`noise_control.room_to_room`](/phonometry/reference/api/noise_control/room-to-room/) | Room-to-room noise reduction: source room, partition, receiving room, criterion. |
+| [`noise_control.valves`](/phonometry/reference/api/noise_control/valves/) | Control valve aerodynamic noise (IEC 60534-8-3:2010). |
 
 ## Broadcast metering
 

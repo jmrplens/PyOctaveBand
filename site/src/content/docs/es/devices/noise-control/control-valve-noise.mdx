@@ -1,0 +1,316 @@
+---
+title: "Ruido de válvulas de control (IEC 60534-8-3)"
+description: "Lo que una válvula de estrangulación le hace a la tubería en la que está: los cinco regímenes de flujo y la eficiencia acústica de cada uno, el diámetro de chorro que fija la frecuencia de pico, la pérdida por transmisión de la tubería con sus frecuencias de anillo y de coincidencia, y el nivel a un metro por fuera."
+references:
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2010
+    title: "Industrial-process control valves — Part 8-3: Noise considerations — Control valve aerodynamic noise prediction method"
+    designation: "IEC 60534-8-3:2010"
+    primary: true
+    note: "Toda esta página: el apartado 5 con sus Tablas 1, 3, 4, 5, 6 y 7, y los siete ejemplos resueltos del anexo A."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2011
+    title: "Electroacoustics — Octave-band and fractional-octave-band filters — Part 1: Specifications"
+    designation: "IEC 61260-1:2014"
+    note: "Las 33 bandas de tercio de octava de 12,5 Hz a 20 kHz que indexa la Tabla 5 y sobre las que va cada espectro de esta página."
+  - type: article
+    authors: ["Reethof, G.", "Ward, W. C."]
+    year: 1986
+    title: "A theoretically based valve noise prediction method for compressible fluids"
+    journal: "Journal of Vibration, Acoustics, Stress, and Reliability in Design"
+    volume: 108
+    issue: 3
+    pages: "329-338"
+    doi: "10.1115/1.3269349"
+    note: "De donde salen los cinco regímenes y la eficiencia acústica de cada uno."
+---
+
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import SeeAlso from '../../../../../components/SeeAlso.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+Una válvula de control suele ser lo más ruidoso de una planta de proceso, y lo
+es por un motivo que conviene decir sin rodeos: estrangular convierte presión
+en velocidad, y esa velocidad se tira después en un chorro libre dentro de la
+tubería. Una fracción pequeña y bien caracterizada de la potencia de ese
+chorro vuelve como sonido. La válvula no lo radia. **La tubería sí**, y por eso
+un método de predicción que se para en la válvula no predice nada de lo que se
+oye.
+
+La IEC 60534-8-3 es esa cadena, del punto de funcionamiento al nivel a un
+metro de la pared de la tubería, y esta página la recorre.
+
+## 1. Cinco regímenes, y por qué el método se bifurca
+
+Todo depende del **cociente diferencial de presiones**, la Ecuación (1):
+
+$$
+x = \frac{p_1 - p_2}{p_1}
+$$
+
+Una válvula que apenas estrangula y otra que lleva un tren de ondas de choque
+no son la misma fuente de ruido, y la norma no finge que lo sean. Las
+Ecuaciones (3) a (7) cortan $x$ en cinco intervalos, y la Tabla 3 le da a cada
+uno su número de Mach, su eficiencia acústica y su frecuencia de pico.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/control_valve_noise.svg" alt="Tres paneles. A la izquierda, la eficiencia acústica de una válvula frente al cociente diferencial de presiones en eje logarítmico, de una parte por millón a dos partes por mil, con los cinco regímenes sombreados y rotulados con números romanos y sus cuatro fronteras dibujadas de puntos. En el centro, el nivel de presión acústica en cada banda de tercio de octava de 12,5 Hz a 20 kHz, dentro de la tubería y a un metro por fuera, unos cien decibelios más abajo, con la frecuencia de pico marcada. A la derecha, la pérdida por transmisión de la tubería frente a la frecuencia, que sube desde noventa decibelios en la parte baja del rango hasta un máximo cerca de la frecuencia de coincidencia interna y vuelve a bajar, con las frecuencias de coincidencia externa, de coincidencia interna y de anillo marcadas" width="100%" />
+
+*La misma válvula, de una parte por millón de la potencia de la vena a dos
+partes por mil, y los cien decibelios que vale la pared de la tubería.*
+
+Los cinco son, en el orden en que los imprime el apartado: **I** subsónico en
+la vena contracta, **II** y **III** bloqueado con un chorro que todavía crece,
+y **IV** y **V** los regímenes de celdas de choque, donde la frecuencia de
+pico deja de seguir a la velocidad del chorro y pasa a seguir al espaciado de
+las celdas.
+
+```python
+from phonometry import noise_control
+
+bounds = noise_control.pressure_ratio_boundaries(1.22, 0.792 / 0.984)
+print(round(bounds.critical, 3))              # 0.285  x_C
+print(round(bounds.vena_contracta, 3))        # 0.439  x_vcc
+print(round(bounds.break_point, 3))           # 0.576  x_B
+print(round(bounds.constant_efficiency, 3))   # 0.942  x_CE
+
+print(noise_control.flow_regime(0.28, bounds))   # 1
+print(noise_control.flow_regime(0.52, bounds))   # 3
+print(noise_control.flow_regime(0.95, bounds))   # 5
+```
+
+El segundo argumento es el factor de recuperación de presión $F_L$, o
+$F_{LP}/F_p$ cuando la válvula lleva accesorios acoplados, que es lo que pide
+la nota de la Tabla 3 y lo que usan todos los ejemplos del anexo A.
+
+**Las fronteras están impresas dos veces y no igual.** El apartado 5.2 cierra
+su lista con «Regime V if $x_{CE} < x$» y la Tabla 3 imprime $x_{CE} \le x$
+para esa misma fila, mientras que su fila del régimen IV acaba en
+$x \le x_{CE}$. Leído como lo imprime la tabla, el punto $x = x_{CE}$
+pertenece a dos regímenes a la vez. El apartado es el texto normativo y su
+lista es consistente, así que `flow_regime` sigue al apartado, y
+[el registro de erratas](/phonometry/es/reference/errata/) recoge la
+discrepancia.
+
+## 2. El chorro, que no es la válvula
+
+La frecuencia de pico del ruido la fija el tamaño de un chorro, no el tamaño
+de la válvula. Una jaula con sesenta agujeros pequeños y un obturador de un
+solo paso con la misma capacidad hacen la misma potencia y la ponen en sitios
+muy distintos. Las Ecuaciones (8a) a (8c) son la forma que tiene la norma de
+medir eso:
+
+$$
+d_H = \frac{4A}{l_w}, \qquad
+d_o = \sqrt{\frac{4 N_o A}{\pi}}, \qquad
+F_d = \frac{d_H}{d_o}
+$$
+
+$d_H$ es el diámetro hidráulico de un paso y $d_o$ el diámetro del orificio
+circular único que dejaría pasar la misma área total, así que $F_d$ está cerca
+de uno en un paso grande y es pequeño en una jaula.
+
+```python
+from phonometry import noise_control
+
+# La jaula del anexo A: seis aberturas, cada una de 0,00137 m2 con
+# 0,181 m de perímetro.
+fd = noise_control.valve_style_modifier(0.00137, 0.181, 6)
+print(round(fd, 3))                                        # 0.296
+
+print(round(noise_control.jet_diameter(90.0, fd, 0.792 / 0.984), 4))
+# 0.0116  m
+```
+
+La Ecuación (9) convierte luego el coeficiente de caudal en el diámetro de
+chorro, $D_j = N_{14} F_d \sqrt{C\,F_{LP}/F_P}$, con el $N_{14}$ de la Tabla 1
+según el coeficiente con el que esté tarada la válvula.
+
+**El anexo A imprime un diámetro de orificio diez veces menor.** Su Tabla A.1
+da $d_o = 0{,}010$ m en las seis columnas donde la Ecuación (8c), con el
+$N_O = 6$ y el $A = 0{,}00137$ m² del propio anexo, da $0{,}102$ m. La fila de
+debajo lo resuelve: el $F_d = 0{,}30$ impreso es $0{,}030/0{,}102$, y sería
+3,0 con el $d_o$ impreso. Esa también está en el registro de erratas, junto a
+un factor geométrico de tubería que el anexo imprime redondeado a 0,98 y con
+el que calculó 0,984.
+
+## 3. Todo el apartado 5, en una llamada
+
+Lo que queda de la cadena es la eficiencia acústica de la Tabla 3, la potencia
+acústica de la Ecuación (11), el nivel interno en la pared de la tubería de la
+Ecuación (18), el espectro de la Ecuación (19), la pérdida por transmisión de
+la Ecuación (20a) y el nivel de fuera de las Ecuaciones (24) y (25).
+
+```python
+from phonometry import noise_control
+
+result = noise_control.valve_aerodynamic_noise(
+    mass_flow=2.22,                # kg/s
+    inlet_pressure=1.0e6,          # Pa, absoluta
+    outlet_pressure=7.2e5,
+    inlet_density=5.3,             # kg/m3
+    inlet_temperature=450.0,       # K
+    specific_heat_ratio=1.22,
+    molecular_mass=19.8,           # kg/kmol
+    flow_coefficient=90.0,         # C_v
+    style_modifier=noise_control.valve_style_modifier(0.00137, 0.181, 6),
+    pressure_recovery=0.792 / 0.984,
+    valve_outlet_diameter=0.1,     # m
+    internal_diameter=0.2031,      # m, la tubería
+    wall_thickness=0.008,          # m
+    pipe_density=8000.0,           # kg/m3, acero
+    efficiency_correction=-3.8,    # A_eta, Tabla 4
+    strouhal_number=0.2,           # St_p, Tabla 4
+)
+
+print(result.regime)                                # 1
+print(round(result.sound_power, 1))                 # 22.3  W
+print(round(result.internal_level, 1))              # 155.3 dB
+print(round(result.peak_frequency))                 # 7778  Hz
+print(round(result.external_level, 1))              # 91.7  dB
+```
+
+Todos menos el último son valores impresos del ejemplo 1 del anexo A, y el
+resultado lleva además el resto de intermedios impresos, así que un cálculo se
+puede contrastar con la norma fila a fila en vez de darlo por bueno.
+
+Los dos últimos argumentos son los únicos que una hoja de datos puede no dar.
+$A_\eta$ es el exponente de la eficiencia acústica y $St_p$ el número de
+Strouhal en el pico; la Tabla 4 imprime parejas típicas para trece estilos de
+válvula y dice en su propia NOTA 1 que las reales las declara el fabricante.
+
+```python
+from phonometry import noise_control
+
+print(noise_control.VALVE_ACOUSTIC_STYLES["globe ported cage"])
+# (-3.8, 0.2)
+print(noise_control.VALVE_ACOUSTIC_STYLES["segmented ball 90 deg"])
+# (-3.6, 0.3)
+```
+
+$A_\eta$ vale $-4$ para un dipolo puro, que es lo que es un chorro libre
+expandiéndose en un volumen grande; los valores impresos van de $-4{,}8$ a
+$-3{,}0$, así que la tabla entera abarca un factor de sesenta en eficiencia,
+que son 18 dB.
+
+## 4. Por dónde sale el sonido de verdad
+
+El nivel interno del ejemplo de arriba ronda los 155 dB, y nadie que esté al
+lado de la tubería oye nada parecido. Lo que hay entre medias es la pared, y
+la Ecuación (20a) vale más de cien decibelios en la parte baja del rango.
+
+No son cien planos. Los reparten tres frecuencias, y en la de en medio es
+donde la pared regala más:
+
+$$
+f_r = \frac{c_s}{\pi D_i}, \qquad
+f_o = \frac{f_r}{4}\left(\frac{c_2}{c_a}\right), \qquad
+f_g = \frac{\sqrt{3}}{\pi t_S}\frac{c_a^2}{c_s}
+$$
+
+```python
+from phonometry import noise_control
+
+pipe = noise_control.coincidence_frequencies(0.200, 0.008, 408.0)
+print(round(pipe.ring))                    # 7958  Hz, f_r
+print(round(pipe.internal_coincidence))    # 2366  Hz, f_o
+print(round(pipe.external_coincidence))    # 1622  Hz, f_g
+```
+
+$f_r$ es la frecuencia de anillo, donde la circunferencia es una longitud de
+onda en el acero. $f_o$ es la frecuencia de coincidencia interna, donde el
+sonido de dentro de la tubería y las ondas de flexión de su pared viajan a la
+misma velocidad y por tanto se acoplan: ese es el máximo del panel derecho de
+la figura, y es por donde sale el ruido de una válvula. $f_g$ es la externa,
+donde las ondas de flexión igualan al aire de fuera.
+
+```python
+import numpy as np
+from phonometry import noise_control
+
+bands = np.array([200.0, 1000.0, 2500.0])
+loss = noise_control.pipe_transmission_loss(
+    bands,
+    internal_diameter=0.200,
+    wall_thickness=0.008,
+    valve_outlet_diameter=0.200,
+    downstream_density=11.1,
+    downstream_sound_speed=408.0,
+    pipe_density=8000.0,
+)
+print(np.round(loss, 1))
+# [-70.4 -56.9 -49.4]
+```
+
+Los tres son valores impresos del ejemplo 7 del anexo A. La pérdida es
+negativa y la Ecuación (24) la **suma**, que es el signo de la propia norma y
+no un convenio elegido aquí.
+
+**Una tubería más fina es una tubería más ruidosa, y por mucho.** El espesor
+de pared entra al cuadrado en la Ecuación (20a), así que reducirlo a la mitad
+vale unos 6 dB en todas las bandas, que es la línea más barata y más olvidada
+de un presupuesto de ruido de válvula.
+
+## 5. Lo que el método no hace
+
+El apartado 5 tiene límites, y dos aprietan en la práctica. El número de Mach
+a la salida de la válvula, $M_o$ de la Ecuación (15), tiene que quedarse por
+debajo de 0,3, y por encima la NOTA 1 dice que no se puede mantener la
+exactitud y que se use el apartado 7. El número de Mach en la tubería, $M_2$
+de la Ecuación (17), no es un límite sino un tope: la NOTA 2 lo recorta a 0,3
+antes de calcular la corrección de velocidad de la Ecuación (16), por rápido
+que vaya la tubería en realidad.
+
+```python
+from phonometry import noise_control
+
+sixth = noise_control.valve_aerodynamic_noise(
+    mass_flow=0.89, inlet_pressure=1.0e6, outlet_pressure=5.0e4,
+    inlet_density=5.3, inlet_temperature=450.0, specific_heat_ratio=1.22,
+    molecular_mass=19.8, flow_coefficient=30.0,
+    style_modifier=noise_control.valve_style_modifier(0.00137, 0.181, 6),
+    pressure_recovery=0.792 / 0.984, valve_outlet_diameter=0.1,
+    internal_diameter=0.15, wall_thickness=0.008, pipe_density=8000.0,
+    efficiency_correction=-3.8, strouhal_number=0.2,
+)
+print(round(sixth.outlet_mach, 2))   # 0.89, muy pasado el 0.3 de la NOTA 1
+print(round(sixth.pipe_mach, 2))     # 0.4, recortado a 0.3 para la corrección
+```
+
+Ese es el ejemplo 6 del anexo A, que el anexo imprime igualmente. La
+biblioteca hace lo mismo y devuelve los dos números en vez de negarse, porque
+la columna impresa es lo que una implementación tiene que reproducir, pero una
+lectura con $M_o = 0{,}89$ es una lectura que el apartado 5 no respalda.
+
+<SeeAlso
+  links={[
+    { href: '/phonometry/es/devices/noise-control/silencers/', label: 'Silenciadores reactivos' },
+    { href: '/phonometry/es/devices/noise-control/duct-path/', label: 'Ruido por conductos' },
+    { href: '/phonometry/es/devices/noise-control/vdi2081-air-systems/', label: 'Ruido de climatización (VDI 2081)' },
+    { href: '/phonometry/es/devices/emission/sound-power-in-duct/', label: 'Potencia acústica en conducto' },
+  ]}
+/>
+
+## Qué cubre esta guía
+
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Todo el apartado 5 de la IEC 60534-8-3:2010 para una válvula con obturador
+estándar: los cocientes de presión del 5.1 y el 5.2 con los cinco regímenes que
+definen, el modificador de estilo de válvula y el diámetro de chorro del 5.3,
+la potencia de la vena, la eficiencia acústica y la frecuencia de pico de la
+Tabla 3, el nivel interno en la pared de la tubería de la Ecuación (18), el
+espectro de tercio de octava de la Ecuación (19), la pérdida por transmisión
+de la tubería del 5.5 con sus frecuencias de anillo y de coincidencia, y el
+nivel exterior del 5.6 por bandas y como un único número ponderado A.
+</ScopeClaim>
+<ScopeClaim status="not-covered" label="Aún no cubierto">
+El resto de la norma y su hermana: los obturadores de bajo ruido del apartado
+6, el procedimiento de Mach alto y el difusor de salida del apartado 7, los
+factores de eficiencia determinados experimentalmente del apartado 8, y el
+caso hidrodinámico de la IEC 60534-8-4, donde el fluido es un líquido y lo que
+hace el ruido es la cavitación y no un chorro.
+</ScopeClaim>
+</Scope>

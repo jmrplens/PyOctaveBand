@@ -342,6 +342,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.noise_control.duct_modes",
             "phonometry.noise_control.enclosures",
             "phonometry.noise_control.room_to_room",
+            "phonometry.noise_control.valves",
         ),
     ),
     Section(

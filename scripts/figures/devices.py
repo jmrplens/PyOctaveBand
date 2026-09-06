@@ -6337,3 +6337,194 @@ def generate_workstation_emission(output_dir: str) -> None:
     plt.tight_layout()
     save_figure(output_dir, "workstation_emission.svg")
     plt.close()
+
+
+def generate_control_valve_noise(output_dir: str) -> None:
+    """IEC 60534-8-3: the five regimes, the pipe, and what comes out."""
+    print("Generating control_valve_noise.svg...")
+    from phonometry import noise_control
+
+    common: dict[str, Any] = {
+        "inlet_pressure": 1.0e6,
+        "inlet_density": 5.3,
+        "inlet_temperature": 450.0,
+        "specific_heat_ratio": 1.22,
+        "molecular_mass": 19.8,
+        "pressure_recovery": 0.792 / 0.984,
+        "wall_thickness": 0.008,
+        "pipe_density": 8000.0,
+        "efficiency_correction": -3.8,
+        "strouhal_number": 0.2,
+        "style_modifier": noise_control.valve_style_modifier(0.00137, 0.181, 6),
+    }
+    bounds = noise_control.pressure_ratio_boundaries(1.22, 0.792 / 0.984)
+
+    _fig, axes = plt.subplots(1, 3, figsize=(16.4, 5.4))
+
+    # -- Left: the acoustical efficiency across the five regimes.
+    #
+    # Table 3 gives each regime its own expression, so the curve is drawn by
+    # running the whole method at 400 outlet pressures and reading off what
+    # it did. The jumps at the boundaries are the standard's, not an
+    # artefact: neighbouring regimes are different formulae that were never
+    # asked to meet.
+    ax = axes[0]
+    ratios = np.linspace(0.02, 0.985, 400)
+    efficiency = []
+    for x in ratios:
+        result = noise_control.valve_aerodynamic_noise(
+            **common,
+            mass_flow=2.22,
+            outlet_pressure=1.0e6 * (1.0 - x),
+            flow_coefficient=90.0,
+            valve_outlet_diameter=0.1,
+            internal_diameter=0.2031,
+        )
+        efficiency.append(result.acoustical_efficiency)
+    edges = [
+        0.0,
+        bounds.critical,
+        bounds.vena_contracta,
+        bounds.break_point,
+        bounds.constant_efficiency,
+        1.0,
+    ]
+    labels = ["I", "II", "III", "IV", "V"]
+    wash = theme_fill(COLOR_PRIMARY, ax)
+    for index, (low, high) in enumerate(zip(edges[:-1], edges[1:], strict=True)):
+        if index % 2 == 0:
+            ax.axvspan(low, high, color=wash, lw=0, zorder=0)
+        ax.text(
+            0.5 * (low + min(high, 1.0)),
+            4.0e-3,
+            labels[index],
+            ha="center",
+            va="center",
+            fontsize=11,
+            color=COLOR_MUTED,
+        )
+    for edge in edges[1:-1]:
+        ax.axvline(edge, color=COLOR_MUTED, ls=":", lw=1.2, zorder=1)
+    ax.plot(ratios, efficiency, color=COLOR_PRIMARY, lw=2.4, zorder=3)
+    ax.set_yscale("log")
+    ax.set_xlim(0.0, 1.0)
+    ax.set_ylim(1e-7, 1e-2)
+    ax.set_xlabel("Differential pressure ratio $x$")
+    ax.set_ylabel("Acoustical efficiency $\\eta$")
+    ax.set_title("What throttling costs, regime by regime")
+    ax.grid(color=COLOR_GRID, ls="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.annotate(
+        "one valve, one part in a million of\nthe stream power at the left and two\n"
+        "parts in a thousand at the right",
+        xy=(0.93, 2.0e-3),
+        xytext=(0.06, 1.6e-5),
+        fontsize=8.5,
+        color=COLOR_FG,
+        ha="left",
+        arrowprops={"arrowstyle": "->", "color": COLOR_FG, "linewidth": 1.1},
+        bbox={
+            "boxstyle": "round,pad=0.3",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=6,
+    )
+
+    # -- Middle: what the pipe wall does to the spectrum.
+    ax2 = axes[1]
+    result = noise_control.valve_aerodynamic_noise(
+        **common,
+        mass_flow=2.22,
+        outlet_pressure=7.2e5,
+        flow_coefficient=90.0,
+        valve_outlet_diameter=0.1,
+        internal_diameter=0.2031,
+    )
+    bands = np.asarray(result.frequency)
+    ax2.plot(
+        bands,
+        np.asarray(result.band_internal_level),
+        color=COLOR_PRIMARY,
+        lw=2.4,
+        label="Inside the pipe, $L_{pi}(f_i)$",
+    )
+    ax2.plot(
+        bands,
+        np.asarray(result.band_external_level),
+        color=COLOR_SECONDARY,
+        lw=2.0,
+        ls="--",
+        label="One metre outside, $L_{pe,1m}(f_i)$",
+    )
+    ax2.axvline(result.peak_frequency, color=COLOR_MUTED, ls=":", lw=1.4)
+    format_frequency_axis(ax2, 12.5, 20000.0)
+    ax2.set_ylim(0.0, 160.0)
+    ax2.set_ylabel("Sound pressure level [dB]")
+    ax2.set_title("A wall worth a hundred decibels")
+    ax2.grid(color=COLOR_GRID, ls="--", alpha=0.5)
+    ax2.set_axisbelow(True)
+    ax2.legend(loc="lower left", fontsize=9)
+    ax2.annotate(
+        "the peak frequency, set by the jet\ndiameter and not by the valve size",
+        xy=(result.peak_frequency, 118.0),
+        xytext=(300.0, 40.0),
+        fontsize=8.5,
+        color=COLOR_FG,
+        arrowprops={"arrowstyle": "->", "color": COLOR_FG, "linewidth": 1.1},
+        bbox={
+            "boxstyle": "round,pad=0.3",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=6,
+    )
+
+    # -- Right: the transmission loss, and the three frequencies shaping it.
+    ax3 = axes[2]
+    pipe = result.pipe_frequencies
+    ax3.plot(
+        bands,
+        np.asarray(result.band_transmission_loss),
+        color=COLOR_FG,
+        lw=2.4,
+    )
+    for frequency, name in (
+        (pipe.external_coincidence, "$f_g$"),
+        (pipe.internal_coincidence, "$f_o$"),
+        (pipe.ring, "$f_r$"),
+    ):
+        ax3.axvline(frequency, color=COLOR_MUTED, ls=":", lw=1.4)
+        ax3.text(
+            frequency * 1.06,
+            -98.0,
+            name,
+            fontsize=10,
+            color=COLOR_MUTED,
+            va="bottom",
+        )
+    format_frequency_axis(ax3, 12.5, 20000.0)
+    ax3.set_ylim(-100.0, -30.0)
+    ax3.set_ylabel("Pipe transmission loss [dB]")
+    ax3.set_title("The pipe is the loudspeaker")
+    ax3.grid(color=COLOR_GRID, ls="--", alpha=0.5)
+    ax3.set_axisbelow(True)
+    ax3.annotate(
+        "the wall lets most through where the\nsound inside it and the bending waves\n"
+        "in it travel at the same speed",
+        xy=(pipe.internal_coincidence, -49.5),
+        xytext=(25.0, -42.0),
+        fontsize=8.5,
+        color=COLOR_FG,
+        arrowprops={"arrowstyle": "->", "color": COLOR_FG, "linewidth": 1.1},
+        bbox={
+            "boxstyle": "round,pad=0.3",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=6,
+    )
+
+    plt.tight_layout()
+    save_figure(output_dir, "control_valve_noise.svg")
+    plt.close()

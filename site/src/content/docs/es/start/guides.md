@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 120 guías de phonometry, agrupadas en los doce temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 121 guías de phonometry, agrupadas en los doce temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -111,7 +111,7 @@ hay ninguna panorámica del campo: cada página es la documentación de trabajo 
 un módulo, escrita para que un resultado se pueda defender apartado por
 apartado en lugar de darlo por bueno.
 
-Esta página es el mapa. Ciento veinte guías repartidas en doce temas, y cada
+Esta página es el mapa. Ciento veintiuna guías repartidas en doce temas, y cada
 área tiene su propio índice con el relato largo de cómo encajan sus piezas. Si
 llegas sin una pregunta concreta, lee primero la
 [introducción](/phonometry/es/start/getting-started/): recorre una señal por toda la
@@ -758,6 +758,9 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 y EBU R 128.
 - [Ruido de climatización a la alemana (VDI 2081)](/phonometry/es/devices/noise-control/vdi2081-air-systems/):
   la misma cadena por la directriz alemana, del modelo de ventilador por tipo
   de montaje al paso a la sala, contra la hoja resuelta de su propia Parte 2.
+- [Ruido de válvulas de control (IEC 60534-8-3)](/phonometry/es/devices/noise-control/control-valve-noise/):
+  los cinco regímenes de flujo de una válvula de estrangulación, el chorro que
+  fija la frecuencia de pico y la pared de la tubería, que es lo que radia.
 - [Entre recintos: partición, receptor y criterio](/phonometry/es/devices/noise-control/room-to-room/):
   la cadena compuesta del recinto emisor al recinto receptor y la pérdida por
   transmisión que necesita una partición o un cerramiento para cumplir un

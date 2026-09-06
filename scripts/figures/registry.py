@@ -107,6 +107,7 @@ from .correlation_analysis import (
 )
 from .devices import (
     generate_channel_weight_map,
+    generate_control_valve_noise,
     generate_discrete_point_qualification,
     generate_distortion,
     generate_duct_attenuation_elements,
@@ -1184,6 +1185,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_intensity_class,
     generate_silencer_side_branch,
     generate_silencer_insertion_loss,
+    generate_control_valve_noise,
     generate_silencer_selection,
     generate_silencer_extended_tube,
     generate_extended_tube_geometry,

@@ -3,13 +3,13 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 807,
-    "passing": 807,
+    "checks": 815,
+    "passing": 815,
     "failing": 0,
-    "domains": 67,
-    "standards": 395,
-    "citations": 635,
-    "designations": 133,
+    "domains": 68,
+    "standards": 396,
+    "citations": 636,
+    "designations": 134,
     "sources": 83
   },
   "units": [
@@ -29,6 +29,7 @@
     "N·s/m",
     "Pa",
     "Pa·s/m²",
+    "W",
     "W/m²",
     "acum",
     "asper",
@@ -463,6 +464,12 @@
       "title": "Industrial noise control",
       "checks": 22,
       "passing": 22
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-3",
+      "title": "Control valve noise (IEC 60534-8-3)",
+      "checks": 8,
+      "passing": 8
     },
     {
       "id": "hvac-noise-vdi-2081",
@@ -21462,6 +21469,288 @@
         "value": 8.88e-16
       },
       "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-3/iec-60534-8-3-2010/regime-examples-1-to-6-table-a-1",
+      "domain": "control-valve-noise-iec-60534-8-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-3",
+        "edition": "2010",
+        "cite": "IEC 60534-8-3:2010"
+      },
+      "quantity": "Regime, examples 1 to 6 (Table A.1)",
+      "kind": "record",
+      "expected": {
+        "label": "I, II, III, IV, V, V",
+        "record": {
+          "example 1": 1.0,
+          "example 2": 2.0,
+          "example 3": 3.0,
+          "example 4": 4.0,
+          "example 5": 5.0,
+          "example 6": 5.0
+        }
+      },
+      "computed": {
+        "label": "example 1 = 1; example 2 = 2; example 3 = 3; example 4 = 4; example 5 = 5; example 6 = 5",
+        "record": {
+          "example 1": 1.0,
+          "example 2": 2.0,
+          "example 3": 3.0,
+          "example 4": 4.0,
+          "example 5": 5.0,
+          "example 6": 5.0
+        }
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-3/iec-60534-8-3-2010/valve-style-modifier-f-d-eqs-8a-to-8c",
+      "domain": "control-valve-noise-iec-60534-8-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-3",
+        "edition": "2010",
+        "cite": "IEC 60534-8-3:2010"
+      },
+      "quantity": "Valve style modifier F_d (Eqs. (8a) to (8c))",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.3
+      },
+      "computed": {
+        "value": 0.296
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.005
+      },
+      "deviation": {
+        "value": -0.004
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-3/iec-60534-8-3-2010/jet-diameter-d-j-example-1-eq-9",
+      "domain": "control-valve-noise-iec-60534-8-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-3",
+        "edition": "2010",
+        "cite": "IEC 60534-8-3:2010"
+      },
+      "quantity": "Jet diameter D_j, example 1 (Eq. (9))",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.012
+      },
+      "computed": {
+        "value": 0.0116
+      },
+      "unit": "m",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0005
+      },
+      "deviation": {
+        "value": -0.0004
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-3/iec-60534-8-3-2010/vena-contracta-pressure-examples-1-to-6-eq-2",
+      "domain": "control-valve-noise-iec-60534-8-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-3",
+        "edition": "2010",
+        "cite": "IEC 60534-8-3:2010"
+      },
+      "quantity": "Vena contracta pressure, examples 1 to 6 (Eq. (2))",
+      "kind": "scalar",
+      "expected": {
+        "value": 104702.0,
+        "label": "example 4, the worst of the six"
+      },
+      "computed": {
+        "value": 104702.0
+      },
+      "unit": "Pa",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 2.0
+      },
+      "deviation": {
+        "value": -0.439
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-3/iec-60534-8-3-2010/sound-power-w-a-examples-1-to-6-eq-11",
+      "domain": "control-valve-noise-iec-60534-8-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-3",
+        "edition": "2010",
+        "cite": "IEC 60534-8-3:2010"
+      },
+      "quantity": "Sound power W_a, examples 1 to 6 (Eq. (11))",
+      "kind": "record",
+      "expected": {
+        "label": "example 1 = 22.3 W; example 2 = 30.4 W; example 3 = 141.3 W; example 4 = 86.1 W; example 5 = 291.9 W; example 6 = 218.3 W",
+        "record": {
+          "example 1": 22.3,
+          "example 2": 30.4,
+          "example 3": 141.3,
+          "example 4": 86.1,
+          "example 5": 291.9,
+          "example 6": 218.3
+        }
+      },
+      "computed": {
+        "label": "example 1 = 22.3 W; example 2 = 30.4 W; example 3 = 141.3 W; example 4 = 86.1 W; example 5 = 291.9 W; example 6 = 218.3 W",
+        "record": {
+          "example 1": 22.3,
+          "example 2": 30.4,
+          "example 3": 141.3,
+          "example 4": 86.1,
+          "example 5": 291.9,
+          "example 6": 218.3
+        }
+      },
+      "unit": "W",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-3/iec-60534-8-3-2010/internal-level-at-the-pipe-wall-examples-1-to-6-eq-18",
+      "domain": "control-valve-noise-iec-60534-8-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-3",
+        "edition": "2010",
+        "cite": "IEC 60534-8-3:2010"
+      },
+      "quantity": "Internal level at the pipe wall, examples 1 to 6 (Eq. (18))",
+      "kind": "record",
+      "expected": {
+        "label": "example 1 = 155.3 dB; example 2 = 156.5 dB; example 3 = 161.7 dB; example 4 = 158.8 dB; example 5 = 157 dB; example 6 = 158.4 dB",
+        "record": {
+          "example 1": 155.3,
+          "example 2": 156.5,
+          "example 3": 161.7,
+          "example 4": 158.8,
+          "example 5": 157.0,
+          "example 6": 158.4
+        }
+      },
+      "computed": {
+        "label": "example 1 = 155.3 dB; example 2 = 156.5 dB; example 3 = 161.7 dB; example 4 = 158.8 dB; example 5 = 157 dB; example 6 = 158.4 dB",
+        "record": {
+          "example 1": 155.3,
+          "example 2": 156.5,
+          "example 3": 161.7,
+          "example 4": 158.8,
+          "example 5": 157.0,
+          "example 6": 158.4
+        }
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-3/iec-60534-8-3-2010/ring-and-coincidence-frequencies-example-7-eqs-21-to-23",
+      "domain": "control-valve-noise-iec-60534-8-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-3",
+        "edition": "2010",
+        "cite": "IEC 60534-8-3:2010"
+      },
+      "quantity": "Ring and coincidence frequencies, example 7 (Eqs. (21) to (23))",
+      "kind": "record",
+      "expected": {
+        "label": "f_r = 7958 Hz; f_o = 2366 Hz; f_g = 1622 Hz",
+        "record": {
+          "f_r": 7958.0,
+          "f_o": 2366.0,
+          "f_g": 1622.0
+        }
+      },
+      "computed": {
+        "label": "f_r = 7958 Hz; f_o = 2366 Hz; f_g = 1622 Hz",
+        "record": {
+          "f_r": 7958.0,
+          "f_o": 2366.0,
+          "f_g": 1622.0
+        }
+      },
+      "unit": "Hz",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-3/iec-60534-8-3-2010/pipe-transmission-loss-example-7-24-bands-eq-20a",
+      "domain": "control-valve-noise-iec-60534-8-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-3",
+        "edition": "2010",
+        "cite": "IEC 60534-8-3:2010"
+      },
+      "quantity": "Pipe transmission loss, example 7, 24 bands (Eq. (20a))",
+      "kind": "scalar",
+      "expected": {
+        "value": -62.6,
+        "label": "band 17 at 500 Hz, the worst of 24"
+      },
+      "computed": {
+        "value": -62.67
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.1
+      },
+      "deviation": {
+        "value": -0.066
+      },
+      "precision": 2,
       "verdict": "pass"
     },
     {
