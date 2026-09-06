@@ -101,10 +101,9 @@ class TestStageSupport:
         assert result.frequency[-1] == pytest.approx(2000.0, rel=0.01)
 
     def test_it_refuses_a_response_that_cannot_reach_one_second(self) -> None:
+        response = platform_response([(0.050, 0.2)], seconds=0.5)
         with pytest.raises(ValueError, match="integrates to 1 s"):
-            room.stage_support(
-                platform_response([(0.050, 0.2)], seconds=0.5), FS, limits=None
-            )
+            room.stage_support(response, FS, limits=None)
 
     def test_the_printed_standard_deviations_close_on_twelve_readings(self) -> None:
         # C.2.4 estimates 1 dB for one band in one position and 0,3 dB for
