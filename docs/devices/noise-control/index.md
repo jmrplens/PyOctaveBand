@@ -74,6 +74,9 @@ occupational limit applies, in [Occupational exposure
 - [Control Valve Noise (IEC 60534-8-3)](control-valve-noise.md):
   the five flow regimes of a throttling valve and the pipe wall that radiates
   what they make.
+- [Hydrodynamic Valve Noise (IEC 60534-8-4)](valve-cavitation.md):
+  the same valve on a liquid line, where cavitation rather than a jet is what
+  makes the noise.
 - [Room to Room: Partition, Receiving Room, Criterion](room-to-room.md):
   the composed source-room to receiving-room chain and the transmission loss a
   partition or an enclosure needs to meet a noise criterion.

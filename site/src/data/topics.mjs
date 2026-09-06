@@ -448,6 +448,7 @@ export const topics = [
           'devices/noise-control/duct-path',
           'devices/noise-control/vdi2081-air-systems',
           'devices/noise-control/control-valve-noise',
+          'devices/noise-control/valve-cavitation',
           'devices/noise-control/room-to-room',
           'devices/noise-control/noise-control',
         ],

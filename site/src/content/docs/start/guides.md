@@ -1,6 +1,6 @@
 ---
 title: "Guides"
-description: "The 121 guides of phonometry, grouped into the twelve topics the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
+description: "The 122 guides of phonometry, grouped into the twelve topics the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
 head:
   - tag: script
     attrs:
@@ -110,7 +110,7 @@ makes, then runnable code and the figure it draws. Nothing here is a survey of
 the field; each page is the working documentation of a module, written so that
 a result can be defended clause by clause rather than trusted.
 
-This page is the map. A hundred and twenty-one guides sit in twelve topics, and each topic has its
+This page is the map. A hundred and twenty-two guides sit in twelve topics, and each topic has its
 own overview page with the longer story of how its pieces fit together. If you
 are arriving without a specific question, read
 [Getting Started](/phonometry/start/getting-started/) first: it runs one signal
@@ -723,6 +723,9 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 and EBU R 128.
 - [Control Valve Noise (IEC 60534-8-3)](/phonometry/devices/noise-control/control-valve-noise/):
   the five flow regimes of a throttling valve, the jet that sets the peak
   frequency, and the pipe wall that is what actually radiates.
+- [Hydrodynamic Valve Noise (IEC 60534-8-4)](/phonometry/devices/noise-control/valve-cavitation/):
+  the same valve on a liquid line, where one threshold decides whether it
+  cavitates and 0,1 in that threshold is worth 14 dB.
 - [Room to Room: Partition, Receiving Room, Criterion](/phonometry/devices/noise-control/room-to-room/):
   the source-room level through a partition into the receiving room, the noise
   criterion verdict and the transmission loss a partition or an enclosure needs.

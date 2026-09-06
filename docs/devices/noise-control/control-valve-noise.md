@@ -415,5 +415,6 @@ substitution of 6.3 and the multipath multistage case of 6.4. And the
 outlet-flow half of Clause 7, for the flow leaving a valve outlet that has
 passed Mach 0,3. Validated against all seven worked examples of Annex A in the
 [conformance report](../../CONFORMANCE.md); the three defects that annex
-carries are in the [errata register](../../ERRATA.md). Clause 8, Clause 9 and
-the hydrodynamic case of IEC 60534-8-4 are not implemented yet.
+carries are in the [errata register](../../ERRATA.md). Clause 8 and Clause 9
+are not implemented yet; the hydrodynamic case of IEC 60534-8-4 has
+[a page of its own](valve-cavitation.md).

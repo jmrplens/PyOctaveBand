@@ -81,6 +81,7 @@ from conformance.domains import (
     electroacoustics,
     noise_control,
     control_valves,
+    control_valves_hydrodynamic,
     vdi2081,
     cnossos_rail,
 )
@@ -189,6 +190,7 @@ __all__ = [
     "building_prediction",
     "cnossos_rail",
     "control_valves",
+    "control_valves_hydrodynamic",
     "count",
     "distortion",
     "electroacoustics",

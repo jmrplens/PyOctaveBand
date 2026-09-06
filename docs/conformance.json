@@ -3,13 +3,13 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 820,
-    "passing": 820,
+    "checks": 834,
+    "passing": 834,
     "failing": 0,
-    "domains": 68,
-    "standards": 396,
-    "citations": 636,
-    "designations": 134,
+    "domains": 69,
+    "standards": 397,
+    "citations": 637,
+    "designations": 135,
     "sources": 83
   },
   "units": [
@@ -470,6 +470,12 @@
       "title": "Control valve noise (IEC 60534-8-3)",
       "checks": 13,
       "passing": 13
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-4",
+      "title": "Control valve noise (IEC 60534-8-4)",
+      "checks": 14,
+      "passing": 14
     },
     {
       "id": "hvac-noise-vdi-2081",
@@ -21932,6 +21938,520 @@
           "L_pAe": 89.0
         }
       },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-4/iec-60534-8-4-2005/flow-conditions-examples-1-to-3-5-1",
+      "domain": "control-valve-noise-iec-60534-8-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-4",
+        "edition": "2005",
+        "cite": "IEC 60534-8-4:2005"
+      },
+      "quantity": "Flow conditions, examples 1 to 3 (5.1)",
+      "kind": "record",
+      "expected": {
+        "label": "Delta p = 2,0 / 3,5 / 3,5 x 1e5 Pa against 2,38 / 2,38 / 3,32 x 1e5 Pa -> turbulent, cavitating, cavitating",
+        "record": {
+          "x_Fzp1 (p1-pv) 1": 2.38,
+          "cavitating 1": 0.0,
+          "x_Fzp1 (p1-pv) 2": 2.38,
+          "cavitating 2": 1.0,
+          "x_Fzp1 (p1-pv) 3": 3.32,
+          "cavitating 3": 1.0
+        }
+      },
+      "computed": {
+        "label": "x_Fzp1 (p1-pv) 1 = 2.38; cavitating 1 = 0; x_Fzp1 (p1-pv) 2 = 2.38; cavitating 2 = 1; x_Fzp1 (p1-pv) 3 = 3.32; cavitating 3 = 1",
+        "record": {
+          "x_Fzp1 (p1-pv) 1": 2.38,
+          "cavitating 1": 0.0,
+          "x_Fzp1 (p1-pv) 2": 2.38,
+          "cavitating 2": 1.0,
+          "x_Fzp1 (p1-pv) 3": 3.32,
+          "cavitating 3": 1.0
+        }
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-4/iec-60534-8-4-2005/characteristic-pressure-ratio-x-fz-and-x-fzp1-eqs-3a-3c",
+      "domain": "control-valve-noise-iec-60534-8-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-4",
+        "edition": "2005",
+        "cite": "IEC 60534-8-4:2005"
+      },
+      "quantity": "Characteristic pressure ratio x_Fz and x_Fzp1 (Eqs. (3a), (3c))",
+      "kind": "record",
+      "expected": {
+        "label": "x_Fz = 0.2543; x_Fzp1 = 0.2386; x_Fzp1 shifted = 0.3324",
+        "record": {
+          "x_Fz": 0.2543,
+          "x_Fzp1": 0.2386,
+          "x_Fzp1 shifted": 0.3324
+        }
+      },
+      "computed": {
+        "label": "x_Fz = 0.2543; x_Fzp1 = 0.2386; x_Fzp1 shifted = 0.3324",
+        "record": {
+          "x_Fz": 0.2543,
+          "x_Fzp1": 0.2386,
+          "x_Fzp1 shifted": 0.3324
+        }
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-4/iec-60534-8-4-2005/jet-diameter-d-j-eq-4",
+      "domain": "control-valve-noise-iec-60534-8-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-4",
+        "edition": "2005",
+        "cite": "IEC 60534-8-4:2005"
+      },
+      "quantity": "Jet diameter D_j (Eq. (4))",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.01758
+      },
+      "computed": {
+        "value": 0.01758
+      },
+      "unit": "m",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 5e-06
+      },
+      "deviation": {
+        "value": 1.38e-07
+      },
+      "precision": 5,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-4/iec-60534-8-4-2005/vena-contracta-velocity-and-stream-power-eqs-5-6",
+      "domain": "control-valve-noise-iec-60534-8-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-4",
+        "edition": "2005",
+        "cite": "IEC 60534-8-4:2005"
+      },
+      "quantity": "Vena contracta velocity and stream power (Eqs. (5), (6))",
+      "kind": "record",
+      "expected": {
+        "label": "U_vc 1 = 21.772; U_vc 2 = 28.801; W_m 1 = 6018.05; W_m 2 = 14042.1",
+        "record": {
+          "U_vc 1": 21.772,
+          "U_vc 2": 28.801,
+          "W_m 1": 6018.05,
+          "W_m 2": 14042.1
+        }
+      },
+      "computed": {
+        "label": "U_vc 1 = 21.772; U_vc 2 = 28.801; W_m 1 = 6018.05; W_m 2 = 14042.1",
+        "record": {
+          "U_vc 1": 21.772,
+          "U_vc 2": 28.801,
+          "W_m 1": 6018.05,
+          "W_m 2": 14042.1
+        }
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-4/iec-60534-8-4-2005/acoustical-efficiencies-eqs-8-9",
+      "domain": "control-valve-noise-iec-60534-8-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-4",
+        "edition": "2005",
+        "cite": "IEC 60534-8-4:2005"
+      },
+      "quantity": "Acoustical efficiencies (Eqs. (8), (9))",
+      "kind": "record",
+      "expected": {
+        "label": "eta_turb 1 (x1e6) = 1.555; eta_turb 2 (x1e6) = 2.057; eta_cav 2 (x1e6) = 1.243; eta_cav 3 (x1e8) = 1.992",
+        "record": {
+          "eta_turb 1 (x1e6)": 1.555,
+          "eta_turb 2 (x1e6)": 2.057,
+          "eta_cav 2 (x1e6)": 1.243,
+          "eta_cav 3 (x1e8)": 1.992
+        }
+      },
+      "computed": {
+        "label": "eta_turb 1 (x1e6) = 1.555; eta_turb 2 (x1e6) = 2.057; eta_cav 2 (x1e6) = 1.243; eta_cav 3 (x1e8) = 1.992",
+        "record": {
+          "eta_turb 1 (x1e6)": 1.555,
+          "eta_turb 2 (x1e6)": 2.057,
+          "eta_cav 2 (x1e6)": 1.243,
+          "eta_cav 3 (x1e8)": 1.992
+        }
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-4/iec-60534-8-4-2005/sound-power-w-a-examples-1-to-3-eqs-7a-7b",
+      "domain": "control-valve-noise-iec-60534-8-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-4",
+        "edition": "2005",
+        "cite": "IEC 60534-8-4:2005"
+      },
+      "quantity": "Sound power W_a, examples 1 to 3 (Eqs. (7a), (7b))",
+      "kind": "record",
+      "expected": {
+        "label": "example 1 = 0.0023 W; example 2 = 0.0116 W; example 3 = 0.0073 W",
+        "record": {
+          "example 1": 0.00234,
+          "example 2": 0.01158,
+          "example 3": 0.00729
+        }
+      },
+      "computed": {
+        "label": "example 1 = 0.0023 W; example 2 = 0.0116 W; example 3 = 0.0073 W",
+        "record": {
+          "example 1": 0.00234,
+          "example 2": 0.01158,
+          "example 3": 0.00729
+        }
+      },
+      "unit": "W",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-4/iec-60534-8-4-2005/internal-level-at-the-pipe-wall-examples-1-to-3-eq-10",
+      "domain": "control-valve-noise-iec-60534-8-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-4",
+        "edition": "2005",
+        "cite": "IEC 60534-8-4:2005"
+      },
+      "quantity": "Internal level at the pipe wall, examples 1 to 3 (Eq. (10))",
+      "kind": "record",
+      "expected": {
+        "label": "example 1 = 149.596 dB; example 2 = 156.543 dB; example 3 = 154.532 dB",
+        "record": {
+          "example 1": 149.596,
+          "example 2": 156.543,
+          "example 3": 154.532
+        }
+      },
+      "computed": {
+        "label": "example 1 = 149.596 dB; example 2 = 156.543 dB; example 3 = 154.532 dB",
+        "record": {
+          "example 1": 149.596,
+          "example 2": 156.543,
+          "example 3": 154.532
+        }
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-4/iec-60534-8-4-2005/strouhal-number-and-turbulent-peak-eqs-11-12",
+      "domain": "control-valve-noise-iec-60534-8-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-4",
+        "edition": "2005",
+        "cite": "IEC 60534-8-4:2005"
+      },
+      "quantity": "Strouhal number and turbulent peak (Eqs. (11), (12))",
+      "kind": "record",
+      "expected": {
+        "label": "N_Str 2 = 0.399; N_Str 3 = 0.243; f_p,turb 2 = 654.35; f_p,turb 3 = 397.93",
+        "record": {
+          "N_Str 2": 0.399,
+          "N_Str 3": 0.243,
+          "f_p,turb 2": 654.35,
+          "f_p,turb 3": 397.93
+        }
+      },
+      "computed": {
+        "label": "N_Str 2 = 0.399; N_Str 3 = 0.243; f_p,turb 2 = 654.35; f_p,turb 3 = 397.93",
+        "record": {
+          "N_Str 2": 0.399,
+          "N_Str 3": 0.243,
+          "f_p,turb 2": 654.35,
+          "f_p,turb 3": 397.93
+        }
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-4/iec-60534-8-4-2005/cavitating-peak-frequency-eq-13",
+      "domain": "control-valve-noise-iec-60534-8-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-4",
+        "edition": "2005",
+        "cite": "IEC 60534-8-4:2005"
+      },
+      "quantity": "Cavitating peak frequency (Eq. (13))",
+      "kind": "record",
+      "expected": {
+        "label": "example 2 = 1088.94 Hz; example 3 = 1973.43 Hz",
+        "record": {
+          "example 2": 1088.94,
+          "example 3": 1973.43
+        }
+      },
+      "computed": {
+        "label": "example 2 = 1088.94 Hz; example 3 = 1973.43 Hz",
+        "record": {
+          "example 2": 1088.94,
+          "example 3": 1973.43
+        }
+      },
+      "unit": "Hz",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-4/iec-60534-8-4-2005/ring-frequency-and-its-transmission-loss-eqs-14-15",
+      "domain": "control-valve-noise-iec-60534-8-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-4",
+        "edition": "2005",
+        "cite": "IEC 60534-8-4:2005"
+      },
+      "quantity": "Ring frequency and its transmission loss (Eqs. (14), (15))",
+      "kind": "record",
+      "expected": {
+        "label": "f_r = 14860.406; TL_fr = -44.71",
+        "record": {
+          "f_r": 14860.406,
+          "TL_fr": -44.71
+        }
+      },
+      "computed": {
+        "label": "f_r = 14860.406; TL_fr = -44.71",
+        "record": {
+          "f_r": 14860.406,
+          "TL_fr": -44.71
+        }
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-4/iec-60534-8-4-2005/turbulent-transmission-loss-examples-1-to-3-eqs-16a-16b",
+      "domain": "control-valve-noise-iec-60534-8-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-4",
+        "edition": "2005",
+        "cite": "IEC 60534-8-4:2005"
+      },
+      "quantity": "Turbulent transmission loss, examples 1 to 3 (Eqs. (16a), (16b))",
+      "kind": "scalar",
+      "expected": {
+        "value": -76.16,
+        "label": "example 3, the worst of the three"
+      },
+      "computed": {
+        "value": -76.152
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.01
+      },
+      "deviation": {
+        "value": 0.008
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-4/iec-60534-8-4-2005/cavitating-transmission-loss-examples-2-and-3-eq-17",
+      "domain": "control-valve-noise-iec-60534-8-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-4",
+        "edition": "2005",
+        "cite": "IEC 60534-8-4:2005"
+      },
+      "quantity": "Cavitating transmission loss, examples 2 and 3 (Eq. (17))",
+      "kind": "scalar",
+      "expected": {
+        "value": -75.006,
+        "label": "example 3, the worse of the two printed rows"
+      },
+      "computed": {
+        "value": -74.922
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.1
+      },
+      "deviation": {
+        "value": 0.084
+      },
+      "precision": 3,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-4/iec-60534-8-4-2005/level-1-m-from-the-pipe-wall-examples-1-to-3-eqs-18a-18b",
+      "domain": "control-valve-noise-iec-60534-8-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-4",
+        "edition": "2005",
+        "cite": "IEC 60534-8-4:2005"
+      },
+      "quantity": "Level 1 m from the pipe wall, examples 1 to 3 (Eqs. (18a), (18b))",
+      "kind": "record",
+      "expected": {
+        "label": "example 1 = 62.7 dB; example 2 = 81 dB; example 3 = 66.9 dB",
+        "record": {
+          "example 1": 62.7,
+          "example 2": 81.0,
+          "example 3": 66.9
+        }
+      },
+      "computed": {
+        "label": "example 1 = 62.7 dB; example 2 = 81 dB; example 3 = 66.9 dB",
+        "record": {
+          "example 1": 62.7,
+          "example 2": 81.0,
+          "example 3": 66.9
+        }
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-4/iec-60534-8-4-2005/frequency-route-at-8-khz-examples-1-to-3-eqs-19-to-22",
+      "domain": "control-valve-noise-iec-60534-8-4",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-4",
+        "edition": "2005",
+        "cite": "IEC 60534-8-4:2005"
+      },
+      "quantity": "Frequency route at 8 kHz, examples 1 to 3 (Eqs. (19) to (22))",
+      "kind": "record",
+      "expected": {
+        "label": "L_pi(8k) 1 = 116.3 dB; L_pi(8k) 2 = 141.9 dB; L_pi(8k) 3 = 128 dB; TL(8k) = -51.76 dB; L_pe(8k) 1 = 51.8 dB; L_pe(8k) 2 = 77.4 dB; L_pe(8k) 3 = 63.6 dB",
+        "record": {
+          "L_pi(8k) 1": 116.3,
+          "L_pi(8k) 2": 141.9,
+          "L_pi(8k) 3": 128.0,
+          "TL(8k)": -51.76,
+          "L_pe(8k) 1": 51.8,
+          "L_pe(8k) 2": 77.4,
+          "L_pe(8k) 3": 63.6
+        }
+      },
+      "computed": {
+        "label": "L_pi(8k) 1 = 116.3 dB; L_pi(8k) 2 = 141.9 dB; L_pi(8k) 3 = 128 dB; TL(8k) = -51.76 dB; L_pe(8k) 1 = 51.8 dB; L_pe(8k) 2 = 77.4 dB; L_pe(8k) 3 = 63.6 dB",
+        "record": {
+          "L_pi(8k) 1": 116.3,
+          "L_pi(8k) 2": 141.9,
+          "L_pi(8k) 3": 128.0,
+          "TL(8k)": -51.76,
+          "L_pe(8k) 1": 51.8,
+          "L_pe(8k) 2": 77.4,
+          "L_pe(8k) 3": 63.6
+        }
+      },
+      "unit": "dB",
       "tolerance": {
         "mode": "absolute",
         "value": 0.0

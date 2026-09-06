@@ -48,9 +48,10 @@ recorded in ``docs/ERRATA.md``:
   transmission losses printed two rows below them are what the corrected
   factors give.
 
-This module implements Clause 5, the standard trim case. The noise-reducing
-trims of Clause 6, the expander of Clause 7 and the hydrodynamic case of
-IEC 60534-8-4 are separate.
+This module implements Clause 5, the standard trim case, with the
+noise-reducing trims of Clause 6 and the expander of Clause 7 alongside it.
+The hydrodynamic case of IEC 60534-8-4, where the fluid is a liquid, is
+:mod:`phonometry.noise_control.valves_hydrodynamic`.
 """
 
 from __future__ import annotations

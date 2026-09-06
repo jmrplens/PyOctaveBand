@@ -279,6 +279,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`noise_control.enclosures`](/phonometry/reference/api/noise_control/enclosures/) | Insertion loss of a close or free-standing machine enclosure. |
 | [`noise_control.room_to_room`](/phonometry/reference/api/noise_control/room-to-room/) | Room-to-room noise reduction: source room, partition, receiving room, criterion. |
 | [`noise_control.valves`](/phonometry/reference/api/noise_control/valves/) | Control valve aerodynamic noise (IEC 60534-8-3:2010). |
+| [`noise_control.valves_hydrodynamic`](/phonometry/reference/api/noise_control/valves-hydrodynamic/) | Control valve hydrodynamic noise (IEC 60534-8-4:2005). |
 
 ## Broadcast metering
 

@@ -38,6 +38,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The same valve on a liquid line, which is a different standard and a
+  different kind of noise: IEC 60534-8-4, in
+  `noise_control.valves_hydrodynamic`.
+
+  A liquid does not compress, so there are no shock cells and no five regimes.
+  There are two sources instead. Turbulence in the jet is the quiet one, an
+  efficiency linear in the jet Mach number and therefore around one part in a
+  million for water. Cavitation is the other, and it does not fade in: it
+  starts at exactly zero on the valve's characteristic pressure ratio, once
+  Equation (3c) has moved that ratio to the working inlet pressure, and then
+  climbs as a fifth power of the ratio to it. `valve_hydrodynamic_noise` runs the whole chain, from the two pressure
+  ratios of Clause 4 to the level 1 m from the pipe, and the pieces are
+  public: `cavitation_efficiency`, `cavitation_peak_frequency`,
+  `cavitation_transmission_loss` with the floor its NOTE puts just above the
+  threshold, and the band route of 5.4 in `band_internal_levels`.
+
+  All three worked examples of Annex A reproduce end to end, at the 62,7,
+  81,0 and 66,9 dB the annex prints, and so does its Figure A.1: the third
+  example is the second one with `x_Fz` shifted by 0,1, and the answer moves
+  14 dB. That is the whole argument for measuring the value rather than
+  estimating it, and it is why `incipient_cavitation_ratio` is documented as
+  an estimate of last resort.
+
+  Six defects of the printed document are in `docs/ERRATA.md`. Equation (12)
+  is printed one way in Clause 5.1 and another in Annex A, and only the
+  annex's form reproduces the annex's own numbers, so `jet_strouhal_number`
+  implements both and defaults to that one. Table A.1 prints a band
+  transmission loss of `51,76 dB` where its own two inputs sum to `-51,763`.
+  The seat diameter formula of 6.3.2 returns millimetres for a symbol declared
+  in metres, which is why that function carries the unit in its name. And
+  Equation (23b) computes each stage's inlet pressure from the next stage
+  instead of the previous one, which would run the pressure backwards along
+  the trim. Equations (18a) and (18b) carry conditions on two different
+  thresholds, which divide the domain between them only at the one inlet
+  pressure where those two are equal. And three intermediates of Table A.1 do
+  not follow from the intermediates printed beside them, by up to 0,08 dB.
+
 - The trims a valve is bought quiet for, which is what Clause 6 is about.
 
   A low-noise trim does not get a different method: it gets different numbers

@@ -293,6 +293,7 @@ export const apiSections = {
       'reference/api/noise_control/enclosures',
       'reference/api/noise_control/room-to-room',
       'reference/api/noise_control/valves',
+      'reference/api/noise_control/valves-hydrodynamic',
     ],
   },
   'broadcast': {

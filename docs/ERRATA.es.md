@@ -4937,6 +4937,216 @@ dos ediciones con las mismas entradas y en el mismo orden.
   impresas, cosa que los $G_x$ impresos no permitirían.
 - **Estado:** sin comunicar.
 
+## IEC 60534-8-4:2005, Ecuación (12) (el número de Strouhal se imprime de una forma en la cláusula y de otra en el anexo)
+
+- **Ubicación:** apartado 5.1, Ecuación (12) del folio impreso 11 (página 13
+  del PDF) de BS EN 60534-8-4:2005, contra esa misma ecuación reescrita en la
+  fila (12) de la Tabla A.1 del folio impreso 23 (página 25 del PDF).
+- **Lo impreso:** la cláusula imprime
+  $N_{STR} = \dfrac{0{,}02\,F_L^2\,C}{N_{34}\,x_{Fzp1}^{1,5}\,d\,d_0}
+  \left(\dfrac{1}{p_1-p_v}\right)^{0,57}$ y el anexo imprime
+  $N_{STR} = \dfrac{0{,}036\,F_L^2\,C\,F_d^{\,0,75}}
+  {N_{34}\,x_{Fzp1}^{1,5}\,d\,d_0}
+  \left(\dfrac{1}{p_1-p_v}\right)^{0,57}$.
+- **El problema:** son dos funciones distintas de la válvula, no dos redondeos
+  de una. El anexo lleva un factor $F_d^{0,75}$ que la cláusula no tiene, y una
+  constante 1,8 veces mayor. Los exponentes 0,57 y 1,5, el cuadrado de $F_L$ y
+  el producto $d\,d_o$ son idénticos en las dos, así que la diferencia está
+  toda en el numerador. Los propios números del anexo resuelven cuál evaluó:
+  con $C_v = 90$, $F_d = 0{,}42$, $F_L = 0{,}92$, $N_{34} = 1{,}17$,
+  $x_{Fzp1} = 0{,}2386$, $d = d_o = 0{,}1$ m y $p_1 - p_v = 997\,680$ Pa, la
+  forma del anexo da 0,399 y la de la cláusula 0,425, y la Tabla A.1 imprime
+  $N_{Str} = 0{,}399$ en dos de sus tres columnas y 0,243 en la tercera, que
+  son la forma del anexo con tres cifras.
+- **Consecuencia:** la frecuencia de pico de la Ecuación (11), y con ella todo
+  el espectro por bandas del 5.4 y la pérdida por transmisión de la Ecuación
+  (16b), que se evalúa en esa frecuencia. Para la válvula del anexo A las dos
+  formas se separan un 6 %; para una válvula de un solo orificio con
+  $F_d = 1$ la del anexo queda un 80 % por encima de la de la cláusula, cinco
+  sextos de octava en la frecuencia de pico. Quien siga la cláusula normativa
+  no reproduce ni una sola fila dependiente de la frecuencia del anexo
+  informativo.
+- **Evidencia:** las dos impresiones tal como aparecen en la página.
+  Verificado en la página 13 del PDF (p. impresa 11) y en la página 25 del PDF
+  (p. impresa 23) de BS EN 60534-8-4:2005.
+- **Comportamiento de la biblioteca:**
+  [`jet_strouhal_number`](../src/phonometry/noise_control/valves_hydrodynamic.py)
+  admite un argumento ``form`` e implementa las dos. Por defecto va
+  ``"annex"``, la forma que reproduce los ejemplos impresos, y la fila de
+  conformidad «Strouhal number and turbulent peak (Eqs. (11), (12))» la fija;
+  un test con el nombre de esta entrada fija la razón entre ambas.
+- **Estado:** sin comunicar.
+
+## IEC 60534-8-4:2005, Tabla A.1 (una pérdida por transmisión por bandas impresa sin su signo menos)
+
+- **Ubicación:** anexo A (informativo), Tabla A.1, la fila de la Ecuación (22a)
+  del folio impreso 25 (página 27 del PDF), las tres columnas.
+- **Lo impreso:** las tres celdas ponen «TL (8 000 Hz) = 51,76 dB», sin signo
+  delante del 5.
+- **El problema:** la Ecuación (22a) es $TL(f_i) = TL_{fr} + \Delta TL(f_i)$, y
+  la tabla imprime sus dos entradas una fila más arriba y dos folios antes:
+  $\Delta TL(8\,000\ \text{Hz}) = -7{,}053$ dB en la fila (22b) de la misma
+  página y $TL_{fr} = -44{,}71$ dB en la fila (15) del folio impreso 23. Su
+  suma es $-51{,}763$ dB. La fila de abajo también lo resuelve: la Ecuación
+  (21) con $L_{pi}(8\,000\ \text{Hz}) = 116{,}3$ dB y los 12,67 dB del
+  término geométrico da 51,87 dB contra los 51,8 impresos de $L_{pe,1m}$, y
+  con los 116,252 dB sin redondear de la cadena da 51,82; con $+51{,}76$
+  daría 155,4 dB.
+- **Consecuencia:** ninguna para el anexo, que calculó con el signo bueno e
+  imprimió el malo, y 103 dB para quien monte un oráculo con esa celda. Todas
+  las demás pérdidas por transmisión de este documento van impresas negativas
+  ($-44{,}71$; $-29{,}56$; $-74{,}27$; $-62{,}917$; $-75{,}006$; $-7{,}053$),
+  incluida la que está justo encima.
+- **Evidencia:** las tres celdas (22a) y las celdas (22b) de encima, leídas en
+  la página impresa. Verificado en la página 27 del PDF (p. impresa 25) de
+  BS EN 60534-8-4:2005: no hay guion, ni menos, ni raya delante de ninguna de
+  las tres, y las celdas (22b) del mismo recorte sí llevan el suyo.
+- **Comportamiento de la biblioteca:**
+  [`transmission_loss_correction`](../src/phonometry/noise_control/valves_hydrodynamic.py)
+  y el ``band_transmission_loss`` de ``valve_hydrodynamic_noise`` devuelven
+  $-51{,}76$ dB en esa banda, que es lo que fija la fila de conformidad
+  «Frequency route at 8 kHz, examples 1 to 3 (Eqs. (19) to (22))» junto con
+  los niveles exteriores que el valor negativo reproduce.
+- **Estado:** sin comunicar.
+
+## IEC 60534-8-4:2005, 6.3.2 b) (una fórmula de diámetro de asiento cuya constante no está en la unidad en que se declara su símbolo)
+
+- **Ubicación:** apartado 6.3.2, ítem b), la fórmula destacada sin numerar del
+  folio impreso 15 (página 17 del PDF), contra la tabla de símbolos del
+  apartado 3 del folio impreso 6 (página 8 del PDF).
+- **Lo impreso:** «$d_o = 5{,}2\sqrt{N_{34}\,C_n}$», sin número de ecuación y
+  sin unidad en la constante. La tabla de símbolos declara $d_o$ «Seat or
+  orifice diameter», unidad **m**.
+- **El problema:** las dos cosas no pueden ser. Para la última etapa de
+  cualquier interno multietapa real la fórmula devuelve decenas: $C_n = 90$
+  como $C_v$, con $N_{34} = 1{,}17$, da 53,4, y un asiento de 53 m no es una
+  válvula. Leído en milímetros son 53 mm, la mitad del diámetro interior de la
+  válvula DN 100 del anexo A, que es lo que parece una última etapa. La
+  IEC 60534-8-3 da esa misma magnitud por otra vía, su Ecuación (27) y el área
+  total de paso, y para esta etapa esa vía da 48,4 mm.
+- **Consecuencia:** el resultado de esta fórmula alimenta la Ecuación (12),
+  donde $d_o$ va en el denominador junto a $d$ en metros. Tomar el número
+  impreso como metros hace el número de Strouhal mil veces menor y con él la
+  frecuencia de pico, que mueve el espectro diez octavas.
+- **Evidencia:** la fórmula y la fila de la tabla de símbolos tal como se
+  imprimen. Verificado en la página 17 del PDF (p. impresa 15) y en la página
+  8 del PDF (p. impresa 6) de BS EN 60534-8-4:2005. Esta entrada se apoya
+  también en la aritmética de la propia fórmula: nada en las páginas 8 a 20 del
+  PDF dice la unidad de la constante 5,2.
+- **Comportamiento de la biblioteca:**
+  [`last_stage_seat_diameter_mm`](../src/phonometry/noise_control/valves_hydrodynamic.py)
+  implementa la fórmula como está impresa y lleva la unidad en el nombre, y su
+  docstring dice que hay que dividir entre mil antes de pasar el resultado a la
+  Ecuación (12). El test con el nombre de esta entrada fija el valor y el orden
+  de magnitud.
+- **Estado:** sin comunicar.
+
+## IEC 60534-8-4:2005, Ecuación (23b) (la presión de entrada de una etapa calculada desde la siguiente en vez de desde la anterior)
+
+- **Ubicación:** apartado 6.2, Ecuaciones (23a) y (23b) del folio impreso 13
+  (página 15 del PDF) de BS EN 60534-8-4:2005.
+- **Lo impreso:** la (23a) es «$p_{1,i} = p_1$ para $i = 1$» y la (23b) es
+  «$p_{1,i} = p_{1,i+1} - \dfrac{p_1-p_2}{(C_{i-1}/C)^2}$ para
+  $i = 2 \ldots n$».
+- **El problema:** tal como está impresa, la presión de entrada de cada etapa
+  se calcula desde la de la **siguiente** restando una cantidad positiva, así
+  que la sucesión crece con $i$: la última etapa arrancaría a la presión más
+  alta y la primera a la más baja, lo que contradice la (23a) e invierte el
+  flujo. El índice del denominador es $C_{i-1}$, la etapa *anterior* a la que
+  se calcula, que es la recursión para la que está escrita la ecuación:
+  $p_{1,i} = p_{1,i-1} - (p_1-p_2)/(C_{i-1}/C)^2$. Leída así, la ecuación es la
+  ley de resistencias en serie, $1/C^2 = \sum_i 1/C_i^2$: cada etapa se lleva
+  una parte del diferencial en proporción inversa al cuadrado de su propia
+  capacidad, y las partes suman el total.
+- **Consecuencia:** toda magnitud por etapa del apartado 6, ya que la (24a)
+  encadena las presiones de salida con las de entrada y la (26) hace el
+  cociente de presiones de cada etapa con ambas. Seguir el índice impreso da un
+  interno cuya primera etapa ve el diferencial más pequeño, justo lo contrario
+  de todo diseño multietapa que describe la cláusula.
+- **Evidencia:** las dos ecuaciones tal como se imprimen. Verificado en la
+  página 15 del PDF (p. impresa 13) de BS EN 60534-8-4:2005: el subíndice es
+  $i+1$ en la presión e $i-1$ en el coeficiente de caudal. Esta entrada se
+  apoya también en la contradicción interna entre la (23a) y la (23b).
+- **Comportamiento de la biblioteca:**
+  [`stage_conditions`](../src/phonometry/noise_control/valves_hydrodynamic.py)
+  implementa la recursión hacia delante y lo dice en su docstring; el test con
+  el nombre de esta entrada fija que las presiones de entrada bajan a lo largo
+  del interno.
+- **Estado:** sin comunicar.
+
+## IEC 60534-8-4:2005, Ecuaciones (18a) y (18b) (dos condiciones que no se reparten el dominio)
+
+- **Ubicación:** apartado 5.3, Ecuaciones (18a) y (18b) del folio impreso 12
+  (página 14 del PDF) de BS EN 60534-8-4:2005.
+- **Lo impreso:** la (18a) termina «for $x_\mathrm{F} \le x_\mathrm{Fz}$» y la
+  (18b) termina «for $x_\mathrm{Fzp1} < x_\mathrm{F} \le 1$».
+- **El problema:** las dos condiciones están escritas contra dos umbrales
+  distintos. $x_\mathrm{Fz}$ es el cociente característico de presiones a los
+  6 × 10⁵ Pa para los que están trazadas la estimación de la Ecuación (3a) y
+  las Figuras 4 a 9, y $x_\mathrm{Fzp1}$ es ese mismo cociente llevado a la
+  presión de entrada real por la Ecuación (3c), así que solo coinciden a esa
+  presión. Por encima, $x_\mathrm{Fzp1} < x_\mathrm{Fz}$ y el intervalo entre
+  los dos se lo reclaman las dos ecuaciones, la turbulenta por la (18a) y la
+  cavitante por la (18b); por debajo no se lo reclama ninguna. Todo lo demás
+  del documento prueba el cociente corregido: las condiciones impresas encima
+  de la (7a) y la (7b), la región impresa para la (9), la NOTA de la (17) y el
+  reparto del 6.3. La (18a) es la única condición del documento que nombra
+  $x_\mathrm{Fz}$, y las dos ni siquiera coinciden en la frontera, que la
+  (18a) incluye con ≤ y la (18b) excluye con <.
+- **Consecuencia:** crece con la presión de entrada, porque es la presión de
+  entrada la que separa los dos umbrales. A los 10 bar del anexo A el
+  intervalo en disputa es $0{,}2386 < x_\mathrm{F} \le 0{,}2543$ y las dos
+  ramas se separan como mucho 0,03 dB dentro de él, porque la Ecuación (9)
+  arranca el término de cavitación en exactamente cero en el umbral. A 100 bar
+  el intervalo va de 0,179 a 0,254 y las dos ramas llegan a separarse 8 dB; a
+  400 bar, 10 dB. Y el servicio de líquido a alta presión es justo donde este
+  método sirve para algo.
+- **Evidencia:** las dos condiciones tal como se imprimen. Verificado en la
+  página 14 del PDF (p. impresa 12) de BS EN 60534-8-4:2005: la (18a) pone
+  «for $x_F \le x_{Fz}$», con el subíndice Fz y sin p1, encima de una (18b)
+  que pone «for $x_{Fzp1} < x_F \le 1$».
+- **Comportamiento de la biblioteca:**
+  [`valve_hydrodynamic_noise`](../src/phonometry/noise_control/valves_hydrodynamic.py)
+  decide el régimen una sola vez, con $p_1 - p_2$ contra
+  $x_\mathrm{Fzp1}(p_1 - p_\mathrm{v})$, que es la prueba que el 5.1 imprime
+  para las Ecuaciones (7a) y (7b), y la potencia sonora, la pérdida por
+  transmisión, el nivel exterior y el espectro por bandas salen todos de esa
+  única marca. El test con el nombre de esta entrada fija que un punto dentro
+  del intervalo en disputa sale cavitante.
+- **Estado:** sin comunicar.
+
+## IEC 60534-8-4:2005, Tabla A.1 (tres intermedios impresos que sus propias ecuaciones no reproducen)
+
+- **Ubicación:** anexo A (informativo), Tabla A.1: la fila de la Ecuación (17)
+  del folio impreso 24 (página 26 del PDF), columnas 2 y 3; la fila de la
+  Ecuación (20a) del mismo folio, columna 3; y la fila de la Ecuación (11) del
+  folio impreso 23 (página 25 del PDF), columna 1.
+- **Lo impreso:** $TL_{cav} = -62{,}917$ y $-75{,}006$;
+  $F_{turb}(8\,000\ \text{Hz}) = -36{,}24$; $f_{p,turb} = 494{,}5$ Hz.
+- **El problema:** ninguno de los tres se sigue de los valores impresos a su
+  lado. La Ecuación (17) con el $TL_{turb}$, el $f_{p,turb}$, el $f_{p,cav}$ y
+  el cociente de eficiencias del propio anexo da $-62{,}86$ y $-74{,}93$, a
+  0,06 y 0,08 dB. La Ecuación (20a) a 8 kHz con el $f_{p,turb} = 397{,}93$ Hz
+  de esa misma columna da $-36{,}18$; los $-36{,}24$ impresos piden 396,0 Hz.
+  Y la cadena sin redondeos por las Ecuaciones (12) y (11) da 494,64 Hz en la
+  primera columna, mientras que las columnas 2 y 3 reproducen sus 654,35 y
+  397,93 Hz hasta la última cifra impresa.
+- **Consecuencia:** pequeña y acotada. Ninguno de los tres llega a un resultado
+  impreso: los niveles exteriores de las Ecuaciones (18a) y (18b) redondean a
+  los mismos 62,7 / 81,0 / 66,9 dB de una forma o de otra, y el nivel por
+  bandas de la (19a) también. Solo importa a quien compare intermedios, que se
+  encontrará tres filas de cuarenta que no puede casar exactamente y ninguna
+  explicación en la página.
+- **Evidencia:** las tres filas tal como se imprimen, recalculadas con los
+  intermedios impresos a su lado. Verificado en las páginas 25 y 26 del PDF
+  (pp. impresas 23 y 24) de BS EN 60534-8-4:2005. Esta entrada se apoya también
+  en un recálculo.
+- **Comportamiento de la biblioteca:** la fila de conformidad «Cavitating
+  transmission loss, examples 2 and 3 (Eq. (17))» lleva una tolerancia de
+  0,1 dB y nombra esta entrada como motivo; los tests con su nombre fijan lo
+  que dan las ecuaciones y dejan constancia de lo que imprimió el anexo.
+- **Estado:** sin comunicar.
+
 ## Propiedades de las fuentes, relacionadas, que no son erratas
 
 Registradas aquí para prevenir futuros «arreglos» que romperían la
