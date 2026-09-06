@@ -4343,6 +4343,72 @@ in the same order.
   drift.
 - **Status:** unreported.
 
+## ISO 3382-1:2009, A.2.1 (the same symbol names two different levels, a page apart)
+
+- **Location:** Annex A (informative), A.2.1. The "where" list under
+  Equations (A.2) and (A.3) on printed folio 13 (PDF page 21), and the "where"
+  list under Equation (A.5) on printed folio 14 (PDF page 22).
+- **The print:** folio 13 gives "$L_{pE}$ is the sound pressure exposure level
+  of $p(t)$", with $p(t)$ "the instantaneous sound pressure of the impulse
+  response measured at the measurement point", that is, the receiver in the
+  hall under test. Folio 14, inside NOTE 1, gives "$L_{pE}$ is the
+  spatial-average sound pressure exposure level measured in the reverberation
+  room".
+- **The problem:** one symbol, two quantities, same subclause, no
+  distinguishing subscript and no note that the symbol has been reused. The
+  second is a calibration of the source in a laboratory; the first is the
+  measurement the whole annex exists to make.
+- **Consequence:** substituting (A.5) into (A.1) as the symbols are printed
+  gives
+
+  $$
+  G = L_{pE} - L_{pE,10} = L_{pE} - \left[ L_{pE} + 10 \lg (A/S_0) - 37 \right]
+    = 37 - 10 \lg (A/S_0)\ \text{dB},
+  $$
+
+  in which the hall has vanished and the sound strength depends only on the
+  absorption area of the reverberation room the source was calibrated in. The
+  substitution is what the printed symbols invite, and it is nonsense.
+- **Evidence:** Verified on PDF pages 21 and 22 (printed pp. 13 and 14) of
+  BS EN ISO 3382-1:2009.
+- **Library behaviour:**
+  [`reverberation_room_reference_level`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/room/auditorium.py)
+  names its argument `reverberation_room_level`, and the hall's own level
+  never reaches it: it is measured by
+  [`sound_strength`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/room/auditorium.py) from the response
+  passed as `ir`. Nothing stops a caller writing the substitution out by hand,
+  but no single variable plays both roles, and the two names say which is
+  which.
+- **Status:** unreported.
+
+## ISO 3382-1:2009, A.2.1 (a directivity survey "at every 12,5 degrees" that does not close the circle)
+
+- **Location:** Annex A (informative), A.2.1, the note immediately under
+  Equation (A.4), printed folio 13 (PDF page 21).
+- **The print:** "When making such a measurement in a free field, it is
+  necessary to make the measurement at every 12,5° around the sound source and
+  to calculate the energy-mean value of the sound pressure exposure levels in
+  order to average the directivity of the sound source."
+- **The problem:** $360 / 12{,}5 = 28{,}8$. There is no whole number of
+  12,5° steps that closes a turn: 28 steps reach 350° and leave a 10° gap, 29
+  steps overshoot to 362,5°. The instruction cannot be followed literally.
+- **Consequence:** two laboratories that both "measure every 12,5°" can use
+  different bearing sets, and for a source at the Table 1 directivity limit
+  (±6 dB at 4 kHz) their energy means differ. The reference level $L_{pE,10}$
+  that every route in A.2.1 leads to is therefore not reproducible from the
+  printed instruction alone. The same standard's own source-qualification
+  survey in 4.2.1 uses 5°, which divides 360 exactly into 72.
+- **Evidence:** Verified on PDF page 21 (printed p. 13) of
+  BS EN ISO 3382-1:2009.
+- **Library behaviour:**
+  [`directivity_energy_average`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/room/auditorium.py) takes
+  the reading the note can support: a uniform sampling of the full turn no
+  coarser than the printed step, so at least
+  $\lceil 360 / 12{,}5 \rceil = 29$ bearings, combined as the energy mean the
+  note asks for. Fewer bearings raise `ValueError` rather than averaging a
+  turn that was never closed.
+- **Status:** unreported.
+
 ## Related source properties that are not errata
 
 Recorded here to prevent future "fixes" that would break agreement with the

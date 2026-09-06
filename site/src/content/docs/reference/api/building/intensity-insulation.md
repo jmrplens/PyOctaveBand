@@ -506,7 +506,7 @@ limp_panel_reduction_index(
 Sound reduction index of a limp panel (ISO 15186-3:2002, Annex A).
 
 Annex A is normative and is how a laboratory qualifies itself: measure a
-limp panel of area $S > 1$ m\ :sup:`2`, calculate what it should
+limp panel of area $S > 1~\text{m}^2$, calculate what it should
 read, and require the two to agree within 4,0 dB from 50 Hz to 160 Hz.
 This is the calculated half.
 

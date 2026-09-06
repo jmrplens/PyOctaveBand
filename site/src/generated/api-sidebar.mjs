@@ -111,6 +111,7 @@ export const apiSections = {
     collapsed: true,
     items: [
       'reference/api/rooms/acoustics',
+      'reference/api/rooms/auditorium',
       'reference/api/rooms/impulse-response',
       'reference/api/rooms/noise-criteria',
       'reference/api/rooms/open-plan',

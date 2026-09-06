@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**785/785 conformance checks pass** across 67 domains and 394 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**792/792 conformance checks pass** across 67 domains and 395 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -130,7 +130,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>Room &amp; building acoustics</b>: 100% (84/84)</summary>
+<summary><b>Room &amp; building acoustics</b>: 100% (91/91)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -140,6 +140,13 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Manual de acustica ambiental y arquitectonica, Ejemplo 7.1 | Reported R'A,tr of the same wall (printed 47 dBA = R'w 52 + Ctr -5) | 47 dBA (+/-0 dBA) | 47 dBA | 0 dBA | 0 % | ![Pass][cv-pass] Pass |
 | CTE Catalogo de Elementos Constructivos | Window size correction of RA (Manual Ejemplo 7.4: 4 m2 window, -2 dB) | 24 dBA (+/-0 dBA) | 24 dBA | 0 dBA | 0 % | ![Pass][cv-pass] Pass |
 | ISO 3382-2:2008 5.3.3 | T30 from a synthetic exponential decay (T=1.0 s) | 1 s (+/-1%) | 1 s | 0 s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3382-1:2009 Annex A (informative) Eq. (A.1) | Sound strength of a response scaled against its free-field reference | 6.0206 dB (+/-0 dB) | 6.0206 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3382-1:2009 Annex A (informative) Eq. (A.2) | Sound pressure exposure level of a 1 Pa burst held for 0,5 s | 90.9691 dB (+/-0 dB) | 90.9691 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3382-1:2009 Annex A (informative) A.2.1 | A calibration shared by both responses cancels out of G | 0 dB shift (+/-1e-09 dB) | max shift over 6 bands 1.42e-14 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3382-1:2009 Annex A (informative) Eqs. (A.4)/(A.8) | Free-field reference referred from 5 m to 10 m | -6.0206 dB (+/-0 dB) | -6.0206 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3382-1:2009 Annex A (informative) Eq. (A.5) | Reverberation-room reference level, A = 0,16 V/T = 10 m2 | 53 dB (+/-0 dB) | 53 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3382-1:2009 Annex A (informative) Eqs. (A.5)/(A.9) | The two printed routes to G span the 0,0206 dB their integers force | 0.0206 dB (+/-0 dB) | 0.0206 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3382-1:2009 Annex A (informative) A.2.1 note | Energy mean of a cosine directivity over a full turn | -3.0103 dB (+/-0 dB) | -3.0103 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 18233:2006 (swept-sine method) | Sweep deconvolution recovers a known IIR response | 0 dB in-band error (+/-0.1 dB) | 0.0006 dB | 0.0006 dB | 1 % | ![Pass][cv-pass] Pass |
 | ISO 717-1 Annex C, Table C.1 | Weighted sound reduction index Rw (C;Ctr) | Rw 30 (C -2; Ctr -3) | Rw 30 (C -2; Ctr -3), unfavourable sum 31.8 dB | exact | 0 % | ![Pass][cv-pass] Pass |
 | ISO 717-1:2020 Annex C, Table C.2 | Enlarged range 50-5000 Hz: Rw (C; Ctr; C50-5000; Ctr,50-5000) | Rw 30 (C -2; Ctr -3; C50-5000 -2; Ctr,50-5000 -4) | Rw 30 (C -2; Ctr -3; C50-5000 -2; Ctr,50-5000 -4) | exact | - | ![Pass][cv-pass] Pass |

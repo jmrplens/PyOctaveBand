@@ -1223,7 +1223,8 @@ def animate_schroeder(output_dir: str) -> None:
     from matplotlib.patches import Patch
 
     from phonometry import room
-    from phonometry.room.acoustics import _T20_RANGE, _T30_RANGE, _onset_index
+    from phonometry.room._shared import onset_index
+    from phonometry.room.acoustics import _T20_RANGE, _T30_RANGE
 
     T = _translate_str
     fs, reverb_t = 48000, 1.2
@@ -1236,7 +1237,7 @@ def animate_schroeder(output_dir: str) -> None:
     res = room.room_parameters(ir, fs, limits=None)
     t20, t30 = float(res.t20[0]), float(res.t30[0])
     p2 = ir.astype(np.float64) ** 2
-    p2 = p2[_onset_index(p2) :]
+    p2 = p2[onset_index(p2) :]
     t_raw = np.arange(p2.size) / fs
     raw_db = 10.0 * np.log10(np.maximum(p2, p2.max() * 1e-12) / p2.max())
 

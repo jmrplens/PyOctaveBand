@@ -1,3 +1,15 @@
+# What each committed clip was drawn by, one line per clip.
+#
+# The clips are not regenerated in CI (an FDTD run plus four video encodes
+# each), so nothing else can tell that the code drawing a clip has moved since
+# the clip was written. Each hash covers the clip's builder, everything it
+# reaches inside scripts/figures (the shared clip tail, the theme, the
+# translation machinery) and the translation-table entries its own strings
+# select; it is taken over the syntax tree, so comments and docstrings do not
+# move it. See scripts/animation_fingerprint.py.
+#
+# Written by the renderer. To refresh one clip, re-render it:
+#     python scripts/generate_graphs.py --animations --anim <clip>
 anim_block_vs_exponential 5de65d81db2ec9a9
 anim_comb_filtering 50b66aa13024cba4
 anim_dynamic_stiffness_sweep bc3ce110ff0a0a3a
@@ -35,7 +47,7 @@ anim_loudness_gating aed15c7167072500
 anim_modulation_transfer b166fb69e9473e06
 anim_onset_detection 0d3ac1fcb77f8411
 anim_power_two_rooms 02c0ccb7832d4883
-anim_schroeder 006cb03444b9c1d7
+anim_schroeder a73c958a5b33b161
 anim_specific_loudness cb66aac7c7236fb7
 anim_standing_wave_tube 735fffae44c184ab
 anim_sweep_deconvolution 55d49146cf40d9f4

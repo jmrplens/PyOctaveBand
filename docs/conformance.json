@@ -3,13 +3,13 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 785,
-    "passing": 785,
+    "checks": 792,
+    "passing": 792,
     "failing": 0,
     "domains": 67,
-    "standards": 394,
-    "citations": 613,
-    "designations": 132,
+    "standards": 395,
+    "citations": 620,
+    "designations": 133,
     "sources": 83
   },
   "units": [
@@ -101,8 +101,8 @@
     {
       "id": "room-building-acoustics",
       "title": "Room & building acoustics",
-      "checks": 84,
-      "passing": 84
+      "checks": 91,
+      "passing": 91
     },
     {
       "id": "room-acoustics",
@@ -4185,6 +4185,211 @@
         "value": -4.65e-11
       },
       "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-annex-a-informative-eq-a-1/sound-strength-of-a-response-scaled-against-its-free-field-reference",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Annex A (informative) Eq. (A.1)",
+        "cite": "ISO 3382-1:2009 Annex A (informative) Eq. (A.1)"
+      },
+      "quantity": "Sound strength of a response scaled against its free-field reference",
+      "kind": "scalar",
+      "expected": {
+        "value": 6.020599913279624
+      },
+      "computed": {
+        "value": 6.0206
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 8.88e-16
+      },
+      "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-annex-a-informative-eq-a-2/sound-pressure-exposure-level-of-a-1-pa-burst-held-for-0-5-s",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Annex A (informative) Eq. (A.2)",
+        "cite": "ISO 3382-1:2009 Annex A (informative) Eq. (A.2)"
+      },
+      "quantity": "Sound pressure exposure level of a 1 Pa burst held for 0,5 s",
+      "kind": "scalar",
+      "expected": {
+        "value": 90.96910013008056
+      },
+      "computed": {
+        "value": 90.9691
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-annex-a-informative-a-2-1/a-calibration-shared-by-both-responses-cancels-out-of-g",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Annex A (informative) A.2.1",
+        "cite": "ISO 3382-1:2009 Annex A (informative) A.2.1"
+      },
+      "quantity": "A calibration shared by both responses cancels out of G",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.0,
+        "label": "0 dB shift (+/-1e-09 dB)"
+      },
+      "computed": {
+        "value": 1.42e-14,
+        "label": "max shift over 6 bands 1.42e-14 dB"
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 1.42e-14
+      },
+      "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-annex-a-informative-eqs-a-4-a-8/free-field-reference-referred-from-5-m-to-10-m",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Annex A (informative) Eqs. (A.4)/(A.8)",
+        "cite": "ISO 3382-1:2009 Annex A (informative) Eqs. (A.4)/(A.8)"
+      },
+      "quantity": "Free-field reference referred from 5 m to 10 m",
+      "kind": "scalar",
+      "expected": {
+        "value": -6.020599913279624
+      },
+      "computed": {
+        "value": -6.0206
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-annex-a-informative-eq-a-5/reverberation-room-reference-level-a-0-16-v-t-10-m2",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Annex A (informative) Eq. (A.5)",
+        "cite": "ISO 3382-1:2009 Annex A (informative) Eq. (A.5)"
+      },
+      "quantity": "Reverberation-room reference level, A = 0,16 V/T = 10 m2",
+      "kind": "scalar",
+      "expected": {
+        "value": 53.0
+      },
+      "computed": {
+        "value": 53.0
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-annex-a-informative-eqs-a-5-a-9/the-two-printed-routes-to-g-span-the-0-0206-db-their-integers-force",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Annex A (informative) Eqs. (A.5)/(A.9)",
+        "cite": "ISO 3382-1:2009 Annex A (informative) Eqs. (A.5)/(A.9)"
+      },
+      "quantity": "The two printed routes to G span the 0,0206 dB their integers force",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.020599913279624182
+      },
+      "computed": {
+        "value": 0.0206
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": 8.88e-16
+      },
+      "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-annex-a-informative-a-2-1-note/energy-mean-of-a-cosine-directivity-over-a-full-turn",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Annex A (informative) A.2.1 note",
+        "cite": "ISO 3382-1:2009 Annex A (informative) A.2.1 note"
+      },
+      "quantity": "Energy mean of a cosine directivity over a full turn",
+      "kind": "scalar",
+      "expected": {
+        "value": -3.010299956639812
+      },
+      "computed": {
+        "value": -3.0103
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": -4.44e-16
+      },
+      "precision": 6,
       "verdict": "pass"
     },
     {

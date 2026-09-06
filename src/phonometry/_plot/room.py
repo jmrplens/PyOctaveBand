@@ -32,9 +32,10 @@ from .common import (
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
-    from numpy.typing import ArrayLike
+    from numpy.typing import ArrayLike, NDArray
 
     from ..room.acoustics import DecayCurve, RoomAcousticsResult
+    from ..room.auditorium import SoundStrengthResult
     from ..room.crowd_noise import CrowdNoiseResult
     from ..room.enclosed_space_absorption import ReverberationResult
     from ..room.image_source import ImageSourceResult
@@ -74,6 +75,20 @@ _RC_HISS_MIN_HZ = 1000.0
 #: The excitation signals ISO 18233 covers and :func:`plot_excitation` draws,
 #: in the order the parameter documents them.
 _EXCITATION_KINDS = ("sweep", "mls")
+
+#: Typical range of the sound strength G in unoccupied halls up to
+#: 25 000 m3, in dB (ISO 3382-1:2009, Table A.1).
+#:
+#: Table A.1 gives its ranges for the SINGLE NUMBER of each quantity, the
+#: average over the bands its own column names, not for one band at a time.
+#: The shading is drawn behind the per-band curve because that is where it
+#: is read, and the single number is marked on top of it so the reader can
+#: see which of the two the range is about.
+_STRENGTH_TYPICAL_RANGE_DB = (-2.0, 10.0)
+
+#: Octave bands Table A.1 averages the sound strength, EDT, clarity,
+#: definition and centre time over, in Hz.
+_SINGLE_NUMBER_BANDS_HZ = (500.0, 1000.0)
 
 #: Spanish translations of the fixed strings rendered by the room ``.plot()``
 #: renderers, keyed by their verbatim English text.  ``_t`` returns the English
@@ -148,6 +163,19 @@ _STRINGS: dict[str, str] = {
     "Speech at {value} m": "Habla a {value} m",
     r"Communication limit ($L_\mathrm{SN}$ = −6 dB)": r"Límite de comunicación ($L_\mathrm{SN}$ = −6 dB)",
     "Crowd self-noise — $L_W$ = {lw} dB per talker": "Ruido autogenerado del público — $L_W$ = {lw} dB por hablante",
+    # --- Sound strength G (ISO 3382-1:2009, A.2.1) ---
+    "Sound strength $G$ [dB]": "Fuerza sonora $G$ [dB]",
+    "ISO 3382-1 sound strength": "Fuerza sonora ISO 3382-1",
+    "Typical range of the single number (Table A.1)": (
+        "Rango habitual del número único (Tabla A.1)"
+    ),
+    r"Single number, $G_m$ (500 Hz to 1 kHz)": (
+        r"Número único, $G_m$ (500 Hz a 1 kHz)"
+    ),
+    "Measured $G$": "$G$ medido",
+    "Exposure level [dB]": "Nivel de exposición [dB]",
+    r"In the hall, $L_{pE}$": r"En la sala, $L_{pE}$",
+    r"Free field at 10 m, $L_{pE,10}$": r"Campo libre a 10 m, $L_{pE,10}$",
 }
 
 
@@ -169,6 +197,35 @@ def _localize_band_axes(ax: Axes, language: str) -> None:
     localize_axes(ax, language)
 
 
+def _band_labels(
+    frequency: ArrayLike | None, count: int, language: str
+) -> tuple[list[str], bool]:
+    """Tick labels for a categorical band axis, and whether they are bands.
+
+    Labels the axis with the standard nominal fractional-octave centres
+    (IEC 61260: 125, 250, 500, 1k, 2k, 4k), not the exact base-ten filter
+    centres (125.89..., 1.99526k...), so the chart matches the nominal
+    frequency table an ISO 3382 report prints.
+
+    :param frequency: The exact band centres in Hz, or ``None`` for a
+        broadband result.
+    :param count: Number of entries on the band axis.
+    :param language: ``"en"`` or ``"es"``.
+    :return: ``(labels, use_freq_axis)``; ``use_freq_axis`` is False when the
+        single entry is a broadband one and the axis is not a frequency axis.
+    """
+    if frequency is None:
+        return [_t("Broadband", language)] * count, False
+    from ..filters.frequencies import _infer_band_fraction, _nominal_freq_for_band
+
+    centers = np.asarray(frequency, dtype=np.float64)
+    fraction = _infer_band_fraction(centers)
+    labels = [
+        _format_freq(_nominal_freq_for_band(float(f), float(fraction))) for f in centers
+    ]
+    return labels, True
+
+
 def plot_room_acoustics(
     result: RoomAcousticsResult,
     ax: Axes | None = None,
@@ -188,29 +245,8 @@ def plot_room_acoustics(
         ``None`` to create the full two-panel figure.
     :return: The axes, or an array of two axes for the default figure.
     """
-    freq = result.frequency
     n = np.asarray(result.t30, dtype=np.float64).size
-    if freq is None:
-        labels = [_t("Broadband", language)] * n
-        use_freq_axis = False
-    else:
-        centers = np.asarray(freq, dtype=np.float64)
-        # Label the categorical band axis with the standard nominal octave /
-        # one-third-octave centres (IEC 61260: 125, 250, 500, 1k, 2k, 4k), not
-        # the exact base-ten filter centres (125.89..., 1.99526k...), so the
-        # chart matches the nominal frequency table an ISO 3382 report prints.
-        from ..filters.frequencies import (
-            _infer_band_fraction,
-            _nominal_freq_for_band,
-        )
-
-        fraction = _infer_band_fraction(centers)
-        labels = [
-            _format_freq(_nominal_freq_for_band(float(f), float(fraction)))
-            for f in centers
-        ]
-        use_freq_axis = True
-
+    labels, use_freq_axis = _band_labels(result.frequency, n, language)
     positions = np.arange(n, dtype=np.float64)
     single = ax is not None
     if ax is not None:
@@ -258,6 +294,126 @@ def plot_room_acoustics(
     ax_clarity.legend(loc="best", fontsize="small")
     _localize_band_axes(ax_times, language)
     _localize_band_axes(ax_clarity, language)
+    return axes
+
+
+def _single_number(
+    frequency: ArrayLike | None, values: NDArray[np.float64]
+) -> float | None:
+    """The Table A.1 single number: the mean over the bands it names.
+
+    ``None`` when the result does not carry both of them, which is when
+    there is no single number to draw and the shaded range has nothing it
+    applies to.
+    """
+    if frequency is None:
+        return None
+    centres = np.asarray(frequency, dtype=np.float64)
+    picked = [
+        int(np.argmin(np.abs(centres - wanted)))
+        for wanted in _SINGLE_NUMBER_BANDS_HZ
+        if float(np.min(np.abs(centres - wanted))) < 0.06 * wanted
+    ]
+    if len(picked) != len(_SINGLE_NUMBER_BANDS_HZ):
+        return None
+    return float(np.mean(values[picked]))
+
+
+def plot_sound_strength(
+    result: SoundStrengthResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes | np.ndarray:
+    """Per-band sound strength G against the Table A.1 typical range.
+
+    The first panel draws G band by band over the -2 dB to +10 dB range
+    ISO 3382-1:2009, Table A.1 gives as typical for unoccupied halls; the
+    second draws the two exposure levels G is the difference of, so the
+    gap between them is the quantity above. With ``ax`` given, only the
+    strength panel is drawn on it.
+
+    :param result: A
+        :class:`~phonometry.room.auditorium.SoundStrengthResult`.
+    :param ax: Existing axes for a single-panel (strength only) plot, or
+        ``None`` to create the full two-panel figure.
+    :param language: ``"en"`` or ``"es"``.
+    :param kwargs: Forwarded to the strength curve's ``plot`` call.
+    :return: The axes, or an array of two axes for the default figure.
+    """
+    strength = np.asarray(result.strength, dtype=np.float64)
+    labels, use_freq_axis = _band_labels(result.frequency, strength.size, language)
+    positions = np.arange(strength.size, dtype=np.float64)
+
+    single = ax is not None
+    if ax is not None:
+        ax_strength = ax
+    else:
+        axes = _new_axes_column(2, figsize=(7.5, 6.0), sharex=True)
+        ax_strength = cast("Axes", axes[0])
+
+    low, high = _STRENGTH_TYPICAL_RANGE_DB
+    ax_strength.axhspan(
+        low,
+        high,
+        color=_C_PRIMARY_LIGHT,
+        alpha=0.3,
+        label=_t("Typical range of the single number (Table A.1)", language),
+    )
+    single_number = _single_number(result.frequency, strength)
+    if single_number is not None:
+        ax_strength.axhline(
+            single_number,
+            color=_C_SECONDARY,
+            ls="--",
+            lw=1.4,
+            zorder=2,
+            label=_t(r"Single number, $G_m$ (500 Hz to 1 kHz)", language),
+        )
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("label", _t("Measured $G$", language))
+    ax_strength.plot(positions, strength, "o-", zorder=3, **kwargs)
+    ax_strength.set_ylabel(_t("Sound strength $G$ [dB]", language))
+    ax_strength.set_title(_t("ISO 3382-1 sound strength", language))
+    _band_axis(
+        ax_strength,
+        labels,
+        xlabel=_t(_FREQUENCY_LABEL, language) if single and use_freq_axis else None,
+        language=language,
+    )
+    ax_strength.grid(True, axis="y", alpha=0.3)
+    ax_strength.legend(loc="best", fontsize="small")
+
+    if single:
+        _localize_band_axes(ax_strength, language)
+        return ax_strength
+
+    ax_levels = cast("Axes", axes[1])
+    ax_levels.plot(
+        positions,
+        np.asarray(result.exposure_level, dtype=np.float64),
+        "o-",
+        color=_C_TERTIARY,
+        label=_t(r"In the hall, $L_{pE}$", language),
+    )
+    ax_levels.plot(
+        positions,
+        np.asarray(result.reference_level, dtype=np.float64),
+        "s--",
+        color=_C_QUATERNARY,
+        label=_t(r"Free field at 10 m, $L_{pE,10}$", language),
+    )
+    ax_levels.set_ylabel(_t("Exposure level [dB]", language))
+    _band_axis(
+        ax_levels,
+        labels,
+        xlabel=_t(_FREQUENCY_LABEL if use_freq_axis else "Band", language),
+        language=language,
+    )
+    ax_levels.grid(True, alpha=0.3)
+    ax_levels.legend(loc="best", fontsize="small")
+    _localize_band_axes(ax_strength, language)
+    _localize_band_axes(ax_levels, language)
     return axes
 
 

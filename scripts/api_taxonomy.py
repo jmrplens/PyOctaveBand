@@ -161,6 +161,7 @@ _SECTION_LIST: tuple[Section, ...] = (
         label_es="Acústica de salas",
         modules=(
             "phonometry.room.acoustics",
+            "phonometry.room.auditorium",
             "phonometry.room.impulse_response",
             "phonometry.room.noise_criteria",
             "phonometry.room.open_plan",

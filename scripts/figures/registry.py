@@ -434,6 +434,7 @@ from .room import (
     generate_room_parameters_bands,
     generate_room_proportion_modes,
     generate_schroeder_decay,
+    generate_sound_strength_routes,
     generate_source_distance_bias,
     generate_steady_state_directivity,
     generate_steady_state_field,
@@ -1082,6 +1083,9 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_flow_resistivity_window,
     generate_steady_state_field,
     generate_room_parameters_bands,
+    # ISO 3382-1 A.2.1: the three printed routes to the free-field reference
+    # of the sound strength, and what G does with distance in a hall.
+    generate_sound_strength_routes,
     generate_fdtd_room_modes,
     # Building & structure-borne result figures (guide figure coverage):
     # ISO 717 enlarged range, ISO 16283 field chains, ISO 10052 survey impact,
