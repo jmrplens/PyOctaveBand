@@ -28,6 +28,7 @@ Both are in ``docs/ERRATA.md``.
 
 from __future__ import annotations
 
+import warnings
 from typing import Any
 
 import numpy as np
@@ -110,10 +111,27 @@ _EXAMPLE_7_PIPE: dict[str, Any] = {
 }
 
 #: Equation (25), the A-weighted level 1 m from the pipe wall, in dB. The
-#: sixth column is not here: it is the only one whose valve outlet is smaller
-#: than its pipe, so the annex adds the expander noise of Clause 7 to it and
-#: this module does not implement that yet.
+#: sixth column is the only one whose outlet Mach number passes the 0,3 of
+#: NOTE 1 to Equation (15), so it is the only one the annex works Clause 7
+#: for, and the only one that needs the expander to close.
 _PRINTED_EXTERNAL_LEVEL = {1: 92.0, 2: 93.0, 3: 98.0, 4: 94.0, 5: 97.0}
+_PRINTED_EXTERNAL_LEVEL_WITH_EXPANDER = 94.0
+
+#: The expander chain of Clause 7, as the sixth column prints it: the pipe
+#: velocity of Equation (34) in m/s, the expander inlet velocity of (35) in
+#: m/s, the Mach number of (39), the stream power of (36) in W, the
+#: acoustical efficiency of (38), the sound power of (40) in W, the peak
+#: frequency of (37) in Hz and the internal level of (41) in dB.
+_PRINTED_EXPANDER = {
+    "U_p": 190.0,
+    "U_R": 460.0,
+    "M_R": 0.96,
+    "W_mR": 47854.0,
+    "eta_R": 8.8e-4,
+    "W_aR": 42.0,
+    "f_pR": 920.0,
+    "L_piR": 151.0,
+}
 
 #: Equations (21), (22) and (23) of example 7, in Hz.
 _PRINTED_PIPE_FREQUENCIES = {"f_r": 7958.0, "f_o": 2365.0, "f_g": 1622.0}
@@ -138,18 +156,27 @@ def _style_modifier() -> float:
     )
 
 
-def _example(index: int) -> ph.noise_control.AerodynamicValveNoise:
-    """One column of Table A.1, through the whole of Clause 5."""
+def _example(
+    index: int, *, expander: bool = False
+) -> ph.noise_control.AerodynamicValveNoise:
+    """One column of Table A.1, through the whole of Clause 5.
+
+    With ``expander`` it also runs Clause 7 on the flow leaving the valve
+    outlet, which the annex does for the sixth column and no other.
+    """
     flow, outlet, coefficient, diameter, bore = _EXAMPLES[index]
-    return ph.noise_control.valve_aerodynamic_noise(
-        **_COMMON,
-        mass_flow=flow,
-        outlet_pressure=outlet,
-        flow_coefficient=coefficient,
-        valve_outlet_diameter=diameter,
-        internal_diameter=bore,
-        style_modifier=_style_modifier(),
-    )
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", ph.noise_control.ValveNoiseWarning)
+        return ph.noise_control.valve_aerodynamic_noise(
+            **_COMMON,
+            mass_flow=flow,
+            outlet_pressure=outlet,
+            flow_coefficient=coefficient,
+            valve_outlet_diameter=diameter,
+            internal_diameter=bore,
+            style_modifier=_style_modifier(),
+            expander=ph.noise_control.Expander() if expander else None,
+        )
 
 
 @register(_IEC60534, "IEC 60534-8-3:2010", "Regime, examples 1 to 6 (Table A.1)")
@@ -307,3 +334,56 @@ def _chk_external_level() -> Outcome:
     }
     expected = {f"example {i}": v for i, v in _PRINTED_EXTERNAL_LEVEL.items()}
     return record(expected, computed, unit="dB")
+
+
+@register(
+    _IEC60534,
+    "IEC 60534-8-3:2010",
+    "Expander chain of Clause 7, example 6 (Eqs. (34) to (41))",
+)
+def _chk_expander() -> Outcome:
+    """Every printed intermediate of the one column the annex works it for.
+
+    Example 6 runs its valve outlet at Mach 0,89, far past the 0,3 that
+    NOTE 1 to Equation (15) holds Clause 5 to, so the flow leaving the outlet
+    is a second source and the annex computes it.
+    """
+    found = _example(6, expander=True).expander
+    if found is None:  # pragma: no cover - the call above asks for one
+        msg = "the expander was not computed"
+        raise RuntimeError(msg)
+    computed = {
+        "U_p": round(found.pipe_velocity),
+        "U_R": round(found.inlet_velocity),
+        "M_R": round(found.mach, 2),
+        "W_mR": round(found.stream_power),
+        "eta_R": round(found.acoustical_efficiency, 5),
+        "W_aR": round(found.sound_power, 1),
+        "f_pR": round(found.peak_frequency),
+        "L_piR": round(found.internal_level),
+    }
+    expected = dict(_PRINTED_EXPANDER)
+    expected["eta_R"] = round(expected["eta_R"], 5)
+    return record(expected, computed)
+
+
+@register(
+    _IEC60534,
+    "IEC 60534-8-3:2010",
+    "A-weighted level with the expander, example 6 (Eqs. (43) and (25))",
+)
+def _chk_external_with_expander() -> Outcome:
+    """The sixth column, closed.
+
+    Clause 5 alone gives 93 dB(A) for this valve; Equation (43) adds the
+    outlet flow to the trim before Equation (24) takes the sum through the
+    pipe wall, and the answer becomes the 94 the annex prints.
+    """
+    return numeric(
+        _PRINTED_EXTERNAL_LEVEL_WITH_EXPANDER,
+        round(_example(6, expander=True).external_level),
+        0.0,
+        unit="dB",
+        places=0,
+        expected_label="94 dB(A), where the trim alone gives 93",
+    )

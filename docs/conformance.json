@@ -3,8 +3,8 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 816,
-    "passing": 816,
+    "checks": 818,
+    "passing": 818,
     "failing": 0,
     "domains": 68,
     "standards": 396,
@@ -468,8 +468,8 @@
     {
       "id": "control-valve-noise-iec-60534-8-3",
       "title": "Control valve noise (IEC 60534-8-3)",
-      "checks": 9,
-      "passing": 9
+      "checks": 11,
+      "passing": 11
     },
     {
       "id": "hvac-noise-vdi-2081",
@@ -21783,6 +21783,82 @@
           "example 4": 94.0,
           "example 5": 97.0
         }
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-3/iec-60534-8-3-2010/expander-chain-of-clause-7-example-6-eqs-34-to-41",
+      "domain": "control-valve-noise-iec-60534-8-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-3",
+        "edition": "2010",
+        "cite": "IEC 60534-8-3:2010"
+      },
+      "quantity": "Expander chain of Clause 7, example 6 (Eqs. (34) to (41))",
+      "kind": "record",
+      "expected": {
+        "label": "U_p = 190; U_R = 460; M_R = 0.96; W_mR = 47854; eta_R = 0.0009; W_aR = 42; f_pR = 920; L_piR = 151",
+        "record": {
+          "U_p": 190.0,
+          "U_R": 460.0,
+          "M_R": 0.96,
+          "W_mR": 47854.0,
+          "eta_R": 0.00088,
+          "W_aR": 42.0,
+          "f_pR": 920.0,
+          "L_piR": 151.0
+        }
+      },
+      "computed": {
+        "label": "U_p = 190; U_R = 460; M_R = 0.96; W_mR = 47854; eta_R = 0.0009; W_aR = 42; f_pR = 920; L_piR = 151",
+        "record": {
+          "U_p": 190.0,
+          "U_R": 460.0,
+          "M_R": 0.96,
+          "W_mR": 47854.0,
+          "eta_R": 0.00088,
+          "W_aR": 42.0,
+          "f_pR": 920.0,
+          "L_piR": 151.0
+        }
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-3/iec-60534-8-3-2010/a-weighted-level-with-the-expander-example-6-eqs-43-and-25",
+      "domain": "control-valve-noise-iec-60534-8-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-3",
+        "edition": "2010",
+        "cite": "IEC 60534-8-3:2010"
+      },
+      "quantity": "A-weighted level with the expander, example 6 (Eqs. (43) and (25))",
+      "kind": "scalar",
+      "expected": {
+        "value": 94.0,
+        "label": "94 dB(A), where the trim alone gives 93"
+      },
+      "computed": {
+        "value": 94.0
       },
       "unit": "dB",
       "tolerance": {
