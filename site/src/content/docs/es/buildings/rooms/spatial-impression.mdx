@@ -80,7 +80,7 @@ J_\mathrm{LFC} = \frac{\int_{0,005}^{0,080}
                       {\int_{0}^{0,080} p^2(t)\ \mathrm{d}t}.
 $$
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lateral_energy_measures.svg" alt="Tres paneles. A la izquierda, el peso que lleva una reflexión frente a su ángulo de incidencia desde el nulo del micrófono en ocho, como el cuadrado del coseno para la fracción lateral y como el coseno mismo para la variante ponderada por coseno, ambos con máximo en uno donde apunta el nulo. En el centro, las dos fracciones banda a banda para una sala con dos segundos de decaimiento, sobre el rango habitual sombreado de 0,05 a 0,35 de la Tabla A.1. A la derecha, la función de correlación interaural de la banda de octava de 500 Hz en la ventana de búsqueda de más menos un milisegundo, para una señal llevada a los dos oídos y para dos independientes, con el máximo de cada una marcado" width="100%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lateral_energy_measures.svg" alt="Tres paneles. A la izquierda, el peso que lleva una reflexión frente a su ángulo de incidencia desde el eje de máxima sensibilidad del micrófono en ocho, como el cuadrado del coseno para la fracción lateral y como el coseno mismo para la variante ponderada por coseno, ambos con máximo en uno sobre ese eje y a cero en los dos nulos, a más menos noventa grados, donde está la fuente. En el centro, las dos fracciones banda a banda para una sala con dos segundos de decaimiento, sobre el rango habitual sombreado de 0,05 a 0,35 de la Tabla A.1. A la derecha, la función de correlación interaural de la banda de octava de 500 Hz en la ventana de búsqueda de más menos un milisegundo, para una señal llevada a los dos oídos y para dos independientes, con el máximo de cada una marcado" width="100%" />
 
 *Las dos ponderaciones, las dos fracciones banda a banda, y la ventana sobre
 la que el coeficiente interaural es el máximo.*
@@ -91,8 +91,8 @@ from phonometry import room
 
 fs = 48000
 # Una reflexión de la mitad de la amplitud directa, 20 ms más tarde, que
-# llega a 45 grados del nulo. El micrófono en ocho la ve a 0,5 cos(45); el
-# omnidireccional, a 0,5, sobre el directo unitario.
+# llega a 45 grados del eje del micrófono. El micrófono en ocho la ve a
+# 0,5 cos(45); el omnidireccional, a 0,5, sobre el directo unitario.
 n = int(0.3 * fs)
 omni, lateral = np.zeros(n), np.zeros(n)
 omni[100] = 1.0
@@ -147,8 +147,9 @@ signed = (0.25 * np.cos(np.deg2rad(45.0)) - 0.25 * np.cos(np.deg2rad(45.0))) / 1
 print(round(signed, 12))                    # 0.0, la lectura equivocada
 ```
 
-Dos salas, una con reflexiones por la izquierda y otra con reflexiones por
-los dos lados, saldrían idénticas y a cero. La biblioteca lee la página.
+Dos salas, una con reflexiones simétricas por los dos lados y otra sin
+ninguna reflexión lateral, saldrían idénticas y a cero. La biblioteca lee
+la página.
 
 ## 3. Envolvimiento: el nivel de lo que llega tarde
 
@@ -235,7 +236,7 @@ print(room.interaural_cross_correlation(-ear, ear, fs, limits=None).coefficient)
 
 delayed = np.concatenate([np.zeros(int(0.0005 * fs)), ear])[: ear.size]
 found = room.interaural_cross_correlation(ear, delayed, fs, limits=None)
-print(found.delay * 1000.0)                 # [0.5]  ms, el oído derecho va delante
+print(found.delay * 1000.0)                 # [0.5]  ms, el oído derecho va detrás
 ```
 
 B.4 imprime tres ventanas: la general, del sonido directo hasta un tiempo del
@@ -260,8 +261,10 @@ aparece como un escalado limpio de la fracción.
 
 Las ventanas de 80 ms son las impresas, y una respuesta que se acaba antes
 levanta un error en lugar de acortarse: una integral de 80 ms tomada sobre
-los 48 ms que se grabaron no es la magnitud impresa, y es mayor que ella,
-porque la cola que falta sólo aparece en el denominador.
+los 48 ms que se grabaron no es la magnitud impresa, porque los 32 ms que no
+se grabaron faltan tanto en el numerador como en el denominador, y hacia qué
+lado se desvía la fracción depende de cuánta energía lateral llevara lo que
+se quedó fuera.
 
 <SeeAlso
   links={[

@@ -309,6 +309,22 @@ class TestInterauralCrossCorrelation:
         with pytest.raises(ValueError, match="forwards in time"):
             room.interaural_cross_correlation(x, x, FS, window=(0.2, 0.1), limits=None)
 
+    def test_it_refuses_a_window_that_starts_before_the_direct_sound(self) -> None:
+        # A negative start used to slice the tail of the response instead,
+        # correlating a window nobody asked for and saying nothing about it.
+        x = decaying_noise(1.0, 0.5, 41)
+        with pytest.raises(ValueError, match="at a finite time of zero or more"):
+            room.interaural_cross_correlation(
+                x, x, FS, window=(-0.05, None), limits=None
+            )
+
+    def test_it_wants_none_for_the_open_end_b4_prints(self) -> None:
+        x = decaying_noise(1.0, 0.5, 42)
+        with pytest.raises(ValueError, match="t_2 = infinity"):
+            room.interaural_cross_correlation(
+                x, x, FS, window=(0.0, float("inf")), limits=None
+            )
+
     def test_it_refuses_two_channels_of_different_lengths(self) -> None:
         x = decaying_noise(1.0, 0.5, 40)
         with pytest.raises(ValueError, match="share a time axis"):

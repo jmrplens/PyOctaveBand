@@ -2995,8 +2995,10 @@ def generate_lateral_energy_measures(output_dir: str) -> None:
 
     # -- Left: the two angular weightings the annex prints, side by side.
     #
-    # The figure-of-eight microphone has its null pointed at the source, so
-    # its output follows the cosine of the angle of incidence. Equation
+    # A.2.4 measures the angle of incidence "relative to the axis of maximum
+    # sensitivity of the microphone", which is what this abscissa is, so the
+    # weight follows its cosine. The null is at right angles to that axis and
+    # is where the source sits, at the two edges of the panel. Equation
     # (A.14) squares the pressure and weights each reflection by cos^2;
     # Equation (A.15) multiplies it by the omnidirectional response instead
     # and weights it by the cosine itself.
@@ -3018,15 +3020,16 @@ def generate_lateral_energy_measures(output_dir: str) -> None:
         lw=1.8,
         label="$J_{LFC}$: $|\\cos\\theta|$  (A.15)",
     )
-    ax.axvline(0.0, color=COLOR_MUTED, ls=":", lw=1.4)
+    for null in (-90.0, 90.0):
+        ax.axvline(null, color=COLOR_MUTED, ls=":", lw=1.4)
     ax.annotate(
         "the null points at the source,\nso the direct sound weighs nothing",
-        xy=(0.0, 0.02),
-        xytext=(-86.0, 0.62),
+        xy=(90.0, 0.02),
+        xytext=(0.0, 0.45),
         textcoords="data",
         fontsize=8.5,
         color=COLOR_FG,
-        ha="left",
+        ha="center",
         va="top",
         arrowprops={"arrowstyle": "->", "color": COLOR_FG, "linewidth": 1.1},
         bbox={
@@ -3036,10 +3039,10 @@ def generate_lateral_energy_measures(output_dir: str) -> None:
         },
         zorder=6,
     )
-    ax.set_xlim(-90.0, 90.0)
+    ax.set_xlim(-95.0, 95.0)
     ax.set_ylim(0.0, 1.05)
     ax.set_xticks([-90, -45, 0, 45, 90])
-    ax.set_xlabel("Angle of incidence from the null (degrees)")
+    ax.set_xlabel("Angle from the axis of maximum sensitivity (degrees)")
     ax.set_ylabel("Weight of one reflection")
     ax.set_title("Two weightings for one reflection")
     ax.grid(color=COLOR_GRID, ls="--", alpha=0.5)

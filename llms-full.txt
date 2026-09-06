@@ -13261,7 +13261,7 @@ J_\mathrm{LFC} = \frac{\int_{0,005}^{0,080}
                       {\int_{0}^{0,080} p^2(t)\ \mathrm{d}t}.
 $$
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lateral_energy_measures_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lateral_energy_measures.svg" alt="Three panels. Left: the weight one reflection carries against its angle of incidence from the null of the figure-of-eight microphone, as the square of the cosine for the lateral fraction and as the cosine itself for the cosine-weighted variant, both peaking at one where the null points. Middle: both fractions band by band for a hall with two seconds of decay, over the shaded 0.05 to 0.35 typical range of Table A.1. Right: the interaural correlation function of the 500 Hz octave band across the plus and minus one millisecond search window, for one signal fed to both ears and for two independent ones, with the maximum of each marked" width="100%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lateral_energy_measures_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lateral_energy_measures.svg" alt="Three panels. Left: the weight one reflection carries against its angle of incidence from the axis of maximum sensitivity of the figure-of-eight microphone, as the square of the cosine for the lateral fraction and as the cosine itself for the cosine-weighted variant, both peaking at one on that axis and falling to zero on the two nulls at plus and minus ninety degrees, where the source sits. Middle: both fractions band by band for a hall with two seconds of decay, over the shaded 0.05 to 0.35 typical range of Table A.1. Right: the interaural correlation function of the 500 Hz octave band across the plus and minus one millisecond search window, for one signal fed to both ears and for two independent ones, with the maximum of each marked" width="100%"></picture>
 
 *The two weightings, both fractions band by band, and the window the
 interaural coefficient is the maximum over.*
@@ -13272,7 +13272,7 @@ from phonometry import room
 
 fs = 48000
 # One reflection of half the direct amplitude, 20 ms late, arriving at 45
-# degrees from the null. The figure-of-eight microphone sees it at
+# degrees from the microphone axis. The figure-of-eight microphone sees it at
 # 0.5 cos(45); the omnidirectional one at 0.5, on top of the unit direct.
 n = int(0.3 * fs)
 omni, lateral = np.zeros(n), np.zeros(n)
@@ -13328,8 +13328,9 @@ signed = (0.25 * np.cos(np.deg2rad(45.0)) - 0.25 * np.cos(np.deg2rad(45.0))) / 1
 print(round(signed, 12))                    # 0.0, the misreading
 ```
 
-Two rooms, one with reflections from the left and one with reflections from
-both sides, would come out identical and zero. The library reads the page.
+Two rooms, one with mirror-image reflections from both sides and one with
+no lateral reflections at all, would come out identical and zero. The
+library reads the page.
 
 ## 3. Envelopment: the level of what arrives late
 
@@ -13415,7 +13416,7 @@ print(room.interaural_cross_correlation(-ear, ear, fs, limits=None).coefficient)
 
 delayed = np.concatenate([np.zeros(int(0.0005 * fs)), ear])[: ear.size]
 found = room.interaural_cross_correlation(ear, delayed, fs, limits=None)
-print(found.delay * 1000.0)                 # [0.5]  ms, the right ear leads
+print(found.delay * 1000.0)                 # [0.5]  ms, the right ear lags
 ```
 
 B.4 prints three windows: the general one from the direct sound to a time of
@@ -13439,8 +13440,10 @@ up as a straight scaling of the fraction.
 
 The 80 ms windows are the printed ones, and a response that stops before
 them raises rather than shortening itself: an 80 ms integral taken over the
-48 ms that were recorded is not the printed quantity, and it is larger than
-it, because the missing tail only ever appears in the denominator.
+48 ms that were recorded is not the printed quantity, because the 32 ms that
+were never recorded are missing from the numerator and from the denominator
+alike, and which way the fraction then moves depends on how lateral the part
+that was lost was.
 
 ## See also
 
@@ -37800,7 +37803,7 @@ documents, one page per module.
 | `LATE_LATERAL_START_S` | `constant` | **0.080 s**, where the numerator of Eq. (A.16) starts. | `room.LATE_LATERAL_START_S` |
 | `LATE_LATERAL_AVERAGE_BANDS_HZ` | `constant` | **(125, 250, 500, 1000) Hz**, the four bands Eq. (A.17) averages. | `room.LATE_LATERAL_AVERAGE_BANDS_HZ` |
 | `interaural_cross_correlation` | `function` | **Interaural cross correlation (ISO 3382-1 Eqs. (B.1)/(B.2)).**<br>• `left`, `right`: ear-canal responses (1D, same length)<br>• `fs`: Sample rate [Hz]<br>• `window`: (t1, t2) [s] from the direct sound, t2 None for the end (Default: (0.0, None))<br>• `limits`, `fraction`: as above | `res = room.interaural_cross_correlation(left, right, fs)`<br><br>• `InterauralCorrelationResult` per band |
-| `InterauralCorrelationResult` | `dataclass` | **Per-band interaural correlation.**<br>• `frequency` [Hz] or None<br>• `coefficient`: IACC<br>• `delay`: lag of the maximum [s], positive when the right ear leads<br>• `lag` [s] and `correlation`: the function itself, one row per band<br>• `.plot()`: the function over the search window | `res.coefficient, res.delay` |
+| `InterauralCorrelationResult` | `dataclass` | **Per-band interaural correlation.**<br>• `frequency` [Hz] or None<br>• `coefficient`: IACC<br>• `delay`: lag of the maximum [s], positive when the right ear lags<br>• `lag` [s] and `correlation`: the function itself, one row per band<br>• `.plot()`: the function over the search window | `res.coefficient, res.delay` |
 | `IACC_SEARCH_S` | `constant` | **0.001 s**, the half-width of the Eq. (B.2) search window. | `room.IACC_SEARCH_S` |
 | `IACC_EARLY_WINDOW_S` | `constant` | **(0.0, 0.080) s**, the early window of B.4. | `room.IACC_EARLY_WINDOW_S` |
 | `IACC_LATE_START_S` | `constant` | **0.080 s**, where B.4's reverberant window starts. | `room.IACC_LATE_START_S` |

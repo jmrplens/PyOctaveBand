@@ -687,8 +687,9 @@ def _window_energy(
 
     A closed window that runs past the end of the response raises rather
     than shortening: an 80 ms early energy taken over the 48 ms that were
-    recorded is not the printed quantity, and it is larger than it, because
-    the missing tail only ever appears in the denominator.
+    recorded is not the printed quantity, and the part that was never
+    recorded is missing from every integral that reaches into it, so the
+    ratio it would give is off by an amount with no fixed sign.
     """
     first = round(start * fs)
     wanted = None if stop is None else round(stop * fs)
@@ -1047,8 +1048,9 @@ class InterauralCorrelationResult:
     ``None`` for a broadband measurement. ``coefficient`` is the IACC of
     Equation (B.2), the largest magnitude the normalised correlation
     function reaches inside the +/-1 ms search window, and ``delay`` the lag
-    in seconds at which it reaches it: positive when the right ear leads,
-    because (B.1) evaluates the right channel at :math:`t + \tau`.
+    in seconds at which it reaches it: positive when the right ear is the
+    later of the two, because (B.1) evaluates the right channel at
+    :math:`t + \tau`.
 
     ``lag`` and ``correlation`` carry the function itself over the search
     window, one row per band, so it can be drawn rather than summarised.
@@ -1131,8 +1133,9 @@ def interaural_cross_correlation(
     :param fraction: Bandwidth fraction (1 = octave, 3 = one-third octave).
     :return: An :class:`InterauralCorrelationResult` with one entry per band.
     :raises ValueError: If a response is not one-dimensional or is silent, if
-        the two channels are of different lengths, if the window is empty or
-        reversed, or if a band has no energy inside it.
+        the two channels are of different lengths, if the window starts before
+        the direct sound or is empty or reversed, or if a band has no energy
+        inside it.
     """
     fs = resolve_fs(left, fs, name="left")
     left_x = validate_ir(left, fs)
@@ -1145,6 +1148,18 @@ def interaural_cross_correlation(
         )
         raise ValueError(msg)
     start, stop = window
+    if not math.isfinite(start) or start < 0.0:
+        msg = (
+            "'window' is measured from the direct sound, so it must start "
+            f"at a finite time of zero or more; got {window!r}."
+        )
+        raise ValueError(msg)
+    if stop is not None and not math.isfinite(stop):
+        msg = (
+            "'window' spells the open end B.4 prints as t_2 = infinity with "
+            f"None, not with {stop!r}."
+        )
+        raise ValueError(msg)
     if stop is not None and stop <= start:
         msg = f"'window' must run forwards in time, got {window!r}."
         raise ValueError(msg)

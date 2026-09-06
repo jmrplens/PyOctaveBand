@@ -332,7 +332,7 @@ turned away from the source does not move it.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If a response is not one-dimensional or is silent, if the two channels are of different lengths, if the window is empty or reversed, or if a band has no energy inside it. |
+| ValueError | If a response is not one-dimensional or is silent, if the two channels are of different lengths, if the window starts before the direct sound or is empty or reversed, or if a band has no energy inside it. |
 
 ## InterauralCorrelationResult
 
@@ -352,8 +352,9 @@ Per-band interaural cross correlation (ISO 3382-1:2009, Annex B).
 `None` for a broadband measurement. `coefficient` is the IACC of
 Equation (B.2), the largest magnitude the normalised correlation
 function reaches inside the +/-1 ms search window, and `delay` the lag
-in seconds at which it reaches it: positive when the right ear leads,
-because (B.1) evaluates the right channel at $t + \tau$.
+in seconds at which it reaches it: positive when the right ear is the
+later of the two, because (B.1) evaluates the right channel at
+$t + \tau$.
 
 `lag` and `correlation` carry the function itself over the search
 window, one row per band, so it can be drawn rather than summarised.

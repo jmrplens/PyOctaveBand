@@ -3858,8 +3858,8 @@ _ES_EXACT = {
     "the null points at the source,\nso the direct sound weighs nothing": (
         "el nulo apunta a la fuente,\nasí que el sonido directo no pesa nada"
     ),
-    "Angle of incidence from the null (degrees)": (
-        "Ángulo de incidencia desde el nulo (grados)"
+    "Angle from the axis of maximum sensitivity (degrees)": (
+        "Ángulo desde el eje de máxima sensibilidad (grados)"
     ),
     "Weight of one reflection": "Peso de una reflexión",
     "A hall with 2.0 s of decay": "Una sala con 2,0 s de decaimiento",
