@@ -3155,3 +3155,168 @@ def generate_lateral_energy_measures(output_dir: str) -> None:
     plt.tight_layout()
     save_figure(output_dir, "lateral_energy_measures.svg")
     plt.close()
+
+
+def generate_stage_support_windows(output_dir: str) -> None:
+    """ISO 3382-1 Annex C and Clause 7: the windows, the supports, the spread."""
+    print("Generating stage_support_windows...")
+    from phonometry import room
+
+    _fig, axes = plt.subplots(1, 3, figsize=(15.2, 4.6))
+
+    # A platform response of the shape Annex C measures: the musician's own
+    # direct sound at 1,0 m, a handful of reflections off the stage and the
+    # enclosure inside the early window, and the hall's decay behind them.
+    fs = 48000
+    rng = np.random.default_rng(3382)
+    n = int(1.6 * fs)
+    t = np.arange(n) / fs
+    envelope = np.exp(-3.0 * np.log(10.0) * t / 1.9)
+    response = rng.standard_normal(n) * envelope * 0.0026
+    for delay, amplitude in ((0.026, 0.032), (0.041, 0.025), (0.063, 0.018)):
+        response[int(delay * fs)] += amplitude
+    response[0] += 1.0
+
+    # -- Left: the three windows on the response, and the two the prose omits.
+    ax = axes[0]
+    window = max(1, int(0.001 * fs))
+    smoothed = np.convolve(response**2, np.ones(window) / window, mode="same")
+    level = 10.0 * np.log10(np.maximum(smoothed, 1e-10))
+    level -= float(np.max(level))
+    ax.plot(t * 1000.0, level, color=COLOR_MUTED, lw=1.0, zorder=2)
+    for (start, stop), colour, label in (
+        (room.STAGE_DIRECT_WINDOW_S, COLOR_TERTIARY, "direct sound, 0 to 10 ms"),
+        (room.EARLY_SUPPORT_WINDOW_S, COLOR_PRIMARY, "early support, 20 to 100 ms"),
+        (room.LATE_SUPPORT_WINDOW_S, COLOR_SECONDARY, "late support, 100 to 1 000 ms"),
+    ):
+        ax.axvspan(
+            start * 1000.0,
+            stop * 1000.0,
+            color=theme_fill(colour, ax),
+            zorder=0,
+            label=label,
+        )
+    ax.set_xscale("symlog", linthresh=10.0)
+    ax.set_xlim(0.0, 1600.0)
+    ax.set_ylim(-80.0, 4.0)
+    ax.set_xlabel("Time from the direct sound (ms)")
+    ax.set_ylabel("Energy envelope re the direct sound (dB)")
+    ax.set_title("The three windows Annex C prints")
+    ax.grid(color=COLOR_GRID, ls="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.annotate(
+        "10 ms to 20 ms counts for neither,\n"
+        "and past 1 000 ms counts for neither:\n"
+        "the prose of C.2.1 and C.2.2 says\n"
+        "neither of those things",
+        xy=(0.03, 0.05),
+        xycoords="axes fraction",
+        ha="left",
+        va="bottom",
+        fontsize=8.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.32",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=6,
+    )
+    ax.legend(loc="upper right", fontsize=8.5)
+
+    # -- Middle: both supports per band against the Table C.1 ranges.
+    ax2 = axes[1]
+    result = room.stage_support(response, fs)
+    bands = np.arange(result.early.size)
+    ax2.axhspan(-24.0, -8.0, color=theme_fill(COLOR_PRIMARY, ax2), zorder=0)
+    ax2.axhspan(-24.0, -10.0, color=theme_fill(COLOR_SECONDARY, ax2), zorder=0)
+    ax2.plot(
+        bands, result.early, "o-", color=COLOR_PRIMARY, lw=2.0, label="$ST_{Early}$"
+    )
+    ax2.plot(
+        bands, result.late, "s--", color=COLOR_SECONDARY, lw=1.6, label="$ST_{Late}$"
+    )
+    ax2.set_xticks(bands)
+    ax2.set_xticklabels(["250", "500", "1k", "2k"][: bands.size])
+    ax2.set_ylim(-30.0, -2.0)
+    ax2.set_xlabel(LABEL_FREQ_HZ)
+    ax2.set_ylabel("Stage support (dB)")
+    ax2.set_title("A platform with 1.9 s of decay")
+    ax2.grid(axis="y", color=COLOR_GRID, ls="--", alpha=0.5)
+    ax2.set_axisbelow(True)
+    ax2.annotate(
+        "the two shaded bands are the typical ranges\n"
+        "of Table C.1, which prints no JND for either",
+        xy=(0.5, 0.03),
+        xycoords="axes fraction",
+        ha="center",
+        va="bottom",
+        fontsize=8.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.32",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=6,
+    )
+    ax2.legend(loc="upper right", fontsize=9)
+
+    # -- Right: what the randomness of the excitation costs, Clause 7.1.
+    ax3 = axes[2]
+    positions = np.arange(1, 25)
+    decay_time = 2.0
+    for centre, colour, label in (
+        (125.0, COLOR_PRIMARY, "125 Hz octave"),
+        (1000.0, COLOR_SECONDARY, "1 kHz octave"),
+    ):
+        bandwidth = float(np.asarray(room.filter_bandwidth(centre)))
+        sigma = np.asarray(
+            room.reverberation_time_standard_deviation(
+                decay_time, bandwidth, positions=positions
+            )
+        )
+        ax3.plot(
+            positions,
+            100.0 * sigma / decay_time,
+            "o-",
+            color=colour,
+            lw=1.8,
+            markersize=4,
+            label=label,
+        )
+    ax3.axhline(
+        5.0,
+        color=COLOR_TERTIARY,
+        ls="--",
+        lw=1.6,
+        label="the 5 % JND of Table A.1",
+    )
+    ax3.set_xlim(0.0, 25.0)
+    ax3.set_ylim(0.0, 12.0)
+    ax3.set_xlabel("Independent source-receiver positions $N$")
+    ax3.set_ylabel("$\\sigma(T_{30})$ as a percentage of $T_{30}$")
+    ax3.set_title("$T_{30}$ = 2.0 s, ten decays in each position")
+    ax3.grid(color=COLOR_GRID, ls="--", alpha=0.5)
+    ax3.set_axisbelow(True)
+    ax3.annotate(
+        "the integrated impulse response is worth ten\n"
+        "interrupted-noise decays per position (7.2)",
+        xy=(0.97, 0.62),
+        xycoords="axes fraction",
+        ha="right",
+        va="bottom",
+        fontsize=8.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.32",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=6,
+    )
+    ax3.legend(loc="upper right", fontsize=9)
+
+    plt.tight_layout()
+    save_figure(output_dir, "stage_support_windows.svg")
+    plt.close()

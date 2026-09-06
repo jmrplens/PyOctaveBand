@@ -4383,6 +4383,57 @@ in the same order.
   turn that was never closed.
 - **Status:** unreported.
 
+## ISO 3382-1:2009, C.2.1 and C.2.2 (the prose of both stage supports leaves out an integration limit)
+
+- **Location:** Annex C (informative), C.2.1 on printed folio 23 (PDF
+  page 31) and C.2.2 on printed folio 24 (PDF page 32), each in the sentence
+  that introduces its own equation.
+- **The print:** C.2.1 defines the early support as "the ratio, in decibels,
+  of the reflected energy **within the first 0,1 s** relative to the direct
+  sound", and prints
+
+  $$
+  ST_\mathrm{Early} = 10 \lg \left[
+      \frac{\int_{0,020}^{0,100} p^2(t)\ \mathrm{d}t}
+           {\int_{0}^{0,010} p^2(t)\ \mathrm{d}t} \right]\ \mathrm{dB}.
+  $$
+
+  C.2.2 defines the late support as "the ratio, in decibels, of the
+  reflected energy **after the first 0,1 s** relative to the direct sound",
+  and prints
+
+  $$
+  ST_\mathrm{Late} = 10 \lg \left[
+      \frac{\int_{0,100}^{1,000} p^2(t)\ \mathrm{d}t}
+           {\int_{0}^{0,010} p^2(t)\ \mathrm{d}t} \right]\ \mathrm{dB}.
+  $$
+
+- **The problem:** neither sentence describes the equation beside it.
+  Equation (C.1) starts at 0,020 s, not at the 0,010 s the direct-sound
+  window ends at, so the interval between them is counted in neither the
+  numerator nor the denominator and the prose never mentions the gap.
+  Equation (C.2) stops at 1,000 s, where the prose puts no upper limit at
+  all.
+- **Consequence:** both move a number, and the first moves it further. On an
+  exponential decay of $T = 2$ s, a reader who takes "within the first 0,1 s"
+  to start where the direct-sound window ends collects the 10 ms to 20 ms
+  interval as well, which is 17 % more energy and **0,68 dB** on
+  $ST_\mathrm{Early}$, against the 1 dB standard deviation C.2.4 estimates
+  for a single reading. The missing ceiling of (C.2) costs 0,01 dB in the
+  same hall, because a 2 s decay is already 30 dB down at one second, and
+  reaches 0,2 dB at $T = 4$ s and 1,0 dB at $T = 8$ s: it is the cathedral,
+  not the concert hall, that the second omission separates.
+- **Evidence:** Verified on PDF pages 31 and 32 (printed pp. 23 and 24) of
+  BS EN ISO 3382-1:2009.
+- **Library behaviour:**
+  [`stage_support`](../src/phonometry/room/auditorium.py) integrates the
+  printed limits, which are the ones in
+  [`EARLY_SUPPORT_WINDOW_S`](../src/phonometry/room/auditorium.py) and
+  `LATE_SUPPORT_WINDOW_S`. `tests/room/test_auditorium_stage.py` drops an
+  arrival into the gap and another past the ceiling and requires both to
+  change nothing.
+- **Status:** unreported.
+
 ## Related source properties that are not errata
 
 Recorded here to prevent future "fixes" that would break agreement with the

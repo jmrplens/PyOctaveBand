@@ -3851,6 +3851,50 @@ _ES_EXACT = {
     "Sound strength $G$ (dB)": "Fuerza sonora $G$ (dB)",
     "direct sound alone": "solo el sonido directo",
     "$G$": "$G$",
+    # --- stage_support_windows (Annex C and Clause 7) ---
+    "The three windows Annex C prints": "Las tres ventanas que imprime el anexo C",
+    "direct sound, 0 to 10 ms": "sonido directo, de 0 a 10 ms",
+    "early support, 20 to 100 ms": "soporte temprano, de 20 a 100 ms",
+    "late support, 100 to 1 000 ms": "soporte tardío, de 100 a 1 000 ms",
+    "Time from the direct sound (ms)": "Tiempo desde el sonido directo (ms)",
+    "Energy envelope re the direct sound (dB)": (
+        "Envolvente de energía respecto al sonido directo (dB)"
+    ),
+    "10 ms to 20 ms counts for neither,\n"
+    "and past 1 000 ms counts for neither:\n"
+    "the prose of C.2.1 and C.2.2 says\n"
+    "neither of those things": (
+        "de 10 ms a 20 ms no cuenta para ninguna,\n"
+        "y pasados 1 000 ms tampoco:\n"
+        "la prosa de C.2.1 y C.2.2 no dice\n"
+        "ninguna de las dos cosas"
+    ),
+    "A platform with 1.9 s of decay": "Un escenario con 1,9 s de decaimiento",
+    "Stage support (dB)": "Soporte de escenario (dB)",
+    "$ST_{Early}$": "$ST_{Early}$",
+    "$ST_{Late}$": "$ST_{Late}$",
+    "the two shaded bands are the typical ranges\n"
+    "of Table C.1, which prints no JND for either": (
+        "las dos bandas sombreadas son los rangos habituales\n"
+        "de la Tabla C.1, que no imprime JND para ninguno"
+    ),
+    "125 Hz octave": "octava de 125 Hz",
+    "1 kHz octave": "octava de 1 kHz",
+    "the 5 % JND of Table A.1": "la JND del 5 % de la Tabla A.1",
+    "Independent source-receiver positions $N$": (
+        "Posiciones fuente-receptor independientes $N$"
+    ),
+    "$\\sigma(T_{30})$ as a percentage of $T_{30}$": (
+        "$\\sigma(T_{30})$ como porcentaje de $T_{30}$"
+    ),
+    "$T_{30}$ = 2.0 s, ten decays in each position": (
+        "$T_{30}$ = 2,0 s, diez caídas en cada posición"
+    ),
+    "the integrated impulse response is worth ten\n"
+    "interrupted-noise decays per position (7.2)": (
+        "la respuesta al impulso integrada vale diez\n"
+        "caídas de ruido interrumpido por posición (apartado 7.2)"
+    ),
     # --- lateral_energy_measures (A.2.4, A.2.5, Annex B) ---
     "Two weightings for one reflection": "Dos ponderaciones para una reflexión",
     "$J_{LF}$: $\\cos^2\\theta$  (A.14)": "$J_{LF}$: $\\cos^2\\theta$  (A.14)",

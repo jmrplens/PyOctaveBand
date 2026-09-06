@@ -40,6 +40,7 @@ if TYPE_CHECKING:
         LateLateralResult,
         LateralEnergyResult,
         SoundStrengthResult,
+        StageSupportResult,
     )
     from ..room.crowd_noise import CrowdNoiseResult
     from ..room.enclosed_space_absorption import ReverberationResult
@@ -115,6 +116,12 @@ _LATERAL_SINGLE_NUMBER_BANDS_HZ = (125.0, 250.0, 500.0, 1000.0)
 #: Typical range of the late lateral sound level in the same halls, in dB
 #: (ISO 3382-1:2009, Table A.1), again for its single number.
 _LATE_LATERAL_TYPICAL_RANGE_DB = (-14.0, 1.0)
+
+#: Typical ranges of the two stage supports on an orchestra platform, in dB
+#: (ISO 3382-1:2009, Table C.1), for their single numbers over the 250 Hz to
+#: 2 kHz octave bands.
+_EARLY_SUPPORT_TYPICAL_RANGE_DB = (-24.0, -8.0)
+_LATE_SUPPORT_TYPICAL_RANGE_DB = (-24.0, -10.0)
 
 #: Spanish translations of the fixed strings rendered by the room ``.plot()``
 #: renderers, keyed by their verbatim English text.  ``_t`` returns the English
@@ -214,6 +221,16 @@ _STRINGS: dict[str, str] = {
     ),
     r"Single number, $J_\mathrm{LFCm}$ (125 Hz to 1 kHz)": (
         r"Número único, $J_\mathrm{LFCm}$ (125 Hz a 1 kHz)"
+    ),
+    r"Early support, $ST_\mathrm{Early}$": r"Soporte temprano, $ST_\mathrm{Early}$",
+    r"Late support, $ST_\mathrm{Late}$": r"Soporte tardío, $ST_\mathrm{Late}$",
+    "Stage support [dB]": "Soporte de escenario [dB]",
+    "ISO 3382-1 stage support": "Soporte de escenario ISO 3382-1",
+    r"Typical range of $ST_\mathrm{Early}$ (Table C.1)": (
+        r"Rango habitual de $ST_\mathrm{Early}$ (Tabla C.1)"
+    ),
+    r"Typical range of $ST_\mathrm{Late}$ (Table C.1)": (
+        r"Rango habitual de $ST_\mathrm{Late}$ (Tabla C.1)"
     ),
     "Interaural cross correlation": "Correlación cruzada interaural",
     "ISO 3382-1 interaural cross correlation": (
@@ -587,6 +604,63 @@ def plot_late_lateral(
     ax.plot(positions, values, "o-", zorder=3, **kwargs)
     ax.set_ylabel(_t(r"Late lateral sound level $L_J$ [dB]", language))
     ax.set_title(_t("ISO 3382-1 late lateral sound level", language))
+    _band_axis(
+        ax,
+        labels,
+        xlabel=_t(_FREQUENCY_LABEL if use_freq_axis else "Band", language),
+        language=language,
+    )
+    ax.grid(True, axis="y", alpha=0.3)
+    ax.legend(loc="best", fontsize="small")
+    _localize_band_axes(ax, language)
+    return ax
+
+
+def plot_stage_support(
+    result: StageSupportResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Both stage supports per band over their Table C.1 ranges.
+
+    :param result: A
+        :class:`~phonometry.room.auditorium.StageSupportResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: ``"en"`` or ``"es"``.
+    :param kwargs: Forwarded to the early-support ``plot`` call.
+    :return: The axes.
+    """
+    early = np.asarray(result.early, dtype=np.float64)
+    late = np.asarray(result.late, dtype=np.float64)
+    labels, use_freq_axis = _band_labels(result.frequency, early.size, language)
+    positions = np.arange(early.size, dtype=np.float64)
+    ax = ax if ax is not None else _new_axes()
+
+    for (low, high), colour, key in (
+        (_EARLY_SUPPORT_TYPICAL_RANGE_DB, _C_PRIMARY_LIGHT, "Early"),
+        (_LATE_SUPPORT_TYPICAL_RANGE_DB, _C_SECONDARY_LIGHT, "Late"),
+    ):
+        ax.axhspan(
+            low,
+            high,
+            color=colour,
+            alpha=0.25,
+            label=_t(rf"Typical range of $ST_\mathrm{{{key}}}$ (Table C.1)", language),
+        )
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("label", _t(r"Early support, $ST_\mathrm{Early}$", language))
+    ax.plot(positions, early, "o-", zorder=3, **kwargs)
+    ax.plot(
+        positions,
+        late,
+        "s--",
+        color=_C_SECONDARY,
+        zorder=3,
+        label=_t(r"Late support, $ST_\mathrm{Late}$", language),
+    )
+    ax.set_ylabel(_t("Stage support [dB]", language))
+    ax.set_title(_t("ISO 3382-1 stage support", language))
     _band_axis(
         ax,
         labels,

@@ -90,6 +90,9 @@ speech intelligibility a room affords is quantified by the
 - [Spatial impression (ISO 3382-1)](spatial-impression.md):
   where the sound comes from, measured with a figure-of-eight microphone
   beside the omnidirectional one and with a head that has two.
+- [Stage support and uncertainty (ISO 3382-1)](stage-and-uncertainty.md):
+  the two measures taken on the platform with the source a metre away, and
+  the uncertainty Clause 7 puts on a measured reverberation time.
 - [Open-Plan Office Acoustics (ISO 3382-3)](open-plan-acoustics.md):
   the spatial decay rate of speech and the distraction and privacy distances.
 - [Image sources and the steady-state room field](room-image-sources.md):

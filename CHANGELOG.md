@@ -38,6 +38,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- What ISO 3382-1 says about the measurement itself, which is a stage the
+  library had nothing for.
+
+  Annex C measures what a player on the platform hears of their own
+  instrument: the early support of Equation (C.1) and the late support of
+  Equation (C.2), both against the same direct sound a metre away, so their
+  difference belongs to the hall and not to how loudly the instrument was
+  played. `room.stage_support` computes them over the 250 Hz to 2 kHz octave
+  bands C.2.4 averages, and carries the two standard deviations that clause
+  estimates, which close on each other: 1 dB for one band in one position is
+  0,2887 dB over the root of the twelve readings, and 0,3 dB is what the
+  clause prints.
+
+  Clause 7 says how much of a measured reverberation time belongs to the
+  noise it was measured with. `reverberation_time_standard_deviation`
+  implements Equations (4) and (5) with the printed coefficients,
+  `filter_bandwidth` the two bandwidths of 7.1, and
+  `minimum_reliable_reverberation_time` the lower limits of Equations (6) and
+  (7). Two things about that clause are worth having in code rather than in a
+  footnote: the standard deviation grows as the square root of the decay
+  time, not as the decay time, and 7.2 values an integrated impulse response
+  at ten interrupted-noise decays per position rather than at the infinity
+  the theory gives, which is 7 % on the answer.
+
+  An errata alongside. The prose of C.2.1 calls the early support "the
+  reflected energy within the first 0,1 s" while Equation (C.1) starts at
+  20 ms, discarding the 10 ms to 20 ms interval, which is 0,68 dB in a
+  two-second hall; the prose of C.2.2 calls the late support "the reflected
+  energy after the first 0,1 s" with no upper bound while Equation (C.2)
+  stops at one second, which separates cathedrals. The equations govern.
+
+  Five conformance rows.
+
 - The three measures ISO 3382-1 needs a second microphone for. The early
   lateral energy fraction of Equations (A.14) and (A.15) is the share of the
   first 80 ms that arrives from the side; the late lateral sound level of

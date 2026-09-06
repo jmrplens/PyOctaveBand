@@ -4718,6 +4718,57 @@ dos ediciones con las mismas entradas y en el mismo orden.
   una vuelta que nunca se cerró.
 - **Estado:** sin comunicar.
 
+## ISO 3382-1:2009, C.2.1 y C.2.2 (la prosa de los dos soportes de escenario se deja un límite de integración)
+
+- **Ubicación:** anexo C (informativo), C.2.1 en el folio impreso 23 (página
+  31 del PDF) y C.2.2 en el folio impreso 24 (página 32 del PDF), cada uno en
+  la frase que presenta su propia ecuación.
+- **Lo impreso:** C.2.1 define el soporte temprano como «the ratio, in
+  decibels, of the reflected energy **within the first 0,1 s** relative to
+  the direct sound», e imprime
+
+  $$
+  ST_\mathrm{Early} = 10 \lg \left[
+      \frac{\int_{0,020}^{0,100} p^2(t)\ \mathrm{d}t}
+           {\int_{0}^{0,010} p^2(t)\ \mathrm{d}t} \right]\ \mathrm{dB}.
+  $$
+
+  C.2.2 define el soporte tardío como «the ratio, in decibels, of the
+  reflected energy **after the first 0,1 s** relative to the direct sound», e
+  imprime
+
+  $$
+  ST_\mathrm{Late} = 10 \lg \left[
+      \frac{\int_{0,100}^{1,000} p^2(t)\ \mathrm{d}t}
+           {\int_{0}^{0,010} p^2(t)\ \mathrm{d}t} \right]\ \mathrm{dB}.
+  $$
+
+- **El problema:** ninguna de las dos frases describe la ecuación que tiene
+  al lado. La Ecuación (C.1) empieza en 0,020 s, no en los 0,010 s donde
+  termina la ventana del sonido directo, así que el intervalo entre ambos no
+  cuenta ni en el numerador ni en el denominador y la prosa no menciona el
+  hueco. La Ecuación (C.2) se detiene en 1,000 s, donde la prosa no pone
+  ningún límite superior.
+- **Consecuencia:** las dos mueven un número, y la primera lo mueve más. En
+  un decaimiento exponencial de $T = 2$ s, quien entienda «within the first
+  0,1 s» como que empieza donde acaba la ventana del sonido directo recoge
+  además el intervalo de 10 ms a 20 ms, que es un 17 % más de energía y
+  **0,68 dB** en $ST_\mathrm{Early}$, frente a la desviación típica de 1 dB
+  que C.2.4 estima para una sola lectura. El techo que le falta a la (C.2)
+  cuesta 0,01 dB en esa misma sala, porque un decaimiento de 2 s ya ha caído
+  30 dB al segundo, y llega a 0,2 dB con $T = 4$ s y a 1,0 dB con $T = 8$ s:
+  es la catedral, y no la sala de conciertos, lo que separa esa segunda
+  omisión.
+- **Evidencia:** verificado en las páginas 31 y 32 del PDF (folios impresos
+  23 y 24) de BS EN ISO 3382-1:2009.
+- **Comportamiento de la biblioteca:**
+  [`stage_support`](../src/phonometry/room/auditorium.py) integra los límites
+  impresos, que son los de
+  [`EARLY_SUPPORT_WINDOW_S`](../src/phonometry/room/auditorium.py) y
+  `LATE_SUPPORT_WINDOW_S`. `tests/room/test_auditorium_stage.py` deja caer una
+  llegada en el hueco y otra pasado el techo y exige que ninguna cambie nada.
+- **Estado:** sin comunicar.
+
 ## Propiedades de las fuentes, relacionadas, que no son erratas
 
 Registradas aquí para prevenir futuros «arreglos» que romperían la

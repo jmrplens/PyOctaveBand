@@ -315,6 +315,122 @@ def _chk_iso3382_1_interaural_correlation() -> Outcome:
 
 @register(
     "Room & building acoustics",
+    "ISO 3382-1:2009 Annex C (informative) Eqs. (C.1)/(C.2)",
+    "Stage support of one arrival in each printed window",
+)
+def _chk_iso3382_1_stage_support() -> Outcome:
+    # Both supports divide by the same unit direct sound, so each is just
+    # 20 lg of the amplitude that landed inside its own window: 0,2 at 50 ms
+    # for the early one, 0,1 at 400 ms for the late one.
+    response = np.zeros(round(2.0 * _FS))
+    response[100] = 1.0
+    response[100 + round(0.050 * _FS)] = 0.2
+    response[100 + round(0.400 * _FS)] = 0.1
+    res = ph.room.stage_support(response, _FS, limits=None)
+    return record(
+        {
+            "ST_Early": round(20.0 * math.log10(0.2), 9),
+            "ST_Late": round(20.0 * math.log10(0.1), 9),
+        },
+        {
+            "ST_Early": round(float(res.early[0]), 9),
+            "ST_Late": round(float(res.late[0]), 9),
+        },
+        unit="dB",
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 C.2.4",
+    "The two printed stage-support standard deviations close on 12 readings",
+)
+def _chk_iso3382_1_stage_support_uncertainty() -> Outcome:
+    # C.2.4 estimates 1 dB for one band in one position and 0,3 dB for the
+    # single number, which is that over the root of the four bands times
+    # three positions it averages: 1/sqrt(12) = 0,2887.
+    readings = len(ph.room.STAGE_SUPPORT_BANDS_HZ) * ph.room.STAGE_SUPPORT_POSITIONS
+    naive = ph.room.STAGE_SUPPORT_STANDARD_DEVIATION_DB / math.sqrt(readings)
+    return numeric(
+        ph.room.STAGE_SUPPORT_SINGLE_NUMBER_STANDARD_DEVIATION_DB,
+        round(naive, 1),
+        1e-12,
+        unit="dB",
+        places=4,
+        computed_label=f"1 dB / sqrt({readings}) = {naive:.4f} dB -> 0.3 dB",
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 Eq. (5)",
+    "Standard deviation of T30, 2 s in the 1 kHz octave, n = 10, N = 12",
+)
+def _chk_iso3382_1_decay_uncertainty() -> Outcome:
+    expected = 0.55 * 2.0 * math.sqrt((1.0 + 1.52 / 10.0) / (12.0 * 710.0 * 2.0))
+    computed = float(
+        np.asarray(
+            ph.room.reverberation_time_standard_deviation(
+                2.0,
+                ph.room.filter_bandwidth(1000.0),
+                evaluation_range=30.0,
+                decays=10,
+                positions=12,
+            )
+        )
+    )
+    return numeric(expected, computed, 1e-12, unit="s", places=8)
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 Eqs. (4)/(5)",
+    "The two evaluation ranges differ by the printed 0,88/0,55 and decay terms",
+)
+def _chk_iso3382_1_decay_uncertainty_ratio() -> Outcome:
+    # 0,88/0,55 is exactly 1,6, so the whole ratio at equal T, B and N is
+    # 1,6 sqrt((1 + 1,90/n)/(1 + 1,52/n)), which is 1,6262 at n = 10. It is
+    # also the ISO 3382-2:2008 Table A.1 pair G = 88 %, H = 1,90 against
+    # G = 55 %, H = 1,52 in its gamma = 5 column.
+    common = {
+        "bandwidth": ph.room.filter_bandwidth(1000.0),
+        "decays": 10,
+        "positions": 12,
+    }
+    wide = float(
+        np.asarray(
+            ph.room.reverberation_time_standard_deviation(
+                2.0, evaluation_range=20.0, **common
+            )
+        )
+    )
+    narrow = float(
+        np.asarray(
+            ph.room.reverberation_time_standard_deviation(
+                2.0, evaluation_range=30.0, **common
+            )
+        )
+    )
+    return numeric(1.6 * math.sqrt(1.19 / 1.152), wide / narrow, 1e-12, places=8)
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 Eqs. (6)/(7)",
+    "Shortest reliable decay time of a 125 Hz octave forward analysis",
+)
+def _chk_iso3382_1_reliable_limit() -> Outcome:
+    # B = 0,71 * 125 = 88,75 Hz, so Equation (6) puts the limit at
+    # 16/88,75 = 0,1803 s, well above the 2 T_det of a fast detector.
+    bandwidth = float(np.asarray(ph.room.filter_bandwidth(125.0)))
+    computed = float(
+        np.asarray(ph.room.minimum_reliable_reverberation_time(bandwidth, 0.02))
+    )
+    return numeric(16.0 / 88.75, computed, 1e-12, unit="s", places=6)
+
+
+@register(
+    "Room & building acoustics",
     "ISO 18233:2006 (swept-sine method)",
     "Sweep deconvolution recovers a known IIR response",
 )
