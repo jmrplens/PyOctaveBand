@@ -58,6 +58,150 @@ def _chk_room_t30() -> Outcome:
 
 @register(
     "Room & building acoustics",
+    "ISO 3382-1:2009 Annex A (informative) Eq. (A.1)",
+    "Sound strength of a response scaled against its free-field reference",
+)
+def _chk_iso3382_1_sound_strength_ratio() -> Outcome:
+    # G is a ratio of energies, so a response that is the reference times k
+    # has G = 20 lg k whatever the waveform. k = 2 is exact in binary
+    # floating point, which leaves only the logarithm.
+    reference = np.zeros(round(0.2 * _FS))
+    reference[round(0.01 * _FS)] = 1.0
+    res = ph.room.sound_strength(2.0 * reference, reference, _FS, limits=None)
+    return numeric(
+        20.0 * math.log10(2.0), float(res.strength[0]), 1e-9, unit="dB", places=6
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 Annex A (informative) Eq. (A.2)",
+    "Sound pressure exposure level of a 1 Pa burst held for 0,5 s",
+)
+def _chk_iso3382_1_exposure_level() -> Outcome:
+    # E = 0,5 Pa^2 s over T0 = 1 s and p0 = 20 uPa.
+    burst = np.ones(round(0.5 * _FS))
+    expected = 10.0 * math.log10(0.5 / (1.0 * (2.0e-5) ** 2))
+    computed = float(
+        np.asarray(ph.room.sound_pressure_exposure_level(burst, _FS, limits=None))[()]
+    )
+    return numeric(expected, computed, 1e-9, unit="dB", places=6)
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 Annex A (informative) A.2.1",
+    "A calibration shared by both responses cancels out of G",
+)
+def _chk_iso3382_1_shared_calibration() -> Outcome:
+    # A.2.1 asks for a calibrated source because G is not scale-free, but
+    # what it needs calibrated is the RATIO: a factor applied to the room
+    # response and to the free-field one alike is the microphone's gain, and
+    # Equation (A.1) divides it out. A factor on one of them does not cancel,
+    # and the check would see it.
+    reference = np.zeros(round(0.3 * _FS))
+    reference[round(0.03 * _FS)] = 1.0
+    t = np.arange(round(2.0 * _FS)) / _FS
+    rng = np.random.default_rng(3382)
+    room_ir = rng.standard_normal(t.size) * np.exp(-3.0 * math.log(10.0) * t)
+    plain = ph.room.sound_strength(room_ir, reference, _FS)
+    gained = ph.room.sound_strength(7.5 * room_ir, 7.5 * reference, _FS)
+    worst = float(np.max(np.abs(gained.strength - plain.strength)))
+    return numeric(
+        0.0,
+        worst,
+        1e-9,
+        unit="dB",
+        places=6,
+        expected_label="0 dB shift (+/-1e-09 dB)",
+        computed_label=f"max shift over 6 bands {worst:.3g} dB",
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 Annex A (informative) Eqs. (A.4)/(A.8)",
+    "Free-field reference referred from 5 m to 10 m",
+)
+def _chk_iso3382_1_free_field_reference() -> Outcome:
+    expected = 20.0 * math.log10(0.5)
+    computed = float(np.asarray(ph.room.free_field_reference_level(0.0, 5.0))[()])
+    return numeric(expected, computed, 1e-12, unit="dB", places=6)
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 Annex A (informative) Eq. (A.5)",
+    "Reverberation-room reference level, A = 0,16 V/T = 10 m2",
+)
+def _chk_iso3382_1_reverberation_room_reference() -> Outcome:
+    # Equation (A.6) with the printed 0,16: V = 200 m3 and T = 3,2 s give
+    # A = 10 m2 exactly, so 10 lg(A/S0) = 10 dB and the printed 37 dB leaves
+    # the reference 27 dB below the room level.
+    area = 0.16 * 200.0 / 3.2
+    computed = float(
+        np.asarray(ph.room.reverberation_room_reference_level(80.0, area))[()]
+    )
+    return numeric(53.0, computed, 1e-12, unit="dB", places=6)
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 Annex A (informative) Eqs. (A.5)/(A.9)",
+    "The two printed routes to G span the 0,0206 dB their integers force",
+)
+def _chk_iso3382_1_route_closure() -> Outcome:
+    # 10 lg(1600 pi) = 37,0127 dB and 10 lg(400 pi) = 30,9921 dB differ by
+    # 10 lg 4 = 6,0206 dB; the printed integers differ by 6. Both roundings
+    # are correct on their own, so the library's two routes to the same G
+    # must disagree by exactly the difference and by nothing else.
+    #
+    # The comparison is a derived identity, not a printed one. (A.5) is
+    # printed for the exposure level of an impulsive source and (A.9) for
+    # the level of a stationary one; the diffuse-to-free-field ratio the two
+    # offsets carry is the same either way, which is why the annex prints
+    # (A.7) and (A.8) as the stationary twins of (A.1) and (A.4).
+    power_level, pressure_level = 100.0, 80.0
+    area = 0.16 * 200.0 / 2.0
+    diffuse_level = power_level + 10.0 * math.log10(4.0 / area)
+    via_room = pressure_level - float(
+        np.asarray(ph.room.reverberation_room_reference_level(diffuse_level, area))[()]
+    )
+    via_power = float(
+        np.asarray(ph.room.sound_strength_from_power(pressure_level, power_level))[()]
+    )
+    return numeric(
+        10.0 * math.log10(4.0) - 6.0,
+        via_power - via_room,
+        1e-12,
+        unit="dB",
+        places=6,
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 Annex A (informative) A.2.1 note",
+    "Energy mean of a cosine directivity over a full turn",
+)
+def _chk_iso3382_1_directivity_energy_mean() -> Outcome:
+    # The mean of cos^2 over N uniform bearings is exactly 1/2 for every
+    # N >= 3, so the energy-mean level is 10 lg(1/2) below the on-axis one
+    # and the answer does not depend on how the turn was sampled.
+    bearings = 29
+    angles = np.arange(bearings) * 2.0 * np.pi / bearings
+    levels = 20.0 * np.log10(np.abs(np.cos(angles)) + 1e-300)
+    return numeric(
+        10.0 * math.log10(0.5),
+        float(np.asarray(ph.room.directivity_energy_average(levels))),
+        1e-12,
+        unit="dB",
+        places=6,
+    )
+
+
+@register(
+    "Room & building acoustics",
     "ISO 18233:2006 (swept-sine method)",
     "Sweep deconvolution recovers a known IIR response",
 )

@@ -38,6 +38,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Sound strength, `G`, the one quantity in ISO 3382-1 Table A.1 that says how
+  loud a hall is. Every other measure the library reads from a room impulse
+  response is a ratio of energies inside one recording and survives any gain
+  in front of it; `G` is the energy of that recording against the same source
+  at 10 m in a free field, so it needs a calibrated source and it needed a
+  reference the library had no way to obtain.
+
+  `room.auditorium` obtains it three ways, which is what Annex A prints:
+  measure closer than 10 m and correct by the inverse square law, Equations
+  (A.4) and (A.8); measure the source in a reverberation room of known
+  absorption area, Equation (A.5); or take its sound power level, Equation
+  (A.9). `sound_strength` accepts the reference either as the free-field
+  response or as a level already obtained, and reports `G` band by band
+  together with the two levels it is the difference of.
+
+  The last two routes carry printed integers, 37 dB and 31 dB, and both are
+  the correctly rounded value of a closed form: `10 lg(1600 pi)` is 37,0127 dB
+  and `10 lg(400 pi)` is 30,9921 dB. Rounded to whole decibels they land 6 dB
+  apart where the exact offsets are `10 lg 4 = 6,0206` dB apart, so the two
+  routes cannot agree to better than 0,0206 dB. The library prints what the
+  standard prints and a conformance row pins the gap, rather than leaving a
+  future test to discover it.
+
+  The integral itself is truncated where the fitted decay meets the noise
+  floor and the missing tail compensated with the fitted rate, which is what
+  ISO 3382-1 5.3.3 Equation (3) prints for this same integral and what the
+  library already does to it for the decay times. A.2.1 puts a lower bound on
+  the upper limit and no upper one, so read literally it would let `G` grow
+  with the length of the tape.
+
+  Seven conformance rows against the printed equations, and two errata. The
+  first is a symbol the annex reuses: `L_pE` is the level measured in the hall
+  under Equations (A.2) and (A.3), and the level measured in the calibration
+  reverberation room under Equation (A.5), five equations later and with no
+  distinguishing subscript; substituting one into the other as printed removes
+  the hall from `G` altogether. The second is the note that asks for a
+  directivity survey "at every 12,5 degrees", which does not divide 360.
+
 - The emission sound pressure level at a work station, which is the number a
   machine is declared and bought by, and which nothing in the library computed.
   `emission.declaration` has been able to *declare* `L_pA` since the ISO 4871

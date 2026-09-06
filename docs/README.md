@@ -113,6 +113,7 @@ predicted.
 **[Room acoustics](buildings/rooms/index.md)**
 
 - [Room Acoustics](buildings/rooms/room-acoustics.md): impulse-response acquisition (ISO 18233), reverberation and room parameters (ISO 3382-1/2), open-plan speech metrics (ISO 3382-3), reverberation-room sound absorption (ISO 354)
+- [Sound strength G (ISO 3382-1)](buildings/rooms/sound-strength.md): how loud the hall is, against the same source at 10 m in a free field, and the three printed routes to that reference
 - [Room impulse response acquisition (ISO 18233)](buildings/rooms/room-impulse-response.md): the exponential sine sweep and its deconvolution, the MLS correlation method, and the source and microphone placement rules of a valid measurement
 - [Open-plan office acoustics (ISO 3382-3)](buildings/rooms/open-plan-acoustics.md): the spatial decay rate $D_{2,\mathrm{S}}$ of A-weighted speech, the level at 4 m, and the distraction and privacy distances derived from STI
 - [Sound absorption in enclosed spaces](buildings/rooms/enclosed-space-absorption.md): the EN 12354-6:2003 prediction of a room's total equivalent absorption area and reverberation time from its surfaces and objects (Clause 4)

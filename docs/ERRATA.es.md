@@ -4650,6 +4650,74 @@ dos ediciones con las mismas entradas y en el mismo orden.
   elección no se mueva.
 - **Estado:** sin comunicar.
 
+## ISO 3382-1:2009, A.2.1 (el mismo símbolo nombra dos niveles distintos, con cinco ecuaciones de por medio)
+
+- **Ubicación:** anexo A (informativo), A.2.1. La lista «where» bajo las
+  Ecuaciones (A.2) y (A.3) en el folio impreso 13 (página 21 del PDF), y la
+  lista «where» bajo la Ecuación (A.5) en el folio impreso 14 (página 22 del
+  PDF).
+- **Lo impreso:** el folio 13 dice «$L_{pE}$ is the sound pressure exposure
+  level of $p(t)$», siendo $p(t)$ «the instantaneous sound pressure of the
+  impulse response measured at the measurement point», es decir, el receptor de
+  la sala bajo ensayo. El folio 14, dentro de la NOTA 1, dice «$L_{pE}$ is the
+  spatial-average sound pressure exposure level measured in the reverberation
+  room».
+- **El problema:** un símbolo, dos magnitudes, el mismo apartado, sin
+  subíndice que las distinga y sin nota que avise de la reutilización. La
+  segunda es una calibración de la fuente en laboratorio; la primera es la
+  medición para la que existe todo el anexo.
+- **Consecuencia:** sustituir la (A.5) en la (A.1) tal como están impresos los
+  símbolos da
+
+  $$
+  G = L_{pE} - L_{pE,10} = L_{pE} - \left[ L_{pE} + 10 \lg (A/S_0) - 37 \right]
+    = 37 - 10 \lg (A/S_0)\ \text{dB},
+  $$
+
+  donde la sala ha desaparecido y la fuerza sonora depende sólo del área de
+  absorción de la cámara reverberante en que se calibró la fuente. La
+  sustitución es la que invitan los símbolos impresos, y no tiene sentido.
+- **Evidencia:** verificado en las páginas 21 y 22 del PDF (folios impresos 13
+  y 14) de BS EN ISO 3382-1:2009.
+- **Comportamiento de la biblioteca:**
+  [`reverberation_room_reference_level`](../src/phonometry/room/auditorium.py)
+  llama a su argumento `reverberation_room_level`, y el nivel de la sala nunca
+  llega hasta él: lo mide
+  [`sound_strength`](../src/phonometry/room/auditorium.py) a partir de la
+  respuesta que se pasa como `ir`. Nada impide que quien llama escriba la
+  sustitución a mano, pero ninguna variable hace los dos papeles, y los dos
+  nombres dicen cuál es cuál.
+- **Estado:** sin comunicar.
+
+## ISO 3382-1:2009, A.2.1 (un barrido de directividad «cada 12,5 grados» que no cierra la circunferencia)
+
+- **Ubicación:** anexo A (informativo), A.2.1, la nota inmediatamente bajo la
+  Ecuación (A.4), folio impreso 13 (página 21 del PDF).
+- **Lo impreso:** «When making such a measurement in a free field, it is
+  necessary to make the measurement at every 12,5° around the sound source and
+  to calculate the energy-mean value of the sound pressure exposure levels in
+  order to average the directivity of the sound source.»
+- **El problema:** $360 / 12{,}5 = 28{,}8$. No hay número entero de pasos de
+  12,5° que cierre una vuelta: 28 pasos llegan a 350° y dejan un hueco de 10°,
+  29 se pasan hasta 362,5°. La instrucción no puede seguirse literalmente.
+- **Consecuencia:** dos laboratorios que «midan cada 12,5°» pueden usar
+  conjuntos de acimuts distintos y, para una fuente en el límite de
+  directividad de la tabla 1 (±6 dB a 4 kHz), sus medias energéticas difieren.
+  El nivel de referencia $L_{pE,10}$ al que llevan todas las rutas de A.2.1 no
+  es, por tanto, reproducible sólo desde la instrucción impresa. El barrido de
+  cualificación de la fuente de la propia norma, en 4.2.1, usa 5°, que divide
+  360 exactamente en 72.
+- **Evidencia:** verificado en la página 21 del PDF (folio impreso 13) de
+  BS EN ISO 3382-1:2009.
+- **Comportamiento de la biblioteca:**
+  [`directivity_energy_average`](../src/phonometry/room/auditorium.py) toma la
+  lectura que la nota sí sostiene: un muestreo uniforme de la vuelta completa
+  no más grueso que el paso impreso, es decir al menos
+  $\lceil 360 / 12{,}5 \rceil = 29$ acimuts, combinados con la media energética
+  que la nota pide. Menos acimuts levantan `ValueError` en lugar de promediar
+  una vuelta que nunca se cerró.
+- **Estado:** sin comunicar.
+
 ## Propiedades de las fuentes, relacionadas, que no son erratas
 
 Registradas aquí para prevenir futuros «arreglos» que romperían la

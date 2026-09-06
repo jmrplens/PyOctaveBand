@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 116 guías de phonometry, agrupadas en los doce temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 117 guías de phonometry, agrupadas en los doce temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -111,7 +111,7 @@ hay ninguna panorámica del campo: cada página es la documentación de trabajo 
 un módulo, escrita para que un resultado se pueda defender apartado por
 apartado en lugar de darlo por bueno.
 
-Esta página es el mapa. Ciento dieciséis guías repartidas en doce temas, y cada
+Esta página es el mapa. Ciento diecisiete guías repartidas en doce temas, y cada
 área tiene su propio índice con el relato largo de cómo encajan sus piezas. Si
 llegas sin una pregunta concreta, lee primero la
 [introducción](/phonometry/es/start/getting-started/): recorre una señal por toda la
@@ -362,6 +362,9 @@ ANSI/ASA S12.2 y ASTM E413/E1414.
 - [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/): los parámetros de
   sala EDT, $T_{20}$, $T_{30}$, $C_{50}$, $C_{80}$, $D_{50}$ y $T_\mathrm{s}$ derivados
   de esa respuesta al impulso.
+- [Fuerza sonora G (ISO 3382-1)](/phonometry/es/buildings/rooms/sound-strength/): la
+  única medida de auditorio que necesita una fuente calibrada, y las tres rutas
+  impresas hasta su referencia en campo libre a 10 m.
 - [Acústica de oficinas diáfanas (ISO 3382-3)](/phonometry/es/buildings/rooms/open-plan-acoustics/):
   la tasa de decaimiento espacial del habla y las distancias de distracción y
   de privacidad de una planta diáfana.

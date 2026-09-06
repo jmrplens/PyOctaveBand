@@ -84,6 +84,9 @@ speech intelligibility a room affords is quantified by the
 - [Room Acoustics](room-acoustics.md): the ISO 3382-1/2
   parameters (T20, T30, EDT, C50, C80, D50, Ts) with the Schroeder integration
   and the accredited fiche.
+- [Sound strength G (ISO 3382-1)](sound-strength.md):
+  how loud the hall is, against the same source at 10 m in a free field, and
+  the three printed routes to that reference.
 - [Open-Plan Office Acoustics (ISO 3382-3)](open-plan-acoustics.md):
   the spatial decay rate of speech and the distraction and privacy distances.
 - [Image sources and the steady-state room field](room-image-sources.md):

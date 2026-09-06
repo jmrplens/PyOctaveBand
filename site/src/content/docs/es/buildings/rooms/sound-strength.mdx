@@ -1,0 +1,402 @@
+---
+title: "Fuerza sonora G (ISO 3382-1)"
+description: "La única medida de auditorio que necesita una fuente calibrada: G como la energía de la respuesta al impulso medida frente a la misma fuente a 10 m en campo libre, y las tres rutas impresas hasta esa referencia cuando no hay una cámara anecoica de 10 m."
+references:
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2009
+    title: "Acoustics — Measurement of room acoustic parameters — Part 1: Performance spaces"
+    designation: "ISO 3382-1:2009"
+    url: "https://www.iso.org/standard/40979.html"
+    note: "El Anexo A.2.1 y las Ecuaciones (A.1) a (A.9): la definición de la fuerza sonora y todas las rutas impresas hasta su referencia en campo libre."
+  - type: book
+    authors: ["Barron, M."]
+    year: 2009
+    title: "Auditorium acoustics and architectural design"
+    edition: "2.ª ed."
+    publisher: "Spon Press"
+    isbn: "978-0-419-24510-0"
+    note: "De dónde viene la fuerza sonora como magnitud de diseño, y cómo se comporta con la distancia en una sala real."
+  - type: article
+    authors: ["Barron, M.", "Lee, L.-J."]
+    year: 1988
+    title: "Energy relations in concert auditoriums. I"
+    journal: "The Journal of the Acoustical Society of America"
+    volume: 84
+    issue: 2
+    pages: "618-628"
+    doi: "10.1121/1.396840"
+    note: "La desviación medida respecto de la teoría clásica que explica por qué G sigue cayendo más allá de la distancia crítica en una sala real."
+  - type: article
+    authors: ["Lundeby, A.", "Vigran, T. E.", "Bietz, H.", "Vorländer, M."]
+    year: 1995
+    title: "Uncertainties of measurements in room acoustics"
+    journal: "Acta Acustica united with Acustica"
+    volume: 81
+    issue: 4
+    pages: "344-355"
+    note: "Las incertidumbres de medición tras las advertencias de esta página sobre el límite de integración y la calibración."
+---
+
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import SeeAlso from '../../../../../components/SeeAlso.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+El tiempo de reverberación dice qué hace una sala con la energía a lo largo
+del tiempo. No dice nada de lo **fuerte** que suena: dos salas con el mismo
+T30 pueden estar a 20 dB de distancia en la misma butaca. La fuerza sonora,
+$G$, es la magnitud que cierra ese hueco, y es la única de la Tabla A.1 de
+la ISO 3382-1 que necesita una fuente calibrada. Todo lo demás de la
+[página de parámetros acústicos de salas](/phonometry/es/buildings/rooms/room-acoustics/)
+— EDT, T20, T30, C50, C80, D50, $T_\mathrm{s}$ — es un cociente de energías dentro
+de un mismo registro y sobrevive a cualquier ganancia que se le ponga
+delante. $G$ no.
+
+## 1. Qué es G
+
+La ISO 3382-1:2009, Ecuación (A.1), la define como la energía de la
+respuesta al impulso medida frente a la energía que la **misma fuente**
+produce a 10 m en campo libre:
+
+$$
+G = 10 \lg \frac{\int_0^{\infty} p^2(t)\ \mathrm{d}t}{\int_0^{\infty} p_{10}^2(t)\ \mathrm{d}t}
+  = L_{pE} - L_{pE,10}\ \text{dB}.
+$$
+
+Ambas integrales son niveles de exposición sonora, Ecuaciones (A.2) y
+(A.3), referidos a $T_0 = 1$ s y $p_0 = 20$ µPa:
+
+$$
+L_{pE} = 10 \lg \left[ \frac{1}{T_0} \int_0^{\infty} \frac{p^2(t)}{p_0^2}\ \mathrm{d}t \right] \text{dB}.
+$$
+
+Las magnitudes de referencia se cancelan en el cociente. Están ahí para que
+cada mitad sea un nivel por derecho propio, que es lo que hace posibles las
+tres rutas de la sección 2: se puede obtener $L_{pE,10}$ sin haber medido
+nunca $p_{10}(t)$, y restarlo de un nivel que sí se midió.
+
+```python
+import numpy as np
+from phonometry import room
+
+fs = 48000
+rng = np.random.default_rng(3382)
+
+# La fuente a 10 m en campo libre: una sola llegada, tomada como unidad.
+reference = np.zeros(int(0.2 * fs))
+reference[480] = 1.0
+
+# La misma fuente oída a 20 m en la sala: la mitad de presión directa, y una
+# cola reverberante que lleva 2,8 veces la energía de campo libre.
+t = np.arange(int(2.0 * fs)) / fs
+ir = rng.standard_normal(t.size) * np.exp(-3.0 * np.log(10.0) * t / 1.8)
+ir *= np.sqrt(2.8 / np.sum(ir**2))
+ir[480] += 0.5
+
+res = room.sound_strength(ir, reference, fs)
+print(res.frequency.round(0))              # [ 126.  251.  501. 1000. 1995. 3981.]
+print(res.strength.round(1))               # [5.9 4.1 4.  4.8 4.7 4.9]  dB
+
+res.plot()      # G frente al rango habitual de la Tabla A.1 (necesita matplotlib)
+```
+
+**El tiempo cero es el sonido directo, no el principio del fichero.** El
+disparo de A.3.4 se aplica por banda a las dos respuestas, así que el
+retardo de propagación y del sistema que lleve el registro se elimina en
+ambos lados y se cancela.
+
+El límite *superior* es el que hay que vigilar. A.2.1 pide que la integral
+llegue al menos al punto donde la curva de decaimiento ha caído 30 dB, y no
+pone límite a cuánto más puede seguir, así que leída al pie de la letra
+dejaría crecer $G$ con la longitud de la cinta: todo lo que hay más allá del
+decaimiento es suelo de ruido, y $G$ no tiene un denominador que lo absorba
+como sí lo tienen C80 y D50. Por eso la integral se trunca donde la recta
+ajustada del decaimiento se cruza con el suelo de ruido y la cola que falta
+se compensa con la pendiente ajustada, que es el tratamiento que la 5.3.3
+Ecuación (3) imprime para esta misma integral y que
+[`decay_curve`](/phonometry/es/buildings/rooms/room-acoustics/) ya le da a la
+misma respuesta. Una respuesta sintética sin suelo de ruido medible se
+integra entera, así que para ella no se mueve nada.
+
+Quedan dos cosas que conviene decir en voz alta, y `sound_strength` las dice
+con un `AuditoriumWarning`: una respuesta de sala que se quedó corta de los
+30 dB que pide A.2.1, y una respuesta de cualquiera de las dos clases
+demasiado corta para que el filtro de su banda más grave termine de sonar. La
+segunda pilla a la referencia más a menudo que a la sala: una ventana de
+campo libre de 40 ms tras la llegada se queda 0,04 dB corta a 125 Hz, una de
+20 ms se queda 0,9 dB corta y una de 10 ms, 13 dB, y nada en la grabación lo
+dice.
+
+## 2. Tres rutas impresas hasta la referencia
+
+Una cámara anecoica de 10 m es rara, así que A.2.1 imprime tres maneras de
+obtener $L_{pE,10}$ sin ella.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_strength_routes.svg" alt="A la izquierda, las tres rutas impresas hasta el nivel de referencia en campo libre a 10 m, dibujadas sobre un eje de 0,04 dB de ancho, que caen a 0,0206 dB unas de otras alrededor del valor exacto. A la derecha, la fuerza sonora frente a la distancia fuente-receptor en una sala de 15 000 metros cúbicos, con la contribución del sonido directo por separado y el rango habitual de la Tabla A.1 sombreado" width="100%" />
+
+*La misma fuente, medida de tres maneras. La dispersión de la izquierda es
+de 0,0206 dB y no es un error de redondeo de la biblioteca: ver la sección 3.
+La banda sombreada de la derecha es lo que la Tabla A.1 da para el número
+único, la media de las octavas de 500 Hz y 1 kHz, no para una banda suelta.*
+
+**Medir más cerca y corregir.** Las Ecuaciones (A.4) y (A.8) aplican la ley
+del inverso del cuadrado desde una distancia $d \geq 3$ m:
+
+$$
+L_{pE,10} = L_{pE,d} + 20 \lg (d/10)\ \text{dB}.
+$$
+
+```python
+from phonometry import room
+
+print(round(room.free_field_reference_level(75.03, 5.0), 4))   # 69.0094
+print(round(room.free_field_reference_level(83.4, 10.0), 4))   # 83.4  (la identidad)
+```
+
+La nota bajo la (A.4) añade que la medición se repite alrededor de la
+fuente y se promedia **energéticamente**, para que la directividad de la
+propia fuente no decida la referencia. `directivity_energy_average` es ese
+promedio:
+
+```python
+import numpy as np
+from phonometry import room
+
+bearings = np.arange(29) * 2.0 * np.pi / 29.0
+levels = 80.0 + 20.0 * np.log10(np.abs(np.cos(bearings)) + 1e-12)
+# El promedio energético de un patrón coseno queda exactamente 10 lg(1/2) por
+# debajo de su máximo, sea cual sea el número de acimuts; el promedio
+# aritmético de esos mismos decibelios, no.
+print(round(room.directivity_energy_average(levels), 4))   # 76.9897
+print(round(float(np.mean(levels)), 1))                    # 74.2  (mal: aritmético)
+```
+
+**Medir en una cámara reverberante.** La Ecuación (A.5) convierte una
+lectura en campo difuso en la de campo libre a través del área de absorción
+de la sala, con $S_0 = 1$ m²:
+
+$$
+L_{pE,10} = L_{pE} + 10 \lg (A/S_0) - 37\ \text{dB}.
+$$
+
+```python
+from phonometry import room
+
+# A = 0,16 V / T (Ecuación (A.6)): 200 m3 con 3,2 s dan exactamente 10 m2.
+print(round(room.reverberation_room_reference_level(80.0, 10.0), 4))   # 53.0
+```
+
+Cuidado con la constante si se está reproduciendo un cálculo a mano. La
+(A.6) imprime $A = 0{,}16\ V/T$, que es $24 \ln 10 / c_0$ con
+$c_0 = 345{,}4$ m/s, mientras que `room.sabine_absorption_area` toma 343 m/s
+por defecto y por tanto 0,1611. La diferencia mueve $10 \lg(A/S_0)$ en
+0,030 dB; pasa `speed_of_sound=345.39` para recuperar la constante impresa.
+
+La (A.5) tampoco lleva **corrección de Waterhouse**, a diferencia del método
+de potencia sonora en cámara reverberante de la ISO 3741 que por lo demás
+refleja. El término omitido $10 \lg(1 + S\lambda/8V)$ vale más de un
+decibelio en la banda de 125 Hz de una sala pequeña, por encima de la
+diferencia apenas perceptible de 1 dB que la Tabla A.1 da a $G$. Eso es una
+propiedad del método impreso, y la biblioteca reproduce el método en lugar
+de mejorarlo por su cuenta.
+
+**Usar el nivel de potencia sonora de la fuente.** La Ecuación (A.9) no
+necesita ninguna medición en campo libre:
+
+$$
+G = L_p - L_W + 31\ \text{dB}.
+$$
+
+```python
+from phonometry import room
+
+print(round(room.sound_strength_from_power(80.0, 100.0), 4))   # 11.0
+```
+
+A.2.1 pide medir $L_W$ según la ISO 3741, que vive en
+[Potencia sonora](/phonometry/es/devices/emission/sound-power/).
+
+## 3. Por qué las rutas no pueden coincidir exactamente
+
+Los 31 dB de la (A.9) son la divergencia de una fuente puntual sobre la
+esfera de radio 10 m, y los 37 dB de la (A.5) el cociente entre campo difuso
+y campo libre al mismo radio. Los dos se imprimen como decibelios enteros, y
+los dos redondeos son correctos:
+
+$$
+10 \lg (4\pi \cdot 10^2) = 30{,}9921\ \text{dB}, \qquad
+10 \lg (16\pi \cdot 10^2) = 37{,}0127\ \text{dB}.
+$$
+
+Los enteros impresos difieren exactamente en 6 dB. Las formas cerradas
+difieren en $10 \lg 4 = 6{,}0206$ dB. Así que la ruta de la cámara
+reverberante y la de la potencia sonora describen la misma situación física
+y **no pueden** coincidir mejor que en 0,0206 dB, haga lo que haga una
+biblioteca. Eso es el 2 % de la diferencia apenas perceptible de 1 dB de la
+Tabla A.1, así que nunca importa en una sala; importa cuando un banco de
+pruebas compara las dos rutas, y por eso el
+[informe de conformidad](/phonometry/es/reference/conformance/) fija el
+hueco en lugar de tolerarlo.
+
+La biblioteca imprime lo que imprime la norma. Una versión que usara
+calladamente 30,9921 dB no cuadraría con ningún cálculo hecho a mano desde
+la página.
+
+Las dos formas cerradas valen además para una impedancia característica de
+exactamente 400 N·s·m⁻³, que es el valor que hace consistentes las
+magnitudes de referencia: $p_0^2 S_0 / \rho c = (20\ \text{µPa})^2 / 400 = 1$
+pW, la potencia sonora de referencia. Ninguna de las dos ecuaciones imprime
+esa salvedad. El aire a 20 °C y 101,325 kPa está más cerca de
+413 N·s·m⁻³, lo que vale 0,14 dB, un orden de magnitud más que cualquiera de
+los dos redondeos. Los desplazamientos son un convenio de las escalas de
+decibelios, no una propiedad del aire de la sala, y la biblioteca no los
+hace seguir al tiempo que haga.
+
+## 4. Qué hace G en una sala
+
+El panel de la derecha de arriba es el gráfico que la propia A.5 sugiere
+dibujar: «algunas medidas como la fuerza sonora, G, tienden a variar con la
+distancia, y una representación gráfica de G en función de la distancia
+fuente-receptor puede ser útil». Cerca de la fuente domina el campo directo
+y $G$ cae 6 dB por duplicación; pasada la distancia crítica toma el relevo
+el campo reverberante y la curva se aplana, en un nivel que fija sólo la
+absorción de la sala. La Tabla A.1 da de −2 dB a +10 dB como rango habitual
+en salas desocupadas de hasta 25 000 m³, y lo da para el **número único**, la
+media aritmética de las bandas de octava de 500 Hz y 1 kHz, que es lo que
+marca la «m» de $G_m$ y lo que dibuja `res.plot()` sobre la banda sombreada.
+
+```python
+import numpy as np
+from phonometry import room
+
+volume, surface, reverberation = 15000.0, 3800.0, 2.0
+area = float(room.sabine_absorption_area(volume, reverberation))
+constant = float(room.room_constant(surface, area / surface))
+level = room.steady_state_spl(100.0, [10.0, 20.0, 40.0], constant)
+print(np.round(room.sound_strength_from_power(level, 100.0), 1))   # [5.8 4.9 4.6]
+print(round(float(room.critical_distance(constant)), 1))           # 5.9  m
+```
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import room
+
+power_level = 100.0
+absorption_area = 0.16 * 200.0 / 2.0
+diffuse_level = power_level + 10.0 * np.log10(4.0 / absorption_area)
+level_at_5m = power_level - 10.0 * np.log10(4.0 * np.pi * 25.0)
+
+routes = [
+    ("cámara anecoica, 5 m", float(room.free_field_reference_level(level_at_5m, 5.0))),
+    (
+        "cámara reverberante",
+        float(room.reverberation_room_reference_level(diffuse_level, absorption_area)),
+    ),
+    ("nivel de potencia sonora", power_level - room.SOUND_STRENGTH_POWER_OFFSET_DB),
+]
+exact = power_level - 10.0 * np.log10(4.0 * np.pi * 100.0)
+
+fig, (left, right) = plt.subplots(1, 2, figsize=(11.8, 5.2))
+for position, (label, value) in enumerate(routes[::-1]):
+    left.plot([exact, value], [position, position], color="grey", lw=1.2)
+    left.plot([value], [position], "o", markersize=11)
+    left.annotate(f"{value:.4f} dB", (value, position), textcoords="offset points",
+                  xytext=(0, 13), ha="center")
+left.axvline(exact, color="black", ls=":", lw=1.3)
+left.set_yticks(range(len(routes)))
+left.set_yticklabels([label for label, _ in routes[::-1]])
+left.set_xlabel("Nivel de referencia a 10 m, $L_{pE,10}$ (dB)")
+left.set_title("Tres rutas impresas, una referencia")
+
+volume, surface, reverberation = 15000.0, 3800.0, 2.0
+area = float(room.sabine_absorption_area(volume, reverberation))
+constant = float(room.room_constant(surface, area / surface))
+distance = np.linspace(3.0, 45.0, 400)
+strength = room.sound_strength_from_power(
+    room.steady_state_spl(power_level, distance, constant), power_level
+)
+direct = room.sound_strength_from_power(
+    power_level + 10.0 * np.log10(1.0 / (4.0 * np.pi * distance**2)), power_level
+)
+right.axhspan(-2.0, 10.0, color="#2ca02c", alpha=0.15)
+right.plot(distance, strength, lw=2.2, label="$G$")
+right.plot(distance, direct, ls="--", lw=1.5, label="solo el sonido directo")
+right.axvline(float(room.critical_distance(constant)), color="grey", ls=":", lw=1.4)
+right.set_xlim(3.0, 45.0)
+right.set_ylim(-4.0, 14.0)
+right.set_xlabel("Distancia fuente-receptor (m)")
+right.set_ylabel("Fuerza sonora $G$ (dB)")
+right.legend()
+plt.tight_layout()
+plt.show()
+```
+
+</details>
+
+La teoría clásica aplana la curva del todo. Las salas reales no: Barron y
+Lee midieron un nivel reverberante que sigue cayendo con la distancia,
+porque el sonido que llega a una butaca lejana ha tardado más en llegar y se
+ha ido absorbiendo por el camino. La curva de arriba es la clásica, y se lee
+como la cota optimista de una medición real.
+
+## 5. La calibración que hay que compartir
+
+$G$ es una diferencia de dos niveles absolutos, así que sólo sobrevive a una
+ganancia que se aplique a **las dos** grabaciones. `sound_strength` calcula
+los dos niveles de exposición a partir de las respuestas que recibe, de modo
+que:
+
+- un factor de calibración común al par se cancela exactamente, y la
+  biblioteca tiene una fila de conformidad que lo exige;
+- un factor sobre una sola de ellas no se cancela, y aparece como un
+  desplazamiento fijo en todas las bandas de $G$;
+- cuando la referencia llega como *nivel* y no como respuesta, la grabación
+  de la sala lleva sola la calibración y tiene que ser absoluta.
+
+Un array de NumPy pelado se lee como pascales. Una
+[`Signal`](/phonometry/es/io/audio-files/) trae su propio factor de calibración y
+se aplica antes de la integral.
+
+## 6. Dónde encaja esto
+
+$G$ pertenece al grupo de magnitudes de la Tabla A.1 que la biblioteca mide
+desde una respuesta al impulso. Los tiempos de caída y los cocientes de
+energía están en
+[Parámetros acústicos de salas](/phonometry/es/buildings/rooms/room-acoustics/);
+la adquisición de la propia respuesta, con las posiciones de fuente y
+micrófono que pide la ISO 3382-1, en
+[Medición de la respuesta al impulso](/phonometry/es/buildings/rooms/room-impulse-response/).
+
+<SeeAlso
+  links={[
+    { href: '/phonometry/es/buildings/rooms/room-acoustics/', label: 'Parámetros acústicos de salas' },
+    { href: '/phonometry/es/buildings/rooms/room-impulse-response/', label: 'Medición de la respuesta al impulso' },
+    { href: '/phonometry/es/devices/emission/sound-power/', label: 'Potencia sonora' },
+    { href: '/phonometry/es/buildings/rooms/enclosed-space-absorption/', label: 'Absorción y tiempo de reverberación' },
+  ]}
+/>
+
+## Qué cubre esta guía
+
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+La fuerza sonora de la ISO 3382-1:2009, A.2.1: el cociente de energías de la
+Ecuación (A.1) medido a partir de un par de respuestas al impulso, el nivel de
+exposición sonora de las Ecuaciones (A.2) y (A.3), la corrección por el inverso
+del cuadrado de las Ecuaciones (A.4) y (A.8) con el mínimo impreso de 3 m, la
+ruta de la cámara reverberante de la Ecuación (A.5), la ruta de la potencia
+sonora de la Ecuación (A.9), y el promedio energético sobre acimuts que pide la
+nota bajo la (A.4).
+</ScopeClaim>
+<ScopeClaim status="not-covered" label="Todavía no cubierto">
+El resto del Anexo A y sus vecinos: las medidas de energía lateral temprana y
+tardía de A.2.4 y A.2.5, la correlación cruzada interaural del Anexo B, el
+soporte de escenario del Anexo C, la incertidumbre de medición del Capítulo 7 y
+la cualificación de la directividad de la fuente de la Tabla 1.
+</ScopeClaim>
+</Scope>

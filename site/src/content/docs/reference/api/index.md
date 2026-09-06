@@ -115,6 +115,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | Module | Summary |
 | :--- | :--- |
 | [`room.acoustics`](/phonometry/reference/api/rooms/acoustics/) | Room acoustic parameters from impulse responses per ISO 3382-1:2009 (performance spaces) and ISO 3382-2:2008 (ordinary rooms). |
+| [`room.auditorium`](/phonometry/reference/api/rooms/auditorium/) | Auditorium measures derived from impulse responses (ISO 3382-1:2009, Annex A). |
 | [`room.impulse_response`](/phonometry/reference/api/rooms/impulse-response/) | Impulse-response acquisition per BS EN ISO 18233:2006. |
 | [`room.noise_criteria`](/phonometry/reference/api/rooms/noise-criteria/) | Room-noise rating curves per ANSI/ASA S12.2-2019. |
 | [`room.open_plan`](/phonometry/reference/api/rooms/open-plan/) | Open-plan-office spatial metrics per ISO 3382-3:2012. |

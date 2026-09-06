@@ -202,6 +202,7 @@ export const topics = [
           { slug: 'buildings/rooms', label: 'Overview', translations: { es: 'Resumen' } },
           'buildings/rooms/room-impulse-response',
           'buildings/rooms/room-acoustics',
+          'buildings/rooms/sound-strength',
           'buildings/rooms/open-plan-acoustics',
           'buildings/rooms/room-image-sources',
           'buildings/rooms/room-noise',

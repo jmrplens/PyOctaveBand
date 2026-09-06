@@ -3823,9 +3823,47 @@ _ES_EXACT = {
     "452 400 000 samples": "452 400 000 muestras",
     "+ 1 line appended by write()": "+ 1 línea añadida por write()",
     "20.0 Pa at full scale, from the sidecar": "20,0 Pa a fondo de escala, del sidecar",
+    # --- sound_strength_routes (ISO 3382-1:2009, A.2.1) ---
+    "Three printed routes, one reference": "Tres rutas impresas, una referencia",
+    "anechoic room, 5 m from the source\n"
+    "$L_{pE,10} = L_{pE,d} + 20\\,\\lg(d/10)$": "cámara anecoica, a 5 m de la fuente\n"
+    "$L_{pE,10} = L_{pE,d} + 20\\,\\lg(d/10)$",
+    "reverberation room, $A$ = 16 m$^2$\n"
+    "$L_{pE,10} = L_{pE} + 10\\,\\lg(A/S_0) - 37$": "cámara reverberante, $A$ = 16 m$^2$\n"
+    "$L_{pE,10} = L_{pE} + 10\\,\\lg(A/S_0) - 37$",
+    "sound power level of the source\n"
+    "$L_{p,10} = L_W - 31$": "nivel de potencia sonora de la fuente\n$L_{p,10} = L_W - 31$",
+    "Reference level at 10 m, $L_{pE,10}$ (dB)": (
+        "Nivel de referencia a 10 m, $L_{pE,10}$ (dB)"
+    ),
+    "the dotted line is the exact free field, $L_W - 10\\,\\lg(4\\pi\\,10^2)$.\n"
+    "31 dB and 37 dB differ by 6 dB where the closed forms differ\n"
+    "by $10\\,\\lg 4$, so the three routes span 0.0206 dB, and cannot span less": (
+        "la línea de puntos es el campo libre exacto, "
+        "$L_W - 10\\,\\lg(4\\pi\\,10^2)$.\n"
+        "31 dB y 37 dB difieren en 6 dB donde las formas cerradas difieren\n"
+        "en $10\\,\\lg 4$, así que las tres rutas abarcan 0,0206 dB, y no menos"
+    ),
+    "A 15 000 m$^3$ hall with a 2.0 s reverberation time": (
+        "Una sala de 15 000 m$^3$ con 2,0 s de tiempo de reverberación"
+    ),
+    "Source-receiver distance (m)": "Distancia fuente-receptor (m)",
+    "Sound strength $G$ (dB)": "Fuerza sonora $G$ (dB)",
+    "direct sound alone": "solo el sonido directo",
+    "$G$": "$G$",
+    "the shaded band is the typical range of Table A.1,\n"
+    "$-$2 dB to $+$10 dB in unoccupied halls": (
+        "la banda sombreada es el rango habitual de la Tabla A.1,\n"
+        "de $-$2 dB a $+$10 dB en salas desocupadas"
+    ),
 }
 
+
 _ES_PATTERNS = [
+    # sound_strength_routes: the route markers and the critical distance are
+    # computed, so only the words around the number can be tabled.
+    (r"^critical distance, (\d+)\.(\d+) m$", r"distancia crítica, \1,\2 m"),
+    (r"^(\d+)\.(\d+) dB$", r"\1,\2 dB"),
     # vdi2081_flow_noise: the annotation and the legend carry the duty point.
     (
         r"^the worked example runs at (\d+)\.(\d+) m/s;\nhalving that is worth "

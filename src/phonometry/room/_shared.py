@@ -151,3 +151,74 @@ def split_bands(
         )
         raise ValueError(msg)
     return np.asarray(freqs, dtype=np.float64), band_signals
+
+
+#: Moving-average window (seconds) used to smooth the squared IR before
+#: fitting the sloping line of ISO 3382-1:2009, 5.3.3, Equation (3).
+SMOOTH_SECONDS = 0.010
+
+#: The decay curve is only trusted down to noise floor + 10 dB.
+TRUST_MARGIN_DB = 10.0
+
+#: Minimum number of level samples for the degree-1 least-squares line fits.
+MIN_LINE_FIT_POINTS = 2
+
+#: Threshold on the fitted decay slope in dB/s: a slope at or shallower than
+#: this (implying a T60 of ~6e8 s, physically meaningless) is treated as no
+#: decay, protecting the decay constant alpha from underflowing and the tail
+#: terms p2_t1/alpha and 1/alpha**2 from overflowing to inf.
+NO_DECAY_SLOPE_DB_PER_S = -1e-7
+
+
+def truncation(
+    p2: NDArray[np.float64], fs: int, noise: float
+) -> tuple[int, float, float]:
+    r"""Truncation point and tail compensation (ISO 3382-1, 5.3.3, Eq. (3)).
+
+    Fits a sloping line to the smoothed squared IR (in dB) between 5 dB
+    below its peak and 10 dB above the noise level; the integration stops
+    at the crossing ``t1`` of that line with the noise level, and the
+    missing tail is compensated assuming an exponential decay with the
+    fitted rate.
+
+    :param p2: Squared impulse response, onset-trimmed.
+    :param fs: Sample rate in Hz.
+    :param noise: Background-noise power (same units as ``p2``).
+    :return: ``(i1, tail_energy, tail_first_moment)`` where ``i1`` is the
+        truncation sample, ``tail_energy`` approximates
+        :math:`\int_{t_1}^{\infty} p^2 \, dt` and ``tail_first_moment``
+        approximates :math:`\int_{t_1}^{\infty} t \, p^2 \, dt` (both in
+        seconds units, i.e. energy = sum(p2)/fs).
+    """
+    n = p2.size
+    no_truncation = (n, 0.0, 0.0)
+    if noise <= 0.0:
+        return no_truncation
+    window = min(max(1, round(SMOOTH_SECONDS * fs)), n)
+    cumulative = np.concatenate(([0.0], np.cumsum(p2)))
+    smoothed = (cumulative[window:] - cumulative[:-window]) / window
+    t_smooth = (np.arange(smoothed.size) + 0.5 * window) / fs
+    tiny = np.finfo(np.float64).tiny
+    level = 10.0 * np.log10(np.maximum(smoothed, tiny))
+    noise_db = 10.0 * np.log10(noise)
+    mask = (level <= level.max() - 5.0) & (level >= noise_db + TRUST_MARGIN_DB)
+    if int(mask.sum()) < MIN_LINE_FIT_POINTS:
+        return no_truncation
+    slope, intercept = np.polyfit(t_smooth[mask], level[mask], 1)
+    # A non-negative slope means no decay; a barely-negative slope (e.g.
+    # -1e-16 dB/s from fitting near-constant noise) would make the decay
+    # constant alpha underflow toward 0 and the tail terms p2_t1/alpha and
+    # 1/alpha**2 overflow to inf. A slope of -1e-7 dB/s implies a T60 of
+    # ~6e8 s, which is physically meaningless, so treat anything shallower
+    # as no decay.
+    if slope >= NO_DECAY_SLOPE_DB_PER_S:
+        return no_truncation
+    t1 = (noise_db - intercept) / slope
+    i1 = min(max(round(t1 * fs), 2), n)
+    # Exponential tail with the fitted rate: p2_fit(t) = 10^((a + b*t)/10),
+    # decay constant alpha = -b*ln(10)/10 (1/s).
+    alpha = -slope * np.log(10.0) / 10.0
+    p2_t1 = 10.0 ** ((intercept + slope * (i1 / fs)) / 10.0)
+    tail_energy = p2_t1 / alpha
+    tail_moment = p2_t1 * (i1 / fs / alpha + 1.0 / alpha**2)
+    return i1, float(tail_energy), float(tail_moment)

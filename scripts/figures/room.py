@@ -35,12 +35,8 @@ def generate_schroeder_decay(output_dir: str) -> None:
     """Schroeder backward integration with T20/T30/EDT regressions (ISO 3382)."""
     print("Generating schroeder_decay.png...")
     from phonometry import room
-    from phonometry.room.acoustics import (
-        _EDT_RANGE,
-        _T20_RANGE,
-        _T30_RANGE,
-        _onset_index,
-    )
+    from phonometry.room._shared import onset_index
+    from phonometry.room.acoustics import _EDT_RANGE, _T20_RANGE, _T30_RANGE
 
     fs = 48000
     reverb_t = 1.2  # target reverberation time (s)
@@ -60,7 +56,7 @@ def generate_schroeder_decay(output_dir: str) -> None:
     # Raw squared-IR level trace (onset-trimmed, normalized to its peak):
     # the noisy line the backward integration smooths into the decay curve.
     p2 = ir.astype(np.float64) ** 2
-    p2 = p2[_onset_index(p2) :]
+    p2 = p2[onset_index(p2) :]
     t_raw = np.arange(p2.size) / fs
     raw_db = 10.0 * np.log10(np.maximum(p2, p2.max() * 1e-12) / p2.max())
 
@@ -2812,4 +2808,179 @@ def generate_decay_range_bias(output_dir: str) -> None:
     )
     plt.tight_layout()
     save_figure(output_dir, "decay_range_bias.svg")
+    plt.close()
+
+
+def generate_sound_strength_routes(output_dir: str) -> None:
+    """ISO 3382-1 A.2.1: how the free-field reference is obtained, and what G does."""
+    print("Generating sound_strength_routes...")
+    from phonometry import room
+
+    _fig, axes = plt.subplots(1, 2, figsize=(11.8, 5.2))
+
+    # -- Left: one source, three printed routes to the same reference level.
+    #
+    # A dodecahedron source of L_W = 100 dB in one octave band, measured
+    # three ways. The reverberation room is 200 m3 with a 2,0 s reverberation
+    # time, so A = 0,16 * 200 / 2,0 = 16 m2 by Equation (A.6), where the
+    # diffuse-field level is L_W + 10 lg(4/A).
+    ax = axes[0]
+    power_level = 100.0
+    absorption_area = 0.16 * 200.0 / 2.0
+    diffuse_level = power_level + 10.0 * np.log10(4.0 / absorption_area)
+    # The free field at 5 m: the exact spread over a sphere of that radius.
+    level_at_5m = power_level - 10.0 * np.log10(4.0 * np.pi * 25.0)
+
+    routes = [
+        (
+            "anechoic room, 5 m from the source\n$L_{pE,10} = L_{pE,d} + 20\\,\\lg(d/10)$",
+            float(room.free_field_reference_level(level_at_5m, 5.0)),
+            COLOR_PRIMARY,
+        ),
+        (
+            "reverberation room, $A$ = 16 m$^2$\n"
+            "$L_{pE,10} = L_{pE} + 10\\,\\lg(A/S_0) - 37$",
+            float(
+                room.reverberation_room_reference_level(diffuse_level, absorption_area)
+            ),
+            COLOR_SECONDARY,
+        ),
+        (
+            "sound power level of the source\n$L_{p,10} = L_W - 31$",
+            power_level - room.SOUND_STRENGTH_POWER_OFFSET_DB,
+            COLOR_TERTIARY,
+        ),
+    ]
+    exact = power_level - 10.0 * np.log10(4.0 * np.pi * 100.0)
+
+    positions = np.arange(len(routes))[::-1]
+    for position, (label, value, colour) in zip(positions, routes, strict=True):
+        ax.plot(
+            [exact, value], [position, position], color=COLOR_MUTED, lw=1.2, zorder=2
+        )
+        ax.plot(
+            [value], [position], "o", color=colour, markersize=11, zorder=4, label=label
+        )
+        # The exact free field runs vertically through the middle of the
+        # panel, so a readout centred on its marker is cut in two by it.
+        # Offset it to the side the marker leaves free, and give it the
+        # chip every annotation over a line gets.
+        ax.annotate(
+            f"{value:.4f} dB",
+            xy=(value, position),
+            xytext=(-10 if value > exact else 10, 12),
+            textcoords="offset points",
+            ha="right" if value > exact else "left",
+            fontsize=9,
+            color=COLOR_FG,
+            bbox={
+                "boxstyle": "round,pad=0.22",
+                "facecolor": COLOR_PANEL,
+                "edgecolor": COLOR_GRID,
+            },
+            zorder=6,
+        )
+    ax.axvline(exact, color=COLOR_FG, ls=":", lw=1.3, zorder=3)
+    ax.set_yticks(positions)
+    ax.set_yticklabels([label for label, _, _ in routes], fontsize=8.5)
+    ax.set_ylim(-1.45, len(routes) - 0.45)
+    ax.set_xlim(68.9955, 69.0255)
+    ax.set_xticks([69.000, 69.005, 69.010, 69.015, 69.020, 69.025])
+    ax.set_xticklabels([f"{tick:.3f}" for tick in ax.get_xticks()])
+    ax.set_xlabel("Reference level at 10 m, $L_{pE,10}$ (dB)")
+    ax.set_title("Three printed routes, one reference")
+    ax.grid(axis="x", color=COLOR_GRID, ls="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.annotate(
+        "the dotted line is the exact free field, $L_W - 10\\,\\lg(4\\pi\\,10^2)$.\n"
+        "31 dB and 37 dB differ by 6 dB where the closed forms differ\n"
+        "by $10\\,\\lg 4$, so the three routes span 0.0206 dB, and cannot span less",
+        xy=(0.5, 0.02),
+        xycoords="axes fraction",
+        ha="center",
+        va="bottom",
+        fontsize=8.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.32",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=6,
+    )
+
+    # -- Right: what A.5 suggests plotting, G against source-receiver distance.
+    #
+    # A 15 000 m3 concert hall of 3 800 m2 of surface with a 2,0 s
+    # reverberation time. The direct field falls at 6 dB per doubling and the
+    # reverberant field does not, so G flattens beyond the critical distance.
+    ax2 = axes[1]
+    volume, surface, reverberation = 15000.0, 3800.0, 2.0
+    area = float(room.sabine_absorption_area(volume, reverberation))
+    constant = float(room.room_constant(surface, area / surface))
+    distance = np.linspace(3.0, 45.0, 400)
+    strength = np.asarray(
+        room.sound_strength_from_power(
+            room.steady_state_spl(power_level, distance, constant), power_level
+        )
+    )
+    direct_only = np.asarray(
+        room.sound_strength_from_power(
+            power_level + 10.0 * np.log10(1.0 / (4.0 * np.pi * distance**2)),
+            power_level,
+        )
+    )
+
+    low, high = -2.0, 10.0
+    ax2.axhspan(low, high, color=theme_fill(COLOR_TERTIARY, ax2), zorder=0)
+    ax2.plot(distance, strength, color=COLOR_PRIMARY, lw=2.2, zorder=4, label="$G$")
+    ax2.plot(
+        distance,
+        direct_only,
+        color=COLOR_SECONDARY,
+        ls="--",
+        lw=1.5,
+        zorder=3,
+        label="direct sound alone",
+    )
+    critical = float(room.critical_distance(constant))
+    ax2.axvline(critical, color=COLOR_MUTED, ls=":", lw=1.4, zorder=2)
+    ax2.annotate(
+        f"critical distance, {critical:.1f} m",
+        xy=(critical, 12.0),
+        xytext=(6, 0),
+        textcoords="offset points",
+        ha="left",
+        va="top",
+        fontsize=8.5,
+        color=COLOR_FG,
+        zorder=5,
+    )
+    ax2.set_xlim(3.0, 45.0)
+    ax2.set_ylim(-4.0, 14.0)
+    ax2.set_xlabel("Source-receiver distance (m)")
+    ax2.set_ylabel("Sound strength $G$ (dB)")
+    ax2.set_title("A 15 000 m$^3$ hall with a 2.0 s reverberation time")
+    ax2.grid(color=COLOR_GRID, ls="--", alpha=0.5)
+    ax2.set_axisbelow(True)
+    ax2.annotate(
+        "the shaded band is the typical range of Table A.1,\n"
+        "$-$2 dB to $+$10 dB in unoccupied halls",
+        xy=(0.97, 0.06),
+        xycoords="axes fraction",
+        ha="right",
+        va="bottom",
+        fontsize=8.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.32",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=6,
+    )
+    ax2.legend(loc="upper right", fontsize=9)
+
+    plt.tight_layout()
+    save_figure(output_dir, "sound_strength_routes.svg")
     plt.close()

@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 785 numerical conformance checks against 394 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 792 numerical conformance checks against 395 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 785 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 67 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 792 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 67 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -139,6 +139,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Room-noise criteria (NC / RC Mark II)](https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/)
 - [Reverberation-time prediction (Sabine · Eyring · Fitzroy · Arau-Puchades)](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/)
 - [Sound absorption in enclosed spaces (EN 12354-6)](https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/)
+- [Sound strength G (ISO 3382-1)](https://jmrplens.github.io/phonometry/buildings/rooms/sound-strength/)
 
 ### Sound insulation
 
@@ -520,6 +521,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [psychoacoustics/tone-audibility](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tone-audibility/)
 - [psychoacoustics/zwicker](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/zwicker/)
 - [rooms/acoustics](https://jmrplens.github.io/phonometry/reference/api/rooms/acoustics/)
+- [rooms/auditorium](https://jmrplens.github.io/phonometry/reference/api/rooms/auditorium/)
 - [rooms/crowd-noise](https://jmrplens.github.io/phonometry/reference/api/rooms/crowd-noise/)
 - [rooms/enclosed-space-absorption](https://jmrplens.github.io/phonometry/reference/api/rooms/enclosed-space-absorption/)
 - [rooms/image-source](https://jmrplens.github.io/phonometry/reference/api/rooms/image-source/)
