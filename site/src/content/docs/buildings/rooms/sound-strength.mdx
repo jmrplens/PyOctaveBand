@@ -48,7 +48,8 @@ nothing about how **loud** the hall is: two rooms with the same T30 can sit
 20 dB apart at the same seat. Sound strength, $G$, is the quantity that
 closes that gap, and it is one of only two measures in ISO 3382-1 Table A.1
 that a calibrated source is needed for, the other being the late lateral
-sound level. Everything else on the
+sound level, which is referred to the same free field. Everything else on
+the
 [room acoustic parameters page](/phonometry/buildings/rooms/room-acoustics/)
 — EDT, T20, T30, C50, C80, D50, $T_\mathrm{s}$ — is a decay time, a ratio of
 energies or a centre time read from one recording alone, and survives any
@@ -131,7 +132,7 @@ the recording says so.
 An anechoic room 10 m across is rare, so A.2.1 prints three ways to obtain
 $L_{pE,10}$ without one.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_strength_routes.svg" alt="Left: three printed routes to the free-field reference level at 10 m, plotted on a decibel axis 0.04 dB wide, landing 0.0206 dB apart around the exact value. Right: sound strength against source-receiver distance in a 15 000 cubic metre hall, with the direct-sound contribution alone and the Table A.1 typical range shaded" width="100%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_strength_routes.svg" alt="Left: three printed routes to the free-field reference level at 10 m, plotted on a decibel axis 0.030 dB wide, landing 0.0206 dB apart around the exact value. Right: sound strength against source-receiver distance in a 15 000 cubic metre hall, with the direct-sound contribution alone and the Table A.1 typical range shaded" width="100%" />
 
 *The same source, measured three ways. The spread on the left is 0.0206 dB
 and it is not a rounding error in the library: see section 3. The shaded
@@ -342,8 +343,9 @@ $G$ is a difference of two absolute levels, so it only survives a gain that
 is applied to **both** recordings. `sound_strength` computes both exposure
 levels from the responses it is given, so:
 
-- a common calibration factor on the pair cancels exactly, and the library
-  has a conformance row holding it to that;
+- a common calibration factor on the pair cancels exactly, and the
+  [conformance report](/phonometry/reference/conformance/) has a row holding
+  it to that;
 - a factor on one of them does not cancel, and shows up as a straight
   offset in every band of $G$;
 - when the reference arrives as a *level* rather than as a response, the
@@ -383,9 +385,10 @@ route of Equation (A.5), the sound-power route of Equation (A.9), and the
 energy mean over bearings the note under (A.4) asks for.
 </ScopeClaim>
 <ScopeClaim status="not-covered" label="Not covered yet">
-The rest of Annex A and its neighbours: the early and late lateral energy
-measures of A.2.4 and A.2.5, the interaural cross correlation of Annex B, the
-stage support of Annex C, the measurement uncertainty of Clause 7, and the
-source directivity qualification of Table 1.
+The rest of Annex A and its neighbours: the stage support of Annex C, the
+measurement uncertainty of Clause 7, and the source directivity qualification
+of Table 1. The lateral energy measures of A.2.4 and A.2.5 and the interaural
+cross correlation of Annex B have a guide of their own,
+[Spatial impression](/phonometry/buildings/rooms/spatial-impression/).
 </ScopeClaim>
 </Scope>

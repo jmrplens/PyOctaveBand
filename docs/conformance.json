@@ -3,12 +3,12 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 792,
-    "passing": 792,
+    "checks": 797,
+    "passing": 797,
     "failing": 0,
     "domains": 67,
     "standards": 395,
-    "citations": 620,
+    "citations": 625,
     "designations": 133,
     "sources": 83
   },
@@ -101,8 +101,8 @@
     {
       "id": "room-building-acoustics",
       "title": "Room & building acoustics",
-      "checks": 91,
-      "passing": 91
+      "checks": 96,
+      "passing": 96
     },
     {
       "id": "room-acoustics",
@@ -4390,6 +4390,156 @@
         "value": -4.44e-16
       },
       "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-annex-a-informative-eq-a-14/early-lateral-energy-fraction-of-one-reflection-at-45-degrees",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Annex A (informative) Eq. (A.14)",
+        "cite": "ISO 3382-1:2009 Annex A (informative) Eq. (A.14)"
+      },
+      "quantity": "Early lateral energy fraction of one reflection at 45 degrees",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.10000000000000002
+      },
+      "computed": {
+        "value": 0.1
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-annex-a-informative-eq-a-15/cosine-weighted-lateral-fraction-of-two-mirror-image-reflections",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Annex A (informative) Eq. (A.15)",
+        "cite": "ISO 3382-1:2009 Annex A (informative) Eq. (A.15)"
+      },
+      "quantity": "Cosine-weighted lateral fraction of two mirror-image reflections",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.23570226039551587
+      },
+      "computed": {
+        "value": 0.235702
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": -5.55e-17
+      },
+      "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-annex-a-informative-eq-a-16/late-lateral-sound-level-of-one-arrival-past-the-early-window",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Annex A (informative) Eq. (A.16)",
+        "cite": "ISO 3382-1:2009 Annex A (informative) Eq. (A.16)"
+      },
+      "quantity": "Late lateral sound level of one arrival past the early window",
+      "kind": "scalar",
+      "expected": {
+        "value": -12.041199826559248
+      },
+      "computed": {
+        "value": -12.0412
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": 5.33e-15
+      },
+      "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-annex-a-informative-eq-a-17/energy-average-of-the-four-late-lateral-octave-bands",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Annex A (informative) Eq. (A.17)",
+        "cite": "ISO 3382-1:2009 Annex A (informative) Eq. (A.17)"
+      },
+      "quantity": "Energy average of the four late lateral octave bands",
+      "kind": "scalar",
+      "expected": {
+        "value": 2.430380486862944
+      },
+      "computed": {
+        "value": 2.43038
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-annex-b-informative-eqs-b-1-b-2/interaural-correlation-of-two-channels-in-anti-phase",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Annex B (informative) Eqs. (B.1)/(B.2)",
+        "cite": "ISO 3382-1:2009 Annex B (informative) Eqs. (B.1)/(B.2)"
+      },
+      "quantity": "Interaural correlation of two channels in anti-phase",
+      "kind": "record",
+      "expected": {
+        "label": "IACC = 1; min IACF = -1",
+        "record": {
+          "IACC": 1.0,
+          "min IACF": -1.0
+        }
+      },
+      "computed": {
+        "label": "IACC = 1; min IACF = -1",
+        "record": {
+          "IACC": 1.0,
+          "min IACF": -1.0
+        }
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
       "verdict": "pass"
     },
     {

@@ -46,9 +46,9 @@ import ThemeImage from '../../../../../components/ThemeImage.astro';
 El tiempo de reverberación dice qué hace una sala con la energía a lo largo
 del tiempo. No dice nada de lo **fuerte** que suena: dos salas con el mismo
 T30 pueden estar a 20 dB de distancia en la misma butaca. La fuerza sonora,
-$G$, es la magnitud que cierra ese hueco, y es una de las dos únicas
-magnitudes de la Tabla A.1 de la ISO 3382-1 que necesitan una fuente
-calibrada, junto con el nivel lateral tardío. Todo lo demás de la
+$G$, es la magnitud que cierra ese hueco, y es una de las dos únicas de la
+Tabla A.1 de la ISO 3382-1 que necesitan una fuente calibrada; la otra es el
+nivel lateral tardío, referido al mismo campo libre. Todo lo demás de la
 [página de parámetros acústicos de salas](/phonometry/es/buildings/rooms/room-acoustics/)
 — EDT, T20, T30, C50, C80, D50, $T_\mathrm{s}$ — es un tiempo de caída, un
 cociente de energías o un tiempo central leído de un solo registro, y
@@ -134,7 +134,7 @@ dice.
 Una cámara anecoica de 10 m es rara, así que A.2.1 imprime tres maneras de
 obtener $L_{pE,10}$ sin ella.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_strength_routes.svg" alt="A la izquierda, las tres rutas impresas hasta el nivel de referencia en campo libre a 10 m, dibujadas sobre un eje de 0,04 dB de ancho, que caen a 0,0206 dB unas de otras alrededor del valor exacto. A la derecha, la fuerza sonora frente a la distancia fuente-receptor en una sala de 15 000 metros cúbicos, con la contribución del sonido directo por separado y el rango habitual de la Tabla A.1 sombreado" width="100%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_strength_routes.svg" alt="A la izquierda, las tres rutas impresas hasta el nivel de referencia en campo libre a 10 m, dibujadas sobre un eje de 0,030 dB de ancho, que caen a 0,0206 dB unas de otras alrededor del valor exacto. A la derecha, la fuerza sonora frente a la distancia fuente-receptor en una sala de 15 000 metros cúbicos, con la contribución del sonido directo por separado y el rango habitual de la Tabla A.1 sombreado" width="100%" />
 
 *La misma fuente, medida de tres maneras. La dispersión de la izquierda es
 de 0,0206 dB y no es un error de redondeo de la biblioteca: ver la sección 3.
@@ -352,8 +352,9 @@ ganancia que se aplique a **las dos** grabaciones. `sound_strength` calcula
 los dos niveles de exposición a partir de las respuestas que recibe, de modo
 que:
 
-- un factor de calibración común al par se cancela exactamente, y la
-  biblioteca tiene una fila de conformidad que lo exige;
+- un factor de calibración común al par se cancela exactamente, y el
+  [informe de conformidad](/phonometry/es/reference/conformance/) tiene una
+  fila que lo exige;
 - un factor sobre una sola de ellas no se cancela, y aparece como un
   desplazamiento fijo en todas las bandas de $G$;
 - cuando la referencia llega como *nivel* y no como respuesta, la grabación
@@ -395,9 +396,10 @@ sonora de la Ecuación (A.9), y el promedio energético sobre acimuts que pide l
 nota bajo la (A.4).
 </ScopeClaim>
 <ScopeClaim status="not-covered" label="Todavía no cubierto">
-El resto del Anexo A y sus vecinos: las medidas de energía lateral temprana y
-tardía de A.2.4 y A.2.5, la correlación cruzada interaural del Anexo B, el
-soporte de escenario del Anexo C, la incertidumbre de medición del Capítulo 7 y
-la cualificación de la directividad de la fuente de la Tabla 1.
+El resto del Anexo A y sus vecinos: el soporte de escenario del Anexo C, la
+incertidumbre de medición del Capítulo 7 y la cualificación de la directividad
+de la fuente de la Tabla 1. Las medidas de energía lateral de A.2.4 y A.2.5 y
+la correlación cruzada interaural del Anexo B tienen guía propia,
+[Impresión espacial](/phonometry/es/buildings/rooms/spatial-impression/).
 </ScopeClaim>
 </Scope>

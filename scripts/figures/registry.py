@@ -421,6 +421,7 @@ from .room import (
     generate_image_source_plan,
     generate_image_source_reflectogram,
     generate_impulse_response,
+    generate_lateral_energy_measures,
     generate_modal_count_per_band,
     generate_nc_blind_spot,
     generate_open_plan_decay,
@@ -1084,8 +1085,11 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_steady_state_field,
     generate_room_parameters_bands,
     # ISO 3382-1 A.2.1: the three printed routes to the free-field reference
-    # of the sound strength, and what G does with distance in a hall.
+    # of the sound strength, and what G does with distance in a hall. A.2.4,
+    # A.2.5 and Annex B: the two angular weightings of the lateral energy
+    # fraction and the window the interaural coefficient is read off.
     generate_sound_strength_routes,
+    generate_lateral_energy_measures,
     generate_fdtd_room_modes,
     # Building & structure-borne result figures (guide figure coverage):
     # ISO 717 enlarged range, ISO 16283 field chains, ISO 10052 survey impact,

@@ -38,6 +38,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The three measures ISO 3382-1 needs a second microphone for. The early
+  lateral energy fraction of Equations (A.14) and (A.15) is the share of the
+  first 80 ms that arrives from the side; the late lateral sound level of
+  Equation (A.16) is the level of what arrives after that window, against the
+  same free-field reference the sound strength uses; and Annex B's interaural
+  cross correlation is the same aspect measured with a head instead.
+
+  Three printed characters decide whether any of it is right, and a PDF text
+  layer deletes all three. Equation (A.15) prints a modulus around
+  `p_L(t) p(t)`, without which two mirror-image reflections cancel to exactly
+  zero rather than adding. Equation (B.1) prints a square root over the
+  product of the two ear energies, without which the function is not a
+  correlation and is not bounded by one. Equation (B.2) prints a modulus
+  around the function, without which two anti-phase ears score zero instead of
+  the one they deserve. All three were read off the rasterised page, and a
+  test pins each against the value the other reading gives.
+
+  Time zero comes from the omnidirectional response throughout: a
+  figure-of-eight microphone aimed as A.2.4 asks has no direct sound to
+  trigger on, and its own onset lands on the first strong reflection.
+
+  Equation (A.17)'s 0,25 is one quarter, so the late lateral average is an
+  energy mean, which footnote a of Table A.1 makes the one exception to the
+  arithmetic averaging every other quantity in that table gets. Five
+  conformance rows, bringing the ISO 3382-1 total to twelve.
+
 - Sound strength, `G`, the one quantity in ISO 3382-1 Table A.1 that says how
   loud a hall is. Every other measure the library reads from a room impulse
   response is a ratio of energies inside one recording and survives any gain
