@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- The accessibility audit drives the browser this site installs. Every audit
+  behind `scripts/with-preview.mjs` needs a headless Chrome and they were not
+  all asking the same package for one: the in-house scripts use `puppeteer`,
+  whose browser `pnpm install` puts in the cache, while `pa11y-ci` carries its
+  own older `puppeteer-core` and looks for whatever Chrome that was built
+  against. Two browsers wanted, one downloaded.
+
+  On a developer machine the cache accumulates versions and both are usually
+  there, so nothing showed. On a fresh worker only one exists and the audit
+  died with "Could not find Chrome (ver. 148.0.7778.97)" on pages that are
+  perfectly fine, and died *intermittently*, because a warm runner cache could
+  still hold the older build. The wrapper now resolves the browser once and
+  passes it to every child, and an explicit `PUPPETEER_EXECUTABLE_PATH` still
+  wins for anyone pointing an audit at a system Chrome.
+
+  Underneath that sat the reason no browser was there to find. Since pnpm 10 a
+  dependency's lifecycle scripts do not run unless they are allow-listed, so
+  puppeteer's install script quietly stopped downloading anything. Nothing
+  failed at install time; the audit failed much later and blamed a page. The
+  workflow asks for the browser in as many words now, and caches it on the
+  lockfile.
+
+  The reason it changed under us at all is that the workflow installed
+  `pnpm@latest`, so the build depended on whatever shipped that morning. The
+  version comes from a pinned `packageManager` field now, the way jmrp.io
+  already does it, and corepack reads it.
+
 ### Added
 
 - `noise_control.flow_noise_straight_duct_overall`, the two closed forms VDI

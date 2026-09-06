@@ -119,14 +119,26 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-      - name: Enable latest pnpm via corepack
+      - name: Enable the pnpm this site pins, via corepack
         # corepack ships with Node and installs pnpm cleanly. We avoid
         # pnpm/action-setup, whose bundled installer crashes while self-updating
         # to the latest release ("Cannot use 'in' operator ... integrity").
+        #
+        # The version comes from `packageManager` in site/package.json, not
+        # from `pnpm@latest`: taking whatever shipped that morning makes the
+        # build depend on a date. It did, and the cost was not a loud install
+        # failure but a policy change three releases later that stopped
+        # dependency lifecycle scripts from running, which surfaced as an
+        # accessibility audit blaming a page for a browser that was never
+        # downloaded.
         run: |
           corepack enable
-          corepack prepare pnpm@latest --activate
           pnpm --version
+        # From site/, because that is where the package.json carrying
+        # `packageManager` lives; corepack reads the nearest one, and the
+        # repository root has none, so a check run from there would report
+        # whatever pnpm corepack defaults to rather than the pinned version.
+        working-directory: site
       - name: Resolve pnpm store path
         # Derive the store path from pnpm itself rather than hardcoding it: it
         # varies with pnpm version and XDG configuration.
@@ -138,6 +150,15 @@ jobs:
           path: ${{ env.PNPM_STORE }}
           key: pnpm-store-${{ runner.os }}-${{ hashFiles('site/pnpm-lock.yaml') }}
           restore-keys: pnpm-store-${{ runner.os }}-
+      - name: Cache the browser the audits drive
+        # Keyed on the lockfile, because the version puppeteer resolves is
+        # pinned there; a lockfile bump downloads a fresh one and everything
+        # else restores.
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/puppeteer
+          key: puppeteer-${{ runner.os }}-${{ hashFiles('site/pnpm-lock.yaml') }}
+          restore-keys: puppeteer-${{ runner.os }}-
       - name: Check the overview and glossary mirrors, then regenerate llms.txt
         run: |
           python3 scripts/mirror_overviews.py --check
@@ -161,6 +182,17 @@ jobs:
         working-directory: site
       - name: Build site
         run: pnpm install --frozen-lockfile && pnpm build
+        working-directory: site
+      - name: Install the browser the audits drive
+        # After the install, because this asks pnpm to run a binary the install
+        # is what puts there. Explicit, rather than left to puppeteer's own
+        # install script: since pnpm 10 a dependency's lifecycle scripts do not
+        # run unless they are allow-listed, so the download quietly stopped
+        # happening. Nothing failed at install time; the accessibility audit
+        # failed much later, on a page that was fine, with "Could not find
+        # Chrome". Asking for the browser in as many words cannot go quiet that
+        # way, whatever the package manager decides about scripts next.
+        run: pnpm exec puppeteer browsers install chrome
         working-directory: site
       - name: Check no published address was left behind
         # Renaming a page changes its URL, and nothing here noticed: Astro does
