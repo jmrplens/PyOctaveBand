@@ -387,3 +387,136 @@ def _chk_external_with_expander() -> Outcome:
         places=0,
         expected_label="94 dB(A), where the trim alone gives 93",
     )
+
+
+#: Annex A.3's example 7: a multipath, multistage cage of 432 passages in a
+#: DN 200 line, with the fluid a vapour at 70 bar. Table 4's "Globe,
+#: multihole drilled plug or cage, to open" gives the efficiency correction;
+#: the annex takes the Strouhal number at the bottom of the 0,1 to 0,3 range
+#: 5.4.2 prints for free jets rather than from the table.
+_EXAMPLE_7 = {
+    "mass_flow": 23.1,
+    "inlet_pressure": 7.0e6,
+    "outlet_pressure": 1.4e6,
+    "inlet_density": 55.3,
+    "inlet_temperature": 290.0,
+    "specific_heat_ratio": 1.31,
+    "molecular_mass": 19.0,
+    "flow_coefficient": 81.5,
+    "last_stage_area": 6.44e-3,
+    "passages": 432,
+    "hydraulic_diameter": 0.0025,
+    "last_stage_recovery": 0.98,
+    "diameter": 0.200,
+    "wall_thickness": 0.008,
+    "pipe_density": 8000.0,
+    "efficiency_correction": -4.8,
+    "strouhal_number": 0.1,
+}
+
+#: Table A.2's printed intermediates for it.
+_PRINTED_EXAMPLE_7 = {
+    "C_n": 315.0,
+    "x": 0.334,
+    "p_vc": 1371038.0,
+    "F_d": 0.028,
+    "W_a": 10.3,
+    "L_pi": 156.9,
+    "f_p": 14381.0,
+    "L_pAe": 89.0,
+}
+
+
+def _example_seven() -> ph.noise_control.AerodynamicValveNoise:
+    """Example 7, through Clause 6's substitution and then Clause 5."""
+    case = _EXAMPLE_7
+    conditions = ph.noise_control.multistage_trim_conditions(
+        inlet_pressure=case["inlet_pressure"],
+        outlet_pressure=case["outlet_pressure"],
+        inlet_density=case["inlet_density"],
+        flow_coefficient=case["flow_coefficient"],
+        last_stage_coefficient=ph.noise_control.last_stage_flow_coefficient(
+            case["last_stage_area"]
+        ),
+    )
+    area = case["last_stage_area"] / case["passages"]
+    modifier = ph.noise_control.valve_style_modifier(
+        area, 4.0 * area / case["hydraulic_diameter"], int(case["passages"])
+    )
+    return ph.noise_control.valve_aerodynamic_noise(
+        mass_flow=case["mass_flow"],
+        inlet_pressure=conditions.stagnation_pressure,
+        outlet_pressure=case["outlet_pressure"],
+        inlet_density=conditions.stagnation_density,
+        inlet_temperature=case["inlet_temperature"],
+        specific_heat_ratio=case["specific_heat_ratio"],
+        molecular_mass=case["molecular_mass"],
+        flow_coefficient=conditions.flow_coefficient,
+        style_modifier=modifier,
+        pressure_recovery=case["last_stage_recovery"],
+        valve_outlet_diameter=case["diameter"],
+        internal_diameter=case["diameter"],
+        wall_thickness=case["wall_thickness"],
+        pipe_density=case["pipe_density"],
+        efficiency_correction=case["efficiency_correction"],
+        strouhal_number=case["strouhal_number"],
+    )
+
+
+@register(
+    _IEC60534,
+    "IEC 60534-8-3:2010",
+    "Multistage trim substitution, example 7 (Eqs. (27) to (29))",
+)
+def _chk_multistage_conditions() -> Outcome:
+    """What Clause 6 hands Clause 5 in place of the valve inlet.
+
+    A multistage trim drops most of its pressure before the stage that makes
+    the noise, so 6.3 runs Clause 5 on that stage. NOTE 3 to Equation (28)
+    picks the branch: with a valve pressure ratio of five it tries (28a)
+    first, and here the answer is 1,5 times the outlet pressure, which is
+    below the 2 that would send it to (28b).
+    """
+    conditions = ph.noise_control.multistage_trim_conditions(
+        inlet_pressure=_EXAMPLE_7["inlet_pressure"],
+        outlet_pressure=_EXAMPLE_7["outlet_pressure"],
+        inlet_density=_EXAMPLE_7["inlet_density"],
+        flow_coefficient=_EXAMPLE_7["flow_coefficient"],
+        last_stage_coefficient=ph.noise_control.last_stage_flow_coefficient(
+            _EXAMPLE_7["last_stage_area"]
+        ),
+    )
+    return numeric(
+        _PRINTED_EXAMPLE_7["C_n"],
+        round(conditions.flow_coefficient),
+        0.5,
+        places=0,
+        expected_label="C_n = 315 from Equation (27), then (28a) for p_n",
+    )
+
+
+@register(
+    _IEC60534,
+    "IEC 60534-8-3:2010",
+    "Multipath multistage trim, example 7 (Table A.2)",
+)
+def _chk_example_seven() -> Outcome:
+    """Every printed intermediate of the seventh example.
+
+    It is the only one on a low-noise trim, and the only one whose valve is
+    not the six-opening cage of A.2: 432 passages of 15 mm² each, a hydraulic
+    diameter of 2,5 mm, and a jet 2,2 mm across.
+    """
+    found = _example_seven()
+    computed = {
+        "x": round(found.pressure_ratio, 3),
+        "p_vc": round(found.vena_contracta_pressure),
+        "W_a": round(found.sound_power, 1),
+        "L_pi": round(found.internal_level, 1),
+        "f_p": round(found.peak_frequency),
+        "L_pAe": round(found.external_level),
+    }
+    expected = {
+        name: value for name, value in _PRINTED_EXAMPLE_7.items() if name in computed
+    }
+    return record(expected, computed)

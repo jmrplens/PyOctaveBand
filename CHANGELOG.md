@@ -38,6 +38,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The trims a valve is bought quiet for, which is what Clause 6 is about.
+
+  A low-noise trim does not get a different method: it gets different numbers
+  fed into the same one, and Clause 6 says which. A drilled cage replaces the
+  pressure recovery factor with a geometry, `[0,9 - 0,06 l/d]`, capped at an
+  aspect ratio of 4 because the bracket would otherwise reach zero at 15. A
+  multistage trim drops most of its pressure before the stage that makes the
+  noise, so the calculation is run on that stage: `multistage_trim_conditions`
+  returns the stagnation pressure at its inlet, the density there and the flow
+  coefficient of the last stage, and says which of Equations (28a), (28b) and
+  (28c) NOTE 3 selected, because that is a two-step reading rather than a
+  formula. `stage_level_correction` puts the earlier stages back.
+
+  That closes the seventh worked example, a 432-passage cage on a 70 bar
+  vapour line, at the 89 dB(A) the annex prints, with a jet 2,2 mm across and
+  a peak at 14,4 kHz. All seven examples of Annex A now reproduce end to end.
+
 - The second noise source a fast valve outlet is, which closes the last of the
   seven worked examples.
 

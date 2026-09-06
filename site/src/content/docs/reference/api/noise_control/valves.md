@@ -443,6 +443,48 @@ $$
 | :--- | :--- |
 | ValueError | If a value is not positive and finite, or the coefficient is not one Table 1 prints a constant for. |
 
+## LAST_STAGE_AREA_CONSTANTS
+
+*Constant* (`dict`).
+
+```python
+LAST_STAGE_AREA_CONSTANTS = {'Cv': 48900.0, 'Kv': 42300.0}
+```
+
+## last_stage_flow_coefficient
+
+```python
+last_stage_flow_coefficient(
+    total_area: float,
+    *,
+    coefficient: str = 'Cv',
+) -> float
+```
+
+Equation (27): the flow coefficient of the last stage, from its area.
+
+$$
+C_n = N_{16} A_n
+$$
+
+6.3 asks for $C_n$ in place of $C$ everywhere in Clause 5,
+and says to use this only when the manufacturer does not state one.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `total_area` | $A_n$, the total flow area of the last stage, in m². |
+| `coefficient` | Which flow coefficient to return, `"Cv"` or `"Kv"`, which selects $N_{16}$ from Table 1. |
+
+**Returns:** $C_n$.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the area is not positive and finite, or the coefficient is not one Table 1 prints a constant for. |
+
 ## MACH_LIMIT_STANDARD_TRIM
 
 *Constant* (`float`).
@@ -450,6 +492,138 @@ $$
 ```python
 MACH_LIMIT_STANDARD_TRIM = 0.3
 ```
+
+## MAXIMUM_PASSAGE_ASPECT
+
+*Constant* (`float`).
+
+```python
+MAXIMUM_PASSAGE_ASPECT = 4.0
+```
+
+## multiple_passage_jet_diameter
+
+```python
+multiple_passage_jet_diameter(
+    flow_coefficient: float,
+    style_modifier: float,
+    passage_length: float,
+    passage_diameter: float,
+    *,
+    coefficient: str = 'Cv',
+) -> float
+```
+
+Equation (26): the jet diameter of a single-stage, many-passage trim.
+
+$$
+D_j = N_{14} F_d \sqrt{C\left[0{,}9 - 0{,}06\,(l/d)\right]}
+$$
+
+6.2 replaces the pressure recovery factor of Equation (9) with that
+bracket, which is what a drilled cage does instead: a long hole recovers
+less than a short one, and NOTE 1 caps the ratio at 4 because the bracket
+would otherwise reach zero at 15.
+
+NOTE 2 adds two conditions on the geometry rather than on the arithmetic,
+and neither is checked here: above a pressure ratio of 4 the valve style
+modifier only holds when the wall between passages is thicker than
+$0{,}7 d$, and it fails altogether once the outlet Mach number
+passes 0,2.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `flow_coefficient` | $C$ of the valve. |
+| `style_modifier` | $F_d$, from [`valve_style_modifier`](/phonometry/reference/api/noise_control/valves/#valve_style_modifier). |
+| `passage_length` | $l$ of one flow passage, in m. |
+| `passage_diameter` | $d$ of one flow passage, in m; the hydraulic diameter for a passage that is not round. |
+| `coefficient` | `"Cv"` or `"Kv"`, selecting $N_{14}$. |
+
+**Returns:** $D_j$, in m.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If a value is not positive and finite, or the coefficient is not one Table 1 prints a constant for. |
+
+## multistage_trim_conditions
+
+```python
+multistage_trim_conditions(
+    *,
+    inlet_pressure: float,
+    outlet_pressure: float,
+    inlet_density: float,
+    flow_coefficient: float,
+    last_stage_coefficient: float,
+) -> MultistageConditions
+```
+
+Equations (27) to (29): the last stage seen as a valve of its own.
+
+A multistage trim drops most of the pressure before the stage that makes
+the noise, so Clause 5 is run on that stage: 6.3 substitutes the
+stagnation pressure $p_n$ at its inlet for $p_1$, the density
+$\rho_n$ there for $\rho_1$, and $C_n$ for $C$.
+
+Which equation gives $p_n$ is NOTE 3's, and it is a two-step
+reading rather than a formula:
+
+$$
+p_n = \sqrt{\left(\frac{p_1 C}{1{,}155 C_n}\right)^2 + p_2^2} \quad (28a), \qquad p_n = p_1 \frac{C}{C_n} \quad (28b)
+$$
+
+$$
+p_n = \sqrt{\left(\frac{C}{C_n}\right)^2 (p_1^2 - p_2^2) + p_2^2} \quad (28c)
+$$
+
+With $p_1/p_2 \ge 2$ the note says to assume $p_n/p_2 < 2$,
+take (28a), and fall through to (28b) if the answer it gives turns out to
+be $2 p_2$ or more. Below a valve ratio of two, (28c) applies
+directly.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `inlet_pressure` | $p_1$ at the valve inlet, absolute, in Pa. |
+| `outlet_pressure` | $p_2$ at the valve outlet, in Pa. |
+| `inlet_density` | $\rho_1$ at the valve inlet, in kg/m³. |
+| `flow_coefficient` | $C$ of the whole valve. |
+| `last_stage_coefficient` | $C_n$ of the last stage, from [`last_stage_flow_coefficient`](/phonometry/reference/api/noise_control/valves/#last_stage_flow_coefficient) or from the manufacturer. |
+
+**Returns:** A [`MultistageConditions`](/phonometry/reference/api/noise_control/valves/#multistageconditions) to pass to [`valve_aerodynamic_noise`](/phonometry/reference/api/noise_control/valves/#valve_aerodynamic_noise) in place of the valve's own inlet.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If a value is not positive and finite, or the outlet pressure is not below the inlet. |
+
+## MultistageConditions
+
+```python
+MultistageConditions(
+    flow_coefficient: float,
+    stagnation_pressure: float,
+    stagnation_density: float,
+    equation: str,
+)
+```
+
+What a multistage trim hands Clause 5 in place of the valve inlet.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `flow_coefficient` | $C_n$ of the last stage, Equation (27). |
+| `stagnation_pressure` | $p_n$ at the inlet of the last stage, in Pa, from whichever of Equations (28a) to (28c) NOTE 3 selects. |
+| `stagnation_density` | $\rho_n$ there, in kg/m³, Equation (29). |
+| `equation` | Which of `"28a"`, `"28b"` and `"28c"` was used, because the branch is a reading of NOTE 3 rather than an arithmetic fact and a report should say which one it took. |
 
 ## PIPE_SOUND_SPEED_M_S
 
@@ -644,6 +818,45 @@ The four pressure ratios that cut Clause 5.2 into five regimes.
 | `break_point` | $x_B$, where the jet stops growing and shock cells take over, Equation (6). |
 | `constant_efficiency` | $x_{CE}$, where the acoustical efficiency stops rising with pressure ratio, Equation (7). |
 | `recovery` | $\alpha$, the recovery correction factor of Equation (5), which the other two are written in terms of. |
+
+## stage_level_correction
+
+```python
+stage_level_correction(
+    last_stage_level: float,
+    stages: int,
+    inlet_pressure: float,
+    stagnation_pressure: float,
+) -> float
+```
+
+Equation (31): what the stages before the last one add.
+
+$$
+L_{pi} = L_{pi,n} + \frac{1}{(n-1)^{0{,}125}}\,10 \lg\frac{p_1}{p_n}
+$$
+
+Clause 5 is run on the last stage alone, and this puts the others back.
+The exponent is small, so the correction barely notices how many stages
+there are: two stages and eight differ by 26 % of a term that is itself
+only a few decibels.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `last_stage_level` | $L_{pi,n}$ of Equation (18) computed on the last stage, in dB. |
+| `stages` | $n$, the number of throttling stages, at least two. |
+| `inlet_pressure` | $p_1$ at the valve inlet, in Pa. |
+| `stagnation_pressure` | $p_n$ at the last stage, in Pa. |
+
+**Returns:** $L_{pi}$ for the whole trim, in dB.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the stage count is below two, or a pressure is not positive and finite, or the stagnation pressure exceeds the inlet. |
 
 ## STRUCTURAL_LOSS_REFERENCE_HZ
 

@@ -342,6 +342,95 @@ algunas rotativas pueden bajar a 0,7 y admite que del resto no hay datos.
 `Expander` toma por defecto ese 0,93 y la fila *expander* de la propia Tabla
 4, que es $A_\eta = -3{,}0$ y no la cifra de la válvula.
 
+## 6. Obturadores diseñados para ser silenciosos
+
+Todo lo de arriba es el apartado 5, que es una válvula con obturador
+corriente. Una válvula que se compra para que suene poco no es eso, y el
+apartado 6 dice en qué se diferencia: **no en el método**, sino en lo que se
+le mete al mismo método.
+
+Hay tres familias y cada una sustituye algo.
+
+**Una jaula perforada** (6.2) hace muchos chorros pequeños en vez de uno
+grande, y la Ecuación (26) sustituye el factor de recuperación de presión de
+la Ecuación (9) por una geometría, $[0{,}9 - 0{,}06\,(l/d)]$, donde $l$ y $d$
+son la longitud y el diámetro de un agujero. Un agujero largo recupera menos
+que uno corto, y la NOTA 1 recorta el cociente en 4 porque si no el corchete
+llegaría a cero en 15.
+
+```python
+from phonometry import noise_control
+
+# El propio ejemplo del 6.2: 48 pasos rectangulares, 10 mm por 2 mm.
+area = 0.010 * 0.002
+perimeter = 2.0 * 0.010 + 2.0 * 0.002
+print(round(4.0 * area / perimeter, 4))          # 0.0033  m, el diámetro hidr.
+print(round(noise_control.multiple_passage_jet_diameter(
+    90.0, 0.094, 0.020, 0.010), 5))              # 0.00362 m
+```
+
+**Un obturador multietapa** (6.3) tira casi toda la presión antes de la etapa
+que hace el ruido, así que el método se corre sobre esa etapa: la presión de
+estancamiento $p_n$ a su entrada hace de $p_1$, la densidad de ahí hace de
+$\rho_1$, y el coeficiente de caudal de la última etapa hace del de la
+válvula.
+
+$$
+C_n = N_{16} A_n, \qquad
+p_n = \sqrt{\left(\frac{p_1 C}{1{,}155 C_n}\right)^2 + p_2^2}, \qquad
+\rho_n = \rho_1 \frac{p_n}{p_1}
+$$
+
+Qué ecuación da $p_n$ es una **lectura en dos pasos**, no una fórmula. La NOTA
+3 dice que con $p_1/p_2 \ge 2$ se supone $p_n/p_2 < 2$, se toma la Ecuación
+(28a), y se pasa a la (28b) si el resultado sale $2 p_2$ o más; por debajo de
+un cociente de dos en la válvula, se aplica la (28c) directamente. El
+resultado dice qué rama tomó, porque un informe no tiene por qué adivinarlo.
+
+```python
+from phonometry import noise_control
+
+conditions = noise_control.multistage_trim_conditions(
+    inlet_pressure=7.0e6, outlet_pressure=1.4e6, inlet_density=55.3,
+    flow_coefficient=81.5,
+    last_stage_coefficient=noise_control.last_stage_flow_coefficient(6.44e-3),
+)
+print(round(conditions.flow_coefficient))        # 315
+print(round(conditions.stagnation_pressure))     # 2102410  Pa
+print(round(conditions.stagnation_density, 1))   # 16.6     kg/m3
+print(conditions.equation)                       # 28a
+```
+
+Esos tres entran luego en `valve_aerodynamic_noise` en lugar de la entrada de
+la válvula. Ese es el ejemplo 7 del anexo A, una jaula de 432 pasos en una
+línea de vapor a 70 bar, y cierra en los **89 dB(A)** impresos, con un chorro
+de 2,2 mm y un pico a 14,4 kHz.
+
+**Un obturador multipaso y multietapa** (6.4) es las dos cosas a la vez, y es
+lo que en realidad es el ejemplo 7. No añade nada nuevo a la sustitución: las
+Ecuaciones (32) y (33) repiten el número de Mach y la frecuencia de pico del
+régimen I con el factor de recuperación de la última etapa, que es lo que la
+sustitución ya ha puesto ahí.
+
+Para el 6.3 hay una cosa más. El apartado 5 se ha corrido sobre la última
+etapa sola, así que la Ecuación (31) devuelve las demás:
+
+$$
+L_{pi} = L_{pi,n} + \frac{1}{(n-1)^{0{,}125}}\,10 \lg\frac{p_1}{p_n}
+$$
+
+```python
+from phonometry import noise_control
+
+print(round(noise_control.stage_level_correction(150.0, 3, 7.0e6, 2.1e6), 1))
+# 154.8  dB
+```
+
+El exponente es 0,125, así que el número de etapas apenas entra: dos etapas y
+ocho se diferencian en una cuarta parte de un término que ya de por sí son
+unos pocos decibelios. Lo que la corrección sigue de verdad es $p_1/p_n$, la
+presión que se llevaron las etapas anteriores.
+
 <SeeAlso
   links={[
     { href: '/phonometry/es/devices/noise-control/silencers/', label: 'Silenciadores reactivos' },
@@ -355,20 +444,28 @@ algunas rotativas pueden bajar a 0,7 y admite que del resto no hay datos.
 
 <Scope>
 <ScopeClaim status="covered" label="Cubierto">
-Todo el apartado 5 de la IEC 60534-8-3:2010 para una válvula con obturador
-estándar: los cocientes de presión del 5.1 y el 5.2 con los cinco regímenes que
+Los apartados 5 y 6 de la IEC 60534-8-3:2010 y la mitad del apartado 7 que
+trata el flujo de salida, frente a los siete ejemplos resueltos del anexo A.
+El apartado 5 para una válvula con obturador estándar: los cocientes de presión del 5.1 y el 5.2 con los cinco regímenes que
 definen, el modificador de estilo de válvula y el diámetro de chorro del 5.3,
 la potencia de la vena, la eficiencia acústica y la frecuencia de pico de la
 Tabla 3, el nivel interno en la pared de la tubería de la Ecuación (18), el
 espectro de tercio de octava de la Ecuación (19), la pérdida por transmisión
 de la tubería del 5.5 con sus frecuencias de anillo y de coincidencia, y el
-nivel exterior del 5.6 por bandas y como un único número ponderado A.
+nivel exterior del 5.6 por bandas y como un único número ponderado A. El
+apartado 6 para un obturador hecho para sonar poco: la jaula perforada del 6.2
+con la Ecuación (26), la sustitución multietapa del 6.3 con las Ecuaciones
+(27) a (29) y la rama de su NOTA 3, la corrección de etapas de la Ecuación
+(31), y el caso multipaso y multietapa del 6.4. Y el apartado 7 para el flujo
+que sale por la salida de la válvula una vez pasado Mach 0,3, con la pieza de
+transición, su potencia y su eficiencia, y la Ecuación (43), que lo suma al
+obturador dentro de la tubería.
 </ScopeClaim>
 <ScopeClaim status="not-covered" label="Aún no cubierto">
-El resto de la norma y su hermana: los obturadores de bajo ruido del apartado
-6, el procedimiento de Mach alto y el difusor de salida del apartado 7, los
-factores de eficiencia determinados experimentalmente del apartado 8, y el
-caso hidrodinámico de la IEC 60534-8-4, donde el fluido es un líquido y lo que
-hace el ruido es la cavitación y no un chorro.
+Los factores de eficiencia determinados experimentalmente del apartado 8, que
+son un procedimiento de laboratorio y no un cálculo; el apartado 9, que
+combina una válvula con dos o más etapas de área fija instaladas aguas abajo;
+y el caso hidrodinámico de la IEC 60534-8-4, donde el fluido es un líquido y
+lo que hace el ruido es la cavitación y no un chorro.
 </ScopeClaim>
 </Scope>
