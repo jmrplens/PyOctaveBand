@@ -343,6 +343,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.noise_control.enclosures",
             "phonometry.noise_control.room_to_room",
             "phonometry.noise_control.valves",
+            "phonometry.noise_control.valves_hydrodynamic",
         ),
     ),
     Section(
@@ -425,6 +426,12 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     "DEFAULT_CO2_MOLE_FRACTION": "phonometry.fluids.air",
     "DEFAULT_RELATIVE_HUMIDITY_PERCENT": "phonometry.fluids.air",
     "DEFAULT_STATIC_PRESSURE_PA": "phonometry.fluids.air",
+    # The two sound speeds and the jet diameter are owned by the aerodynamic
+    # valve module and imported by the hydrodynamic one, which IEC 60534-8-4
+    # sends to IEC 60534-8-3 for all three, so a plain scan sees them twice.
+    "AIR_SOUND_SPEED_M_S": "phonometry.noise_control.valves",
+    "PIPE_SOUND_SPEED_M_S": "phonometry.noise_control.valves",
+    "jet_diameter": "phonometry.noise_control.valves",
     # The ERB_N / Cam constants are owned by erb_scale and imported by the
     # ISO 532-2 loudness model, so a plain scan sees them in both modules.
     "ERB_C1": "phonometry.psychoacoustics.erb_scale",

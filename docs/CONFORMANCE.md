@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**820/820 conformance checks pass** across 68 domains and 396 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**834/834 conformance checks pass** across 69 domains and 397 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -1350,6 +1350,28 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | IEC 60534-8-3:2010 | A-weighted level with the expander, example 6 (Eqs. (43) and (25)) | 94 dB(A), where the trim alone gives 93 | 94 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | IEC 60534-8-3:2010 | Multistage trim substitution, example 7 (Eqs. (27) to (29)) | C_n = 315 from Equation (27), then (28a) for p_n | 315 | 0 | 0 % | ![Pass][cv-pass] Pass |
 | IEC 60534-8-3:2010 | Multipath multistage trim, example 7 (Table A.2) | x = 0.334; p_vc = 1371038; W_a = 10.3; L_pi = 156.9; f_p = 14381; L_pAe = 89 | x = 0.334; p_vc = 1371038; W_a = 10.3; L_pi = 156.9; f_p = 14381; L_pAe = 89 | exact | 0 % | ![Pass][cv-pass] Pass |
+
+</details>
+
+<details>
+<summary><b>Control valve noise (IEC 60534-8-4)</b>: 100% (14/14)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
+|:---|:---|:---|:---|:---|:---:|:---:|
+| IEC 60534-8-4:2005 | Flow conditions, examples 1 to 3 (5.1) | Delta p = 2,0 / 3,5 / 3,5 x 1e5 Pa against 2,38 / 2,38 / 3,32 x 1e5 Pa -> turbulent, cavitating, cavitating | x_Fzp1 (p1-pv) 1 = 2.38; cavitating 1 = 0; x_Fzp1 (p1-pv) 2 = 2.38; cavitating 2 = 1; x_Fzp1 (p1-pv) 3 = 3.32; cavitating 3 = 1 | exact | 0 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-4:2005 | Characteristic pressure ratio x_Fz and x_Fzp1 (Eqs. (3a), (3c)) | x_Fz = 0.2543; x_Fzp1 = 0.2386; x_Fzp1 shifted = 0.3324 | x_Fz = 0.2543; x_Fzp1 = 0.2386; x_Fzp1 shifted = 0.3324 | exact | 0 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-4:2005 | Jet diameter D_j (Eq. (4)) | 0.01758 m (+/-0.00001 m) | 0.01758 m | 0 m | 3 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-4:2005 | Vena contracta velocity and stream power (Eqs. (5), (6)) | U_vc 1 = 21.772; U_vc 2 = 28.801; W_m 1 = 6018.05; W_m 2 = 14042.1 | U_vc 1 = 21.772; U_vc 2 = 28.801; W_m 1 = 6018.05; W_m 2 = 14042.1 | exact | 0 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-4:2005 | Acoustical efficiencies (Eqs. (8), (9)) | eta_turb 1 (x1e6) = 1.555; eta_turb 2 (x1e6) = 2.057; eta_cav 2 (x1e6) = 1.243; eta_cav 3 (x1e8) = 1.992 | eta_turb 1 (x1e6) = 1.555; eta_turb 2 (x1e6) = 2.057; eta_cav 2 (x1e6) = 1.243; eta_cav 3 (x1e8) = 1.992 | exact | 0 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-4:2005 | Sound power W_a, examples 1 to 3 (Eqs. (7a), (7b)) | example 1 = 0.0023 W; example 2 = 0.0116 W; example 3 = 0.0073 W | example 1 = 0.0023 W; example 2 = 0.0116 W; example 3 = 0.0073 W | exact | 0 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-4:2005 | Internal level at the pipe wall, examples 1 to 3 (Eq. (10)) | example 1 = 149.596 dB; example 2 = 156.543 dB; example 3 = 154.532 dB | example 1 = 149.596 dB; example 2 = 156.543 dB; example 3 = 154.532 dB | exact | 0 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-4:2005 | Strouhal number and turbulent peak (Eqs. (11), (12)) | N_Str 2 = 0.399; N_Str 3 = 0.243; f_p,turb 2 = 654.35; f_p,turb 3 = 397.93 | N_Str 2 = 0.399; N_Str 3 = 0.243; f_p,turb 2 = 654.35; f_p,turb 3 = 397.93 | exact | 0 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-4:2005 | Cavitating peak frequency (Eq. (13)) | example 2 = 1088.94 Hz; example 3 = 1973.43 Hz | example 2 = 1088.94 Hz; example 3 = 1973.43 Hz | exact | 0 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-4:2005 | Ring frequency and its transmission loss (Eqs. (14), (15)) | f_r = 14860.406; TL_fr = -44.71 | f_r = 14860.406; TL_fr = -44.71 | exact | 0 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-4:2005 | Turbulent transmission loss, examples 1 to 3 (Eqs. (16a), (16b)) | example 3, the worst of the three | -76.152 dB | 0.008 dB | 80 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-4:2005 | Cavitating transmission loss, examples 2 and 3 (Eq. (17)) | example 3, the worse of the two printed rows | -74.922 dB | 0.084 dB | 84 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-4:2005 | Level 1 m from the pipe wall, examples 1 to 3 (Eqs. (18a), (18b)) | example 1 = 62.7 dB; example 2 = 81 dB; example 3 = 66.9 dB | example 1 = 62.7 dB; example 2 = 81 dB; example 3 = 66.9 dB | exact | 0 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-4:2005 | Frequency route at 8 kHz, examples 1 to 3 (Eqs. (19) to (22)) | L_pi(8k) 1 = 116.3 dB; L_pi(8k) 2 = 141.9 dB; L_pi(8k) 3 = 128 dB; TL(8k) = -51.76 dB; L_pe(8k) 1 = 51.8 dB; L_pe(8k) 2 = 77.4 dB; L_pe(8k) 3 = 63.6 dB | L_pi(8k) 1 = 116.3 dB; L_pi(8k) 2 = 141.9 dB; L_pi(8k) 3 = 128 dB; TL(8k) = -51.76 dB; L_pe(8k) 1 = 51.8 dB; L_pe(8k) 2 = 77.4 dB; L_pe(8k) 3 = 63.6 dB | exact | 0 % | ![Pass][cv-pass] Pass |
 
 </details>
 

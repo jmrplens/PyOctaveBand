@@ -3189,6 +3189,27 @@ _ES_EXACT = {
     "the wall lets most through where the\nsound inside it and the bending waves\n"
     "in it travel at the same speed": "la pared deja pasar más donde el sonido\nde dentro y las ondas de flexión "
     "de la\npared viajan a la misma velocidad",
+    # valve_cavitation_noise: the threshold, the two humps, the efficiencies
+    "Where the noise stops being turbulence": "Donde el ruido deja de ser turbulencia",
+    "Differential pressure ratio $x_F$": "Cociente diferencial de presiones $x_F$",
+    "Level 1 m from the pipe [dB]": "Nivel a 1 m de la tubería [dB]",
+    "Measured $x_{Fz}$": "$x_{Fz}$ medido",
+    "$x_{Fz} + 0{,}1$": "$x_{Fz} + 0{,}1$",
+    "the same valve at the same flow, with a\nthreshold 0,1 apart: 14 dB between the\n"
+    "two markers, and the standard asks for\na measured value for exactly this reason": "la misma válvula al mismo caudal, con un\numbral separado 0,1: 14 dB entre los dos\n"
+    "marcadores, y por eso mismo la norma pide\nun valor medido",
+    "Two humps, weighted by two efficiencies": "Dos jorobas, pesadas por dos eficiencias",
+    "Turbulent share": "Parte turbulenta",
+    "Cavitating share": "Parte cavitante",
+    "the cavitating share is 38 % of the power\nhere, and it sits an octave above the\n"
+    "turbulent one: the wall passes it better": "aquí la parte cavitante es el 38 % de la potencia\ny está una octava por encima de la turbulenta:\n"
+    "la pared la deja pasar mejor",
+    "What the bubbles add": "Lo que añaden las burbujas",
+    "Turbulent, $\\eta_{turb}$": "Turbulenta, $\\eta_{turb}$",
+    "Cavitating, $\\eta_{cav}$": "Cavitante, $\\eta_{cav}$",
+    "zero at the threshold, then a fifth power:\nthe cavitation term passes the turbulent\n"
+    "one within a tenth of $x_F$ of starting": "cero en el umbral y luego una quinta potencia:\nel término de cavitación pasa al turbulento\n"
+    "en menos de una décima de $x_F$",
     # silencer_selection: reactive against dissipative on one axis
     "Choosing the family: where each one is worth having": "Elegir la familia: dónde compensa cada una",
     "Reactive: 0.3 m expansion chamber, $m = 4$": "Reactivo: cámara de expansión de 0,3 m, $m = 4$",

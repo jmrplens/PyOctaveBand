@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 820 numerical conformance checks against 396 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 834 numerical conformance checks against 397 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 820 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 68 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 834 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 69 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -314,6 +314,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Industrial noise control: HVAC and enclosures](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/)
 - [HVAC noise the German way (VDI 2081)](https://jmrplens.github.io/phonometry/devices/noise-control/vdi2081-air-systems/)
 - [Control valve noise (IEC 60534-8-3)](https://jmrplens.github.io/phonometry/devices/noise-control/control-valve-noise/)
+- [Hydrodynamic valve noise (IEC 60534-8-4)](https://jmrplens.github.io/phonometry/devices/noise-control/valve-cavitation/)
 
 ## Wave simulation
 
@@ -504,6 +505,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [noise_control/room-to-room](https://jmrplens.github.io/phonometry/reference/api/noise_control/room-to-room/)
 - [noise_control/silencers](https://jmrplens.github.io/phonometry/reference/api/noise_control/silencers/)
 - [noise_control/valves](https://jmrplens.github.io/phonometry/reference/api/noise_control/valves/)
+- [noise_control/valves-hydrodynamic](https://jmrplens.github.io/phonometry/reference/api/noise_control/valves-hydrodynamic/)
 - [power/declaration](https://jmrplens.github.io/phonometry/reference/api/power/declaration/)
 - [power/intensity](https://jmrplens.github.io/phonometry/reference/api/power/intensity/)
 - [power/intensity-compliance](https://jmrplens.github.io/phonometry/reference/api/power/intensity-compliance/)
@@ -21235,8 +21237,9 @@ substitution of 6.3 and the multipath multistage case of 6.4. And the
 outlet-flow half of Clause 7, for the flow leaving a valve outlet that has
 passed Mach 0,3. Validated against all seven worked examples of Annex A in the
 [conformance report](https://jmrplens.github.io/phonometry/reference/conformance/); the three defects that annex
-carries are in the [errata register](https://jmrplens.github.io/phonometry/reference/errata/). Clause 8, Clause 9 and
-the hydrodynamic case of IEC 60534-8-4 are not implemented yet.
+carries are in the [errata register](https://jmrplens.github.io/phonometry/reference/errata/). Clause 8 and Clause 9
+are not implemented yet; the hydrodynamic case of IEC 60534-8-4 has
+[a page of its own](https://jmrplens.github.io/phonometry/devices/noise-control/valve-cavitation/).
 
 ---
 
@@ -22149,6 +22152,9 @@ occupational limit applies, in [Occupational exposure
 - [Control Valve Noise (IEC 60534-8-3)](https://jmrplens.github.io/phonometry/devices/noise-control/control-valve-noise/):
   the five flow regimes of a throttling valve and the pipe wall that radiates
   what they make.
+- [Hydrodynamic Valve Noise (IEC 60534-8-4)](https://jmrplens.github.io/phonometry/devices/noise-control/valve-cavitation/):
+  the same valve on a liquid line, where cavitation rather than a jet is what
+  makes the noise.
 - [Room to Room: Partition, Receiving Room, Criterion](https://jmrplens.github.io/phonometry/devices/noise-control/room-to-room/):
   the composed source-room to receiving-room chain and the transmission loss a
   partition or an enclosure needs to meet a noise criterion.
@@ -23485,6 +23491,331 @@ supplied.
   engineering* (2nd ed.). Wiley.
   [doi:10.1002/9780470172568](https://doi.org/10.1002/9780470172568). The
   companion treatment of reactive and dissipative silencers.
+
+---
+
+
+<!-- source: docs/devices/noise-control/valve-cavitation.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/valve-cavitation/ -->
+Source: https://jmrplens.github.io/phonometry/devices/noise-control/valve-cavitation/
+
+# Hydrodynamic valve noise (IEC 60534-8-4)
+
+A liquid does not compress, so a control valve on a water line cannot build
+the shock cells that [the aerodynamic part](https://jmrplens.github.io/phonometry/devices/noise-control/control-valve-noise/) spends
+five regimes on. It makes noise two ways instead, and the whole of
+IEC 60534-8-4 is the sum of them: **turbulence** in the jet leaving the vena contracta, and
+**cavitation**, once the pressure there falls low enough for the liquid to
+flash to vapour and the bubbles to collapse again downstream.
+
+The difference between the two is not a matter of degree. Turbulent noise
+follows the jet velocity gently; cavitation arrives at a threshold and then
+climbs as a fifth power. Everything on this page turns on where the operating
+point sits with respect to that threshold.
+
+## 1. The threshold, and why the standard asks you to measure it
+
+Two ratios decide the regime. The first is the **differential pressure
+ratio**, Equation (1), which says how far towards flashing this operating
+point is:
+
+$$
+x_F = \frac{p_1 - p_2}{p_1 - p_v}
+$$
+
+The second is the **characteristic pressure ratio** $x_{Fz}$: the value of
+$x_F$ at which cavitation first becomes audible on this valve. It is a
+property of the valve, measured to IEC 60534-8-2, and 4.2 offers Equation (3a)
+only as an estimate for when no measurement exists. Equation (3c) then moves
+it from the 6 × 10⁵ Pa the estimate is drawn at to the working inlet pressure.
+
+```python
+from phonometry import noise_control
+
+x_f = noise_control.differential_pressure_ratio(
+    inlet_pressure=1.0e6, outlet_pressure=6.5e5, vapour_pressure=2.32e3
+)
+print(round(x_f, 4))                                    # 0.3508
+
+x_fz = noise_control.incipient_cavitation_ratio(90.0, 0.42, 0.92)
+print(round(x_fz, 4))                                   # 0.2543  at 6e5 Pa
+print(round(noise_control.corrected_incipient_ratio(x_fz, 1.0e6), 4))
+#                                                       # 0.2386  at 10 bar
+```
+
+This valve is past its threshold, so it cavitates. A multihole trim of the
+same capacity would not be: Equation (3b) answers on the hole geometry rather
+than on the capacity, and a hundred and twenty holes of three millimetres push
+the threshold up by half. The comparison has to be made against the **corrected**
+value, which is the half of it a reader is most likely to skip.
+
+```python
+holes = noise_control.multihole_incipient_cavitation_ratio(120, 0.003, 0.92)
+print(round(holes, 4))                                  # 0.3941  at 6e5 Pa
+print(round(noise_control.corrected_incipient_ratio(holes, 1.0e6), 4))
+#                                                       # 0.3698  still above x_F
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/valve_cavitation_noise_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/valve_cavitation_noise.svg" alt="Three panels. Left: the level one metre from the pipe against the differential pressure ratio, drawn twice for the same valve with characteristic pressure ratios 0,1 apart, each curve rising smoothly, stepping up sharply at its own threshold and flattening near 90 decibels, with the three worked examples marked. Middle: the sound pressure level in each one-third-octave band from 50 Hz to 20 kHz, showing the turbulent and cavitating shares of the internal spectrum, their sum, and the level one metre outside sixty to a hundred decibels below, with both peak frequencies marked. Right: the two acoustical efficiencies against the differential pressure ratio on a logarithmic axis, the turbulent one almost flat near one part in a million and the cavitating one rising from zero at the threshold to cross it and keep climbing" width="100%"></picture>
+
+*The left panel is Annex A's own Figure A.1: the same valve at the same flow,
+with a characteristic pressure ratio 0,1 apart, and 14 dB between the two
+markers at $x_F = 0{,}35$.*
+
+That 14 dB is the reason 4.2 warns that a prediction built on the estimate
+"can create uncertainties". The estimate is not a small correction to the
+answer; on a cavitating valve it **is** the answer.
+
+## 2. Two efficiencies, and one stream power to share
+
+The source half of the method is short. The differential of Equation (2) is
+capped at the choking point, Equation (5) turns it into a jet velocity and
+Equation (6) into the stream power the valve dissipates:
+
+```python
+choked = noise_control.cavitation_differential(
+    inlet_pressure=1.0e6,
+    outlet_pressure=6.5e5,
+    vapour_pressure=2.32e3,
+    pressure_recovery=0.92,
+)
+speed = noise_control.vena_contracta_velocity(choked, 997.0, 0.92)
+power = noise_control.mechanical_stream_power(40.0, speed, 0.92)
+print(round(speed, 3), round(power, 1))                 # 28.801 14042.1
+```
+
+Then two efficiencies say what fraction of those fourteen kilowatts leaves as
+sound. Equation (8) makes the turbulent one linear in the jet Mach number,
+reaching $10^{-4}$ only when the jet reaches the speed of sound in the liquid,
+which for water is 1 400 m/s and never happens in a control valve:
+
+$$
+\eta_{turb} = 10^{-4}\left(\frac{U_{vc}}{c_L}\right)
+$$
+
+Equation (9) is the other one, and it is worth reading factor by factor:
+
+$$
+\eta_{cav} = 0{,}32\, \eta_{turb}
+  \sqrt{\frac{p_1 - p_2}{\Delta p_c}\cdot\frac{1}{x_{Fzp1}}}\;
+  e^{5 x_{Fzp1}}
+  \left(\frac{1 - x_{Fzp1}}{1 - x_F}\right)^{0,5}
+  \left(\frac{x_F}{x_{Fzp1}}\right)^{5}
+  \left(x_F - x_{Fzp1}\right)^{1,5}
+$$
+
+Three of those factors do all the work. $(x_F - x_{Fzp1})^{1,5}$ starts the
+term at **exactly zero** on the threshold, so the two regimes meet without a
+step. $(x_F/x_{Fzp1})^5$ then makes it climb almost vertically. And
+$(1 - x_F)^{-0,5}$ sends it towards infinity as the valve approaches flashing,
+which is where the method stops.
+
+```python
+turbulent = noise_control.turbulent_efficiency(speed, 1400.0)
+cavitating = noise_control.cavitation_efficiency(
+    turbulent=turbulent,
+    differential=3.5e5,
+    choked_differential=choked,
+    pressure_ratio=0.3508,
+    corrected_ratio=0.2386,
+)
+print(f"{turbulent:.3e} {cavitating:.3e}")              # 2.057e-06 1.242e-06
+```
+
+Just past the threshold the cavitation term is already comparable with the
+turbulent one, and Equation (7b) adds them before Table 2's acoustic power
+ratio $r_W$ takes the share that is radiated into the pipe rather than lost in
+the body: a quarter for every globe and rotary valve, a half for the
+butterflies, one for an expander.
+
+## 3. The whole chain in one call
+
+```python
+valve = dict(
+    inlet_pressure=1.0e6,
+    vapour_pressure=2.32e3,
+    liquid_density=997.0,
+    liquid_sound_speed=1400.0,
+    flow_coefficient=90.0,
+    style_modifier=0.42,
+    pressure_recovery=0.92,
+    power_ratio=0.25,
+    valve_diameter=0.1,
+    seat_diameter=0.1,
+    internal_diameter=0.1071,
+    wall_thickness=0.0036,
+    pipe_density=7800.0,
+)
+res = noise_control.valve_hydrodynamic_noise(
+    **valve, mass_flow=40.0, outlet_pressure=6.5e5, incipient_ratio=x_fz
+)
+print(res.regime)                                       # cavitating
+print(round(res.sound_power, 5), "W")                   # 0.01158 W
+print(round(res.internal_level, 3), "dB")               # 156.543 dB
+print(round(res.turbulent_peak, 2), round(res.cavitation_peak, 2))
+#                                                       # 654.35 1088.94
+print(round(res.external_level, 1), "dB at 1 m")        # 81.0 dB at 1 m
+```
+
+Every one of those is a printed cell of Annex A's Table A.1. The same call on
+the first column, 30 kg/s into 8 bar, stays turbulent and answers 62,7 dB; the
+third column is the second one again with $x_{Fz}$ shifted by 0,1, and answers
+66,9 dB.
+
+The two peak frequencies are Equations (11) and (13), and (13) is the
+surprising one: on the threshold the cavitating peak is **six times** the
+turbulent peak, and it falls from there as the valve is opened further into
+cavitation, because the bubbles grow larger and take longer to collapse. Just
+past onset, cavitation is a hiss; deep into it, a rumble.
+
+## 4. The pipe, and a printed sign that cannot be right
+
+Inside the pipe this valve runs at 156 dB. What makes the outside habitable is
+the wall, and the standard anchors its transmission loss at the **ring
+frequency**, Equation (14), where one wavelength in the wall material wraps
+exactly once around the circumference:
+
+```python
+print(round(res.pipe_ring_frequency, 1), "Hz")          # 14860.4 Hz
+print(round(res.reference_transmission_loss, 2), "dB")  # -44.71 dB
+print(round(res.transmission_loss, 2), "dB")            # -62.86 dB
+```
+
+Both terms of Equation (15) are printed with a minus sign, so the
+transmission loss of this method is a **negative number that is added** all
+the way to the end. Away from the ring frequency Equations (16b) and (22b)
+only make it worse, and the peak frequencies of a control valve are more than
+a decade below the ring frequency of its pipe, which is where the other 18 dB
+of this valve's loss come from: Equation (16b) costs 27 dB at the turbulent
+peak, and Equation (17) hands 9 of them back because the valve cavitates.
+
+Band by band, 5.4 spreads the internal level with Equations (20a) and (20b)
+and gives the wall a frequency-dependent loss with Equation (22a):
+
+```python
+import numpy as np
+
+band = int(np.argmin(np.abs(res.frequency - 8000.0)))
+print(round(float(res.band_internal_level[band]), 1))     # 141.9
+print(round(float(res.band_transmission_loss[band]), 2))  # -51.76
+print(round(float(res.band_external_level[band]), 1))     # 77.4
+```
+
+Those three are printed in Table A.1 as 141,9 dB, **51,76 dB** and 77,4 dB.
+The middle one is printed without its minus sign, and it cannot be: its own
+two inputs, $-44{,}71$ and $-7{,}053$ dB, sum to $-51{,}763$, and the row
+below only reproduces its printed 77,4 dB with the negative value.
+[The errata register](https://jmrplens.github.io/phonometry/reference/errata/) records it, along with three
+intermediates of the same table that its own equations do not reproduce.
+
+## 5. One equation, printed two ways
+
+Equation (12), the Strouhal number that places the turbulent peak, appears
+twice in the document and not identically. Clause 5.1 prints a leading 0,02
+and no valve style modifier; Table A.1 prints 0,036 and a factor
+$F_d^{0,75}$. Both are on the page, and they are not the same function of the
+valve.
+
+```python
+form = dict(
+    flow_coefficient=90.0,
+    style_modifier=0.42,
+    pressure_recovery=0.92,
+    corrected_ratio=0.2386,
+    valve_diameter=0.1,
+    seat_diameter=0.1,
+    inlet_pressure=1.0e6,
+    vapour_pressure=2.32e3,
+)
+print(round(noise_control.jet_strouhal_number(**form, form="annex"), 3))   # 0.399
+print(round(noise_control.jet_strouhal_number(**form, form="clause"), 3))  # 0.425
+```
+
+Only the annex form reproduces the annex's own printed $N_{Str} = 0{,}399$,
+so it is the default here and the clause form is one keyword away. For this
+valve the two differ by 6 %; for a single-port valve with $F_d = 1$ the annex
+form is 80 % above the clause one, which is five sixths of an octave in the
+peak frequency and a few decibels through the transmission loss.
+
+## 6. Stage by stage
+
+Clause 6 is the same method with per-stage inputs. Each stage takes a share of
+the differential in inverse proportion to the square of its own flow
+coefficient, which is the series law $1/C^2 = \sum_i 1/C_i^2$:
+
+```python
+stages = noise_control.stage_conditions(
+    inlet_pressure=1.0e6,
+    outlet_pressure=4.0e5,
+    vapour_pressure=2.32e3,
+    stage_coefficients=[130.0, 160.0, 199.1],
+    flow_coefficient=90.0,
+)
+for stage in stages:
+    print(round(stage.inlet_pressure), round(stage.pressure_ratio, 3))
+# 1000000 0.288
+# 712426 0.267
+# 522582 0.236
+
+print(round(noise_control.combine_stage_levels(78.0, 74.0, 71.0), 1))   # 80.0
+```
+
+Those three coefficients increase along the flow, which is the device of
+Figure 2: most of the pressure is taken in the first stages and the last one
+is left working at a differential small enough not to cavitate. 6.3.2 then
+calculates **only** that last stage, because the sound the earlier ones make
+is absorbed inside the trim before it reaches the pipe, and it caps the
+differential at the last stage's own cavitation threshold rather than at the
+choking point:
+
+```python
+print(noise_control.last_stage_differential(
+    inlet_pressure=6.0e5,
+    outlet_pressure=4.0e5,
+    vapour_pressure=2.32e3,
+    corrected_ratio=0.30,
+))                                                      # 179304.0
+
+print(noise_control.uniform_passage_style_modifier(16))            # 0.25
+print(round(noise_control.last_stage_seat_diameter_mm(45.0), 1))   # 37.7
+```
+
+The last of those carries its unit in its name for a reason. The formula it
+implements is the one display formula in the standard with no equation number,
+$d_o = 5{,}2\sqrt{N_{34} C_n}$, and Clause 3 declares $d_o$ in metres, which
+for any real last stage it cannot be: 37,7 of anything is millimetres. Divide
+by a thousand before handing it to Equation (12).
+
+## See also
+
+- [Control Valve Noise (IEC 60534-8-3)](https://jmrplens.github.io/phonometry/devices/noise-control/control-valve-noise/): the same
+  chain for a compressible fluid, where five flow regimes take the place of
+  one threshold.
+- [Reactive Silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/): the four-pole chain that would be put
+  downstream of a line this loud.
+- [Duct-Borne Noise](https://jmrplens.github.io/phonometry/devices/noise-control/duct-path/): the same question for a ventilation
+  system, where the source is a fan rather than a jet.
+- [Errata in published sources](https://jmrplens.github.io/phonometry/reference/errata/): the six entries this page
+  rests on, from a sign to an equation printed two ways.
+- API reference: [`noise_control.valves_hydrodynamic`](https://jmrplens.github.io/phonometry/reference/api/noise_control/valves-hydrodynamic/).
+
+## Standards
+
+IEC 60534-8-4:2005, Clauses 4, 5 and 6. The preliminary calculations of
+Clause 4: the pressure ratio of Equation (1), the capped differential of (2),
+the characteristic
+pressure ratio of (3a) to (3c), the jet diameter of (4), the vena contracta
+velocity of (5) and the stream power of (6). The prediction of Clause 5: the
+two acoustical efficiencies of (8) and (9), the sound power of (7a) and (7b),
+the internal level of (10), the Strouhal number and both peak frequencies of
+(11) to (13), the transmission loss of (14) to (17) with the floor of the
+NOTE, the external level of (18a) and (18b), and the band route of 5.4. And
+Clause 6 for a multistage trim: the stage pressures and ratios of (23a) to
+(26), the energy sum of (27), and the last stage of 6.3.2. Validated against
+all three worked examples of Annex A in the
+[conformance report](https://jmrplens.github.io/phonometry/reference/conformance/); the six defects that annex and
+its clauses carry are in the [errata register](https://jmrplens.github.io/phonometry/reference/errata/). The
+laboratory measurement of x_Fz (IEC 60534-8-2) and the flashing regime past
+x_F = 1 are not implemented.
 
 ---
 
@@ -39302,6 +39633,21 @@ documents, one page per module.
 | `AIR_SOUND_SPEED_M_S` / `PIPE_SOUND_SPEED_M_S` | `constant` | **343 m/s** and **5000 m/s**, the values NOTES 3 and 4 print for the coincidence frequencies; the second is why Clause 1 restricts the method to steel pipe. | `noise_control.PIPE_SOUND_SPEED_M_S` |
 | `STRUCTURAL_LOSS_REFERENCE_HZ` / `UNIVERSAL_GAS_CONSTANT` | `constant` | **1.0 Hz**, the f_s of Eq. (20c) that the equation never names again, and **8314 J/(kmol K)**, paired with a molecular mass in kg/kmol as Eqs. (10) and (14) are written for. | `noise_control.UNIVERSAL_GAS_CONSTANT` |
 | `REGIME_SUBSONIC` / `REGIME_CHOKED` / `REGIME_SUPERSONIC` / `REGIME_SHOCK` / `REGIME_CONSTANT_EFFICIENCY` / `REGIME_COUNT` | `constant` | **1 to 5**, the five regimes of Clause 5.2 by the number it prints, and their count. | `res.regime == noise_control.REGIME_SHOCK` |
+| `valve_hydrodynamic_noise` | `function` | **Control valve hydrodynamic noise, the whole of IEC 60534-8-4 Clauses 4 and 5.**<br>• operating point: `mass_flow` [kg/s], `inlet_pressure` / `outlet_pressure` / `vapour_pressure` [Pa], `liquid_density` [kg/m3], `liquid_sound_speed` [m/s]<br>• valve: `flow_coefficient` C, `style_modifier` F_d, `pressure_recovery` F_L, `incipient_ratio` x_Fz, `power_ratio` r_W (Table 2), `valve_diameter` d and `seat_diameter` d_o [m]<br>• pipe: `internal_diameter` D_i [m], `wall_thickness` t_p [m], `pipe_density` [kg/m3]<br>• `strouhal_form`: 'annex' (Default) or 'clause', the two printings of Eq. (12)<br>• `frequency` (Default: the 50 Hz to 20 kHz thirds of 5.4.1) | `res = noise_control.valve_hydrodynamic_noise(mass_flow=30.0, ...)`<br><br>• `HydrodynamicValveNoise` |
+| `HydrodynamicValveNoise` | `dataclass` | **What IEC 60534-8-4 says about one operating point on a liquid line.**<br>• `regime` ('turbulent' / 'cavitating'), `pressure_ratio` x_F, `differential` and `cavitation_differential` [Pa], `incipient_ratio` / `corrected_ratio`<br>• `jet_diameter` [m], `velocity` U_vc [m/s], `stream_power` / `sound_power` [W], `turbulent_efficiency` / `cavitation_efficiency`<br>• `internal_level` [dB], `strouhal_number`, `turbulent_peak` / `cavitation_peak` [Hz]<br>• `pipe_ring_frequency` [Hz], `reference_transmission_loss`, `turbulent_transmission_loss`, `cavitation_transmission_loss`, `transmission_loss` [dB]<br>• `frequency` and the three band arrays, plus `external_level` [dB] at 1 m | `res.regime, res.external_level` |
+| `differential_pressure_ratio` / `cavitation_differential` | `function` | **Eqs. (1) and (2): how far towards flashing the operating point is, and the differential the jet velocity is computed from.**<br>• keyword-only: `inlet_pressure`, `outlet_pressure`, `vapour_pressure` [Pa]; the second also takes `pressure_recovery`<br>• x_F = (p1 - p2)/(p1 - p_v); Delta p_c is the lesser of p1 - p2 and F_L^2 (p1 - p_v) | `noise_control.differential_pressure_ratio(inlet_pressure=1e6, outlet_pressure=8e5, vapour_pressure=2320.0)  # 0.2005` |
+| `incipient_cavitation_ratio` / `multihole_incipient_cavitation_ratio` / `corrected_incipient_ratio` | `function` | **Eqs. (3a), (3b) and (3c): where cavitation becomes audible.**<br>• (3a): `flow_coefficient`, `style_modifier`, `pressure_recovery`, `coefficient` 'Cv' (Default) / 'Kv'<br>• (3b): `passages` N_o, `hole_diameter` d_H [m], `pressure_recovery`<br>• (3c) moves x_Fz from the 6e5 Pa the charts are drawn at to the working `inlet_pressure`<br>4.2 asks for a value measured to IEC 60534-8-2; these are the estimates it offers instead | `noise_control.incipient_cavitation_ratio(90.0, 0.42, 0.92)  # 0.2543` |
+| `vena_contracta_velocity` / `mechanical_stream_power` | `function` | **Eqs. (5) and (6): the jet velocity and the stream power it carries.**<br>• `differential` Delta p_c [Pa], `density` [kg/m3], `pressure_recovery`<br>• `mass_flow` [kg/s], `velocity` [m/s], `pressure_recovery` | `noise_control.vena_contracta_velocity(2e5, 997.0, 0.92)  # 21.77 m/s` |
+| `turbulent_efficiency` / `cavitation_efficiency` | `function` | **Eqs. (8) and (9): the two acoustical efficiencies the sound power is a fraction of.**<br>• turbulent: `velocity`, `sound_speed`; 1e-4 at U_vc = c_L and linear below it<br>• cavitating (keyword-only): `turbulent`, `differential`, `choked_differential`, `pressure_ratio`, `corrected_ratio`<br>Exactly zero on the threshold, so the two regimes meet without a step | `noise_control.turbulent_efficiency(21.77, 1400.0)  # 1.555e-6` |
+| `internal_sound_pressure_level` | `function` | **Eq. (10): the level inside, at the pipe wall.**<br>• keyword-only: `sound_power` W_a [W], `density` and `sound_speed` of the liquid, `internal_diameter` D_i [m]<br>The liquid's impedance is in the numerator, which is why a water line runs 150 dB inside | `noise_control.internal_sound_pressure_level(sound_power=0.00234, density=997.0, sound_speed=1400.0, internal_diameter=0.1071)` |
+| `jet_strouhal_number` / `turbulent_peak_frequency` / `cavitation_peak_frequency` | `function` | **Eqs. (12), (11) and (13): where the noise sits in frequency.**<br>• `jet_strouhal_number` (keyword-only): `flow_coefficient`, `style_modifier`, `pressure_recovery`, `corrected_ratio`, `valve_diameter`, `seat_diameter`, `inlet_pressure`, `vapour_pressure`, `coefficient`, `form` 'annex' (Default) / 'clause'<br>• `turbulent_peak_frequency(strouhal_number, velocity, jet)`<br>• `cavitation_peak_frequency(turbulent_peak, pressure_ratio, corrected_ratio)`: six times the turbulent peak on the threshold, falling from there | `noise_control.cavitation_peak_frequency(654.35, 0.3508, 0.2386)` |
+| `pipe_ring_frequency` / `reference_transmission_loss` / `transmission_loss_correction` | `function` | **Eqs. (14), (15), (16b) and (22b): the pipe wall.**<br>• `pipe_ring_frequency(internal_diameter, pipe_sound_speed=5000)`<br>• `reference_transmission_loss(internal_diameter, wall_thickness, pipe_density=…, air_density=…, …)`, negative by construction and therefore added downstream<br>• `transmission_loss_correction(frequency, ring)`: one expression for both printed equations, scalar or per band | `noise_control.reference_transmission_loss(0.1071, 0.0036, pipe_density=7800.0)  # -44.7 dB` |
+| `cavitation_transmission_loss` | `function` | **Eq. (17): what cavitation does to the wall.**<br>• `turbulent_loss` [dB]; keyword-only `turbulent_peak`, `cavitation_peak` [Hz], `efficiency_ratio`<br>• `pressure_ratio` and `corrected_ratio` apply the NOTE's floor, which keeps the cavitating loss from falling below the turbulent one within 0.1 of the threshold | `noise_control.cavitation_transmission_loss(-71.84, turbulent_peak=654.35, cavitation_peak=1088.94, efficiency_ratio=0.377)` |
+| `turbulent_distribution` / `cavitation_distribution` / `band_internal_levels` | `function` | **Eqs. (20a), (20b), (19a) and (19b): the internal level, band by band.**<br>• the two distributions take `frequency` and their own peak, and return a dB correction<br>• `band_internal_levels(frequency, internal_level, *, turbulent_peak, cavitation_peak=None, cavitation_fraction=0.0)` weights the two by their share of the sound power<br>Turbulent: 3 dB per octave up, 9 dB down. Cavitating: 4.5 dB both ways | `noise_control.band_internal_levels(bands, 156.5, turbulent_peak=654.4, cavitation_peak=1088.9, cavitation_fraction=0.377)` |
+| `stage_conditions` / `StageConditions` / `combine_stage_levels` | `function` / `dataclass` / `function` | **Clause 6: Eqs. (23a) to (24b), (26) and (27) for a multistage trim.**<br>• `stage_conditions` (keyword-only): `inlet_pressure`, `outlet_pressure`, `vapour_pressure`, `stage_coefficients` C_i, `flow_coefficient` C<br>• each stage takes a share of the differential in inverse proportion to its own C_i squared, the series law 1/C^2 = sum(1/C_i^2)<br>• `StageConditions`: `inlet_pressure`, `outlet_pressure`, `pressure_ratio`<br>• `combine_stage_levels(*levels)`: the energy sum of Eq. (27) | `noise_control.stage_conditions(inlet_pressure=1e6, outlet_pressure=4e5, vapour_pressure=2320.0, stage_coefficients=[156.0]*3, flow_coefficient=90.0)` |
+| `last_stage_differential` / `uniform_passage_style_modifier` / `last_stage_seat_diameter_mm` | `function` | **6.3.2: the fixed multistage device, where only the last stage is calculated.**<br>• `last_stage_differential` (keyword-only, Eq. (28)) caps the differential at the *cavitation threshold* of the last stage, not at F_L^2 as Eq. (2) does<br>• `uniform_passage_style_modifier(passages)` = 1/sqrt(N_o), Eq. (29)<br>• `last_stage_seat_diameter_mm(flow_coefficient, coefficient='Cv')`: the unnumbered 5.2 sqrt(N_34 C_n), which returns **millimetres** for a symbol Clause 3 declares in metres (see `docs/ERRATA.md`) | `noise_control.uniform_passage_style_modifier(16)  # 0.25` |
+| `ACOUSTIC_POWER_RATIOS` / `CAPACITY_SCALE_CONSTANTS` | `constant` | **Table 2**: r_W for the twelve valves and fittings the table prints, a quarter for the globes and rotaries, a half for the butterflies, one for an expander. **Table 1**: N_34, `{'Cv': 1.17, 'Kv': 1.0}` | `noise_control.ACOUSTIC_POWER_RATIOS['globe parabolic plug']  # 0.25` |
+| `STROUHAL_CONSTANTS` / `REFERENCE_INLET_PRESSURE_PA` / `CAVITATION_FLOOR_WIDTH` / `AIR_DENSITY_KG_M3` | `constant` | **The two printings of Eq. (12)**, `{'annex': 0.036, 'clause': 0.02}`; **6e5 Pa**, the inlet pressure x_Fz is drawn at; **0.1**, the width in x_F of the band the NOTE to Eq. (17) floors the efficiency ratio in; **1.293 kg/m3** for the air outside the pipe | `noise_control.STROUHAL_CONSTANTS['annex']` |
 | `EnclosureResult` | `dataclass` | **Enclosure insertion-loss result.**<br>• `panel_transmission_loss`, `correction` C, `insertion_loss`, `room_constant`, `external_area`, `internal_area`<br>• `.plot()` | `res.insertion_loss` |
 | `program_loudness` | `function` | **EBU R 128 measurement set of a programme (BS.1770-5 + Tech 3341/3342).**<br>• `x`: signal (1D mono or 2D [channels, samples], 1.0 = 0 dBFS)<br>• `fs` [Hz]<br>• `weights`: per-channel Gi (Default: Table 3 by channel count)<br>• `momentary_step` [s] (Default: 0.01), `short_term_step` [s] (Default: 0.1)<br>• `oversample`: true-peak factor (Default: None → reaches 192 kHz) | `res = broadcast.program_loudness(x, fs)`<br><br>• `ProgramLoudnessResult` |
 | `integrated_loudness` | `function` | **Programme (integrated) loudness with the two-stage gate (BS.1770-5 Annex 1).**<br>• `x`, `fs` [Hz]<br>• `weights` (Default: Table 3 by channel count)<br>Absolute gate −70 LKFS, relative −10 LU | `integrated_loudness(x, fs)  # LUFS` |
@@ -54255,7 +54601,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 820 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 834 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -54624,7 +54970,7 @@ sample from the metrology core:
 | IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()`; IEC 61252:2025 has since superseded this print, and the transcription still targets the 1993+A2 text | `tests/signals/test_levels.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-820 numerical conformance checks across 68 domains and 396 standards, covering
+834 numerical conformance checks across 69 domains and 397 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise

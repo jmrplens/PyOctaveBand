@@ -8,6 +8,7 @@ instrument classes that qualify them. Everything here is embedded by a page
 under ``devices/``.
 """
 
+import math
 import re
 import warnings
 from typing import TYPE_CHECKING, Any
@@ -41,7 +42,11 @@ if TYPE_CHECKING:
         LoudspeakerCharacteristics,
         MicrophoneCharacteristics,
     )
-    from phonometry.noise_control import EnclosureResult, RoomToRoomResult
+    from phonometry.noise_control import (
+        EnclosureResult,
+        HydrodynamicValveNoise,
+        RoomToRoomResult,
+    )
 
 # A negative reading a library plot assembled with ``format()``: the ASCII
 # hyphen before a digit, in a position no word or bracket claims. Restated to
@@ -6336,6 +6341,254 @@ def generate_workstation_emission(output_dir: str) -> None:
 
     plt.tight_layout()
     save_figure(output_dir, "workstation_emission.svg")
+    plt.close()
+
+
+def generate_valve_cavitation_noise(output_dir: str) -> None:
+    """IEC 60534-8-4: the threshold, the two humps, and what the bubbles add."""
+    print("Generating valve_cavitation_noise.svg...")
+    from phonometry import noise_control
+
+    common: dict[str, Any] = {
+        "inlet_pressure": 1.0e6,
+        "vapour_pressure": 2.32e3,
+        "liquid_density": 997.0,
+        "liquid_sound_speed": 1400.0,
+        "flow_coefficient": 90.0,
+        "style_modifier": 0.42,
+        "pressure_recovery": 0.92,
+        "power_ratio": 0.25,
+        "valve_diameter": 0.1,
+        "seat_diameter": 0.1,
+        "internal_diameter": 0.1071,
+        "wall_thickness": 0.0036,
+        "pipe_density": 7800.0,
+    }
+    inlet, vapour = 1.0e6, 2.32e3
+    threshold = noise_control.incipient_cavitation_ratio(90.0, 0.42, 0.92)
+
+    def at(ratio: float, *, incipient: float) -> "HydrodynamicValveNoise":
+        """The valve at differential pressure ratio ``ratio``.
+
+        The mass flow is not held constant along the sweep: a valve of fixed
+        travel passes what the differential gives it, so the flow follows
+        the square root of the differential of Equation (2) and stops
+        growing when that one does. The two printed examples are on this
+        curve, 30 kg/s at 2 bar and 40 at 3,5.
+        """
+        outlet = inlet - ratio * (inlet - vapour)
+        choked = noise_control.cavitation_differential(
+            inlet_pressure=inlet,
+            outlet_pressure=outlet,
+            vapour_pressure=vapour,
+            pressure_recovery=0.92,
+        )
+        return noise_control.valve_hydrodynamic_noise(
+            **common,
+            mass_flow=30.0 * math.sqrt(choked / 2.0e5),
+            outlet_pressure=outlet,
+            incipient_ratio=incipient,
+        )
+
+    _fig, axes = plt.subplots(1, 3, figsize=(16.4, 5.4))
+
+    # -- Left: Figure A.1 of the annex, which is the whole argument of the
+    # standard in one plot: the same valve, the same flow, and a
+    # characteristic pressure ratio 0,1 apart.
+    ax = axes[0]
+    ratios = np.linspace(0.03, 0.92, 300)
+    for incipient, colour, style, label in (
+        (threshold, COLOR_PRIMARY, "-", "Measured $x_{Fz}$"),
+        (threshold + 0.1, COLOR_SECONDARY, "--", "$x_{Fz} + 0{,}1$"),
+    ):
+        levels = [at(x, incipient=incipient).external_level for x in ratios]
+        ax.plot(ratios, levels, color=colour, lw=2.4, ls=style, label=label)
+    for ratio, marker in ((0.2005, "D"), (0.3508, "s")):
+        ax.plot(
+            ratio,
+            at(ratio, incipient=threshold).external_level,
+            marker,
+            color=COLOR_PRIMARY,
+            markersize=7,
+            zorder=5,
+        )
+    ax.plot(
+        0.3508,
+        at(0.3508, incipient=threshold + 0.1).external_level,
+        "o",
+        color=COLOR_SECONDARY,
+        markersize=7,
+        zorder=5,
+    )
+    ax.set_xlim(0.0, 1.0)
+    ax.set_ylim(30.0, 100.0)
+    ax.set_xlabel("Differential pressure ratio $x_F$")
+    ax.set_ylabel("Level 1 m from the pipe [dB]")
+    ax.set_title("Where the noise stops being turbulence")
+    ax.grid(color=COLOR_GRID, ls="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower right", fontsize=9)
+    ax.annotate(
+        "the same valve at the same flow, with a\nthreshold 0,1 apart: 14 dB between the\n"
+        "two markers, and the standard asks for\na measured value for exactly this reason",
+        xy=(0.3508, 74.0),
+        xytext=(0.30, 38.0),
+        fontsize=8.5,
+        color=COLOR_FG,
+        ha="left",
+        arrowprops={"arrowstyle": "->", "color": COLOR_FG, "linewidth": 1.1},
+        bbox={
+            "boxstyle": "round,pad=0.3",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=6,
+    )
+
+    # -- Middle: the cavitating spectrum, taken apart. Equation (19b) is
+    # the two distributions added in energy, each weighted by the share of
+    # the sound power its own efficiency accounts for, and the sum is a
+    # two-humped spectrum whose taller hump is decided by that share alone.
+    ax2 = axes[1]
+    cavitating = at(0.3508, incipient=threshold)
+    cavitation_peak = cavitating.cavitation_peak
+    efficiency = cavitating.cavitation_efficiency
+    if cavitation_peak is None or efficiency is None:  # pragma: no cover
+        msg = "Example 2 of Annex A cavitates; its cavitation terms are not None."
+        raise RuntimeError(msg)
+    share = efficiency / (cavitating.turbulent_efficiency + efficiency)
+    bands = np.asarray(cavitating.frequency)
+    turbulent_hump = (
+        cavitating.internal_level
+        + 10.0 * math.log10(1.0 - share)
+        + noise_control.turbulent_distribution(bands, cavitating.turbulent_peak)
+    )
+    cavitation_hump = (
+        cavitating.internal_level
+        + 10.0 * math.log10(share)
+        + noise_control.cavitation_distribution(bands, cavitation_peak)
+    )
+    ax2.plot(
+        bands,
+        np.asarray(cavitating.band_internal_level),
+        color=COLOR_PRIMARY,
+        lw=2.4,
+        label="Inside the pipe, $L_{pi}(f_i)$",
+    )
+    ax2.plot(
+        bands,
+        np.asarray(turbulent_hump),
+        color=COLOR_TERTIARY,
+        lw=1.6,
+        ls=":",
+        label="Turbulent share",
+    )
+    ax2.plot(
+        bands,
+        np.asarray(cavitation_hump),
+        color=COLOR_QUATERNARY,
+        lw=1.6,
+        ls="-.",
+        label="Cavitating share",
+    )
+    ax2.plot(
+        bands,
+        np.asarray(cavitating.band_external_level),
+        color=COLOR_SECONDARY,
+        lw=2.0,
+        ls="--",
+        label="One metre outside, $L_{pe,1m}(f_i)$",
+    )
+    for frequency, name, side in (
+        (cavitating.turbulent_peak, "$f_{p,turb}$", "right"),
+        (cavitation_peak, "$f_{p,cav}$", "left"),
+    ):
+        ax2.axvline(frequency, color=COLOR_MUTED, ls=":", lw=1.4)
+        ax2.text(
+            frequency * (0.93 if side == "right" else 1.07),
+            118.0,
+            name,
+            fontsize=10,
+            color=COLOR_MUTED,
+            ha=side,
+            va="bottom",
+        )
+    format_frequency_axis(ax2, 50.0, 20000.0)
+    ax2.set_ylim(60.0, 165.0)
+    ax2.set_ylabel("Sound pressure level [dB]")
+    ax2.set_title("Two humps, weighted by two efficiencies")
+    ax2.grid(color=COLOR_GRID, ls="--", alpha=0.5)
+    ax2.set_axisbelow(True)
+    ax2.legend(loc="lower left", fontsize=8.5)
+    ax2.annotate(
+        "the cavitating share is 38 % of the power\nhere, and it sits an octave above the\n"
+        "turbulent one: the wall passes it better",
+        xy=(cavitation_peak, 140.0),
+        xytext=(330.0, 92.0),
+        fontsize=8.5,
+        color=COLOR_FG,
+        arrowprops={"arrowstyle": "->", "color": COLOR_FG, "linewidth": 1.1},
+        bbox={
+            "boxstyle": "round,pad=0.3",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=6,
+    )
+
+    # -- Right: the two efficiencies that decide all of it.
+    ax3 = axes[2]
+    turbulent, cavitation = [], []
+    for x in ratios:
+        found = at(x, incipient=threshold)
+        turbulent.append(found.turbulent_efficiency)
+        cavitation.append(found.cavitation_efficiency or float("nan"))
+    corrected = at(0.3508, incipient=threshold).corrected_ratio
+    ax3.axvspan(0.0, corrected, color=theme_fill(COLOR_PRIMARY, ax3), lw=0, zorder=0)
+    ax3.plot(
+        ratios,
+        turbulent,
+        color=COLOR_PRIMARY,
+        lw=2.4,
+        label="Turbulent, $\\eta_{turb}$",
+    )
+    ax3.plot(
+        ratios,
+        cavitation,
+        color=COLOR_SECONDARY,
+        lw=2.4,
+        ls="--",
+        label="Cavitating, $\\eta_{cav}$",
+    )
+    ax3.axvline(corrected, color=COLOR_MUTED, ls=":", lw=1.4)
+    ax3.set_yscale("log")
+    ax3.set_xlim(0.0, 1.0)
+    ax3.set_ylim(1e-10, 1e-2)
+    ax3.set_xlabel("Differential pressure ratio $x_F$")
+    ax3.set_ylabel("Acoustical efficiency $\\eta$")
+    ax3.set_title("What the bubbles add")
+    ax3.grid(color=COLOR_GRID, ls="--", alpha=0.5)
+    ax3.set_axisbelow(True)
+    ax3.legend(loc="upper left", fontsize=9)
+    ax3.annotate(
+        "zero at the threshold, then a fifth power:\nthe cavitation term passes the turbulent\n"
+        "one within a tenth of $x_F$ of starting",
+        xy=(corrected, 3.0e-7),
+        xytext=(0.33, 2.0e-10),
+        fontsize=8.5,
+        color=COLOR_FG,
+        ha="left",
+        arrowprops={"arrowstyle": "->", "color": COLOR_FG, "linewidth": 1.1},
+        bbox={
+            "boxstyle": "round,pad=0.3",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=6,
+    )
+
+    plt.tight_layout()
+    save_figure(output_dir, "valve_cavitation_noise.svg")
     plt.close()
 
 
