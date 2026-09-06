@@ -69,6 +69,14 @@ _REVERBERATION_TIME_LABEL = "Reverberation time $T$ [s]"
 #: Shared legend entry naming the equivalent absorption area of a curve.
 _ABSORPTION_AREA_LABEL = "$A$ = {value} m²"
 
+#: Legend entry of the shaded band every Table A.1 range is drawn as.  The
+#: table gives its ranges for the single number, so the same wording serves
+#: the strength, the lateral fraction and the late lateral level alike.
+_TABLE_A1_RANGE_LABEL = "Typical range of the single number (Table A.1)"
+
+#: Ordinate of the interaural cross-correlation function of Annex B.
+_IACF_LABEL = r"$\mathrm{IACF}(\tau)$"
+
 #: Highest octave band shaded with the +5 dB rumble tolerance in the RC Mark II
 #: plot (ANSI/ASA S12.2 Annex D, clause D.3: at and below 500 Hz).
 _RC_RUMBLE_MAX_HZ = 500.0
@@ -184,9 +192,7 @@ _STRINGS: dict[str, str] = {
     # --- Sound strength G (ISO 3382-1:2009, A.2.1) ---
     "Sound strength $G$ [dB]": "Fuerza sonora $G$ [dB]",
     "ISO 3382-1 sound strength": "Fuerza sonora ISO 3382-1",
-    "Typical range of the single number (Table A.1)": (
-        "Rango habitual del número único (Tabla A.1)"
-    ),
+    _TABLE_A1_RANGE_LABEL: "Rango habitual del número único (Tabla A.1)",
     r"Single number, $G_m$ (500 Hz to 1 kHz)": (
         r"Número único, $G_m$ (500 Hz a 1 kHz)"
     ),
@@ -214,7 +220,7 @@ _STRINGS: dict[str, str] = {
         "Correlación cruzada interaural ISO 3382-1"
     ),
     r"Interaural delay $\tau$ [ms]": r"Retardo interaural $\tau$ [ms]",
-    r"$\mathrm{IACF}(\tau)$": r"$\mathrm{IACF}(\tau)$",
+    _IACF_LABEL: _IACF_LABEL,
 }
 
 
@@ -407,7 +413,7 @@ def plot_sound_strength(
         high,
         color=_C_PRIMARY_LIGHT,
         alpha=0.3,
-        label=_t("Typical range of the single number (Table A.1)", language),
+        label=_t(_TABLE_A1_RANGE_LABEL, language),
     )
     single_number = _single_number(result.frequency, strength)
     if single_number is not None:
@@ -492,7 +498,7 @@ def plot_lateral_energy(
         high,
         color=_C_PRIMARY_LIGHT,
         alpha=0.3,
-        label=_t("Typical range of the single number (Table A.1)", language),
+        label=_t(_TABLE_A1_RANGE_LABEL, language),
     )
     single_number = _single_number(
         result.frequency, values, _LATERAL_SINGLE_NUMBER_BANDS_HZ
@@ -564,7 +570,7 @@ def plot_late_lateral(
         high,
         color=_C_PRIMARY_LIGHT,
         alpha=0.3,
-        label=_t("Typical range of the single number (Table A.1)", language),
+        label=_t(_TABLE_A1_RANGE_LABEL, language),
     )
     picked = _band_indices(result.frequency, LATE_LATERAL_AVERAGE_BANDS_HZ)
     if picked is not None:
@@ -638,7 +644,7 @@ def plot_interaural_correlation(
             zorder=4,
         )
     ax.set_xlabel(_t(r"Interaural delay $\tau$ [ms]", language))
-    ax.set_ylabel(_t(r"$\mathrm{IACF}(\tau)$", language))
+    ax.set_ylabel(_t(_IACF_LABEL, language))
     ax.set_title(_t("ISO 3382-1 interaural cross correlation", language))
     ax.set_xlim(float(lag_ms[0]), float(lag_ms[-1]))
     ax.grid(True, alpha=0.3)
