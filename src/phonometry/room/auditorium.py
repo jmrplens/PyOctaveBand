@@ -1579,13 +1579,29 @@ TABLE_A1 = {
 }
 
 
+#: The alternative symbol Table A.1 prints inside a row it shares. "Early
+#: lateral energy fraction, J_LF or J_LFC" is one row, with one band set, one
+#: just-noticeable difference and one typical range, so the cosine-weighted
+#: variant of Equation (A.15) is looked up through the row of Equation (A.14)
+#: rather than being given an eighth row of its own.
+_TABLE_A1_ALIASES = {"J_LFC": "J_LF"}
+
+
 def _band_positions(
     frequency: ArrayLike, wanted: tuple[float, ...], name: str
 ) -> list[int]:
     """Where the named nominal bands sit on a measured band axis."""
     centres = np.asarray(frequency, dtype=np.float64)
-    if centres.ndim != 1:
-        msg = f"'{name}' must be a one-dimensional band axis in Hz."
+    if centres.ndim != 1 or centres.size == 0:
+        msg = f"'{name}' must be a non-empty one-dimensional band axis in Hz."
+        raise ValueError(msg)
+    if not np.all(np.isfinite(centres)):
+        # A NaN defeats both halves of the lookup below: np.min returns NaN,
+        # so the "does not carry the band" comparison is False, and np.argmin
+        # then hands back its own index for every band asked for. What comes
+        # out is a real reading from an arbitrary band, which is worse than
+        # an error because it looks right.
+        msg = f"'{name}' must be a band axis of finite centre frequencies in Hz."
         raise ValueError(msg)
     found = []
     for band in wanted:
@@ -1621,7 +1637,11 @@ def single_number_average(
     four, and an accessor that hard-codes the mid pair is wrong for half the
     table.
 
-    :param symbol: The quantity, as :data:`TABLE_A1` keys it.
+    :param symbol: The quantity, as :data:`TABLE_A1` keys it. ``"J_LFC"``
+        is taken too: Table A.1 prints the early lateral energy fraction as
+        one row, "J_LF or J_LFC", so both weightings of
+        :func:`early_lateral_energy_fraction` share its four bands, its
+        just-noticeable difference and its typical range.
     :param values: Its per-band values, one per entry of ``frequency``.
     :param frequency: The band centre frequencies in Hz, as a result carries
         them.
@@ -1689,7 +1709,11 @@ def perceptibly_different(symbol: str, first: ArrayLike, second: ArrayLike) -> b
     than a difference in seconds. The late lateral sound level has no JND at
     all, printed as "Not known", and this function refuses to invent one.
 
-    :param symbol: The quantity, as :data:`TABLE_A1` keys it.
+    :param symbol: The quantity, as :data:`TABLE_A1` keys it. ``"J_LFC"``
+        is taken too: Table A.1 prints the early lateral energy fraction as
+        one row, "J_LF or J_LFC", so both weightings of
+        :func:`early_lateral_energy_fraction` share its four bands, its
+        just-noticeable difference and its typical range.
     :param first: One value, in the quantity's unit.
     :param second: The other, of the same shape.
     :return: True when the two differ by at least the just-noticeable
@@ -1717,14 +1741,13 @@ def perceptibly_different(symbol: str, first: ArrayLike, second: ArrayLike) -> b
 
 
 def _table_a1_row(symbol: str) -> AuditoriumQuantity:
-    """One row of Table A.1, by the symbol the standard prints."""
-    if symbol not in TABLE_A1:
-        msg = (
-            f"ISO 3382-1:2009, Table A.1 prints "
-            f"{', '.join(sorted(TABLE_A1))}; got {symbol!r}."
-        )
+    """One row of Table A.1, by either symbol the standard prints for it."""
+    key = _TABLE_A1_ALIASES.get(symbol, symbol)
+    if key not in TABLE_A1:
+        printed = ", ".join(sorted([*TABLE_A1, *_TABLE_A1_ALIASES]))
+        msg = f"ISO 3382-1:2009, Table A.1 prints {printed}; got {symbol!r}."
         raise ValueError(msg)
-    return TABLE_A1[symbol]
+    return TABLE_A1[key]
 
 
 def minimum_receiver_positions(seats: ArrayLike) -> NDArray[np.float64] | float:
@@ -1751,11 +1774,11 @@ def minimum_receiver_positions(seats: ArrayLike) -> NDArray[np.float64] | float:
     :param seats: The number of seats in the hall.
     :return: The minimum number of positions, not rounded, clamped to the
         6 to 10 the table and A.4 between them authorise.
-    :raises ValueError: If a seat count is not positive.
+    :raises ValueError: If a seat count is not a positive, finite number.
     """
     count = np.asarray(seats, dtype=np.float64)
-    if np.any(count <= 0.0):
-        msg = "'seats' must be a positive number of seats."
+    if not np.all(np.isfinite(count)) or np.any(count <= 0.0):
+        msg = "'seats' must be a positive, finite number of seats."
         raise ValueError(msg)
     line = 6.0 + 2.0 * np.log2(count / 500.0)
     positions = np.asarray(np.clip(line, 6.0, 10.0), dtype=np.float64)

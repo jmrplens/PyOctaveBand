@@ -747,7 +747,7 @@ as balconies and under-balcony areas will need more than this.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If a seat count is not positive. |
+| ValueError | If a seat count is not a positive, finite number. |
 
 ## MINIMUM_REFERENCE_DISTANCE_M
 
@@ -825,7 +825,7 @@ all, printed as "Not known", and this function refuses to invent one.
 
 | Name | Description |
 | :--- | :--- |
-| `symbol` | The quantity, as [`TABLE_A1`](/phonometry/reference/api/rooms/auditorium/#table_a1) keys it. |
+| `symbol` | The quantity, as [`TABLE_A1`](/phonometry/reference/api/rooms/auditorium/#table_a1) keys it. `"J_LFC"` is taken too: Table A.1 prints the early lateral energy fraction as one row, "J_LF or J_LFC", so both weightings of [`early_lateral_energy_fraction`](/phonometry/reference/api/rooms/auditorium/#early_lateral_energy_fraction) share its four bands, its just-noticeable difference and its typical range. |
 | `first` | One value, in the quantity's unit. |
 | `second` | The other, of the same shape. |
 
@@ -930,7 +930,7 @@ table.
 
 | Name | Description |
 | :--- | :--- |
-| `symbol` | The quantity, as [`TABLE_A1`](/phonometry/reference/api/rooms/auditorium/#table_a1) keys it. |
+| `symbol` | The quantity, as [`TABLE_A1`](/phonometry/reference/api/rooms/auditorium/#table_a1) keys it. `"J_LFC"` is taken too: Table A.1 prints the early lateral energy fraction as one row, "J_LF or J_LFC", so both weightings of [`early_lateral_energy_fraction`](/phonometry/reference/api/rooms/auditorium/#early_lateral_energy_fraction) share its four bands, its just-noticeable difference and its typical range. |
 | `values` | Its per-band values, one per entry of `frequency`. |
 | `frequency` | The band centre frequencies in Hz, as a result carries them. |
 

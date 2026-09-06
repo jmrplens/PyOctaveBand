@@ -4510,12 +4510,17 @@ in the same order.
   its bearing, trail it, or straddle it, and the clause does not choose. Nor
   does it say how the six are combined, although the reference they are
   compared with is explicitly "a 360° energetic average".
-- **Consequence:** the phase shifts every reported deviation by up to half a
-  window, 15° of the pattern, which for a source near its Table 1 limit can
-  decide whether the largest deviation lands on a lobe or between two of
-  them. Two laboratories that both follow the clause can report different
-  maximum deviations for one source, and the standard gives no way to tell
-  which of them read it right.
+- **Consequence:** over a full turn the six-point windows are one cyclic set
+  whichever end of its arc a window is pinned to, so the phase moves the
+  bearing each deviation is reported against by up to half a window, 15° of
+  the pattern, and leaves the deviations themselves alone. For a source near
+  its Table 1 limit that is still what decides whether the largest deviation
+  is reported on a lobe or between two of them, which is the orientation A.4
+  then asks to be turned and measured again. The other two silences do move
+  the number: the span reading and the combination law both change what an
+  arc averages, so two laboratories that follow the clause can report
+  different maximum deviations for one source, and the standard gives no way
+  to tell which of them read it right.
 - **Evidence:** Verified on PDF page 11 (printed p. 3) of
   BS EN ISO 3382-1:2009.
 - **Library behaviour:**

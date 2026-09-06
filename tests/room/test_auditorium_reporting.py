@@ -101,6 +101,29 @@ class TestSingleNumberAverage:
             5.0, abs=1e-12
         )
 
+    def test_the_cosine_weighting_shares_the_row_it_is_printed_in(self) -> None:
+        # Table A.1 prints one row, "J_LF or J_LFC", so the cosine-weighted
+        # variant of (A.15) is averaged and judged by the same numbers.
+        values = np.array([0.2, 0.3, 0.4, 0.5, 9.0, 9.0])
+        assert room.single_number_average("J_LFC", values, OCTAVES) == pytest.approx(
+            room.single_number_average("J_LF", values, OCTAVES)
+        )
+        assert room.perceptibly_different("J_LFC", 0.20, 0.26)
+        assert not room.perceptibly_different("J_LFC", 0.20, 0.24)
+
+    def test_it_names_both_printed_symbols_when_it_refuses_one(self) -> None:
+        with pytest.raises(ValueError, match="J_LFC"):
+            room.single_number_average("J_XX", np.zeros(6), OCTAVES)
+
+    @pytest.mark.parametrize("bad", [np.nan, np.inf])
+    def test_it_refuses_a_band_axis_that_is_not_finite(self, bad: float) -> None:
+        # A NaN centre made np.argmin hand back index 0 for every band, and
+        # the average that came out was a real reading from the wrong band.
+        axis = OCTAVES.copy()
+        axis[0] = bad
+        with pytest.raises(ValueError, match="finite centre frequencies"):
+            room.single_number_average("G", np.arange(6.0), axis)
+
     def test_the_lateral_fraction_averages_four_bands(self) -> None:
         # EXAMPLE 2 of A.5: J_LFm is averaged in the 125 Hz to 1 kHz bands,
         # so the two top octaves take no part in it.
@@ -211,8 +234,17 @@ class TestMinimumReceiverPositions:
         assert out == pytest.approx([6.0, 8.0, 10.0])
 
     def test_it_refuses_a_hall_with_no_seats(self) -> None:
-        with pytest.raises(ValueError, match="positive number of seats"):
+        with pytest.raises(ValueError, match="positive, finite number of seats"):
             room.minimum_receiver_positions(0)
+
+    @pytest.mark.parametrize("seats", [np.nan, np.inf, [500.0, np.nan]])
+    def test_it_refuses_a_seat_count_that_is_not_a_number(
+        self, seats: float | list[float]
+    ) -> None:
+        # A NaN used to come back as a NaN, and an infinite hall used to be
+        # clipped to the ten positions Table A.2 prints for a 2 000-seat one.
+        with pytest.raises(ValueError, match="positive, finite number of seats"):
+            room.minimum_receiver_positions(seats)
 
 
 class TestSourceDirectivity:

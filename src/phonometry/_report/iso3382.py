@@ -333,7 +333,7 @@ def _band_fraction(frequency: np.ndarray | None) -> int:
 
 
 def _reverberation_descriptor(
-    result: RoomAcousticsResult, values: np.ndarray, fraction: int = 1
+    result: RoomAcousticsResult, values: np.ndarray, fraction: int
 ) -> tuple[float, bool, float]:
     """Return ``(value, is_mid, band)`` for the boxed reverberation descriptor.
 
@@ -486,7 +486,9 @@ def _verdict(
     what the sheet says about that room.
     """
     t_value, is_mid, _ = _reverberation_descriptor(
-        result, np.asarray(result.t30, dtype=np.float64)
+        result,
+        np.asarray(result.t30, dtype=np.float64),
+        _band_fraction(result.frequency),
     )
     if not math.isfinite(t_value):
         return None

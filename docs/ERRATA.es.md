@@ -4820,12 +4820,17 @@ dos ediciones con las mismas entradas y en el mismo orden.
   centrada, y el apartado no elige. Tampoco dice cómo se combinan los seis,
   aunque la referencia con la que se comparan sea explícitamente «a 360°
   energetic average».
-- **Consecuencia:** la fase desplaza toda desviación reportada hasta media
-  ventana, 15° del patrón, lo que en una fuente cercana a su límite de la
-  Tabla 1 puede decidir si la desviación máxima cae sobre un lóbulo o entre
-  dos. Dos laboratorios que sigan los dos el apartado pueden dar desviaciones
-  máximas distintas para una misma fuente, y la norma no da forma de saber
-  cuál de los dos la leyó bien.
+- **Consecuencia:** en una vuelta completa las ventanas de seis puntos son un
+  mismo conjunto cíclico se ancle la ventana por donde se ancle, así que la
+  fase desplaza hasta media ventana, 15° del patrón, la orientación con la
+  que se reporta cada desviación, y deja las desviaciones intactas. En una
+  fuente cercana a su límite de la Tabla 1 eso sigue decidiendo si la
+  desviación máxima se reporta sobre un lóbulo o entre dos, que es la
+  orientación que la A.4 pide luego girar y volver a medir. Los otros dos
+  silencios sí mueven el número: la lectura del span y la ley de combinación
+  cambian lo que promedia cada arco, así que dos laboratorios que sigan los
+  dos el apartado pueden dar desviaciones máximas distintas para una misma
+  fuente, y la norma no da forma de saber cuál de los dos la leyó bien.
 - **Evidencia:** verificado en la página 11 del PDF (folio impreso 3) de
   BS EN ISO 3382-1:2009.
 - **Comportamiento de la biblioteca:**
