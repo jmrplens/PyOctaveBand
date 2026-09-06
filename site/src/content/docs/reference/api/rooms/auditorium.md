@@ -197,6 +197,14 @@ of `ir`, band by band.
 EARLY_LATERAL_WINDOW_S = (0.005, 0.08)
 ```
 
+## EARLY_SUPPORT_WINDOW_S
+
+*Constant* (`tuple`).
+
+```python
+EARLY_SUPPORT_WINDOW_S = (0.02, 0.1)
+```
+
 ## free_field_reference_level
 
 ```python
@@ -483,6 +491,14 @@ microphone aimed as A.2.5 asks has no direct sound to trigger on, and an
 
 ```python
 LATE_LATERAL_START_S = 0.08
+```
+
+## LATE_SUPPORT_WINDOW_S
+
+*Constant* (`tuple`).
+
+```python
+LATE_SUPPORT_WINDOW_S = (0.1, 1.0)
 ```
 
 ## LateLateralResult
@@ -835,3 +851,149 @@ With `ax` given, only the strength panel is drawn on it; otherwise a
 second panel shows the two levels G is the difference of. Requires
 matplotlib (`pip install phonometry[plot]`); returns the
 `Axes` (or an array of two).
+
+## STAGE_DIRECT_WINDOW_S
+
+*Constant* (`tuple`).
+
+```python
+STAGE_DIRECT_WINDOW_S = (0.0, 0.01)
+```
+
+## stage_support
+
+```python
+stage_support(
+    ir: Signal | list[float] | NDArray[np.float64],
+    fs: int | None = None,
+    *,
+    limits: tuple[float, float] | None = (250.0, 2000.0),
+    fraction: int = 1,
+) -> StageSupportResult
+```
+
+Early and late stage support of a platform response, per band.
+
+ISO 3382-1:2009, Equations (C.1) and (C.2), the reflected energy a
+musician hears from the platform against the direct sound of their own
+instrument:
+
+$$
+ST_\mathrm{Early} = 10 \lg \frac{\int_{0,020}^{0,100} p^2(t)\ \mathrm{d}t} {\int_{0}^{0,010} p^2(t)\ \mathrm{d}t}\ \mathrm{dB}, \qquad ST_\mathrm{Late} = 10 \lg \frac{\int_{0,100}^{1,000} p^2(t)\ \mathrm{d}t} {\int_{0}^{0,010} p^2(t)\ \mathrm{d}t}\ \mathrm{dB}
+$$
+
+Both are measured with the source and the microphone 1,0 m apart on the
+platform, at the same height, with nothing reflecting within 2 m
+(C.2.1 and C.2.3). Because they share a denominator, their difference is
+a property of the hall alone and does not depend on how loud the direct
+sound was.
+
+**Two limits are in the equations and not in the prose.** C.2.1
+describes the early support as "the reflected energy within the first
+0,1 s", but (C.1) starts at 20 ms, discarding the 10 ms to 20 ms
+interval; C.2.2 describes the late support as "the reflected energy
+after the first 0,1 s" with no upper bound, but (C.2) stops at one
+second, which matters in any hall whose reverberation time is longer
+than that. The equations govern, and
+:doc:`the errata register </reference/errata>` records the rest.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ir` | Impulse response measured on the platform (1D), 1,0 m from the acoustic centre of an omnidirectional source. |
+| `fs` | Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own. |
+| `limits` | `(f_min, f_max)` band-centre limits in Hz; default the 250 Hz to 2 kHz octave bands C.2.4 averages over. `None` measures the broadband response. |
+| `fraction` | Bandwidth fraction (1 = octave, 3 = one-third octave). C.2.4 asks for octave bands. |
+
+**Returns:** A [`StageSupportResult`](/phonometry/reference/api/rooms/auditorium/#stagesupportresult) with one entry per band.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the response is not one-dimensional or is silent, if a band has no energy, or if the response is shorter than the one second Equation (C.2) integrates to. |
+
+## STAGE_SUPPORT_BANDS_HZ
+
+*Constant* (`tuple`).
+
+```python
+STAGE_SUPPORT_BANDS_HZ = (250.0, 500.0, 1000.0, 2000.0)
+```
+
+## STAGE_SUPPORT_DISTANCE_M
+
+*Constant* (`float`).
+
+```python
+STAGE_SUPPORT_DISTANCE_M = 1.0
+```
+
+## STAGE_SUPPORT_HEIGHTS_M
+
+*Constant* (`tuple`).
+
+```python
+STAGE_SUPPORT_HEIGHTS_M = (1.0, 1.5)
+```
+
+## STAGE_SUPPORT_POSITIONS
+
+*Constant* (`int`).
+
+```python
+STAGE_SUPPORT_POSITIONS = 3
+```
+
+## STAGE_SUPPORT_SINGLE_NUMBER_STANDARD_DEVIATION_DB
+
+*Constant* (`float`).
+
+```python
+STAGE_SUPPORT_SINGLE_NUMBER_STANDARD_DEVIATION_DB = 0.3
+```
+
+## STAGE_SUPPORT_STANDARD_DEVIATION_DB
+
+*Constant* (`float`).
+
+```python
+STAGE_SUPPORT_STANDARD_DEVIATION_DB = 1.0
+```
+
+## StageSupportResult
+
+```python
+StageSupportResult(
+    frequency: NDArray[np.float64] | None,
+    early: NDArray[np.float64],
+    late: NDArray[np.float64],
+)
+```
+
+Per-band stage support (ISO 3382-1:2009, Annex C).
+
+`frequency` holds the exact band centre frequencies in Hz, or is
+`None` for a broadband measurement. `early` is
+$ST_\mathrm{Early}$ in dB (Equation (C.1)) and `late`
+$ST_\mathrm{Late}$ in dB (Equation (C.2)), both referred to the
+same direct sound. Table C.1 gives their typical ranges as -24 dB to
+-8 dB and -24 dB to -10 dB and prints "Not known" for both
+just-noticeable differences, so this module has none.
+
+### StageSupportResult.plot()
+
+```python
+StageSupportResult.plot(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Plot both supports per band against the Table C.1 ranges.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.

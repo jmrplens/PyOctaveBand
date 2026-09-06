@@ -64,6 +64,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
     from matplotlib.axes import Axes
+    from numpy.typing import ArrayLike
 
     from .._report.metadata import ReportMetadata
     from ..io._signal import Signal
@@ -597,3 +598,194 @@ def room_parameters(
         ),
         curvature=curvature,
     )
+
+
+#: Bandwidth of a fractional-octave filter as a fraction of its mid-band
+#: frequency, for the uncertainty of ISO 3382-1:2009, 7.1: "For an octave
+#: filter, B = 0,71 f_c, and for one-third-octave filter, B = 0,23 f_c".
+#:
+#: These are the printed working values, not filter design values. The exact
+#: IEC 61260 band-edge widths are 2^(1/2) - 2^(-1/2) = 0,7071 and
+#: 2^(1/6) - 2^(-1/6) = 0,2316, so the printed pair is each of those rounded
+#: to two figures, 0,4 % and 0,7 % away. Since sigma follows the square root
+#: of B, that is at most 0,4 % on the answer.
+FILTER_BANDWIDTH_FRACTION = {1: 0.71, 3: 0.23}
+
+#: The coefficients ISO 3382-1:2009, Equations (4) and (5) print, keyed by the
+#: evaluation range in dB they belong to: ``(prefactor, decay term)``.
+#:
+#: They are the D = 20 dB and D = 30 dB rows of the general form ISO
+#: 3382-2:2008 prints as Equation (A.4), at its Table A.1 column for
+#: gamma = T/T_det = 5, which ISO 3382-1 does not print: G = 88 % with
+#: H = 1,90, and G = 55 % with H = 1,52.
+DECAY_UNCERTAINTY_COEFFICIENTS = {20.0: (0.88, 1.90), 30.0: (0.55, 1.52)}
+
+#: Decays per position the integrated impulse response method is worth
+#: (ISO 3382-1:2009, 7.2). The theory says an infinite number, but the clause
+#: puts the practical figure at ten and that is what an uncertainty is
+#: computed with: the two differ by 7 % on sigma(T30) and 9 % on sigma(T20).
+INTEGRATED_RESPONSE_DECAYS = 10
+
+#: The bandwidth-time product ISO 3382-1:2009, Equation (6) asks a reliable
+#: decay time to clear.
+MINIMUM_BANDWIDTH_TIME_PRODUCT = 16.0
+
+#: The multiple of the averaging detector's own reverberation time that
+#: Equation (7) asks a reliable decay time to clear.
+MINIMUM_DETECTOR_MULTIPLE = 2.0
+
+
+def filter_bandwidth(centre: ArrayLike, fraction: int = 1) -> np.ndarray | float:
+    """Bandwidth of a fractional-octave filter (ISO 3382-1:2009, 7.1).
+
+    The ``B`` of Equations (4) to (6), as the clause prints it: 0,71 times
+    the mid-band frequency for an octave filter and 0,23 times it for a
+    one-third-octave one. See :data:`FILTER_BANDWIDTH_FRACTION` for how
+    those two figures sit against the exact IEC 61260 band edges.
+
+    :param centre: Mid-band frequency, in Hz.
+    :param fraction: Bandwidth fraction: 1 for an octave filter, 3 for a
+        one-third-octave one.
+    :return: The bandwidth in Hz, in the shape of ``centre``.
+    :raises ValueError: If ``fraction`` is not one the clause prints a
+        coefficient for.
+    """
+    if fraction not in FILTER_BANDWIDTH_FRACTION:
+        msg = (
+            f"ISO 3382-1:2009, 7.1 prints a bandwidth for the octave and "
+            f"one-third-octave filters, so 'fraction' must be one of "
+            f"{sorted(FILTER_BANDWIDTH_FRACTION)}; got {fraction!r}."
+        )
+        raise ValueError(msg)
+    frequencies = np.asarray(centre, dtype=np.float64)
+    if np.any(frequencies <= 0.0):
+        msg = "'centre' must be a positive frequency in Hz."
+        raise ValueError(msg)
+    width = np.asarray(
+        FILTER_BANDWIDTH_FRACTION[fraction] * frequencies, dtype=np.float64
+    )
+    return float(width) if width.ndim == 0 else width
+
+
+def reverberation_time_standard_deviation(
+    reverberation_time: ArrayLike,
+    bandwidth: ArrayLike,
+    *,
+    evaluation_range: float = 30.0,
+    decays: ArrayLike = INTEGRATED_RESPONSE_DECAYS,
+    positions: ArrayLike = 1,
+) -> np.ndarray | float:
+    r"""Standard deviation of a measured reverberation time (7.1).
+
+    ISO 3382-1:2009, Equations (4) and (5):
+
+    .. math::
+
+       \sigma(T_{20}) = 0{,}88\, T_{20} \sqrt{\frac{1 + 1{,}90/n}{N B T_{20}}},
+       \qquad
+       \sigma(T_{30}) = 0{,}55\, T_{30} \sqrt{\frac{1 + 1{,}52/n}{N B T_{30}}}
+
+    The uncertainty is a property of the *excitation*, not of the room: the
+    interrupted-noise method restarts a random process for every decay, and
+    the clause quantifies how much of the answer that randomness owns. The
+    integrated impulse response method is deterministic, and 7.2 values it at
+    ten interrupted-noise decays per position rather than at the infinity the
+    theory gives, which is what ``decays`` defaults to.
+
+    Note that :math:`\sigma` grows as :math:`\sqrt{T}`, not as :math:`T`: the
+    prefactor's :math:`T` and the :math:`T` under the radical leave one half
+    power between them, so a long reverberation time is measured with a
+    larger absolute uncertainty and a smaller relative one.
+
+    :param reverberation_time: The measured decay time, in seconds.
+    :param bandwidth: Bandwidth of the analysis filter, in Hz;
+        :func:`filter_bandwidth` gives the clause's own figure for it.
+    :param evaluation_range: The range the decay time was fitted over, in
+        dB: 20 for :math:`T_{20}` or 30 for :math:`T_{30}`, the two the
+        clause prints coefficients for.
+    :param decays: Decays measured in each position, the ``n`` of the
+        equations. Broadcast against the rest.
+    :param positions: Independent measurement positions, the ``N``: source
+        and receiver combinations, not receivers alone. Broadcast against
+        the rest, so a sweep over survey sizes is one call.
+    :return: The standard deviation in seconds, of the broadcast shape.
+    :raises ValueError: If ``evaluation_range`` is not one the clause prints
+        coefficients for, if ``decays`` or ``positions`` is not positive, or
+        if a reverberation time or bandwidth is not positive.
+    """
+    key = float(evaluation_range)
+    if key not in DECAY_UNCERTAINTY_COEFFICIENTS:
+        msg = (
+            f"ISO 3382-1:2009, 7.1 prints coefficients for the 20 dB and "
+            f"30 dB evaluation ranges, so 'evaluation_range' must be one of "
+            f"{sorted(DECAY_UNCERTAINTY_COEFFICIENTS)}; got "
+            f"{evaluation_range!r}."
+        )
+        raise ValueError(msg)
+    counted = np.asarray(decays, dtype=np.float64)
+    places = np.asarray(positions, dtype=np.float64)
+    if np.any(counted < 1.0) or np.any(places < 1.0):
+        msg = "'decays' and 'positions' count measurements, so both must be at least 1."
+        raise ValueError(msg)
+    times = np.asarray(reverberation_time, dtype=np.float64)
+    width = np.asarray(bandwidth, dtype=np.float64)
+    if np.any(times <= 0.0) or np.any(width <= 0.0):
+        msg = "'reverberation_time' and 'bandwidth' must be positive."
+        raise ValueError(msg)
+    prefactor, decay_term = DECAY_UNCERTAINTY_COEFFICIENTS[key]
+    sigma = np.asarray(
+        prefactor
+        * times
+        * np.sqrt((1.0 + decay_term / counted) / (places * width * times)),
+        dtype=np.float64,
+    )
+    return float(sigma) if sigma.ndim == 0 else sigma
+
+
+def minimum_reliable_reverberation_time(
+    bandwidth: ArrayLike, detector_time: float = 0.0
+) -> np.ndarray | float:
+    r"""Shortest decay time a forward analysis can be trusted with (7.3).
+
+    ISO 3382-1:2009, Equations (6) and (7) put two lower limits on a
+    reverberation time measured by traditional forward analysis, and both
+    are normative:
+
+    .. math::
+
+       B T > 16, \qquad T > 2\, T_\mathrm{det}
+
+    The first is the filter's: a band of width ``B`` cannot resolve a decay
+    faster than its own impulse response. The second is the averaging
+    detector's, and it drops out when the analysis has no detector, which is
+    the case for the backward integration of 5.3.3. This function returns the
+    larger of the two, which is the limit that binds.
+
+    ISO 3382-2:2008, 7.3 NOTE relaxes the first to ``B T > 4`` when the
+    filtering is time-reversed, which is what
+    :func:`phonometry.room.room_parameters` does with ``zero_phase=True``.
+
+    :param bandwidth: Bandwidth of the analysis filter, in Hz;
+        :func:`filter_bandwidth` gives the clause's own figure for it.
+    :param detector_time: Reverberation time of the averaging detector, in
+        seconds. Zero, the default, for an analysis with no detector.
+    :return: The shortest reliable reverberation time in seconds, of the
+        shape of ``bandwidth``.
+    :raises ValueError: If a bandwidth is not positive, or the detector time
+        is negative.
+    """
+    width = np.asarray(bandwidth, dtype=np.float64)
+    if np.any(width <= 0.0):
+        msg = "'bandwidth' must be positive, in Hz."
+        raise ValueError(msg)
+    if detector_time < 0.0:
+        msg = "'detector_time' must not be negative."
+        raise ValueError(msg)
+    limit = np.asarray(
+        np.maximum(
+            MINIMUM_BANDWIDTH_TIME_PRODUCT / width,
+            MINIMUM_DETECTOR_MULTIPLE * detector_time,
+        ),
+        dtype=np.float64,
+    )
+    return float(limit) if limit.ndim == 0 else limit

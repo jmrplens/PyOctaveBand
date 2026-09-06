@@ -1,0 +1,260 @@
+---
+title: "Stage support and uncertainty (ISO 3382-1)"
+description: "The two measures a musician cares about, taken on the platform with the source a metre away, and what the randomness of the excitation costs a reverberation time."
+references:
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2009
+    title: "Acoustics — Measurement of room acoustic parameters — Part 1: Performance spaces"
+    designation: "ISO 3382-1:2009"
+    url: "https://www.iso.org/standard/40979.html"
+    note: "Clause 7 and Annex C: the uncertainty of a measured reverberation time and the two stage supports."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2008
+    title: "Acoustics — Measurement of room acoustic parameters — Part 2: Reverberation time in ordinary rooms"
+    designation: "ISO 3382-2:2008"
+    url: "https://www.iso.org/standard/36201.html"
+    note: "Its Equation (A.4) and Table A.1 are the general form the two coefficients of ISO 3382-1 Clause 7 are one column of."
+  - type: article
+    authors: ["Gade, A. C."]
+    year: 1989
+    title: "Investigations of musicians' room acoustic conditions in concert halls. II: Field experiments and synthesis of results"
+    journal: "Acustica"
+    volume: 69
+    issue: 6
+    pages: "249-262"
+    note: "The field work the stage support of Annex C comes from, and the source-receiver geometry it fixes."
+  - type: article
+    authors: ["Davy, J. L."]
+    year: 1980
+    title: "The variance of impulse decays"
+    journal: "Acustica"
+    volume: 44
+    issue: 1
+    pages: "51-56"
+    note: "One of the two references Clause 7.1 derives its coefficients from."
+---
+
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+import SeeAlso from '../../../../components/SeeAlso.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
+
+Every other page about ISO 3382-1 measures what a listener hears. This one
+covers the two things the standard says about the measurement itself: what a
+musician on the platform hears of their own instrument, and how much of a
+measured reverberation time belongs to the room rather than to the noise the
+room was excited with.
+
+## 1. Support: the hall answering the player
+
+A musician a metre from their own instrument hears the direct sound and,
+some milliseconds later, whatever the platform and the enclosure send back.
+Annex C makes that a ratio, measured with the source and the microphone
+1,0 m apart at the same height, with nothing reflecting within 2 m:
+
+$$
+ST_\mathrm{Early} = 10 \lg \left[
+    \frac{\int_{0,020}^{0,100} p^2(t)\ \mathrm{d}t}
+         {\int_{0}^{0,010} p^2(t)\ \mathrm{d}t} \right] \text{dB},
+\qquad
+ST_\mathrm{Late} = 10 \lg \left[
+    \frac{\int_{0,100}^{1,000} p^2(t)\ \mathrm{d}t}
+         {\int_{0}^{0,010} p^2(t)\ \mathrm{d}t} \right] \text{dB}.
+$$
+
+Early support relates to ensemble, the ease of hearing the other players;
+late support to how much of the hall comes back. Both divide by the same
+direct sound, so their difference is a property of the hall and does not
+move with how loudly the instrument was played.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stage_support_windows.svg" alt="Three panels. Left: the energy envelope of a platform impulse response on a logarithmic time axis, with the direct window from 0 to 10 ms, the early window from 20 to 100 ms and the late window from 100 to 1 000 ms shaded, leaving visible gaps between 10 and 20 ms and after one second. Middle: both stage supports band by band for a platform with 1.9 seconds of decay, over the shaded typical ranges of Table C.1. Right: the standard deviation of a two-second reverberation time as a percentage of it, falling with the number of independent positions, for the 125 Hz and 1 kHz octave bands, against the 5 per cent just-noticeable difference" width="100%" />
+
+*The three windows, the two supports, and what the excitation costs.*
+
+```python
+import numpy as np
+from phonometry import room
+
+fs = 48000
+# A unit direct arrival, one reflection in the early window and one in the
+# late one: each support is then 20 lg of that reflection's amplitude.
+response = np.zeros(round(2.0 * fs))
+response[100] = 1.0
+response[100 + round(0.050 * fs)] = 0.2
+response[100 + round(0.400 * fs)] = 0.1
+
+result = room.stage_support(response, fs, limits=None)
+print(result.early.round(4))       # [-13.9794]  = 20 lg 0.2
+print(result.late.round(4))        # [-20.]      = 20 lg 0.1
+
+result.plot()   # both supports against the Table C.1 ranges
+```
+
+Table C.1 gives the typical ranges as −24 dB to −8 dB for the early support
+and −24 dB to −10 dB for the late one, and prints "Not known" for both
+just-noticeable differences, so this module has none. C.2.4 asks for the
+250 Hz to 2 kHz octave bands, which is what `limits` defaults to, and puts
+the standard deviation of one band in one position at 1 dB and of the
+frequency- and position-averaged single number at 0,3 dB. That pair closes:
+1 dB over the root of four bands in three positions is 0,2887 dB, which
+rounds to the printed figure, and it holds for exactly those twelve readings.
+
+## 2. Two integration limits that are in the equations and not in the prose
+
+The left-hand panel above shows two gaps, and neither is described by the
+sentence beside the equation that makes it.
+
+C.2.1 calls the early support "the reflected energy within the first 0,1 s",
+but Equation (C.1) starts at 20 ms, not at the 10 ms where the direct window
+ends. The interval between them counts for nothing, and taking the prose at
+its word instead adds 17 % more energy in a 2 s hall, worth 0,68 dB against
+the 1 dB standard deviation C.2.4 estimates for a single reading.
+
+C.2.2 calls the late support "the reflected energy after the first 0,1 s"
+with no upper bound at all, but Equation (C.2) stops at one second. That one
+costs 0,01 dB at $T = 2$ s, where the decay is already 30 dB down by then,
+and grows to 1,0 dB at $T = 8$ s: it separates cathedrals, not concert
+halls.
+
+The equations govern, and
+[the errata register](/phonometry/reference/errata/) records both.
+
+```python
+import numpy as np
+from phonometry import room
+
+fs = 48000
+response = np.zeros(round(2.0 * fs))
+response[100] = 1.0
+response[100 + round(0.050 * fs)] = 0.2
+response[100 + round(0.400 * fs)] = 0.1
+
+# An arrival in the 10 ms to 20 ms gap, and one past the one-second ceiling.
+neither = response.copy()
+neither[100 + round(0.015 * fs)] = 5.0
+neither[100 + round(1.500 * fs)] = 5.0
+
+plain = room.stage_support(response, fs, limits=None)
+loud = room.stage_support(neither, fs, limits=None)
+print(np.allclose(plain.early, loud.early))    # True
+print(np.allclose(plain.late, loud.late))      # True
+```
+
+## 3. What the excitation costs
+
+A reverberation time measured with interrupted noise is a measurement of a
+random process, and Clause 7.1 says how much of the answer that randomness
+owns:
+
+$$
+\sigma(T_{20}) = 0{,}88\, T_{20}
+    \sqrt{\frac{1 + 1{,}90/n}{N B T_{20}}},
+\qquad
+\sigma(T_{30}) = 0{,}55\, T_{30}
+    \sqrt{\frac{1 + 1{,}52/n}{N B T_{30}}},
+$$
+
+with $B$ the filter bandwidth, $n$ the decays measured in each position and
+$N$ the independent positions, meaning source and receiver combinations
+rather than receivers alone.
+
+```python
+from phonometry import room
+
+# The 1 kHz octave: the clause puts B at 0,71 times the mid-band frequency.
+print(room.filter_bandwidth(1000.0))                       # 710.0  Hz
+print(room.filter_bandwidth(1000.0, 3))                    # 230.0  Hz
+
+sigma = room.reverberation_time_standard_deviation(2.0, 710.0, positions=12)
+print(round(float(sigma), 6))                              # 0.009044  s
+print(round(100.0 * float(sigma) / 2.0, 3))                # 0.452  %
+```
+
+Two things fall out of the printed form that are worth knowing before
+planning a survey.
+
+**It grows as the square root of the decay time.** The $T$ in the prefactor
+and the $T$ under the radical leave half a power between them, so a long
+reverberation time carries a larger absolute uncertainty and a smaller
+relative one. Four times the decay time is twice the standard deviation, not
+four times it.
+
+**The integrated impulse response is not free of it.** Clause 7.2 says the
+method behaves like an average of ten interrupted-noise decays per position,
+not like the infinity the theory gives, and that is what `decays` defaults
+to. The difference is 7 % on $\sigma(T_{30})$ and 9 % on $\sigma(T_{20})$,
+which is not a rounding.
+
+```python
+from phonometry import room
+
+ten = room.reverberation_time_standard_deviation(2.0, 710.0, decays=10)
+many = room.reverberation_time_standard_deviation(2.0, 710.0, decays=10**9)
+print(round(float(ten) / float(many), 4))                  # 1.0733
+```
+
+The two coefficient pairs are not arbitrary. ISO 3382-2:2008 prints the same
+result in general form, $\sigma(T)/T = G \sqrt{(1 + H/n)/(N B T)}$, with a
+table of $G$ and $H$ against the evaluation range and against
+$\gamma = T/T_\mathrm{det}$. The 88 % with $H = 1{,}90$ and the 55 % with
+$H = 1{,}52$ are its 20 dB and 30 dB rows in the $\gamma = 5$ column, an
+assumption ISO 3382-1 does not print.
+
+## 4. Where a short decay stops being measurable
+
+Clause 7.3 puts two lower limits on a decay time measured by traditional
+forward analysis, and both are normative:
+
+$$
+B\,T > 16, \qquad T > 2\, T_\mathrm{det}.
+$$
+
+The first is the filter's own: a band of width $B$ cannot resolve a decay
+faster than its impulse response. The second is the averaging detector's,
+and it drops out when there is no detector, which is the case for the
+backward integration of 5.3.3.
+
+```python
+from phonometry import room
+
+print(round(float(room.minimum_reliable_reverberation_time(88.75)), 4))   # 0.1803  s
+print(round(float(room.minimum_reliable_reverberation_time(2840.0)), 4))  # 0.0056  s
+print(room.minimum_reliable_reverberation_time(710.0, 0.05))              # 0.1  s
+```
+
+The 125 Hz octave binds hardest, because it is the narrowest: 16 over
+88,75 Hz is 180 ms, and a room drier than that cannot have its 125 Hz
+reverberation time measured by forward analysis at all. ISO 3382-2:2008,
+7.3 NOTE relaxes the product to `B T > 4` when the filtering is
+time-reversed, which is what
+[`room_parameters`](/phonometry/buildings/rooms/room-acoustics/) does with
+`zero_phase=True`.
+
+<SeeAlso
+  links={[
+    { href: '/phonometry/buildings/rooms/room-acoustics/', label: 'Room Acoustic Parameters' },
+    { href: '/phonometry/buildings/rooms/sound-strength/', label: 'Sound Strength G' },
+    { href: '/phonometry/buildings/rooms/spatial-impression/', label: 'Spatial Impression' },
+    { href: '/phonometry/buildings/rooms/room-impulse-response/', label: 'Measuring the Room Impulse Response' },
+  ]}
+/>
+
+## What this guide covers
+
+<Scope>
+<ScopeClaim status="covered" label="Covered">
+The stage support of ISO 3382-1:2009, Annex C: Equations (C.1) and (C.2) with
+their printed integration limits, the Table C.1 typical ranges, and the two
+standard deviations C.2.4 estimates. And Clause 7: the standard deviation of a
+measured reverberation time from Equations (4) and (5), the two printed filter
+bandwidths, the ten decays Clause 7.2 values an integrated impulse response
+at, and the lower limits of Equations (6) and (7).
+</ScopeClaim>
+<ScopeClaim status="not-covered" label="Not covered yet">
+The measurement plan itself: the source directivity limits of Table 1 with the
+gliding average that qualifies a source against them, the minimum receiver
+counts of Table A.2, and the reporting contract of Clause 9.2.
+</ScopeClaim>
+</Scope>

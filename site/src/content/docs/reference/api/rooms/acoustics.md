@@ -77,6 +77,14 @@ integrated impulse response, Clause 6).
 
 **Returns:** A [`DecayCurve`](/phonometry/reference/api/rooms/acoustics/#decaycurve) with `time` in seconds from the direct sound and `level` in dB (0 dB at time zero), up to the noise truncation point. It unpacks as `time, level = decay_curve(...)` for backward compatibility and exposes [`DecayCurve.plot`](/phonometry/reference/api/rooms/acoustics/#decaycurveplot).
 
+## DECAY_UNCERTAINTY_COEFFICIENTS
+
+*Constant* (`dict`).
+
+```python
+DECAY_UNCERTAINTY_COEFFICIENTS = {20.0: (0.88, 1.9), 30.0: (0.55, 1.52)}
+```
+
 ## DecayCurve
 
 ```python
@@ -110,6 +118,161 @@ Plot the decay curve with optional straight T-fit overlays.
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`. Pass `fits=False` to omit the
 EDT/T20/T30 fit lines.
+
+## filter_bandwidth
+
+```python
+filter_bandwidth(centre: ArrayLike, fraction: int = 1) -> np.ndarray | float
+```
+
+Bandwidth of a fractional-octave filter (ISO 3382-1:2009, 7.1).
+
+The `B` of Equations (4) to (6), as the clause prints it: 0,71 times
+the mid-band frequency for an octave filter and 0,23 times it for a
+one-third-octave one. See [`FILTER_BANDWIDTH_FRACTION`](/phonometry/reference/api/rooms/acoustics/#filter_bandwidth_fraction) for how
+those two figures sit against the exact IEC 61260 band edges.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `centre` | Mid-band frequency, in Hz. |
+| `fraction` | Bandwidth fraction: 1 for an octave filter, 3 for a one-third-octave one. |
+
+**Returns:** The bandwidth in Hz, in the shape of `centre`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If `fraction` is not one the clause prints a coefficient for. |
+
+## FILTER_BANDWIDTH_FRACTION
+
+*Constant* (`dict`).
+
+```python
+FILTER_BANDWIDTH_FRACTION = {1: 0.71, 3: 0.23}
+```
+
+## INTEGRATED_RESPONSE_DECAYS
+
+*Constant* (`int`).
+
+```python
+INTEGRATED_RESPONSE_DECAYS = 10
+```
+
+## MINIMUM_BANDWIDTH_TIME_PRODUCT
+
+*Constant* (`float`).
+
+```python
+MINIMUM_BANDWIDTH_TIME_PRODUCT = 16.0
+```
+
+## MINIMUM_DETECTOR_MULTIPLE
+
+*Constant* (`float`).
+
+```python
+MINIMUM_DETECTOR_MULTIPLE = 2.0
+```
+
+## minimum_reliable_reverberation_time
+
+```python
+minimum_reliable_reverberation_time(
+    bandwidth: ArrayLike,
+    detector_time: float = 0.0,
+) -> np.ndarray | float
+```
+
+Shortest decay time a forward analysis can be trusted with (7.3).
+
+ISO 3382-1:2009, Equations (6) and (7) put two lower limits on a
+reverberation time measured by traditional forward analysis, and both
+are normative:
+
+$$
+B T > 16, \qquad T > 2\, T_\mathrm{det}
+$$
+
+The first is the filter's: a band of width `B` cannot resolve a decay
+faster than its own impulse response. The second is the averaging
+detector's, and it drops out when the analysis has no detector, which is
+the case for the backward integration of 5.3.3. This function returns the
+larger of the two, which is the limit that binds.
+
+ISO 3382-2:2008, 7.3 NOTE relaxes the first to `B T > 4` when the
+filtering is time-reversed, which is what
+[`phonometry.room.room_parameters`](/phonometry/reference/api/rooms/acoustics/#room_parameters) does with `zero_phase=True`.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `bandwidth` | Bandwidth of the analysis filter, in Hz; [`filter_bandwidth`](/phonometry/reference/api/rooms/acoustics/#filter_bandwidth) gives the clause's own figure for it. |
+| `detector_time` | Reverberation time of the averaging detector, in seconds. Zero, the default, for an analysis with no detector. |
+
+**Returns:** The shortest reliable reverberation time in seconds, of the shape of `bandwidth`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If a bandwidth is not positive, or the detector time is negative. |
+
+## reverberation_time_standard_deviation
+
+```python
+reverberation_time_standard_deviation(
+    reverberation_time: ArrayLike,
+    bandwidth: ArrayLike,
+    *,
+    evaluation_range: float = 30.0,
+    decays: ArrayLike = 10,
+    positions: ArrayLike = 1,
+) -> np.ndarray | float
+```
+
+Standard deviation of a measured reverberation time (7.1).
+
+ISO 3382-1:2009, Equations (4) and (5):
+
+$$
+\sigma(T_{20}) = 0{,}88\, T_{20} \sqrt{\frac{1 + 1{,}90/n}{N B T_{20}}}, \qquad \sigma(T_{30}) = 0{,}55\, T_{30} \sqrt{\frac{1 + 1{,}52/n}{N B T_{30}}}
+$$
+
+The uncertainty is a property of the *excitation*, not of the room: the
+interrupted-noise method restarts a random process for every decay, and
+the clause quantifies how much of the answer that randomness owns. The
+integrated impulse response method is deterministic, and 7.2 values it at
+ten interrupted-noise decays per position rather than at the infinity the
+theory gives, which is what `decays` defaults to.
+
+Note that $\sigma$ grows as $\sqrt{T}$, not as $T$: the
+prefactor's $T$ and the $T$ under the radical leave one half
+power between them, so a long reverberation time is measured with a
+larger absolute uncertainty and a smaller relative one.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `reverberation_time` | The measured decay time, in seconds. |
+| `bandwidth` | Bandwidth of the analysis filter, in Hz; [`filter_bandwidth`](/phonometry/reference/api/rooms/acoustics/#filter_bandwidth) gives the clause's own figure for it. |
+| `evaluation_range` | The range the decay time was fitted over, in dB: 20 for $T_{20}$ or 30 for $T_{30}$, the two the clause prints coefficients for. |
+| `decays` | Decays measured in each position, the `n` of the equations. Broadcast against the rest. |
+| `positions` | Independent measurement positions, the `N`: source and receiver combinations, not receivers alone. Broadcast against the rest, so a sweep over survey sizes is one call. |
+
+**Returns:** The standard deviation in seconds, of the broadcast shape.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If `evaluation_range` is not one the clause prints coefficients for, if `decays` or `positions` is not positive, or if a reverberation time or bandwidth is not positive. |
 
 ## room_parameters
 

@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 797 numerical conformance checks against 395 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 802 numerical conformance checks against 395 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 797 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 67 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 802 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 67 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -139,8 +139,13 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Room-noise criteria (NC / RC Mark II)](https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/)
 - [Reverberation-time prediction (Sabine · Eyring · Fitzroy · Arau-Puchades)](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/)
 - [Sound absorption in enclosed spaces (EN 12354-6)](https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/)
+
+### Auditorium measures of the ISO 3382-1 annexes
+
+- [Overview](https://jmrplens.github.io/phonometry/buildings/rooms/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-buildings-rooms-auditorium.txt)
 - [Sound strength G (ISO 3382-1)](https://jmrplens.github.io/phonometry/buildings/rooms/sound-strength/)
 - [Spatial impression (ISO 3382-1)](https://jmrplens.github.io/phonometry/buildings/rooms/spatial-impression/)
+- [Stage support and uncertainty (ISO 3382-1)](https://jmrplens.github.io/phonometry/buildings/rooms/stage-and-uncertainty/)
 
 ### Sound insulation
 
@@ -365,6 +370,7 @@ One file per area, each small enough to fetch whole. `llms-full.txt` is the comp
 - [Hearing and exposure](https://jmrplens.github.io/phonometry/llms/llms-perception-hearing.txt)
 - [Rooms and buildings](https://jmrplens.github.io/phonometry/llms/llms-buildings.txt)
 - [Room acoustics](https://jmrplens.github.io/phonometry/llms/llms-buildings-rooms.txt)
+- [Auditorium measures of the ISO 3382-1 annexes](https://jmrplens.github.io/phonometry/llms/llms-buildings-rooms-auditorium.txt)
 - [Sound insulation](https://jmrplens.github.io/phonometry/llms/llms-buildings-insulation.txt)
 - [Insulation ratings and the envelope](https://jmrplens.github.io/phonometry/llms/llms-buildings-insulation-ratings.txt)
 - [Insulation design](https://jmrplens.github.io/phonometry/llms/llms-buildings-design.txt)
@@ -10433,6 +10439,9 @@ speech intelligibility a room affords is quantified by the
 - [Spatial impression (ISO 3382-1)](https://jmrplens.github.io/phonometry/buildings/rooms/spatial-impression/):
   where the sound comes from, measured with a figure-of-eight microphone
   beside the omnidirectional one and with a head that has two.
+- [Stage support and uncertainty (ISO 3382-1)](https://jmrplens.github.io/phonometry/buildings/rooms/stage-and-uncertainty/):
+  the two measures taken on the platform with the source a metre away, and
+  the uncertainty Clause 7 puts on a measured reverberation time.
 - [Open-Plan Office Acoustics (ISO 3382-3)](https://jmrplens.github.io/phonometry/buildings/rooms/open-plan-acoustics/):
   the spatial decay rate of speech and the distraction and privacy distances.
 - [Image sources and the steady-state room field](https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/):
@@ -13466,6 +13475,230 @@ average of Equation (A.17), and the interaural cross correlation of
 Equations (B.1) and (B.2). Validated against closed-form reflection
 geometries and against the printed characters a text layer deletes, in the
 [conformance report](https://jmrplens.github.io/phonometry/reference/conformance/).
+
+---
+
+
+<!-- source: docs/buildings/rooms/stage-and-uncertainty.md | canonical: https://jmrplens.github.io/phonometry/buildings/rooms/stage-and-uncertainty/ -->
+Source: https://jmrplens.github.io/phonometry/buildings/rooms/stage-and-uncertainty/
+
+# Stage support and uncertainty (ISO 3382-1)
+
+Every other page about ISO 3382-1 measures what a listener hears. This one
+covers the two things the standard says about the measurement itself: what a
+musician on the platform hears of their own instrument, and how much of a
+measured reverberation time belongs to the room rather than to the noise the
+room was excited with.
+
+## 1. Support: the hall answering the player
+
+A musician a metre from their own instrument hears the direct sound and,
+some milliseconds later, whatever the platform and the enclosure send back.
+Annex C makes that a ratio, measured with the source and the microphone
+1,0 m apart at the same height, with nothing reflecting within 2 m:
+
+$$
+ST_\mathrm{Early} = 10 \lg \left[
+    \frac{\int_{0,020}^{0,100} p^2(t)\ \mathrm{d}t}
+         {\int_{0}^{0,010} p^2(t)\ \mathrm{d}t} \right] \text{dB},
+\qquad
+ST_\mathrm{Late} = 10 \lg \left[
+    \frac{\int_{0,100}^{1,000} p^2(t)\ \mathrm{d}t}
+         {\int_{0}^{0,010} p^2(t)\ \mathrm{d}t} \right] \text{dB}.
+$$
+
+Early support relates to ensemble, the ease of hearing the other players;
+late support to how much of the hall comes back. Both divide by the same
+direct sound, so their difference is a property of the hall and does not
+move with how loudly the instrument was played.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stage_support_windows_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stage_support_windows.svg" alt="Three panels. Left: the energy envelope of a platform impulse response on a logarithmic time axis, with the direct window from 0 to 10 ms, the early window from 20 to 100 ms and the late window from 100 to 1 000 ms shaded, leaving visible gaps between 10 and 20 ms and after one second. Middle: both stage supports band by band for a platform with 1.9 seconds of decay, over the shaded typical ranges of Table C.1. Right: the standard deviation of a two-second reverberation time as a percentage of it, falling with the number of independent positions, for the 125 Hz and 1 kHz octave bands, against the 5 per cent just-noticeable difference" width="100%"></picture>
+
+*The three windows, the two supports, and what the excitation costs.*
+
+```python
+import numpy as np
+from phonometry import room
+
+fs = 48000
+# A unit direct arrival, one reflection in the early window and one in the
+# late one: each support is then 20 lg of that reflection's amplitude.
+response = np.zeros(round(2.0 * fs))
+response[100] = 1.0
+response[100 + round(0.050 * fs)] = 0.2
+response[100 + round(0.400 * fs)] = 0.1
+
+result = room.stage_support(response, fs, limits=None)
+print(result.early.round(4))       # [-13.9794]  = 20 lg 0.2
+print(result.late.round(4))        # [-20.]      = 20 lg 0.1
+
+result.plot()   # both supports against the Table C.1 ranges
+```
+
+Table C.1 gives the typical ranges as −24 dB to −8 dB for the early support
+and −24 dB to −10 dB for the late one, and prints "Not known" for both
+just-noticeable differences, so this module has none. C.2.4 asks for the
+250 Hz to 2 kHz octave bands, which is what `limits` defaults to, and puts
+the standard deviation of one band in one position at 1 dB and of the
+frequency- and position-averaged single number at 0,3 dB. That pair closes:
+1 dB over the root of four bands in three positions is 0,2887 dB, which
+rounds to the printed figure, and it holds for exactly those twelve readings.
+
+## 2. Two integration limits that are in the equations and not in the prose
+
+The left-hand panel above shows two gaps, and neither is described by the
+sentence beside the equation that makes it.
+
+C.2.1 calls the early support "the reflected energy within the first 0,1 s",
+but Equation (C.1) starts at 20 ms, not at the 10 ms where the direct window
+ends. The interval between them counts for nothing, and taking the prose at
+its word instead adds 17 % more energy in a 2 s hall, worth 0,68 dB against
+the 1 dB standard deviation C.2.4 estimates for a single reading.
+
+C.2.2 calls the late support "the reflected energy after the first 0,1 s"
+with no upper bound at all, but Equation (C.2) stops at one second. That one
+costs 0,01 dB at $T = 2$ s, where the decay is already 30 dB down by then,
+and grows to 1,0 dB at $T = 8$ s: it separates cathedrals, not concert
+halls.
+
+The equations govern, and
+[the errata register](https://jmrplens.github.io/phonometry/reference/errata/) records both.
+
+```python
+import numpy as np
+from phonometry import room
+
+fs = 48000
+response = np.zeros(round(2.0 * fs))
+response[100] = 1.0
+response[100 + round(0.050 * fs)] = 0.2
+response[100 + round(0.400 * fs)] = 0.1
+
+# An arrival in the 10 ms to 20 ms gap, and one past the one-second ceiling.
+neither = response.copy()
+neither[100 + round(0.015 * fs)] = 5.0
+neither[100 + round(1.500 * fs)] = 5.0
+
+plain = room.stage_support(response, fs, limits=None)
+loud = room.stage_support(neither, fs, limits=None)
+print(np.allclose(plain.early, loud.early))    # True
+print(np.allclose(plain.late, loud.late))      # True
+```
+
+## 3. What the excitation costs
+
+A reverberation time measured with interrupted noise is a measurement of a
+random process, and Clause 7.1 says how much of the answer that randomness
+owns:
+
+$$
+\sigma(T_{20}) = 0{,}88\, T_{20}
+    \sqrt{\frac{1 + 1{,}90/n}{N B T_{20}}},
+\qquad
+\sigma(T_{30}) = 0{,}55\, T_{30}
+    \sqrt{\frac{1 + 1{,}52/n}{N B T_{30}}},
+$$
+
+with $B$ the filter bandwidth, $n$ the decays measured in each position and
+$N$ the independent positions, meaning source and receiver combinations
+rather than receivers alone.
+
+```python
+from phonometry import room
+
+# The 1 kHz octave: the clause puts B at 0,71 times the mid-band frequency.
+print(room.filter_bandwidth(1000.0))                       # 710.0  Hz
+print(room.filter_bandwidth(1000.0, 3))                    # 230.0  Hz
+
+sigma = room.reverberation_time_standard_deviation(2.0, 710.0, positions=12)
+print(round(float(sigma), 6))                              # 0.009044  s
+print(round(100.0 * float(sigma) / 2.0, 3))                # 0.452  %
+```
+
+Two things fall out of the printed form that are worth knowing before
+planning a survey.
+
+**It grows as the square root of the decay time.** The $T$ in the prefactor
+and the $T$ under the radical leave half a power between them, so a long
+reverberation time carries a larger absolute uncertainty and a smaller
+relative one. Four times the decay time is twice the standard deviation, not
+four times it.
+
+**The integrated impulse response is not free of it.** Clause 7.2 says the
+method behaves like an average of ten interrupted-noise decays per position,
+not like the infinity the theory gives, and that is what `decays` defaults
+to. The difference is 7 % on $\sigma(T_{30})$ and 9 % on $\sigma(T_{20})$,
+which is not a rounding.
+
+```python
+from phonometry import room
+
+ten = room.reverberation_time_standard_deviation(2.0, 710.0, decays=10)
+many = room.reverberation_time_standard_deviation(2.0, 710.0, decays=10**9)
+print(round(float(ten) / float(many), 4))                  # 1.0733
+```
+
+The two coefficient pairs are not arbitrary. ISO 3382-2:2008 prints the same
+result in general form, $\sigma(T)/T = G \sqrt{(1 + H/n)/(N B T)}$, with a
+table of $G$ and $H$ against the evaluation range and against
+$\gamma = T/T_\mathrm{det}$. The 88 % with $H = 1{,}90$ and the 55 % with
+$H = 1{,}52$ are its 20 dB and 30 dB rows in the $\gamma = 5$ column, an
+assumption ISO 3382-1 does not print.
+
+## 4. Where a short decay stops being measurable
+
+Clause 7.3 puts two lower limits on a decay time measured by traditional
+forward analysis, and both are normative:
+
+$$
+B\,T > 16, \qquad T > 2\, T_\mathrm{det}.
+$$
+
+The first is the filter's own: a band of width $B$ cannot resolve a decay
+faster than its impulse response. The second is the averaging detector's,
+and it drops out when there is no detector, which is the case for the
+backward integration of 5.3.3.
+
+```python
+from phonometry import room
+
+print(round(float(room.minimum_reliable_reverberation_time(88.75)), 4))   # 0.1803  s
+print(round(float(room.minimum_reliable_reverberation_time(2840.0)), 4))  # 0.0056  s
+print(room.minimum_reliable_reverberation_time(710.0, 0.05))              # 0.1  s
+```
+
+The 125 Hz octave binds hardest, because it is the narrowest: 16 over
+88,75 Hz is 180 ms, and a room drier than that cannot have its 125 Hz
+reverberation time measured by forward analysis at all. ISO 3382-2:2008,
+7.3 NOTE relaxes the product to `B T > 4` when the filtering is
+time-reversed, which is what
+[`room_parameters`](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) does with
+`zero_phase=True`.
+
+## See also
+
+- [Room Acoustic Parameters](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the decay times this page
+  puts an uncertainty on.
+- [Sound strength G (ISO 3382-1)](https://jmrplens.github.io/phonometry/buildings/rooms/sound-strength/): how loud the hall is,
+  against the same source at 10 m in a free field.
+- [Spatial impression (ISO 3382-1)](https://jmrplens.github.io/phonometry/buildings/rooms/spatial-impression/): where the sound
+  comes from, measured with a second microphone.
+- [Measuring the Room Impulse Response](https://jmrplens.github.io/phonometry/buildings/rooms/room-impulse-response/): the
+  ISO 18233 acquisition of the responses this page measures.
+- API reference: [`room.auditorium`](https://jmrplens.github.io/phonometry/reference/api/rooms/auditorium/) and [`room.acoustics`](https://jmrplens.github.io/phonometry/reference/api/rooms/acoustics/).
+
+## Standards
+
+ISO 3382-1:2009, Annex C (informative): the early and late stage support of
+Equations (C.1) and (C.2), their Table C.1 ranges and the two standard
+deviations of C.2.4. And its normative Clause 7: the standard deviation of a
+measured reverberation time from Equations (4) and (5) with the printed
+filter bandwidths, and the lower limits of Equations (6) and (7). The two
+coefficient pairs are the 20 dB and 30 dB rows of the general form
+ISO 3382-2:2008 prints as its Equation (A.4). Validated against closed-form
+window geometries and the printed coefficients in the
+[conformance report](https://jmrplens.github.io/phonometry/reference/conformance/); the two integration limits the
+prose of Annex C leaves out are in the [errata register](https://jmrplens.github.io/phonometry/reference/errata/).
 
 ---
 
@@ -37808,6 +38041,25 @@ documents, one page per module.
 | `IACC_EARLY_WINDOW_S` | `constant` | **(0.0, 0.080) s**, the early window of B.4. | `room.IACC_EARLY_WINDOW_S` |
 | `IACC_LATE_START_S` | `constant` | **0.080 s**, where B.4's reverberant window starts. | `room.IACC_LATE_START_S` |
 | `IACC_JND` | `constant` | **0.075**, the just-noticeable difference B.4 assumes for IACC. | `room.IACC_JND` |
+| `stage_support` | `function` | **Early and late stage support (ISO 3382-1 Eqs. (C.1)/(C.2)).**<br>• `ir`: platform response 1,0 m from the source (1D)<br>• `fs`: Sample rate [Hz]<br>• `limits`: (f_min, f_max) or None (Default: (250, 2000), the bands C.2.4 averages)<br>• `fraction`: 1 or 3 (Default: 1) | `res = room.stage_support(ir, fs)`<br><br>• `StageSupportResult` per band |
+| `StageSupportResult` | `dataclass` | **Per-band stage support.**<br>• `frequency` [Hz] or None<br>• `early`: ST_Early [dB]<br>• `late`: ST_Late [dB]<br>• `.plot()`: both against the Table C.1 ranges | `res.early, res.late` |
+| `STAGE_DIRECT_WINDOW_S` | `constant` | **(0.0, 0.010) s**, the direct-sound window both equations divide by. | `room.STAGE_DIRECT_WINDOW_S` |
+| `EARLY_SUPPORT_WINDOW_S` | `constant` | **(0.020, 0.100) s**, the numerator of Eq. (C.1); it starts at 20 ms, not at 10 ms. | `room.EARLY_SUPPORT_WINDOW_S` |
+| `LATE_SUPPORT_WINDOW_S` | `constant` | **(0.100, 1.000) s**, the numerator of Eq. (C.2); it stops at one second. | `room.LATE_SUPPORT_WINDOW_S` |
+| `STAGE_SUPPORT_DISTANCE_M` | `constant` | **1.0 m** between source and microphone (C.2.1). | `room.STAGE_SUPPORT_DISTANCE_M` |
+| `STAGE_SUPPORT_HEIGHTS_M` | `constant` | **(1.0, 1.5) m**, the two heights C.2.3 permits for both. | `room.STAGE_SUPPORT_HEIGHTS_M` |
+| `STAGE_SUPPORT_BANDS_HZ` | `constant` | **(250, 500, 1000, 2000) Hz**, the bands C.2.4 averages. | `room.STAGE_SUPPORT_BANDS_HZ` |
+| `STAGE_SUPPORT_POSITIONS` | `constant` | **3** positions C.2.3 asks for and C.2.4 averages over. | `room.STAGE_SUPPORT_POSITIONS` |
+| `STAGE_SUPPORT_STANDARD_DEVIATION_DB` | `constant` | **1.0 dB** for one band in one position (C.2.4). | `room.STAGE_SUPPORT_STANDARD_DEVIATION_DB` |
+| `STAGE_SUPPORT_SINGLE_NUMBER_STANDARD_DEVIATION_DB` | `constant` | **0.3 dB** for the single number (C.2.4); it is 1 dB over the root of the twelve readings. | `room.STAGE_SUPPORT_SINGLE_NUMBER_STANDARD_DEVIATION_DB` |
+| `reverberation_time_standard_deviation` | `function` | **Standard deviation of a measured T (ISO 3382-1 Eqs. (4)/(5)).**<br>• `reverberation_time` [s]<br>• `bandwidth` [Hz], from `filter_bandwidth`<br>• `evaluation_range`: 20 or 30 [dB] (Default: 30)<br>• `decays`: n per position (Default: 10, what 7.2 values an integrated response at)<br>• `positions`: N source-receiver combinations (Default: 1) | `room.reverberation_time_standard_deviation(2.0, 710.0, positions=12)`<br><br>• `0.009044` s |
+| `filter_bandwidth` | `function` | **Bandwidth of a fractional-octave filter (ISO 3382-1 7.1).**<br>• `centre`: mid-band frequency [Hz]<br>• `fraction`: 1 or 3 (Default: 1) | `room.filter_bandwidth(1000.0)` → `710.0` Hz |
+| `minimum_reliable_reverberation_time` | `function` | **Shortest decay a forward analysis can resolve (ISO 3382-1 Eqs. (6)/(7)).**<br>• `bandwidth` [Hz]<br>• `detector_time`: T of the averaging detector [s] (Default: 0.0, no detector) | `room.minimum_reliable_reverberation_time(88.75)`<br><br>• `0.1803` s |
+| `FILTER_BANDWIDTH_FRACTION` | `constant` | **{1: 0.71, 3: 0.23}**, the two bandwidths 7.1 prints as a fraction of the centre. | `room.FILTER_BANDWIDTH_FRACTION[1]` → `0.71` |
+| `DECAY_UNCERTAINTY_COEFFICIENTS` | `constant` | **{20.0: (0.88, 1.90), 30.0: (0.55, 1.52)}**, the printed pairs of Eqs. (4) and (5). | `room.DECAY_UNCERTAINTY_COEFFICIENTS[30.0]` |
+| `INTEGRATED_RESPONSE_DECAYS` | `constant` | **10**, the decays per position 7.2 values an integrated impulse response at. | `room.INTEGRATED_RESPONSE_DECAYS` |
+| `MINIMUM_BANDWIDTH_TIME_PRODUCT` | `constant` | **16.0**, the B·T of Eq. (6). | `room.MINIMUM_BANDWIDTH_TIME_PRODUCT` |
+| `MINIMUM_DETECTOR_MULTIPLE` | `constant` | **2.0**, the multiple of the detector's own T in Eq. (7). | `room.MINIMUM_DETECTOR_MULTIPLE` |
 | `AuditoriumWarning` | `class` | **A measurement outside the conditions ISO 3382-1 prints for it.**<br>• raised for a room response cut short of the 30 dB of A.2.1<br>• for a response of either kind that ends before its lowest band's filter has rung down<br>• and for a free-field distance under 3 m | `warnings.simplefilter('error', room.AuditoriumWarning)` |
 | `REFERENCE_DISTANCE_M` | `constant` | **10.0 m**, the free-field distance G is referenced to (ISO 3382-1 A.2.1). | `room.REFERENCE_DISTANCE_M` → `10.0` |
 | `MINIMUM_REFERENCE_DISTANCE_M` | `constant` | **3.0 m**, the shortest distance Eqs. (A.4)/(A.8) are printed for. | `room.MINIMUM_REFERENCE_DISTANCE_M` → `3.0` |
@@ -53286,7 +53538,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 797 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 802 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -53655,7 +53907,7 @@ sample from the metrology core:
 | IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()`; IEC 61252:2025 has since superseded this print, and the transcription still targets the 1993+A2 text | `tests/signals/test_levels.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-797 numerical conformance checks across 67 domains and 395 standards, covering
+802 numerical conformance checks across 67 domains and 395 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise

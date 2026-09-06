@@ -437,6 +437,7 @@ from .room import (
     generate_schroeder_decay,
     generate_sound_strength_routes,
     generate_source_distance_bias,
+    generate_stage_support_windows,
     generate_steady_state_directivity,
     generate_steady_state_field,
     generate_sweep_distortion_separation,
@@ -1090,6 +1091,9 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # fraction and the window the interaural coefficient is read off.
     generate_sound_strength_routes,
     generate_lateral_energy_measures,
+    # Annex C and Clause 7: the three windows the stage supports divide, and
+    # what the randomness of an interrupted-noise excitation costs a T30.
+    generate_stage_support_windows,
     generate_fdtd_room_modes,
     # Building & structure-borne result figures (guide figure coverage):
     # ISO 717 enlarged range, ISO 16283 field chains, ISO 10052 survey impact,

@@ -3,12 +3,12 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 797,
-    "passing": 797,
+    "checks": 802,
+    "passing": 802,
     "failing": 0,
     "domains": 67,
     "standards": 395,
-    "citations": 625,
+    "citations": 630,
     "designations": 133,
     "sources": 83
   },
@@ -101,8 +101,8 @@
     {
       "id": "room-building-acoustics",
       "title": "Room & building acoustics",
-      "checks": 96,
-      "passing": 96
+      "checks": 101,
+      "passing": 101
     },
     {
       "id": "room-acoustics",
@@ -4540,6 +4540,159 @@
         "value": 0.0
       },
       "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-annex-c-informative-eqs-c-1-c-2/stage-support-of-one-arrival-in-each-printed-window",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Annex C (informative) Eqs. (C.1)/(C.2)",
+        "cite": "ISO 3382-1:2009 Annex C (informative) Eqs. (C.1)/(C.2)"
+      },
+      "quantity": "Stage support of one arrival in each printed window",
+      "kind": "record",
+      "expected": {
+        "label": "ST_Early = -13.9794 dB; ST_Late = -20 dB",
+        "record": {
+          "ST_Early": -13.979400087,
+          "ST_Late": -20.0
+        }
+      },
+      "computed": {
+        "label": "ST_Early = -13.9794 dB; ST_Late = -20 dB",
+        "record": {
+          "ST_Early": -13.979400087,
+          "ST_Late": -20.0
+        }
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-c-2-4/the-two-printed-stage-support-standard-deviations-close-on-12-readings",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "C.2.4",
+        "cite": "ISO 3382-1:2009 C.2.4"
+      },
+      "quantity": "The two printed stage-support standard deviations close on 12 readings",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.3
+      },
+      "computed": {
+        "value": 0.3,
+        "label": "1 dB / sqrt(12) = 0.2887 dB -> 0.3 dB"
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 4,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-eq-5/standard-deviation-of-t30-2-s-in-the-1-khz-octave-n-10-n-12",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Eq. (5)",
+        "cite": "ISO 3382-1:2009 Eq. (5)"
+      },
+      "quantity": "Standard deviation of T30, 2 s in the 1 kHz octave, n = 10, N = 12",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.009044490969723418
+      },
+      "computed": {
+        "value": 0.00904449
+      },
+      "unit": "s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 8,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-eqs-4-5/the-two-evaluation-ranges-differ-by-the-printed-0-88-0-55-and-decay-terms",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Eqs. (4)/(5)",
+        "cite": "ISO 3382-1:2009 Eqs. (4)/(5)"
+      },
+      "quantity": "The two evaluation ranges differ by the printed 0,88/0,55 and decay terms",
+      "kind": "scalar",
+      "expected": {
+        "value": 1.6261747890200624
+      },
+      "computed": {
+        "value": 1.62617479
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": -2.22e-16
+      },
+      "precision": 8,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-eqs-6-7/shortest-reliable-decay-time-of-a-125-hz-octave-forward-analysis",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Eqs. (6)/(7)",
+        "cite": "ISO 3382-1:2009 Eqs. (6)/(7)"
+      },
+      "quantity": "Shortest reliable decay time of a 125 Hz octave forward analysis",
+      "kind": "scalar",
+      "expected": {
+        "value": 0.18028169014084508
+      },
+      "computed": {
+        "value": 0.180282
+      },
+      "unit": "s",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 6,
       "verdict": "pass"
     },
     {

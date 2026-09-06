@@ -1246,3 +1246,152 @@ def _correlation_curve(
         shifted[max(0, -low) : max(0, -low) + taken.size] = taken
         products[position] = float(np.sum(window_left * shifted))
     return np.asarray(products / np.sqrt(energy_left * energy_right))
+
+
+#: The direct-sound window both stage support equations divide by, in
+#: seconds from its arrival (ISO 3382-1:2009, Equations (C.1) and (C.2)).
+STAGE_DIRECT_WINDOW_S = (0.0, 0.010)
+
+#: Numerator window of the early support, Equation (C.1), in seconds. It
+#: starts at 20 ms, not at the 10 ms the direct window ends at: the interval
+#: between the two is discarded and the prose of C.2.1 does not say so.
+EARLY_SUPPORT_WINDOW_S = (0.020, 0.100)
+
+#: Numerator window of the late support, Equation (C.2), in seconds. Its
+#: upper limit is one second, which the prose of C.2.2 also leaves out.
+LATE_SUPPORT_WINDOW_S = (0.100, 1.000)
+
+#: Distance from the acoustic centre of the source that C.2.1 and C.2.2 ask
+#: the stage support to be measured at, in metres.
+STAGE_SUPPORT_DISTANCE_M = 1.0
+
+#: The two heights C.2.3 permits for the source and the microphone together,
+#: in metres. They are discrete choices, not the ends of a range.
+STAGE_SUPPORT_HEIGHTS_M = (1.0, 1.5)
+
+#: Octave bands C.2.4 averages the stage support over for its single number.
+STAGE_SUPPORT_BANDS_HZ = (250.0, 500.0, 1000.0, 2000.0)
+
+#: Positions C.2.3 asks for, and C.2.4 averages over alongside the bands.
+STAGE_SUPPORT_POSITIONS = 3
+
+#: Standard deviation C.2.4 estimates for one position in one octave band,
+#: in dB.
+STAGE_SUPPORT_STANDARD_DEVIATION_DB = 1.0
+
+#: Standard deviation C.2.4 estimates for the frequency- and
+#: position-averaged single number, in dB. It is the one above divided by the
+#: root of the twelve readings it averages, 1/sqrt(12) = 0,2887, rounded, so
+#: it holds for exactly four bands in three positions and for nothing else.
+STAGE_SUPPORT_SINGLE_NUMBER_STANDARD_DEVIATION_DB = 0.3
+
+
+@dataclass(frozen=True)
+class StageSupportResult:
+    r"""Per-band stage support (ISO 3382-1:2009, Annex C).
+
+    ``frequency`` holds the exact band centre frequencies in Hz, or is
+    ``None`` for a broadband measurement. ``early`` is
+    :math:`ST_\mathrm{Early}` in dB (Equation (C.1)) and ``late``
+    :math:`ST_\mathrm{Late}` in dB (Equation (C.2)), both referred to the
+    same direct sound. Table C.1 gives their typical ranges as -24 dB to
+    -8 dB and -24 dB to -10 dB and prints "Not known" for both
+    just-noticeable differences, so this module has none.
+    """
+
+    frequency: NDArray[np.float64] | None
+    early: NDArray[np.float64]
+    late: NDArray[np.float64]
+
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Plot both supports per band against the Table C.1 ranges.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+        """
+        from .._i18n import check_language
+        from .._plot.room import plot_stage_support
+
+        check_language(language)
+        return plot_stage_support(self, ax=ax, language=language, **kwargs)
+
+
+def stage_support(
+    ir: Signal | list[float] | NDArray[np.float64],
+    fs: int | None = None,
+    *,
+    limits: tuple[float, float] | None = (250.0, 2000.0),
+    fraction: int = 1,
+) -> StageSupportResult:
+    r"""Early and late stage support of a platform response, per band.
+
+    ISO 3382-1:2009, Equations (C.1) and (C.2), the reflected energy a
+    musician hears from the platform against the direct sound of their own
+    instrument:
+
+    .. math::
+
+       ST_\mathrm{Early} = 10 \lg
+           \frac{\int_{0,020}^{0,100} p^2(t)\ \mathrm{d}t}
+                {\int_{0}^{0,010} p^2(t)\ \mathrm{d}t}\ \mathrm{dB},
+       \qquad
+       ST_\mathrm{Late} = 10 \lg
+           \frac{\int_{0,100}^{1,000} p^2(t)\ \mathrm{d}t}
+                {\int_{0}^{0,010} p^2(t)\ \mathrm{d}t}\ \mathrm{dB}
+
+    Both are measured with the source and the microphone 1,0 m apart on the
+    platform, at the same height, with nothing reflecting within 2 m
+    (C.2.1 and C.2.3). Because they share a denominator, their difference is
+    a property of the hall alone and does not depend on how loud the direct
+    sound was.
+
+    **Two limits are in the equations and not in the prose.** C.2.1
+    describes the early support as "the reflected energy within the first
+    0,1 s", but (C.1) starts at 20 ms, discarding the 10 ms to 20 ms
+    interval; C.2.2 describes the late support as "the reflected energy
+    after the first 0,1 s" with no upper bound, but (C.2) stops at one
+    second, which matters in any hall whose reverberation time is longer
+    than that. The equations govern, and
+    :doc:`the errata register </reference/errata>` records the rest.
+
+    :param ir: Impulse response measured on the platform (1D), 1,0 m from
+        the acoustic centre of an omnidirectional source.
+    :param fs: Sample rate in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own.
+    :param limits: ``(f_min, f_max)`` band-centre limits in Hz; default the
+        250 Hz to 2 kHz octave bands C.2.4 averages over. ``None`` measures
+        the broadband response.
+    :param fraction: Bandwidth fraction (1 = octave, 3 = one-third octave).
+        C.2.4 asks for octave bands.
+    :return: A :class:`StageSupportResult` with one entry per band.
+    :raises ValueError: If the response is not one-dimensional or is silent,
+        if a band has no energy, or if the response is shorter than the one
+        second Equation (C.2) integrates to.
+
+    """
+    fs = resolve_fs(ir, fs, name="ir")
+    x = validate_ir(ir, fs)
+    frequency, bands = split_bands(x, fs, limits, fraction)
+
+    early = np.empty(len(bands), dtype=np.float64)
+    late = np.empty(len(bands), dtype=np.float64)
+    for index, band in enumerate(bands):
+        p2 = band.astype(np.float64) ** 2
+        if not np.any(p2 > 0.0):
+            msg = f"Band {index} of 'ir' has no energy."
+            raise ValueError(msg)
+        p2 = p2[onset_index(p2) :]
+        # The A.3.4 trigger puts the direct sound at sample zero of the
+        # trimmed band and that sample is non-zero by construction, so the
+        # denominator of both equations always has something in it.
+        direct = _window_energy(p2, fs, *STAGE_DIRECT_WINDOW_S)
+        early[index] = 10.0 * np.log10(
+            _window_energy(p2, fs, *EARLY_SUPPORT_WINDOW_S) / direct
+        )
+        late[index] = 10.0 * np.log10(
+            _window_energy(p2, fs, *LATE_SUPPORT_WINDOW_S) / direct
+        )
+
+    return StageSupportResult(frequency=frequency, early=early, late=late)

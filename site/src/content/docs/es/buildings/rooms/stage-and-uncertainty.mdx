@@ -1,0 +1,263 @@
+---
+title: "Soporte de escenario e incertidumbre (ISO 3382-1)"
+description: "Las dos medidas que le importan al músico, tomadas en el escenario con la fuente a un metro, y lo que la aleatoriedad de la excitación le cuesta a un tiempo de reverberación."
+references:
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2009
+    title: "Acoustics — Measurement of room acoustic parameters — Part 1: Performance spaces"
+    designation: "ISO 3382-1:2009"
+    url: "https://www.iso.org/standard/40979.html"
+    note: "El capítulo 7 y el anexo C: la incertidumbre de un tiempo de reverberación medido y los dos soportes de escenario."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2008
+    title: "Acoustics — Measurement of room acoustic parameters — Part 2: Reverberation time in ordinary rooms"
+    designation: "ISO 3382-2:2008"
+    url: "https://www.iso.org/standard/36201.html"
+    note: "Su Ecuación (A.4) y su Tabla A.1 son la forma general de la que los dos coeficientes del capítulo 7 de la ISO 3382-1 son una columna."
+  - type: article
+    authors: ["Gade, A. C."]
+    year: 1989
+    title: "Investigations of musicians' room acoustic conditions in concert halls. II: Field experiments and synthesis of results"
+    journal: "Acustica"
+    volume: 69
+    issue: 6
+    pages: "249-262"
+    note: "El trabajo de campo del que sale el soporte de escenario del anexo C, y la geometría fuente-receptor que fija."
+  - type: article
+    authors: ["Davy, J. L."]
+    year: 1980
+    title: "The variance of impulse decays"
+    journal: "Acustica"
+    volume: 44
+    issue: 1
+    pages: "51-56"
+    note: "Una de las dos referencias de las que el apartado 7.1 deriva sus coeficientes."
+---
+
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import SeeAlso from '../../../../../components/SeeAlso.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+Todas las demás páginas sobre la ISO 3382-1 miden lo que oye un oyente. Esta
+cubre las dos cosas que la norma dice sobre la medición misma: lo que un
+músico en el escenario oye de su propio instrumento, y cuánto de un tiempo
+de reverberación medido pertenece a la sala y no al ruido con que se excitó.
+
+## 1. Soporte: la sala respondiendo al intérprete
+
+Un músico a un metro de su propio instrumento oye el sonido directo y, unos
+milisegundos después, lo que le devuelven el escenario y la concha. El anexo
+C convierte eso en un cociente, medido con la fuente y el micrófono a 1,0 m
+y a la misma altura, sin nada que refleje a menos de 2 m:
+
+$$
+ST_\mathrm{Early} = 10 \lg \left[
+    \frac{\int_{0,020}^{0,100} p^2(t)\ \mathrm{d}t}
+         {\int_{0}^{0,010} p^2(t)\ \mathrm{d}t} \right] \text{dB},
+\qquad
+ST_\mathrm{Late} = 10 \lg \left[
+    \frac{\int_{0,100}^{1,000} p^2(t)\ \mathrm{d}t}
+         {\int_{0}^{0,010} p^2(t)\ \mathrm{d}t} \right] \text{dB}.
+$$
+
+El soporte temprano se relaciona con el conjunto, con lo fácil que resulta
+oír a los demás intérpretes; el tardío, con cuánta sala vuelve. Los dos
+dividen por el mismo sonido directo, así que su diferencia es una propiedad
+de la sala y no se mueve con la fuerza con que se tocó el instrumento.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stage_support_windows.svg" alt="Tres paneles. A la izquierda, la envolvente de energía de una respuesta al impulso de escenario en un eje de tiempo logarítmico, con la ventana del directo de 0 a 10 ms, la temprana de 20 a 100 ms y la tardía de 100 a 1 000 ms sombreadas, dejando huecos visibles entre 10 y 20 ms y pasado un segundo. En el centro, los dos soportes de escenario banda a banda para un escenario con 1,9 segundos de decaimiento, sobre los rangos habituales sombreados de la Tabla C.1. A la derecha, la desviación típica de un tiempo de reverberación de dos segundos como porcentaje de él, que cae con el número de posiciones independientes, para las bandas de octava de 125 Hz y 1 kHz, frente a la diferencia apenas perceptible del 5 por ciento" width="100%" />
+
+*Las tres ventanas, los dos soportes, y lo que cuesta la excitación.*
+
+```python
+import numpy as np
+from phonometry import room
+
+fs = 48000
+# Una llegada directa unitaria, una reflexión en la ventana temprana y otra
+# en la tardía: cada soporte es entonces 20 lg de la amplitud de la suya.
+response = np.zeros(round(2.0 * fs))
+response[100] = 1.0
+response[100 + round(0.050 * fs)] = 0.2
+response[100 + round(0.400 * fs)] = 0.1
+
+result = room.stage_support(response, fs, limits=None)
+print(result.early.round(4))       # [-13.9794]  = 20 lg 0,2
+print(result.late.round(4))        # [-20.]      = 20 lg 0,1
+
+result.plot()   # los dos soportes frente a los rangos de la Tabla C.1
+```
+
+La Tabla C.1 da los rangos habituales de −24 dB a −8 dB para el soporte
+temprano y de −24 dB a −10 dB para el tardío, e imprime «Not known» para las
+dos diferencias apenas perceptibles, así que este módulo no tiene ninguna.
+C.2.4 pide las bandas de octava de 250 Hz a 2 kHz, que es lo que toma
+`limits` por defecto, y sitúa la desviación típica de una banda en una
+posición en 1 dB y la del número único promediado en frecuencia y posición en
+0,3 dB. Ese par cierra: 1 dB partido por la raíz de las cuatro bandas en tres
+posiciones son 0,2887 dB, que redondean a la cifra impresa, y vale para
+exactamente esas doce lecturas.
+
+## 2. Dos límites de integración que están en las ecuaciones y no en la prosa
+
+El panel de la izquierda de arriba muestra dos huecos, y a ninguno lo
+describe la frase que acompaña a la ecuación que lo crea.
+
+C.2.1 llama al soporte temprano «the reflected energy within the first 0,1
+s», pero la Ecuación (C.1) arranca en 20 ms, no en los 10 ms donde acaba la
+ventana del directo. El intervalo entre ambos no cuenta para nada, y tomar la
+prosa al pie de la letra añade un 17 % más de energía en una sala de 2 s, que
+valen 0,68 dB frente a la desviación típica de 1 dB que C.2.4 estima para una
+sola lectura.
+
+C.2.2 llama al soporte tardío «the reflected energy after the first 0,1 s»
+sin ningún límite superior, pero la Ecuación (C.2) se detiene en un segundo.
+Eso cuesta 0,01 dB con $T = 2$ s, donde el decaimiento ya ha caído 30 dB para
+entonces, y crece hasta 1,0 dB con $T = 8$ s: separa catedrales, no salas de
+conciertos.
+
+Mandan las ecuaciones, y
+[el registro de erratas](/phonometry/es/reference/errata/) recoge las dos.
+
+```python
+import numpy as np
+from phonometry import room
+
+fs = 48000
+response = np.zeros(round(2.0 * fs))
+response[100] = 1.0
+response[100 + round(0.050 * fs)] = 0.2
+response[100 + round(0.400 * fs)] = 0.1
+
+# Una llegada en el hueco de 10 ms a 20 ms, y otra pasado el techo de 1 s.
+neither = response.copy()
+neither[100 + round(0.015 * fs)] = 5.0
+neither[100 + round(1.500 * fs)] = 5.0
+
+plain = room.stage_support(response, fs, limits=None)
+loud = room.stage_support(neither, fs, limits=None)
+print(np.allclose(plain.early, loud.early))    # True
+print(np.allclose(plain.late, loud.late))      # True
+```
+
+## 3. Lo que cuesta la excitación
+
+Un tiempo de reverberación medido con ruido interrumpido es la medida de un
+proceso aleatorio, y el apartado 7.1 dice cuánto de la respuesta pertenece a
+esa aleatoriedad:
+
+$$
+\sigma(T_{20}) = 0{,}88\, T_{20}
+    \sqrt{\frac{1 + 1{,}90/n}{N B T_{20}}},
+\qquad
+\sigma(T_{30}) = 0{,}55\, T_{30}
+    \sqrt{\frac{1 + 1{,}52/n}{N B T_{30}}},
+$$
+
+con $B$ el ancho de banda del filtro, $n$ las caídas medidas en cada posición
+y $N$ las posiciones independientes, entendidas como combinaciones de fuente
+y receptor y no como receptores sueltos.
+
+```python
+from phonometry import room
+
+# La octava de 1 kHz: el apartado pone B en 0,71 veces la frecuencia central.
+print(room.filter_bandwidth(1000.0))                       # 710.0  Hz
+print(room.filter_bandwidth(1000.0, 3))                    # 230.0  Hz
+
+sigma = room.reverberation_time_standard_deviation(2.0, 710.0, positions=12)
+print(round(float(sigma), 6))                              # 0.009044  s
+print(round(100.0 * float(sigma) / 2.0, 3))                # 0.452  %
+```
+
+De la forma impresa salen dos cosas que conviene saber antes de planificar
+una campaña.
+
+**Crece como la raíz cuadrada del tiempo de caída.** La $T$ del prefactor y
+la $T$ bajo el radical dejan media potencia entre las dos, así que un tiempo
+de reverberación largo lleva una incertidumbre absoluta mayor y una relativa
+menor. Cuatro veces el tiempo de caída es el doble de desviación típica, no
+cuatro veces.
+
+**La respuesta al impulso integrada no se libra.** El apartado 7.2 dice que
+el método se comporta como una media de diez caídas de ruido interrumpido por
+posición, no como el infinito que da la teoría, y eso es lo que toma `decays`
+por defecto. La diferencia es un 7 % en $\sigma(T_{30})$ y un 9 % en
+$\sigma(T_{20})$, que no es un redondeo.
+
+```python
+from phonometry import room
+
+ten = room.reverberation_time_standard_deviation(2.0, 710.0, decays=10)
+many = room.reverberation_time_standard_deviation(2.0, 710.0, decays=10**9)
+print(round(float(ten) / float(many), 4))                  # 1.0733
+```
+
+Los dos pares de coeficientes no son arbitrarios. La ISO 3382-2:2008 imprime
+el mismo resultado en forma general, $\sigma(T)/T = G \sqrt{(1 + H/n)/(N B
+T)}$, con una tabla de $G$ y $H$ frente al rango de evaluación y frente a
+$\gamma = T/T_\mathrm{det}$. El 88 % con $H = 1{,}90$ y el 55 % con
+$H = 1{,}52$ son sus filas de 20 dB y 30 dB en la columna $\gamma = 5$, un
+supuesto que la ISO 3382-1 no imprime.
+
+## 4. Dónde un decaimiento corto deja de ser medible
+
+El apartado 7.3 pone dos límites inferiores a un tiempo de caída medido por
+análisis directo, y los dos son normativos:
+
+$$
+B\,T > 16, \qquad T > 2\, T_\mathrm{det}.
+$$
+
+El primero es del propio filtro: una banda de anchura $B$ no puede resolver
+un decaimiento más rápido que su respuesta al impulso. El segundo es del
+detector promediador, y desaparece cuando no hay detector, que es el caso de
+la integración inversa de 5.3.3.
+
+```python
+from phonometry import room
+
+print(round(float(room.minimum_reliable_reverberation_time(88.75)), 4))   # 0.1803  s
+print(round(float(room.minimum_reliable_reverberation_time(2840.0)), 4))  # 0.0056  s
+print(room.minimum_reliable_reverberation_time(710.0, 0.05))              # 0.1  s
+```
+
+La octava de 125 Hz es la que más aprieta, por ser la más estrecha: 16
+partido por 88,75 Hz son 180 ms, y a una sala más seca que eso no se le puede
+medir el tiempo de reverberación a 125 Hz por análisis directo. La NOTA de
+7.3 de la ISO 3382-2:2008 relaja el producto a `B T > 4` cuando el filtrado
+es de tiempo invertido, que es lo que hace
+[`room_parameters`](/phonometry/es/buildings/rooms/room-acoustics/) con
+`zero_phase=True`.
+
+<SeeAlso
+  links={[
+    { href: '/phonometry/es/buildings/rooms/room-acoustics/', label: 'Parámetros acústicos de salas' },
+    { href: '/phonometry/es/buildings/rooms/sound-strength/', label: 'Fuerza sonora G' },
+    { href: '/phonometry/es/buildings/rooms/spatial-impression/', label: 'Impresión espacial' },
+    { href: '/phonometry/es/buildings/rooms/room-impulse-response/', label: 'Medición de la respuesta al impulso' },
+  ]}
+/>
+
+## Qué cubre esta guía
+
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+El soporte de escenario de la ISO 3382-1:2009, anexo C: las Ecuaciones (C.1) y
+(C.2) con sus límites de integración impresos, los rangos habituales de la
+Tabla C.1 y las dos desviaciones típicas que estima C.2.4. Y el capítulo 7: la
+desviación típica de un tiempo de reverberación medido de las Ecuaciones (4) y
+(5), los dos anchos de banda de filtro impresos, las diez caídas en que el
+apartado 7.2 valora una respuesta al impulso integrada, y los límites
+inferiores de las Ecuaciones (6) y (7).
+</ScopeClaim>
+<ScopeClaim status="not-covered" label="Todavía no cubierto">
+El plan de medición en sí: los límites de directividad de la fuente de la
+Tabla 1 con el promedio deslizante que cualifica una fuente frente a ellos, los
+recuentos mínimos de receptores de la Tabla A.2, y el contrato de informe del
+apartado 9.2.
+</ScopeClaim>
+</Scope>

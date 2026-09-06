@@ -277,6 +277,25 @@ documents, one page per module.
 | `IACC_EARLY_WINDOW_S` | `constant` | **(0.0, 0.080) s**, the early window of B.4. | `room.IACC_EARLY_WINDOW_S` |
 | `IACC_LATE_START_S` | `constant` | **0.080 s**, where B.4's reverberant window starts. | `room.IACC_LATE_START_S` |
 | `IACC_JND` | `constant` | **0.075**, the just-noticeable difference B.4 assumes for IACC. | `room.IACC_JND` |
+| `stage_support` | `function` | **Early and late stage support (ISO 3382-1 Eqs. (C.1)/(C.2)).**<br>• `ir`: platform response 1,0 m from the source (1D)<br>• `fs`: Sample rate [Hz]<br>• `limits`: (f_min, f_max) or None (Default: (250, 2000), the bands C.2.4 averages)<br>• `fraction`: 1 or 3 (Default: 1) | `res = room.stage_support(ir, fs)`<br><br>• `StageSupportResult` per band |
+| `StageSupportResult` | `dataclass` | **Per-band stage support.**<br>• `frequency` [Hz] or None<br>• `early`: ST_Early [dB]<br>• `late`: ST_Late [dB]<br>• `.plot()`: both against the Table C.1 ranges | `res.early, res.late` |
+| `STAGE_DIRECT_WINDOW_S` | `constant` | **(0.0, 0.010) s**, the direct-sound window both equations divide by. | `room.STAGE_DIRECT_WINDOW_S` |
+| `EARLY_SUPPORT_WINDOW_S` | `constant` | **(0.020, 0.100) s**, the numerator of Eq. (C.1); it starts at 20 ms, not at 10 ms. | `room.EARLY_SUPPORT_WINDOW_S` |
+| `LATE_SUPPORT_WINDOW_S` | `constant` | **(0.100, 1.000) s**, the numerator of Eq. (C.2); it stops at one second. | `room.LATE_SUPPORT_WINDOW_S` |
+| `STAGE_SUPPORT_DISTANCE_M` | `constant` | **1.0 m** between source and microphone (C.2.1). | `room.STAGE_SUPPORT_DISTANCE_M` |
+| `STAGE_SUPPORT_HEIGHTS_M` | `constant` | **(1.0, 1.5) m**, the two heights C.2.3 permits for both. | `room.STAGE_SUPPORT_HEIGHTS_M` |
+| `STAGE_SUPPORT_BANDS_HZ` | `constant` | **(250, 500, 1000, 2000) Hz**, the bands C.2.4 averages. | `room.STAGE_SUPPORT_BANDS_HZ` |
+| `STAGE_SUPPORT_POSITIONS` | `constant` | **3** positions C.2.3 asks for and C.2.4 averages over. | `room.STAGE_SUPPORT_POSITIONS` |
+| `STAGE_SUPPORT_STANDARD_DEVIATION_DB` | `constant` | **1.0 dB** for one band in one position (C.2.4). | `room.STAGE_SUPPORT_STANDARD_DEVIATION_DB` |
+| `STAGE_SUPPORT_SINGLE_NUMBER_STANDARD_DEVIATION_DB` | `constant` | **0.3 dB** for the single number (C.2.4); it is 1 dB over the root of the twelve readings. | `room.STAGE_SUPPORT_SINGLE_NUMBER_STANDARD_DEVIATION_DB` |
+| `reverberation_time_standard_deviation` | `function` | **Standard deviation of a measured T (ISO 3382-1 Eqs. (4)/(5)).**<br>• `reverberation_time` [s]<br>• `bandwidth` [Hz], from `filter_bandwidth`<br>• `evaluation_range`: 20 or 30 [dB] (Default: 30)<br>• `decays`: n per position (Default: 10, what 7.2 values an integrated response at)<br>• `positions`: N source-receiver combinations (Default: 1) | `room.reverberation_time_standard_deviation(2.0, 710.0, positions=12)`<br><br>• `0.009044` s |
+| `filter_bandwidth` | `function` | **Bandwidth of a fractional-octave filter (ISO 3382-1 7.1).**<br>• `centre`: mid-band frequency [Hz]<br>• `fraction`: 1 or 3 (Default: 1) | `room.filter_bandwidth(1000.0)` → `710.0` Hz |
+| `minimum_reliable_reverberation_time` | `function` | **Shortest decay a forward analysis can resolve (ISO 3382-1 Eqs. (6)/(7)).**<br>• `bandwidth` [Hz]<br>• `detector_time`: T of the averaging detector [s] (Default: 0.0, no detector) | `room.minimum_reliable_reverberation_time(88.75)`<br><br>• `0.1803` s |
+| `FILTER_BANDWIDTH_FRACTION` | `constant` | **{1: 0.71, 3: 0.23}**, the two bandwidths 7.1 prints as a fraction of the centre. | `room.FILTER_BANDWIDTH_FRACTION[1]` → `0.71` |
+| `DECAY_UNCERTAINTY_COEFFICIENTS` | `constant` | **{20.0: (0.88, 1.90), 30.0: (0.55, 1.52)}**, the printed pairs of Eqs. (4) and (5). | `room.DECAY_UNCERTAINTY_COEFFICIENTS[30.0]` |
+| `INTEGRATED_RESPONSE_DECAYS` | `constant` | **10**, the decays per position 7.2 values an integrated impulse response at. | `room.INTEGRATED_RESPONSE_DECAYS` |
+| `MINIMUM_BANDWIDTH_TIME_PRODUCT` | `constant` | **16.0**, the B·T of Eq. (6). | `room.MINIMUM_BANDWIDTH_TIME_PRODUCT` |
+| `MINIMUM_DETECTOR_MULTIPLE` | `constant` | **2.0**, the multiple of the detector's own T in Eq. (7). | `room.MINIMUM_DETECTOR_MULTIPLE` |
 | `AuditoriumWarning` | `class` | **A measurement outside the conditions ISO 3382-1 prints for it.**<br>• raised for a room response cut short of the 30 dB of A.2.1<br>• for a response of either kind that ends before its lowest band's filter has rung down<br>• and for a free-field distance under 3 m | `warnings.simplefilter('error', room.AuditoriumWarning)` |
 | `REFERENCE_DISTANCE_M` | `constant` | **10.0 m**, the free-field distance G is referenced to (ISO 3382-1 A.2.1). | `room.REFERENCE_DISTANCE_M` → `10.0` |
 | `MINIMUM_REFERENCE_DISTANCE_M` | `constant` | **3.0 m**, the shortest distance Eqs. (A.4)/(A.8) are printed for. | `room.MINIMUM_REFERENCE_DISTANCE_M` → `3.0` |

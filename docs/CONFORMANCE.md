@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**797/797 conformance checks pass** across 67 domains and 395 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**802/802 conformance checks pass** across 67 domains and 395 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -130,7 +130,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>Room &amp; building acoustics</b>: 100% (96/96)</summary>
+<summary><b>Room &amp; building acoustics</b>: 100% (101/101)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -152,6 +152,11 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 3382-1:2009 Annex A (informative) Eq. (A.16) | Late lateral sound level of one arrival past the early window | -12.0412 dB (+/-0 dB) | -12.0412 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 3382-1:2009 Annex A (informative) Eq. (A.17) | Energy average of the four late lateral octave bands | 2.43038 dB (+/-0 dB) | 2.43038 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
 | ISO 3382-1:2009 Annex B (informative) Eqs. (B.1)/(B.2) | Interaural correlation of two channels in anti-phase | IACC = 1; min IACF = -1 | IACC = 1; min IACF = -1 | exact | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3382-1:2009 Annex C (informative) Eqs. (C.1)/(C.2) | Stage support of one arrival in each printed window | ST_Early = -13.9794 dB; ST_Late = -20 dB | ST_Early = -13.9794 dB; ST_Late = -20 dB | exact | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3382-1:2009 C.2.4 | The two printed stage-support standard deviations close on 12 readings | 0.3 dB (+/-0 dB) | 1 dB / sqrt(12) = 0.2887 dB -> 0.3 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3382-1:2009 Eq. (5) | Standard deviation of T30, 2 s in the 1 kHz octave, n = 10, N = 12 | 0.00904449 s (+/-0 s) | 0.00904449 s | 0 s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3382-1:2009 Eqs. (4)/(5) | The two evaluation ranges differ by the printed 0,88/0,55 and decay terms | 1.62617479 (+/-0) | 1.62617479 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3382-1:2009 Eqs. (6)/(7) | Shortest reliable decay time of a 125 Hz octave forward analysis | 0.180282 s (+/-0 s) | 0.180282 s | 0 s | 0 % | ![Pass][cv-pass] Pass |
 | ISO 18233:2006 (swept-sine method) | Sweep deconvolution recovers a known IIR response | 0 dB in-band error (+/-0.1 dB) | 0.0006 dB | 0.0006 dB | 1 % | ![Pass][cv-pass] Pass |
 | ISO 717-1 Annex C, Table C.1 | Weighted sound reduction index Rw (C;Ctr) | Rw 30 (C -2; Ctr -3) | Rw 30 (C -2; Ctr -3), unfavourable sum 31.8 dB | exact | 0 % | ![Pass][cv-pass] Pass |
 | ISO 717-1:2020 Annex C, Table C.2 | Enlarged range 50-5000 Hz: Rw (C; Ctr; C50-5000; Ctr,50-5000) | Rw 30 (C -2; Ctr -3; C50-5000 -2; Ctr,50-5000 -4) | Rw 30 (C -2; Ctr -3; C50-5000 -2; Ctr,50-5000 -4) | exact | - | ![Pass][cv-pass] Pass |
