@@ -1501,6 +1501,11 @@ class AuditoriumQuantity:
     unit: str
 
 
+#: The one listener aspect of Table A.1 that spans more than one quantity:
+#: clarity is judged by C80, by D50 and by the centre time together, so the
+#: three rows carry the same aspect and the table cannot be keyed by it.
+_CLARITY_ASPECT = "Perceived clarity of sound"
+
 #: ISO 3382-1:2009, Table A.1, keyed by the symbol the standard prints.
 #: Five listener aspects and seven quantities: "Perceived clarity of sound"
 #: carries three of them, and the early lateral energy fraction is one row
@@ -1528,7 +1533,7 @@ TABLE_A1 = {
     ),
     "C80": AuditoriumQuantity(
         symbol="C80",
-        aspect="Perceived clarity of sound",
+        aspect=_CLARITY_ASPECT,
         averaging_bands_hz=(500.0, 1000.0),
         just_noticeable_difference=1.0,
         relative_jnd=False,
@@ -1538,7 +1543,7 @@ TABLE_A1 = {
     ),
     "D50": AuditoriumQuantity(
         symbol="D50",
-        aspect="Perceived clarity of sound",
+        aspect=_CLARITY_ASPECT,
         averaging_bands_hz=(500.0, 1000.0),
         just_noticeable_difference=0.05,
         relative_jnd=False,
@@ -1548,7 +1553,7 @@ TABLE_A1 = {
     ),
     "Ts": AuditoriumQuantity(
         symbol="Ts",
-        aspect="Perceived clarity of sound",
+        aspect=_CLARITY_ASPECT,
         averaging_bands_hz=(500.0, 1000.0),
         just_noticeable_difference=0.010,
         relative_jnd=False,
