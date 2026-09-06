@@ -4530,6 +4530,103 @@ in the same order.
   round the turn. Its docstring says all three choices are choices.
 - **Status:** unreported.
 
+## IEC 60534-8-3:2010, Annex A (the piping geometry factor is printed rounded, and the annex did not use the rounded value)
+
+- **Location:** Annex A (informative), A.2, the "Given data" block on printed
+  folio 32 (PDF page 34) of BS EN 60534-8-3:2011, against the Equation (2) row
+  of Table A.1 on the same folio.
+- **The print:** the given data lists "Piping geometry factor: $F_\mathrm{p} =
+  0{,}98$", under the heading "The following values are used in, or determined
+  from, calculations based on IEC 60534-2-1." Table A.1 then prints
+  $p_{vc} = 567\,787$ Pa for example 1 and five more values for the other
+  columns, from
+  $p_{vc} = p_1\left[1 - x/(F_{LP}/F_P)^2\right]$ with $F_{LP} = 0{,}792$.
+- **The problem:** those two cannot both be right. Solving Equation (2) for
+  $(F_{LP}/F_P)^2$ from each printed pair gives 0,647 829, 0,647 827,
+  0,647 821, 0,647 829 and 0,647 833 in the five columns that print a value,
+  which is $F_p = 0{,}984$ to four digits in every one of them. The printed
+  0,98 gives 0,653 128 and $p_{vc} = 571\,294$ Pa, 3 507 Pa away from the
+  printed figure. The value is a computed one, not a datum: the annex says it
+  comes from IEC 60534-2-1, and the head loss coefficient it prints,
+  $\Sigma\zeta = 0{,}86$, gives $F_p = 0{,}984$ for the DN 100 case. So the
+  annex computed with three decimals and printed two.
+- **Consequence:** every downstream quantity moves. With the printed 0,98 the
+  four regime boundaries come out $x_C = 0{,}287$, $\alpha = 0{,}786$,
+  $x_B = 0{,}578$ against the printed 0,285, 0,784 and 0,576, and example 1's
+  sound power comes out 21,9 W against the printed 22,3 W. Nothing is far
+  wrong, and nothing reproduces either: a reader checking their implementation
+  against Annex A with the number Annex A prints will not match a single row.
+- **Evidence:** the given data and the six $p_{vc}$ values read from the
+  printed page. Verified on PDF pages 33 and 34 (printed pp. 31 and 32) of
+  BS EN 60534-8-3:2011.
+- **Library behaviour:**
+  [`valve_aerodynamic_noise`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/noise_control/valves.py) takes
+  the ratio as an argument and does not hold a value of its own; the
+  conformance rows and `tests/noise_control/test_valves.py` pass
+  $0{,}792/0{,}984$ and say why in the fixture.
+- **Status:** unreported.
+
+## IEC 60534-8-3:2010, Table A.1 (an equivalent orifice diameter ten times too small, contradicted by the row below it)
+
+- **Location:** Annex A (informative), Table A.1, the Equation (8c) row on
+  printed folio 33 (PDF page 35), against the Equation (8a) row printed
+  immediately below it.
+- **The print:** all six columns of the (8c) row read $d_0 = 0.010$ m. The
+  given data on folio 31 gives $N_\mathrm{O} = 6$ cage openings and
+  $A = 0{,}00137$ m² for one of them, and Equation (8c) is
+  $d_o = \sqrt{4 N_o A/\pi}$.
+- **The problem:** $\sqrt{4 \times 6 \times 0{,}00137/\pi} = 0{,}102$ m, not
+  0,010 m. The two numerals are the same three digits in a different order.
+  The row below settles which is meant: Equation (8a) is $F_d = d_H/d_o$, the
+  (8b) row prints $d_H = 0{,}030$ m, and the (8a) row prints $F_d = 0{,}30$ in
+  all six columns. 0,030/0,102 is 0,30; 0,030/0,010 is 3,0.
+- **Consequence:** a reader who takes the printed $d_o$ gets a valve style
+  modifier of 3,0, a jet diameter ten times too large from Equation (9), and a
+  peak frequency ten times too low, which moves the internal spectrum of
+  Equation (19) by more than three octaves. The rest of the table is computed
+  with 0,102 m, so the error is confined to the one printed cell.
+- **Evidence:** the (8b), (8c) and (8a) rows read from the printed page.
+  Verified on PDF pages 33 and 35 (printed pp. 31 and 33) of
+  BS EN 60534-8-3:2011.
+- **Library behaviour:**
+  [`valve_style_modifier`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/noise_control/valves.py)
+  implements (8b) and (8c) as printed and returns 0,296 for the annex's cage,
+  which rounds to the printed $F_d$; the test named after this entry pins both
+  readings so the printed $d_o$ cannot come back.
+- **Status:** unreported.
+
+## IEC 60534-8-3:2010, Table A.2 (two frequency factors whose exponent is one power of ten out)
+
+- **Location:** Annex A (informative), A.3, the $G_x$ column of Table A.2 on
+  printed folio 43 (PDF page 45), bands 5 and 10 of 33.
+- **The print:** the column runs $G_{x,4} = 5.6 \times 10^{-9}$,
+  $G_{x,5} = 1.4 \times 10^{-9}$, $G_{x,6} = 3.6 \times 10^{-8}$, and later
+  $G_{x,9} = 5.8 \times 10^{-7}$, $G_{x,10} = 1.4 \times 10^{-7}$,
+  $G_{x,11} = 3.5 \times 10^{-6}$.
+- **The problem:** below the internal coincidence frequency Table 6 makes
+  $G_x$ proportional to $f_i^4$, so the column has to rise monotonically, and
+  it does everywhere except at those two bands, where it falls. Recomputing
+  Table 6 for this pipe gives $1{,}4 \times 10^{-8}$ at band 5 and
+  $1{,}4 \times 10^{-6}$ at band 10: the mantissa is right in both and the
+  exponent is one too small.
+- **Consequence:** none for the rest of the annex, and that is what settles
+  it. The transmission losses printed two rows further down, $TL_5 = -86{,}1$
+  dB and $TL_{10} = -76{,}2$ dB, are what Equation (20a) gives with the
+  corrected factors; the printed factors would give $-96{,}1$ dB and
+  $-86{,}3$ dB. So Table A.2 computed with the right values and printed the
+  wrong ones, and anyone seeding an oracle from the $G_x$ column alone
+  inherits a 10 dB error in two bands.
+- **Evidence:** the $G_x$ column read from the printed page. Verified on PDF
+  pages 45 and 46 (printed pp. 43 and 44) of BS EN 60534-8-3:2011; the 24
+  printed transmission losses on the second of them are what the library
+  reproduces to within 0,07 dB.
+- **Library behaviour:**
+  [`pipe_transmission_loss`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/noise_control/valves.py)
+  computes $G_x$ from Table 6, and the conformance row "Pipe transmission
+  loss, example 7, 24 bands" reproduces every printed loss, which the printed
+  $G_x$ could not.
+- **Status:** unreported.
+
 ## Related source properties that are not errata
 
 Recorded here to prevent future "fixes" that would break agreement with the

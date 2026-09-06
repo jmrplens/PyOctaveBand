@@ -3172,6 +3172,23 @@ _ES_EXACT = {
     "near 645 Hz, just past the half-wave trough\nof the TL, both "
     "insertion losses dip again": "cerca de 645 Hz, justo tras el cero de media onda\nde la TL, las "
     "dos pérdidas por inserción vuelven a caer",
+    # control_valve_noise: the five regimes, the pipe and what comes out
+    "What throttling costs, regime by regime": "Lo que cuesta estrangular, régimen a régimen",
+    "Differential pressure ratio $x$": "Cociente diferencial de presiones $x$",
+    "Acoustical efficiency $\\eta$": "Eficiencia acústica $\\eta$",
+    "one valve, one part in a million of\nthe stream power at the left and two\n"
+    "parts in a thousand at the right": "una misma válvula: una parte por millón de\nla potencia de la vena "
+    "a la izquierda y dos\npartes por mil a la derecha",
+    "A wall worth a hundred decibels": "Una pared que vale cien decibelios",
+    "Inside the pipe, $L_{pi}(f_i)$": "Dentro de la tubería, $L_{pi}(f_i)$",
+    "One metre outside, $L_{pe,1m}(f_i)$": "A un metro por fuera, $L_{pe,1m}(f_i)$",
+    "the peak frequency, set by the jet\ndiameter and not by the valve size": "la frecuencia de pico, la fija el diámetro\ndel chorro y no el "
+    "tamaño de la válvula",
+    "The pipe is the loudspeaker": "La tubería es el altavoz",
+    "Pipe transmission loss [dB]": "Pérdida por transmisión de la tubería [dB]",
+    "the wall lets most through where the\nsound inside it and the bending waves\n"
+    "in it travel at the same speed": "la pared deja pasar más donde el sonido\nde dentro y las ondas de flexión "
+    "de la\npared viajan a la misma velocidad",
     # silencer_selection: reactive against dissipative on one axis
     "Choosing the family: where each one is worth having": "Elegir la familia: dónde compensa cada una",
     "Reactive: 0.3 m expansion chamber, $m = 4$": "Reactivo: cámara de expansión de 0,3 m, $m = 4$",

@@ -57,18 +57,29 @@ function spell(n, lang) {
 			tens: ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'],
 		},
 		es: {
-			units: ['', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve',
+			// The last digit agrees with the noun ("treinta y una guías"), so the
+			// unit that has two genders is written as the pattern for both. It
+			// never reaches the hundreds, where 1 is spelled "ciento" or "cien".
+			units: ['', 'un(?:o|a)', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve',
 				'diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete',
 				'dieciocho', 'diecinueve'],
 			tens: ['', '', 'veinte', 'treinta', 'cuarenta', 'cincuenta', 'sesenta', 'setenta',
 				'ochenta', 'noventa'],
 		},
 	}[lang];
-	const below100 = (v) =>
-		v < 20
-			? table.units[v]
-			: table.tens[Math.floor(v / 10)] +
-				(v % 10 ? (lang === 'es' ? ' y ' : '-') + table.units[v % 10] : '');
+	// Spanish writes 21 to 29 as one word, with the accents that fusion puts on
+	// some of them ("veintidós", "veintiséis"), and it agrees the last digit
+	// with the noun: 121 guides are "ciento veintiuna guías", not "veintiuno".
+	// The three endings are all the number, so the pattern takes any of them.
+	const es20s = ['veinte', 'veinti(?:uno|una|ún)', 'veintidós', 'veintitrés',
+		'veinticuatro', 'veinticinco', 'veintiséis', 'veintisiete', 'veintiocho',
+		'veintinueve'];
+	const below100 = (v) => {
+		if (v < 20) return table.units[v];
+		if (lang === 'es' && v < 30) return es20s[v - 20];
+		return table.tens[Math.floor(v / 10)] +
+			(v % 10 ? (lang === 'es' ? ' y ' : '-') + table.units[v % 10] : '');
+	};
 	if (n < 100) return below100(n);
 	const rest = n % 100;
 	const hundreds = Math.floor(n / 100);

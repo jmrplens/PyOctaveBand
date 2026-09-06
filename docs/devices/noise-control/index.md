@@ -71,6 +71,9 @@ occupational limit applies, in [Occupational exposure
 - [HVAC Noise the German Way (VDI 2081)](vdi2081-air-systems.md):
   the same chain by the German guideline, against the worked sheet of its own
   Part 2.
+- [Control Valve Noise (IEC 60534-8-3)](control-valve-noise.md):
+  the five flow regimes of a throttling valve and the pipe wall that radiates
+  what they make.
 - [Room to Room: Partition, Receiving Room, Criterion](room-to-room.md):
   the composed source-room to receiving-room chain and the transmission loss a
   partition or an enclosure needs to meet a noise criterion.

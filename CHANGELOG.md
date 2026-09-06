@@ -38,6 +38,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- What a control valve does to a pipe, which is where a plant's loudest noise
+  usually comes from and which nothing in the library predicted.
+
+  IEC 60534-8-3 turns an operating point into a level one metre from the pipe
+  wall. The chain has a branch in the middle, the flow regime: five printed
+  pressure ratios cut the differential pressure ratio into five intervals,
+  from subsonic flow in the vena contracta to the fully developed shock cells
+  of regime V, and each one has its own Mach number, its own acoustical
+  efficiency and its own peak frequency. Everything either side of the branch
+  is common to all five, and the last third of the method is not about the
+  valve at all: it is the pipe, whose transmission loss is shaped by its ring
+  frequency and by two coincidence frequencies, and which is what actually
+  radiates.
+
+  `valve_aerodynamic_noise` runs the whole of Clause 5 and returns every
+  printed intermediate beside the answer, so a result can be read against the
+  standard row by row rather than trusted. The 2010 edition made the method
+  spectral, so the result carries the internal level, the transmission loss
+  and the external level in all 33 one-third-octave bands from 12,5 Hz to
+  20 kHz, as well as the single A-weighted number.
+
+  Annex A is an unusually complete oracle, and eight conformance rows now run
+  against it: six operating points that walk the five regimes in order, with
+  their regimes, sound powers and internal levels, the valve style modifier,
+  the jet diameter and the vena contracta pressure of those columns, and a
+  seventh example whose pipe pins the ring and coincidence frequencies and the
+  transmission loss in all 33 bands to within 0,07 dB.
+
+  Three things in that annex do not reproduce themselves and are in the errata
+  register. The piping geometry factor is printed rounded to 0,98 and the
+  annex computed with 0,984, which is enough to make every row of the table
+  disagree with a reader who takes the printed value. The equivalent orifice
+  diameter is printed ten times too small, and the valve style modifier one
+  row below is what proves it. And two frequency factors of the seventh
+  example carry an exponent one power of ten out, which the transmission
+  losses printed two rows further down contradict.
+
 - The four tables ISO 3382-1 prints, and the rules that go with them.
 
   Table 1 says how far from omnidirectional a source may be before it stops

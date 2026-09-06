@@ -1,0 +1,279 @@
+← [Documentation index](../../README.md)
+
+# Control valve noise (IEC 60534-8-3)
+
+A control valve is usually the loudest thing in a process plant, and it is
+loud for a reason worth stating plainly: throttling turns pressure into
+velocity, and the velocity is then thrown away in a free jet inside the pipe.
+A small and well characterised fraction of that jet's power comes back as
+sound. The valve does not radiate it. **The pipe does**, which is why a
+prediction method that stops at the valve is not a prediction of anything
+anyone hears.
+
+IEC 60534-8-3 is that chain, from an operating point to a level one metre from
+the pipe wall, and this page follows it.
+
+## 1. Five regimes, and why the method has a branch in it
+
+Everything turns on the **differential pressure ratio**, Equation (1):
+
+$$
+x = \frac{p_1 - p_2}{p_1}
+$$
+
+A valve barely throttling and a valve running a shock train are not the same
+noise source, and the standard does not pretend otherwise. Equations (3) to
+(7) cut $x$ into five intervals, and Table 3 gives each interval its own Mach
+number, its own acoustical efficiency and its own peak frequency.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/control_valve_noise_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/control_valve_noise.svg" alt="Three panels. Left: the acoustical efficiency of one valve against the differential pressure ratio on a logarithmic axis, from one part in a million to two parts in a thousand, with the five regimes shaded and labelled with roman numerals and their four boundaries drawn as dotted lines. Middle: the sound pressure level in each one-third-octave band from 12.5 Hz to 20 kHz, once inside the pipe and once one metre outside it, about a hundred decibels lower, with the peak frequency marked. Right: the pipe transmission loss against frequency, rising from ninety decibels at the bottom of the range to a maximum near the internal coincidence frequency and falling again, with the external coincidence, internal coincidence and ring frequencies marked" width="100%"></picture>
+
+*The same valve, from one part in a million of the stream power to two parts
+in a thousand, and the hundred decibels the pipe wall is worth.*
+
+The five are, in the order the clause prints them: **I** subsonic in the vena
+contracta, **II** and **III** choked with a jet that is still growing, and
+**IV** and **V** the shock-cell regimes, where the peak frequency stops
+following the jet velocity and starts following the spacing of the cells.
+
+```python
+from phonometry import noise_control
+
+bounds = noise_control.pressure_ratio_boundaries(1.22, 0.792 / 0.984)
+print(round(bounds.critical, 3))              # 0.285  x_C
+print(round(bounds.vena_contracta, 3))        # 0.439  x_vcc
+print(round(bounds.break_point, 3))           # 0.576  x_B
+print(round(bounds.constant_efficiency, 3))   # 0.942  x_CE
+
+print(noise_control.flow_regime(0.28, bounds))   # 1
+print(noise_control.flow_regime(0.52, bounds))   # 3
+print(noise_control.flow_regime(0.95, bounds))   # 5
+```
+
+The second argument is the pressure recovery factor $F_L$, or
+$F_{LP}/F_p$ when the valve has attached fittings, which is what the note to
+Table 3 asks for and what every example in Annex A uses.
+
+**The boundaries are printed twice and not identically.** Clause 5.2 ends its
+list with "Regime V if $x_{CE} < x$" and Table 3 prints $x_{CE} \le x$ for the
+same row, while its regime IV row ends $x \le x_{CE}$. Read as the table
+prints it, the single point $x = x_{CE}$ belongs to two regimes at once. The
+clause is the normative text and its list is consistent, so `flow_regime`
+follows the clause, and
+[the errata register](../../ERRATA.md) records the
+disagreement.
+
+## 2. The jet, which is not the valve
+
+The peak frequency of the noise is set by the size of one jet, not by the size
+of the valve. A cage with sixty small holes and a single-port plug of the same
+capacity make the same power and put it in very different places.
+Equations (8a) to (8c) are how the standard measures that:
+
+$$
+d_H = \frac{4A}{l_w}, \qquad
+d_o = \sqrt{\frac{4 N_o A}{\pi}}, \qquad
+F_d = \frac{d_H}{d_o}
+$$
+
+$d_H$ is the hydraulic diameter of one passage and $d_o$ the diameter of the
+single circular orifice that would pass the same total area, so $F_d$ is near
+one for a single large port and small for a cage.
+
+```python
+from phonometry import noise_control
+
+# The cage of Annex A: six openings, each 0,00137 m2 with a 0,181 m perimeter.
+fd = noise_control.valve_style_modifier(0.00137, 0.181, 6)
+print(round(fd, 3))                                        # 0.296
+
+print(round(noise_control.jet_diameter(90.0, fd, 0.792 / 0.984), 4))
+# 0.0116  m
+```
+
+Equation (9) then turns the flow coefficient into the jet diameter,
+$D_j = N_{14} F_d \sqrt{C\,F_{LP}/F_P}$, with $N_{14}$ from Table 1 by
+whichever coefficient the valve is rated in.
+
+**Annex A prints an orifice diameter ten times too small.** Its Table A.1
+gives $d_o = 0{,}010$ m in all six columns where Equation (8c) with the
+annex's own $N_O = 6$ and $A = 0{,}00137$ m² gives $0{,}102$ m. The row below
+settles it: the printed $F_d = 0{,}30$ is $0{,}030/0{,}102$, and it would be
+3,0 with the printed $d_o$. That one is in the errata register too, along with
+a piping geometry factor the annex prints rounded to 0,98 and computed with
+0,984.
+
+## 3. The whole of Clause 5, in one call
+
+The rest of the chain is the acoustical efficiency of Table 3, the sound power
+of Equation (11), the internal level at the pipe wall of Equation (18), the
+spectrum of Equation (19), the pipe transmission loss of Equation (20a) and
+the level outside of Equations (24) and (25).
+
+```python
+from phonometry import noise_control
+
+result = noise_control.valve_aerodynamic_noise(
+    mass_flow=2.22,                # kg/s
+    inlet_pressure=1.0e6,          # Pa, absolute
+    outlet_pressure=7.2e5,
+    inlet_density=5.3,             # kg/m3
+    inlet_temperature=450.0,       # K
+    specific_heat_ratio=1.22,
+    molecular_mass=19.8,           # kg/kmol
+    flow_coefficient=90.0,         # C_v
+    style_modifier=noise_control.valve_style_modifier(0.00137, 0.181, 6),
+    pressure_recovery=0.792 / 0.984,
+    valve_outlet_diameter=0.1,     # m
+    internal_diameter=0.2031,      # m, the pipe
+    wall_thickness=0.008,          # m
+    pipe_density=8000.0,           # kg/m3, steel
+    efficiency_correction=-3.8,    # A_eta, Table 4
+    strouhal_number=0.2,           # St_p, Table 4
+)
+
+print(result.regime)                                # 1
+print(round(result.sound_power, 1))                 # 22.3  W
+print(round(result.internal_level, 1))              # 155.3 dB
+print(round(result.peak_frequency))                 # 7778  Hz
+print(round(result.external_level, 1))              # 91.7  dB
+```
+
+Every one of those is a printed value of Annex A's example 1, including the
+last: the annex prints $L_{pAe,1m} = 92$ dB(A) for it. Five of the six columns
+end in a number Clause 5 alone reaches, and the library reproduces all five;
+the sixth is the one whose valve outlet is narrower than its pipe, so the annex
+adds the expander noise of Clause 7 to it, and Clause 5 by itself lands a
+decibel low. The result also carries the rest of the printed intermediates, so
+a calculation can be read against the standard row by row rather than trusted.
+
+The last two arguments are the only ones a data sheet may not give.
+$A_\eta$ is the exponent of the acoustical efficiency and $St_p$ the Strouhal
+number at the peak; Table 4 prints typical pairs for thirteen valve styles and
+says in its own NOTE 1 that a manufacturer states the real ones.
+
+```python
+from phonometry import noise_control
+
+print(noise_control.VALVE_ACOUSTIC_STYLES["globe ported cage"])
+# (-3.8, 0.2)
+print(noise_control.VALVE_ACOUSTIC_STYLES["segmented ball 90 deg"])
+# (-3.6, 0.3)
+```
+
+$A_\eta$ is $-4$ for a pure dipole, which is what a free jet expanding into a
+large volume is; the printed values run from $-4{,}8$ to $-3{,}0$, so the
+whole table spans a factor of sixty in efficiency, which is 18 dB.
+
+## 4. Where the sound actually comes out
+
+The internal level is around 155 dB in the example above, and nobody standing
+beside the pipe hears anything like that. The pipe wall is what stands between
+them, and Equation (20a) is worth more than a hundred decibels at the bottom
+of the range.
+
+It is not a flat hundred. Three frequencies shape it, and the middle one is
+where the wall gives most away:
+
+$$
+f_r = \frac{c_s}{\pi D_i}, \qquad
+f_o = \frac{f_r}{4}\left(\frac{c_2}{c_a}\right), \qquad
+f_g = \frac{\sqrt{3}}{\pi t_S}\frac{c_a^2}{c_s}
+$$
+
+```python
+from phonometry import noise_control
+
+pipe = noise_control.coincidence_frequencies(0.200, 0.008, 408.0)
+print(round(pipe.ring))                    # 7958  Hz, f_r
+print(round(pipe.internal_coincidence))    # 2366  Hz, f_o
+print(round(pipe.external_coincidence))    # 1622  Hz, f_g
+```
+
+$f_r$ is the ring frequency, where the circumference is one wavelength in the
+steel. $f_o$ is the internal coincidence frequency, where the sound inside the
+pipe and the bending waves in its wall travel at the same speed, so they
+couple: that is the maximum in the right-hand panel of the figure, and it is
+where a valve's noise gets out. $f_g$ is the external one, where the bending
+waves match the air outside.
+
+```python
+import numpy as np
+from phonometry import noise_control
+
+bands = np.array([200.0, 1000.0, 2500.0])
+loss = noise_control.pipe_transmission_loss(
+    bands,
+    internal_diameter=0.200,
+    wall_thickness=0.008,
+    valve_outlet_diameter=0.200,
+    downstream_density=11.1,
+    downstream_sound_speed=408.0,
+    pipe_density=8000.0,
+)
+print(np.round(loss, 1))
+# [-70.4 -56.9 -49.4]
+```
+
+All three are printed values of Annex A's example 7. The loss is
+negative and Equation (24) *adds* it, which is the standard's own sign and not
+a convention chosen here.
+
+**A thinner pipe is a louder pipe, and by a lot.** The wall thickness enters
+Equation (20a) squared, so halving it is worth about 6 dB in every band, which
+is the cheapest and most often forgotten line in a valve noise budget.
+
+## 5. What the method will not do
+
+Clause 5 has limits, and two of them bite in practice. The valve outlet Mach
+number $M_o$ of Equation (15) must stay below 0,3, and above that NOTE 1 says
+accuracy cannot be maintained and Clause 7 is used instead. The pipe Mach
+number $M_2$ of Equation (17) is not a limit but a clamp: NOTE 2 caps it at
+0,3 before the velocity correction of Equation (16) is computed, however fast
+the pipe actually runs.
+
+```python
+from phonometry import noise_control
+
+sixth = noise_control.valve_aerodynamic_noise(
+    mass_flow=0.89, inlet_pressure=1.0e6, outlet_pressure=5.0e4,
+    inlet_density=5.3, inlet_temperature=450.0, specific_heat_ratio=1.22,
+    molecular_mass=19.8, flow_coefficient=30.0,
+    style_modifier=noise_control.valve_style_modifier(0.00137, 0.181, 6),
+    pressure_recovery=0.792 / 0.984, valve_outlet_diameter=0.1,
+    internal_diameter=0.15, wall_thickness=0.008, pipe_density=8000.0,
+    efficiency_correction=-3.8, strouhal_number=0.2,
+)
+print(round(sixth.outlet_mach, 2))   # 0.89, far past the 0.3 of NOTE 1
+print(round(sixth.pipe_mach, 2))     # 0.4, clamped to 0.3 for the correction
+```
+
+That is Annex A's example 6, which the annex prints anyway. The library does
+the same and reports both numbers rather than refusing, because the printed
+column is what an implementation has to reproduce, but a reading with
+$M_o = 0{,}89$ is a reading Clause 5 does not stand behind.
+
+## See also
+
+- [Reactive Silencers](silencers.md): the four-pole chain that would be put
+  downstream of a valve this loud.
+- [Duct-Borne Noise](duct-path.md): the same question for a ventilation
+  system, where the source is a fan rather than a jet.
+- [HVAC Noise the German Way (VDI 2081)](vdi2081-air-systems.md): another
+  chain that ends in a level rather than in a sound power.
+- [Sound Power in a Duct](../emission/sound-power-in-duct.md): the ISO 5136
+  measurement of what a source puts into a pipe, which is the measured
+  counterpart of what this page predicts.
+- API reference: [`noise_control.valves`](https://jmrplens.github.io/phonometry/reference/api/noise_control/valves/).
+
+## Standards
+
+IEC 60534-8-3:2010, Clause 5, for a valve with standard trim: the pressure
+ratios of 5.1 and 5.2, the geometry of 5.3, the regime-dependent quantities of
+Table 3, the internal level and spectrum of 5.4, the pipe transmission loss of
+5.5 and the external level of 5.6, with Tables 1, 4, 5, 6 and 7. Validated
+against the seven worked examples of Annex A in the
+[conformance report](../../CONFORMANCE.md); the three defects that annex
+carries are in the [errata register](../../ERRATA.md). The noise-reducing
+trims of Clause 6, the high Mach number procedure and expander of Clause 7,
+and the hydrodynamic case of IEC 60534-8-4 are not implemented yet.
