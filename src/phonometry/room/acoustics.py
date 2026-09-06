@@ -43,15 +43,14 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.utils import _typesignal
 from .._internal.validation import (
     check_engine,
-    require_finite_array,
     require_ranks,
     require_same_length,
 )
 from ..filters.core import OctaveFilterBank
-from ..io._resolve import apply_calibration, resolve_fs
+from ..io._resolve import resolve_fs
+from ._shared import noise_power, onset_index, split_bands, validate_ir
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -64,18 +63,6 @@ if TYPE_CHECKING:
 #: Default octave-band analysis range (ISO 3382-1:2009, 5.1: engineering
 #: and precision methods cover at least 125 Hz to 4 kHz in octave bands).
 _DEFAULT_BANDS = (125.0, 4000.0)
-
-#: Onset threshold: the direct sound starts where the squared IR first
-#: rises to within 20 dB of its maximum (trigger point per ISO 3382-1:2009,
-#: A.3.4, which places it where the signal first rises significantly above
-#: the background but is more than 20 dB below the maximum; this detector
-#: takes the first sample at/above the -20 dB edge, one sample inside that
-#: bound, which errs early - the safe direction, see :func:`_onset_index`).
-_ONSET_DB = 20.0
-
-#: Fraction of the (onset-trimmed) response used to estimate the
-#: background-noise level from its tail.
-_NOISE_TAIL_FRACTION = 0.1
 
 #: ISO 3382-1:2009, 5.3.3: noise at least evaluation range + 15 dB below
 #: the maximum of the impulse response (i.e. 10 dB below the lowest
@@ -299,35 +286,6 @@ class RoomAcousticsResult:
         )
 
 
-def _onset_index(p2: np.ndarray) -> int:
-    """Index where the direct sound starts: first sample of the squared
-    IR within ``_ONSET_DB`` of its maximum (trigger per ISO 3382-1, A.3.4).
-
-    A.3.4 places the trigger where the signal first rises significantly
-    above the background but is "more than 20 dB below the maximum"; this
-    detector takes the first sample at or above the -20 dB edge, i.e. one
-    sample inside that bound rather than the last sample outside it.
-    Taking the *first* sample within the threshold makes the detector err
-    early, which is the safe direction: a late onset that clips the direct
-    sound is catastrophic for the early-to-late energy ratios (a +1 ms late
-    onset can cost several dB on C50/C80 and tens of ms on Ts), whereas an
-    early onset is essentially harmless. The clarity/definition/centre-time
-    parameters therefore rely on a clean, impulsive direct arrival; a soft
-    direct sound or pre-ringing from external processing can still push
-    detection late.
-    """
-    peak = int(np.argmax(p2))
-    threshold = p2[peak] * 10.0 ** (-_ONSET_DB / 10.0)
-    above = np.nonzero(p2[: peak + 1] >= threshold)[0]
-    return int(above[0]) if above.size else peak
-
-
-def _noise_power(p2: np.ndarray) -> float:
-    """Background-noise power estimated from the tail of the squared IR."""
-    tail = max(1, round(p2.size * _NOISE_TAIL_FRACTION))
-    return float(np.mean(p2[-tail:]))
-
-
 def _truncation(
     p2: np.ndarray, fs: int, noise_power: float
 ) -> tuple[int, float, float]:
@@ -396,7 +354,7 @@ def _schroeder(
         compensation, the truncation sample ``i1`` and the tail first
         moment :math:`\int_{t_1}^{\infty} t \, p^2 \, dt`.
     """
-    noise = _noise_power(p2)
+    noise = noise_power(p2)
     i1, tail_energy, tail_moment = _truncation(p2, fs, noise)
     cumulative = np.cumsum(p2[:i1]) / fs
     total = float(cumulative[-1]) + tail_energy
@@ -442,8 +400,8 @@ def _band_parameters(x: np.ndarray, fs: int) -> tuple[float, ...]:
     p2 = x.astype(np.float64) ** 2
     if not np.any(p2 > 0.0):
         return (nan,) * 7 + (0.0,)
-    p2 = p2[_onset_index(p2) :]
-    noise = _noise_power(p2)
+    p2 = p2[onset_index(p2) :]
+    noise = noise_power(p2)
     peak = float(p2.max())
     dyn = 10.0 * np.log10(peak / noise) if noise > 0.0 else float("inf")
     time, level, cumulative, total, i1, tail_moment = _schroeder(p2, fs)
@@ -470,20 +428,6 @@ def _band_parameters(x: np.ndarray, fs: int) -> tuple[float, ...]:
     first_moment = float(np.dot(time, p2[:i1])) / fs + tail_moment
     ts = first_moment / total
     return edt, t20, t30, c50, c80, d50, ts, dyn
-
-
-def _validate_ir(ir: Signal | list[float] | np.ndarray, fs: int) -> np.ndarray:
-    x = _typesignal(ir, name="ir")
-    if x.ndim != 1:
-        msg = "The impulse response must be one-dimensional."
-        raise ValueError(msg)
-    if fs <= 0:
-        msg = "Sample rate 'fs' must be positive."
-        raise ValueError(msg)
-    if not np.any(x):
-        msg = "Impulse response 'ir' is silent."
-        raise ValueError(msg)
-    return apply_calibration(ir, x)
 
 
 @dataclass(frozen=True)
@@ -592,7 +536,7 @@ def decay_curve(
         for backward compatibility and exposes :meth:`DecayCurve.plot`.
     """
     fs = resolve_fs(ir, fs, name="ir")
-    x = _validate_ir(ir, fs)
+    x = validate_ir(ir, fs)
     if band is not None:
         if band <= 0.0:
             msg = "Band centre frequency 'band' must be positive."
@@ -628,7 +572,7 @@ def decay_curve(
     if not np.any(p2 > 0.0):
         msg = "The selected band has no energy."
         raise ValueError(msg)
-    p2 = p2[_onset_index(p2) :]
+    p2 = p2[onset_index(p2) :]
     time, level, _, _, _, _ = _schroeder(p2, fs)
     return DecayCurve(time=time, level=level, band=band)
 
@@ -687,36 +631,10 @@ def room_parameters(
     :return: :class:`RoomAcousticsResult` with one entry per band.
     """
     fs = resolve_fs(ir, fs, name="ir")
-    x = _validate_ir(ir, fs)
-    frequency: np.ndarray | None
-    if limits is None:
-        frequency = None
-        band_signals: list[np.ndarray] = [x]
-    else:
-        if len(limits) != 2:  # noqa: PLR2004
-            msg = "'limits' must be a (f_min, f_max) pair or None."
-            raise ValueError(msg)
-        require_finite_array(limits, "limits")
-        bank = OctaveFilterBank(
-            fs=fs, fraction=fraction, order=6, limits=[limits[0], limits[1]]
-        )
-        _, freqs, bands = bank.filter(
-            x,
-            sigbands=True,
-            detrend=False,
-            calculate_level=False,
-            zero_phase=zero_phase,
-        )
-        # np.asarray, not a cast: a bank on the default calibration hands
-        # back Signals, and what follows is array arithmetic.
-        band_signals = [np.asarray(band) for band in bands]
-        if not band_signals:
-            msg = (
-                f"'limits' {limits} leaves no band below the Nyquist "
-                f"frequency at fs={fs} Hz."
-            )
-            raise ValueError(msg)
-        frequency = np.asarray(freqs, dtype=np.float64)
+    x = validate_ir(ir, fs)
+    frequency, band_signals = split_bands(
+        x, fs, limits, fraction, zero_phase=zero_phase
+    )
 
     values = np.array([_band_parameters(sig, fs) for sig in band_signals])
     edt, t20, t30, c50, c80, d50, ts, dyn = (values[:, k] for k in range(8))
