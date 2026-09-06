@@ -175,16 +175,16 @@ class TestSoundStrength:
 
     def test_it_wants_the_reference_exactly_once(self) -> None:
         room_ir = noisy_decay(1.0, 2.0)
+        reference = anechoic_ir()
         with pytest.raises(ValueError, match="exactly once"):
             room.sound_strength(room_ir, fs=FS)
         with pytest.raises(ValueError, match="exactly once"):
-            room.sound_strength(room_ir, anechoic_ir(), FS, reference_level=0.0)
+            room.sound_strength(room_ir, reference, FS, reference_level=0.0)
 
     def test_it_refuses_a_reference_level_of_the_wrong_width(self) -> None:
+        room_ir = noisy_decay(1.0, 2.0)
         with pytest.raises(ValueError, match="does not broadcast"):
-            room.sound_strength(
-                noisy_decay(1.0, 2.0), fs=FS, reference_level=[1.0, 2.0, 3.0]
-            )
+            room.sound_strength(room_ir, fs=FS, reference_level=[1.0, 2.0, 3.0])
 
     def test_the_decay_range_the_warning_asks_for_is_the_printed_thirty(
         self,
@@ -200,10 +200,10 @@ class TestSoundStrength:
     def test_it_warns_when_the_room_response_was_cut_short(self) -> None:
         # A 2 s decay recorded for 0,1 s never reaches the 30 dB of decay
         # A.2.1 asks the integral to run to.
+        room_ir = exponential_ir(2.0, 0.1)
+        reference = anechoic_ir()
         with pytest.warns(AuditoriumWarning, match="cut short"):
-            room.sound_strength(
-                exponential_ir(2.0, 0.1), anechoic_ir(), FS, limits=None
-            )
+            room.sound_strength(room_ir, reference, FS, limits=None)
 
     def test_it_does_not_grow_with_the_length_of_the_recording(self) -> None:
         # Same event, three lengths of tape over a noise floor. Without the
@@ -225,8 +225,10 @@ class TestSoundStrength:
     def test_it_warns_when_a_response_cannot_hold_its_lowest_band(self) -> None:
         # A 5 ms anechoic window stops long before the 125 Hz octave filter
         # has rung down, so that band's exposure level is 24 dB light.
+        room_ir = noisy_decay(1.0, 3.0)
+        reference = anechoic_ir(0.006)
         with pytest.warns(AuditoriumWarning, match="ring down"):
-            room.sound_strength(noisy_decay(1.0, 3.0), anechoic_ir(0.006), FS)
+            room.sound_strength(room_ir, reference, FS)
 
     def test_it_does_not_warn_about_the_free_field_reference(self) -> None:
         # The reference has no reverberant decay to reach 30 dB of; what

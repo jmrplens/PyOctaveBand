@@ -167,6 +167,66 @@ def _exposure_level(p2: NDArray[np.float64], fs: int) -> float:
     return float(10.0 * np.log10(energy / (_T0 * _P0**2)))
 
 
+def _band_energy(
+    band: NDArray[np.float64], index: int, name: str
+) -> NDArray[np.float64]:
+    """One band squared, from its own direct sound onwards (A.2.1)."""
+    p2 = band.astype(np.float64) ** 2
+    if not np.any(p2 > 0.0):
+        msg = f"Band {index} of '{name}' has no energy."
+        raise ValueError(msg)
+    return p2[onset_index(p2) :]
+
+
+def _decay_range_is_thin(p2: NDArray[np.float64]) -> bool:
+    """Whether a band never falls the 30 dB A.2.1 asks the integral to reach.
+
+    A response with no measurable noise floor decays as far as it is asked
+    to, so it is not thin.
+    """
+    floor = noise_power(p2)
+    if floor <= 0.0:
+        return False
+    return bool(float(np.max(p2)) / floor < 10.0 ** (_MINIMUM_DECAY_RANGE_DB / 10.0))
+
+
+def _ring_down_seconds(centre_hz: float, fraction: int) -> float:
+    """How long a band filter of that centre needs to ring down.
+
+    The 2,2 is the number of cycles a one-pole envelope of quality factor
+    :math:`Q` takes to fall 60 dB divided by :math:`Q`, so the product is
+    the settling time of the filter and not of the room.
+    """
+    return _MINIMUM_RING_DOWNS * 2.2 * _filter_quality_factor(fraction) / centre_hz
+
+
+def _warn_short_ring_down(name: str, short: list[tuple[float, float]]) -> None:
+    """Warn about the band that is furthest from having rung down."""
+    if not short:
+        return
+    needed, held = max(short)
+    warnings.warn(
+        f"'{name}' holds {held * 1e3:.0f} ms after its direct sound and "
+        f"a band of it needs about {needed * 1e3:.0f} ms for its filter "
+        "to ring down, so that band's exposure level is short of the "
+        "energy the response actually carries.",
+        AuditoriumWarning,
+        stacklevel=4,
+    )
+
+
+def _warn_cut_short(name: str) -> None:
+    """Warn about a room response that never reaches 30 dB of decay."""
+    warnings.warn(
+        f"'{name}' has a band whose noise floor is less than "
+        f"{_MINIMUM_DECAY_RANGE_DB:g} dB below its peak, so the room "
+        "response was cut short of the point ISO 3382-1:2009, A.2.1 asks "
+        "the integral to reach.",
+        AuditoriumWarning,
+        stacklevel=4,
+    )
+
+
 def _band_exposure_levels(
     ir: Signal | list[float] | NDArray[np.float64],
     fs: int,
@@ -181,47 +241,19 @@ def _band_exposure_levels(
     frequency, bands = split_bands(x, fs, limits, fraction, name="limits")
     levels = np.empty(len(bands), dtype=np.float64)
     thin = False
-    short: tuple[float, float] | None = None
+    short: list[tuple[float, float]] = []
     for index, band in enumerate(bands):
-        p2 = band.astype(np.float64) ** 2
-        if not np.any(p2 > 0.0):
-            msg = f"Band {index} of '{name}' has no energy."
-            raise ValueError(msg)
-        p2 = p2[onset_index(p2) :]
-        floor = noise_power(p2)
-        peak = float(np.max(p2))
-        if floor > 0.0 and peak / floor < 10.0 ** (_MINIMUM_DECAY_RANGE_DB / 10.0):
-            thin = True
+        p2 = _band_energy(band, index, name)
+        thin = thin or _decay_range_is_thin(p2)
         if frequency is not None:
-            needed = (
-                _MINIMUM_RING_DOWNS
-                * 2.2
-                * _filter_quality_factor(fraction)
-                / float(frequency[index])
-            )
+            needed = _ring_down_seconds(float(frequency[index]), fraction)
             held = p2.size / fs
-            if held < needed and (short is None or needed > short[0]):
-                short = (needed, held)
+            if held < needed:
+                short.append((needed, held))
         levels[index] = _exposure_level(p2, fs)
-    if short is not None:
-        needed, held = short
-        warnings.warn(
-            f"'{name}' holds {held * 1e3:.0f} ms after its direct sound and "
-            f"a band of it needs about {needed * 1e3:.0f} ms for its filter "
-            "to ring down, so that band's exposure level is short of the "
-            "energy the response actually carries.",
-            AuditoriumWarning,
-            stacklevel=3,
-        )
+    _warn_short_ring_down(name, short)
     if thin and check_decay:
-        warnings.warn(
-            f"'{name}' has a band whose noise floor is less than "
-            f"{_MINIMUM_DECAY_RANGE_DB:g} dB below its peak, so the room "
-            "response was cut short of the point ISO 3382-1:2009, A.2.1 asks "
-            "the integral to reach.",
-            AuditoriumWarning,
-            stacklevel=3,
-        )
+        _warn_cut_short(name)
     return frequency, levels
 
 
