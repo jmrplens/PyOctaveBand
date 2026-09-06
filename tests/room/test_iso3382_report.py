@@ -225,17 +225,41 @@ def _synthetic_result(
 def test_third_octave_report_renders(tmp_path: Path) -> None:
     """A one-third-octave analysis renders and labels T_mid honestly.
 
-    With one-third-octave data only the 500 Hz and 1 kHz one-third-octave
-    bands are averaged (not the two full octaves), so the boxed descriptor
-    must say so instead of the octave "500-1000 Hz" label.
+    ISO 3382-1:2009, 9.1 prints two routes to a single-number reverberation
+    time and no third: the mean of the 500 Hz and 1 kHz octave bands, or
+    "averages over the six one-third-octave bands from 400 Hz to 1 250 Hz".
+    A one-third-octave analysis takes the second, and the boxed descriptor
+    must say so instead of wearing the octave "500-1000 Hz" label.
     """
     res = room.room_parameters(_synthetic_ir(), _FS, limits=(100.0, 5000.0), fraction=3)
     out = tmp_path / "thirds.pdf"
     res.report(str(out), metadata=_full_metadata())
     assert_one_page(str(out))
     text = _extract_text(str(out))
-    assert "500 Hz and 1 kHz one-third-octave bands" in text
+    assert "six one-third-octave bands" in text
+    assert "400 Hz to 1250 Hz" in text
     assert "500-1000 Hz" not in text
+
+
+def test_third_octave_verdict_uses_the_six_band_mean(tmp_path: Path) -> None:
+    """The verdict judges the number the box prints, not a two-band mean.
+
+    ISO 3382-1:2009, 9.1's one-third-octave route averages the six bands from
+    400 Hz to 1 250 Hz. Averaging only the two one-third-octave bands that
+    happen to be called 500 Hz and 1 kHz is neither printed route, and it put
+    a second, different T_mid on the same sheet: this profile boxes 1.33 s
+    while that two-band mean is 1.31 s, so a 1.32 s requirement was badged
+    PASS under a box that exceeded it.
+    """
+    freq = np.array([398.107, 501.187, 630.957, 794.328, 1000.0, 1258.925])
+    t30 = np.array([1.42, 1.38, 1.40, 1.36, 1.24, 1.18])
+    res = _synthetic_result(freq, t30=t30, edt=t30.copy())
+    out = tmp_path / "thirds_verdict.pdf"
+    res.report(str(out), metadata=_full_metadata(requirement=1.32))
+    text = _extract_text(str(out))
+    assert "= 1.33 s, required" in text
+    assert "= 1.31 s, required" not in text
+    assert "FAIL" in text
 
 
 def test_band_range_without_mid_octaves_names_the_band(tmp_path: Path) -> None:

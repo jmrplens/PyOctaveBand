@@ -205,6 +205,7 @@ export const topics = [
           'buildings/rooms/sound-strength',
           'buildings/rooms/spatial-impression',
           'buildings/rooms/stage-and-uncertainty',
+          'buildings/rooms/reporting-and-qualification',
           'buildings/rooms/open-plan-acoustics',
           'buildings/rooms/room-image-sources',
           'buildings/rooms/room-noise',

@@ -628,7 +628,7 @@ _STRINGS: dict[str, str] = {
     "Microphone positions": "Posiciones de micrófono",
     "T<sub>mid</sub> (500-1000 Hz) = <b>{value} s</b>": "T<sub>mid</sub> (500-1000 Hz) = <b>{value} s</b>",
     "T<sub>mid</sub> = <b>{value} s</b>": "T<sub>mid</sub> = <b>{value} s</b>",
-    "Mid-frequency mean over the 500 Hz and 1 kHz one-third-octave bands.": "Media de frecuencias medias sobre las bandas de tercio de octava de 500 Hz y 1 kHz.",
+    "Mid-frequency mean over the six one-third-octave bands from 400 Hz to 1250 Hz.": "Media de frecuencias medias sobre las seis bandas de tercio de octava de 400 Hz a 1250 Hz.",
     "T<sub>30</sub> = <b>{value} s</b>": "T<sub>30</sub> = <b>{value} s</b>",
     "T<sub>30</sub> ({band} Hz) = <b>{value} s</b>": "T<sub>30</sub> ({band} Hz) = <b>{value} s</b>",
     "EDT<sub>mid</sub> = {value} s": "EDT<sub>mid</sub> = {value} s",

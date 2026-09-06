@@ -3851,6 +3851,32 @@ _ES_EXACT = {
     "Sound strength $G$ (dB)": "Fuerza sonora $G$ (dB)",
     "direct sound alone": "solo el sonido directo",
     "$G$": "$G$",
+    # --- directivity_and_tables (Table 1, 4.2.1 and Table A.1) ---
+    "A source measured every 5 degrees": "Una fuente medida cada 5 grados",
+    "125 Hz survey": "barrido de 125 Hz",
+    "4 kHz survey": "barrido de 4 kHz",
+    "125 Hz, arcs": "125 Hz, arcos",
+    "4 kHz, arcs": "4 kHz, arcos",
+    "125 Hz, Table 1 limit $\\pm$1 dB": "125 Hz, límite de la Tabla 1 $\\pm$1 dB",
+    "4 kHz, Table 1 limit $\\pm$6 dB": "4 kHz, límite de la Tabla 1 $\\pm$6 dB",
+    "Bearing of the arc (degrees)": "Acimut del arco (grados)",
+    "Deviation from the whole turn (dB)": "Desviación respecto de la vuelta (dB)",
+    "Gliding 30 degree arcs against Table 1": (
+        "Arcos deslizantes de 30 grados frente a la Tabla 1"
+    ),
+    "the arcs average energy, and so does the\n"
+    "reference: a 360 degree average in the plane": (
+        "los arcos promedian energía, y la referencia\n"
+        "también: una media de 360 grados en el plano"
+    ),
+    "What each single number of Table A.1 averages": (
+        "Qué promedia cada número único de la Tabla A.1"
+    ),
+    "five quantities average two bands and two average four;\n"
+    "only the red row is averaged over energy, by Equation (A.17)": (
+        "cinco magnitudes promedian dos bandas y dos promedian cuatro;\n"
+        "sólo la fila roja se promedia en energía, por la Ecuación (A.17)"
+    ),
     # --- stage_support_windows (Annex C and Clause 7) ---
     "The three windows Annex C prints": "Las tres ventanas que imprime el anexo C",
     "direct sound, 0 to 10 ms": "sonido directo, de 0 a 10 ms",

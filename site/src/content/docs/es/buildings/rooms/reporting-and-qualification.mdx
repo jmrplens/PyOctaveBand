@@ -1,0 +1,289 @@
+---
+title: "Informe y cualificación de la fuente (ISO 3382-1)"
+description: "Las tablas impresas de la ISO 3382-1: la directividad que una fuente tiene que salvar, cuántas posiciones de micrófono pide una sala, qué bandas promedia cada número único, y qué tiene que llevar el informe de ensayo."
+references:
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2009
+    title: "Acoustics — Measurement of room acoustic parameters — Part 1: Performance spaces"
+    designation: "ISO 3382-1:2009"
+    url: "https://www.iso.org/standard/40979.html"
+    note: "La Tabla 1 y 4.2.1, la Tabla A.1, la Tabla A.2 con A.4, A.5 y el capítulo 9: las tablas y las reglas de informe de esta página."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2014
+    title: "Electroacoustics — Octave-band and fractional-octave-band filters — Part 1: Specifications"
+    designation: "IEC 61260-1:2014"
+    url: "https://webstore.iec.ch/publication/5063"
+    note: "Las frecuencias centrales de banda sobre las que se toma cada promedio de esta página."
+  - type: article
+    authors: ["Bradley, J. S."]
+    year: 2011
+    title: "Review of objective room acoustics measures and future needs"
+    journal: "Applied Acoustics"
+    volume: 72
+    issue: 10
+    pages: "713-720"
+    doi: "10.1016/j.apacoust.2011.04.004"
+    note: "Una revisión de para qué sirven las magnitudes de la Tabla A.1 y de dónde salieron sus diferencias apenas perceptibles."
+  - type: article
+    authors: ["Witew, I. B.", "Behler, G. K.", "Vorländer, M."]
+    year: 2017
+    title: "About just noticeable differences for aspects of spatial impressions in concert halls"
+    journal: "Acoustics Australia"
+    volume: 45
+    issue: 2
+    pages: "195-202"
+    doi: "10.1007/s40857-017-0094-7"
+    note: "Por qué la Tabla A.1 no imprime ninguna diferencia apenas perceptible para el nivel lateral tardío."
+---
+
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import SeeAlso from '../../../../../components/SeeAlso.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+Casi toda la ISO 3382-1 habla de cómo medir. Esta página habla de las cuatro
+tablas que imprime y de las reglas que las acompañan: qué tiene que ser una
+fuente antes de poder usarse, a cuántas butacas tiene que llegar un barrido,
+cómo se promedian las bandas hasta el único número por el que se cita una
+sala, y qué tiene que decir el informe.
+
+## 1. Cualificar la fuente
+
+Una fuente que no es omnidireccional mide una sala distinta según hacia
+dónde apunte. La Tabla 1 dice cuánto puede alejarse de la
+omnidireccionalidad, banda a banda, y 4.2.1 dice cómo averiguarlo.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/directivity_and_tables.svg" alt="Tres paneles. A la izquierda, un diagrama polar de una fuente medida cada 5 grados, casi redonda a 125 Hz y muy lobulada a 4 kHz. En el centro, la desviación de cada arco deslizante de 30 grados respecto de la media de la vuelta frente al acimut, con los límites de la Tabla 1 de más menos 1 dB y más menos 6 dB dibujados con línea discontinua; el barrido de 125 Hz se queda muy dentro de su límite y el de 4 kHz baja por debajo del suyo. A la derecha, una rejilla de las siete magnitudes de la Tabla A.1 frente a las seis bandas de octava, con las bandas que promedia cada número único sombreadas, dos para cinco de ellas y cuatro para las otras dos, y la fila del nivel lateral tardío en otro color porque es la única que se promedia en energía" width="100%" />
+
+*Una fuente cualifica a 125 Hz y falla a 4 kHz, y la Tabla A.1 no promedia
+todas las magnitudes sobre las mismas bandas.*
+
+El barrido se hace sobre un plato giratorio, o midiendo cada 5 grados si no
+lo hay. En cualquier caso las lecturas se combinan en **arcos deslizantes de
+30
+grados**, y cada arco se compara con una referencia que es «a 360 degree
+energetic average in the measurement plane». Fuente y micrófono están a 1,5
+m como mínimo durante todo el barrido.
+
+```python
+import numpy as np
+from phonometry import room
+
+bearings = np.arange(72) * room.DIRECTIVITY_STEP_DEG
+pattern = 7.5 * np.cos(8.0 * np.deg2rad(bearings))
+pattern += 2.4 * np.cos(16.0 * np.deg2rad(bearings))
+
+deviation = room.gliding_directivity_deviation(94.0 + pattern)
+print(round(float(np.max(np.abs(deviation))), 2))   # 6.89  dB
+print(room.source_directivity_limit(4000.0))        # 6.0   dB
+```
+
+La Tabla 1 imprime seis bandas, de 125 Hz a 4 kHz, y ninguna más, así que un
+barrido en la octava de 63 Hz o de 8 kHz no tiene límite impreso al que
+atenerse, en lugar de tener el más cercano:
+
+```python
+from phonometry import room
+
+print(room.MAX_SOURCE_DIRECTIVITY_DEVIATION_DB)
+# {125.0: 1.0, 250.0: 1.0, 500.0: 1.0, 1000.0: 3.0, 2000.0: 5.0, 4000.0: 6.0}
+```
+
+**Dos cosas de ese barrido no las resuelve lo impreso.** La primera es una
+contradicción: 4.2.1 y el título de la Tabla 1 llaman a sus valores la
+desviación *máxima* aceptable, y A.4 los llama «the minimum limits given in
+Table 1» cuando pide volver a medir con tres orientaciones una fuente al
+límite. Leída al pie de la letra, A.4 pide el trabajo extra con las fuentes
+que menos lo necesitan. La segunda es una omisión: «gliding averages, each
+covering six neighbouring points» no dice si los seis van por delante, por
+detrás o a caballo del arco al que se atribuyen. En una vuelta completa eso
+es un reetiquetado, así que desplaza hasta 15 grados del patrón la
+orientación con la que se reporta cada desviación, no la desviación misma,
+pero esa orientación es justo la que la A.4 pide girar en una fuente
+marginal. Las dos están en
+[el registro de erratas](/phonometry/es/reference/errata/), y
+`gliding_directivity_deviation` dice en su docstring qué lecturas tomó.
+
+## 2. Cuántas posiciones, y dónde
+
+La Tabla A.2 imprime tres filas: 500 butacas piden 6 posiciones de micrófono,
+1 000 piden 8 y 2 000 piden 10. Están exactamente sobre una recta en el
+logaritmo del número de butacas, dos posiciones por duplicación, que es lo que
+permite responder por una sala que caiga entre dos filas.
+
+```python
+from phonometry import room
+
+print([round(float(room.minimum_receiver_positions(n)), 2)
+       for n in (500, 1000, 1400, 2000)])
+# [6.0, 8.0, 8.97, 10.0]
+print(round(float(room.minimum_receiver_positions(5000)), 2))   # 10.0
+```
+
+La recta se acaba donde se acaba la tabla. A.4 pide «a minimum of between 6
+and 10 representative microphone positions», así que un pabellón de 5 000
+butacas no se lleva trece posiciones por la fe de tres filas, ni un estudio de
+200 se lleva cuatro. A.4 añade la geometría que la tabla no da: al menos tres
+posiciones de fuente en el escenario en el caso normal, 1,5 m de altura de
+fuente, 1,2 m de altura de micrófono en las butacas, posiciones repartidas por
+igual sobre todo el público, y más allá donde una sala se rompe en anfiteatros
+y zonas bajo ellos.
+
+## 3. El número único, y las dos excepciones que lleva dentro
+
+Toda magnitud del anexo A se acaba citando como un número, y A.5 pide el
+índice «m» en el símbolo cuando así se hace. Lo que promedia esa «m» **no** es
+lo mismo para todas: la Tabla A.1 le da a cada fila su propio conjunto de
+bandas, y A.5 imprime dos ejemplos justo por eso, $G_m$ sobre las octavas de
+500 Hz y 1 kHz y $J_{\mathrm{LF}m}$ sobre cuatro bandas desde 125 Hz.
+
+```python
+import numpy as np
+from phonometry import room
+
+octaves = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+strength = np.array([6.2, 5.4, 4.8, 4.4, 4.1, 3.6])
+lateral = np.array([0.20, 0.26, 0.31, 0.28, 0.24, 0.19])
+
+print(round(room.single_number_average("G", strength, octaves), 4))    # 4.6
+print(round(room.single_number_average("J_LF", lateral, octaves), 4))  # 0.2625
+print(room.TABLE_A1["G"].averaging_bands_hz)      # (500.0, 1000.0)
+print(room.TABLE_A1["J_LF"].averaging_bands_hz)   # (125.0, 250.0, 500.0, 1000.0)
+```
+
+Una de las siete filas lleva dos símbolos. La tabla imprime la fracción de
+energía lateral temprana como «$J_{\mathrm{LF}}$ or $J_{\mathrm{LFC}}$», una
+sola fila para las dos ponderaciones de las Ecuaciones (A.14) y (A.15), así
+que `"J_LFC"` se admite donde se admite `"J_LF"` y lee las
+mismas cuatro bandas, la misma diferencia apenas perceptible y el mismo
+rango.
+
+```python
+import numpy as np
+from phonometry import room
+
+octaves = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+lateral = np.array([0.20, 0.26, 0.31, 0.28, 0.24, 0.19])
+
+print(round(room.single_number_average("J_LFC", lateral, octaves), 4))  # 0.2625
+print(room.perceptibly_different("J_LFC", 0.20, 0.26))                  # True
+```
+
+La nota a al pie de la tabla hace de una fila la excepción a lo aritmético: el
+nivel lateral tardío se promedia en **energía**, por la Ecuación (A.17). Y dos
+de sus diferencias apenas perceptibles tampoco son números lisos. La del
+tiempo de caída temprano se imprime como «Rel. 5 %», una fracción del valor y
+no una diferencia en segundos, así que los mismos 60 ms no significan nada en
+una sala de dos segundos y son evidentes en una de medio. La del nivel lateral
+tardío se imprime como «Not known», y la biblioteca se niega a inventarla.
+
+```python
+from phonometry import room
+
+print(room.perceptibly_different("EDT", 2.0, 2.06))    # False
+print(room.perceptibly_different("EDT", 0.5, 0.56))    # True
+print(room.TABLE_A1["L_J"].just_noticeable_difference) # None
+```
+
+A.5 ofrece además una presentación más gruesa, los **pares** de octavas:
+125 Hz con 250 Hz para un resultado de graves, 500 Hz con 1 kHz para uno de
+medios y 2 kHz con 4 kHz para uno de agudos, todos aritméticos. Es un producto
+distinto del número único y los dos no deben compartir camino en el código:
+son las mismas dos bandas para las cinco magnitudes monoaurales y conjuntos
+distintos para las laterales.
+
+```python
+import numpy as np
+from phonometry import room
+
+octaves = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+lateral = np.array([0.20, 0.26, 0.31, 0.28, 0.24, 0.19])
+
+pairs = room.octave_pair_averages(lateral, octaves)
+print({k: round(v, 4) for k, v in pairs.items()})
+# {'low': 0.23, 'mid': 0.295, 'high': 0.215}
+print(round(room.single_number_average("J_LF", lateral, octaves), 4))  # 0.2625
+```
+
+A.5 advierte de que las fracciones de energía lateral en la octava de 4 kHz no
+suelen considerarse subjetivamente importantes, así que el par de agudos dice
+poco de ellas.
+
+## 4. Dos rutas a un tiempo de reverberación de frecuencias medias
+
+El apartado 9.1 imprime dos maneras de citar un solo número de tiempo de
+reverberación, y ninguna tercera: la media de $T_{30}$ sobre las bandas de
+**octava** de 500 Hz y 1 kHz, o «averages over the six one-third-octave bands
+from 400 Hz to 1 250 Hz».
+
+```python
+from phonometry import room
+
+print(room.MID_FREQUENCY_OCTAVES_HZ)
+# (500.0, 1000.0)
+print(room.MID_FREQUENCY_THIRD_OCTAVES_HZ)
+# (400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0)
+```
+
+Lo que un análisis en tercios de octava no puede hacer es promediar las dos
+bandas de tercio que resulta que se llaman 500 Hz y 1 kHz. Eso son dos
+tercios de octava frente a las dos octavas que cubre cualquiera de las dos
+rutas impresas, una tercera parte del ancho, y no es ninguna de ellas. La
+[ficha acreditada](/phonometry/es/buildings/rooms/room-acoustics/) toma la ruta
+de las seis bandas cuando el análisis va en tercios, y lo dice en la hoja.
+
+## 5. Qué tiene que decir el informe
+
+El capítulo 9 es normativo, a diferencia de todos los anexos de esta página, y
+9.2 es su única exigencia sobre lo que se escribe y no sobre lo que se mide.
+Lista quince puntos, de la a) a la o), y `TEST_REPORT_ITEMS` los lleva en
+orden: la declaración de conformidad, el nombre y el lugar de la sala, su
+plano y su volumen, su butacas y su tapicería, la forma y el material de
+paredes y techo, la ocupación, el estado de cualquier equipo variable, los
+telones en un teatro, el mobiliario de escenario, la temperatura y la humedad,
+los aparatos, la señal, la cobertura con sus posiciones y alturas, y la fecha
+y la organización.
+
+```python
+from phonometry import room
+
+print(len(room.TEST_REPORT_ITEMS))     # 15
+print(room.TEST_REPORT_ITEMS[3])
+# volume of the room, with an explanation of how it is defined if the room
+# is not completely enclosed
+```
+
+Casi todo eso son metadatos y no medición, y llega a la ficha acreditada por
+el contenedor `ReportMetadata` que rellena la
+[página de parámetros acústicos de salas](/phonometry/es/buildings/rooms/room-acoustics/).
+
+<SeeAlso
+  links={[
+    { href: '/phonometry/es/buildings/rooms/room-acoustics/', label: 'Parámetros acústicos de salas' },
+    { href: '/phonometry/es/buildings/rooms/sound-strength/', label: 'Fuerza sonora G' },
+    { href: '/phonometry/es/buildings/rooms/spatial-impression/', label: 'Impresión espacial' },
+    { href: '/phonometry/es/buildings/rooms/stage-and-uncertainty/', label: 'Soporte de escenario e incertidumbre' },
+  ]}
+/>
+
+## Qué cubre esta guía
+
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Las tablas impresas de la ISO 3382-1:2009 y las reglas que las rodean: la
+Tabla 1 con el barrido de arcos deslizantes de 4.2.1, la Tabla A.1 con sus
+bandas de promediado por magnitud, su única fila promediada en energía y su
+única diferencia apenas perceptible relativa, la Tabla A.2 con la recta sobre
+la que están sus tres filas, los pares de octavas de A.5, las dos rutas al
+número único del apartado 9.1, y los quince puntos que el apartado 9.2 dice
+que un informe de ensayo tiene que incluir.
+</ScopeClaim>
+<ScopeClaim status="not-covered" label="Todavía no cubierto">
+Los procedimientos que las acompañan: la repetición con tres orientaciones que
+A.4 pide de una fuente cercana a sus límites de la Tabla 1, el promediado por
+zonas que A.5 sugiere para una sala grande, y los convenios de dibujo del
+apartado 9.1, que son de papel y no de números.
+</ScopeClaim>
+</Scope>

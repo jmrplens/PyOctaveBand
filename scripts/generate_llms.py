@@ -329,9 +329,10 @@ def _area_members() -> dict[str, list[str]]:
 #: routes by the quantity actually measured: sound pressure, sound intensity,
 #: and the surface velocity of the casing. The intensity pair carves out.
 #:
-#: ``buildings/rooms`` has ten, and three of them are the auditorium measures
-#: of the ISO 3382-1 annexes, which the standard itself keeps apart from the
-#: decay analysis of its normative body. Those three carve out.
+#: ``buildings/rooms`` has eleven, and four of them are the auditorium
+#: measures of the ISO 3382-1 annexes and the tables that report them, which
+#: the standard itself keeps apart from the decay analysis of its normative
+#: body. Those four carve out.
 #:
 #: In both, the leaf names are guide filenames and the label mirrors the
 #: heading. The carved-out shard has no page of its own, so its Overview link
@@ -351,7 +352,12 @@ MANUAL_SPLITS: dict[str, tuple[str, str, tuple[str, ...]]] = {
     "buildings/rooms": (
         "buildings-rooms-auditorium",
         "Auditorium measures of the ISO 3382-1 annexes",
-        ("sound-strength", "spatial-impression", "stage-and-uncertainty"),
+        (
+            "sound-strength",
+            "spatial-impression",
+            "stage-and-uncertainty",
+            "reporting-and-qualification",
+        ),
     ),
 }
 

@@ -3,12 +3,12 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 802,
-    "passing": 802,
+    "checks": 807,
+    "passing": 807,
     "failing": 0,
     "domains": 67,
     "standards": 395,
-    "citations": 630,
+    "citations": 635,
     "designations": 133,
     "sources": 83
   },
@@ -101,8 +101,8 @@
     {
       "id": "room-building-acoustics",
       "title": "Room & building acoustics",
-      "checks": 101,
-      "passing": 101
+      "checks": 106,
+      "passing": 106
     },
     {
       "id": "room-acoustics",
@@ -4693,6 +4693,184 @@
         "value": 0.0
       },
       "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-table-a-1/the-single-number-of-each-quantity-averages-the-bands-the-table-names",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Table A.1",
+        "cite": "ISO 3382-1:2009 Table A.1"
+      },
+      "quantity": "The single number of each quantity averages the bands the table names",
+      "kind": "record",
+      "expected": {
+        "label": "G_m = 0.45; J_LFm = 0.35",
+        "record": {
+          "G_m": 0.45,
+          "J_LFm": 0.35
+        }
+      },
+      "computed": {
+        "label": "G_m = 0.45; J_LFm = 0.35",
+        "record": {
+          "G_m": 0.45,
+          "J_LFm": 0.35
+        }
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-table-a-1-footnote-a/only-the-late-lateral-level-is-energy-averaged-and-it-differs",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Table A.1 footnote a",
+        "cite": "ISO 3382-1:2009 Table A.1 footnote a"
+      },
+      "quantity": "Only the late lateral level is energy averaged, and it differs",
+      "kind": "scalar",
+      "expected": {
+        "value": -3.532402555940367
+      },
+      "computed": {
+        "value": -3.532403,
+        "label": "-3.5324 dB, against -6.5000 dB arithmetic"
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-12
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 6,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-table-a-2/minimum-receiver-positions-at-the-three-printed-hall-sizes",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Table A.2",
+        "cite": "ISO 3382-1:2009 Table A.2"
+      },
+      "quantity": "Minimum receiver positions at the three printed hall sizes",
+      "kind": "record",
+      "expected": {
+        "label": "500 seats = 6; 1000 seats = 8; 2000 seats = 10",
+        "record": {
+          "500 seats": 6.0,
+          "1000 seats": 8.0,
+          "2000 seats": 10.0
+        }
+      },
+      "computed": {
+        "label": "500 seats = 6; 1000 seats = 8; 2000 seats = 10",
+        "record": {
+          "500 seats": 6.0,
+          "1000 seats": 8.0,
+          "2000 seats": 10.0
+        }
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-4-2-1/a-gliding-directivity-survey-references-the-whole-turn-energy-mean",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "4.2.1",
+        "cite": "ISO 3382-1:2009 4.2.1"
+      },
+      "quantity": "A gliding directivity survey references the whole-turn energy mean",
+      "kind": "scalar",
+      "expected": {
+        "value": 1.0,
+        "label": "1 (+/-1e-09)"
+      },
+      "computed": {
+        "value": 1.0
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 1e-09
+      },
+      "deviation": {
+        "value": -4.44e-16
+      },
+      "precision": 9,
+      "verdict": "pass"
+    },
+    {
+      "id": "room-building-acoustics/iso-3382-1-2009-clause-9-1/a-one-third-octave-fiche-averages-the-six-bands-not-two-of-them",
+      "domain": "room-building-acoustics",
+      "reference": {
+        "kind": "standard",
+        "designation": "ISO 3382-1",
+        "edition": "2009",
+        "clause": "Clause 9.1",
+        "cite": "ISO 3382-1:2009 Clause 9.1"
+      },
+      "quantity": "A one-third-octave fiche averages the six bands, not two of them",
+      "kind": "record",
+      "expected": {
+        "label": "band 1 = 400 Hz; band 2 = 500 Hz; band 3 = 630 Hz; band 4 = 800 Hz; band 5 = 1000 Hz; band 6 = 1250 Hz",
+        "record": {
+          "band 1": 400.0,
+          "band 2": 500.0,
+          "band 3": 630.0,
+          "band 4": 800.0,
+          "band 5": 1000.0,
+          "band 6": 1250.0
+        }
+      },
+      "computed": {
+        "label": "band 1 = 400 Hz; band 2 = 500 Hz; band 3 = 630 Hz; band 4 = 800 Hz; band 5 = 1000 Hz; band 6 = 1250 Hz",
+        "record": {
+          "band 1": 400.0,
+          "band 2": 500.0,
+          "band 3": 630.0,
+          "band 4": 800.0,
+          "band 5": 1000.0,
+          "band 6": 1250.0
+        }
+      },
+      "unit": "Hz",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
       "verdict": "pass"
     },
     {

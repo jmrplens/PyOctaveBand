@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**802/802 conformance checks pass** across 67 domains and 395 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**807/807 conformance checks pass** across 67 domains and 395 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -130,7 +130,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>Room &amp; building acoustics</b>: 100% (101/101)</summary>
+<summary><b>Room &amp; building acoustics</b>: 100% (106/106)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -157,6 +157,11 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 3382-1:2009 Eq. (5) | Standard deviation of T30, 2 s in the 1 kHz octave, n = 10, N = 12 | 0.00904449 s (+/-0 s) | 0.00904449 s | 0 s | 0 % | ![Pass][cv-pass] Pass |
 | ISO 3382-1:2009 Eqs. (4)/(5) | The two evaluation ranges differ by the printed 0,88/0,55 and decay terms | 1.62617479 (+/-0) | 1.62617479 | 0 | 0 % | ![Pass][cv-pass] Pass |
 | ISO 3382-1:2009 Eqs. (6)/(7) | Shortest reliable decay time of a 125 Hz octave forward analysis | 0.180282 s (+/-0 s) | 0.180282 s | 0 s | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3382-1:2009 Table A.1 | The single number of each quantity averages the bands the table names | G_m = 0.45; J_LFm = 0.35 | G_m = 0.45; J_LFm = 0.35 | exact | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3382-1:2009 Table A.1 footnote a | Only the late lateral level is energy averaged, and it differs | -3.532403 dB (+/-0 dB) | -3.5324 dB, against -6.5000 dB arithmetic | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3382-1:2009 Table A.2 | Minimum receiver positions at the three printed hall sizes | 500 seats = 6; 1000 seats = 8; 2000 seats = 10 | 500 seats = 6; 1000 seats = 8; 2000 seats = 10 | exact | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3382-1:2009 4.2.1 | A gliding directivity survey references the whole-turn energy mean | 1 (+/-1e-09) | 1 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| ISO 3382-1:2009 Clause 9.1 | A one-third-octave fiche averages the six bands, not two of them | band 1 = 400 Hz; band 2 = 500 Hz; band 3 = 630 Hz; band 4 = 800 Hz; band 5 = 1000 Hz; band 6 = 1250 Hz | band 1 = 400 Hz; band 2 = 500 Hz; band 3 = 630 Hz; band 4 = 800 Hz; band 5 = 1000 Hz; band 6 = 1250 Hz | exact | 0 % | ![Pass][cv-pass] Pass |
 | ISO 18233:2006 (swept-sine method) | Sweep deconvolution recovers a known IIR response | 0 dB in-band error (+/-0.1 dB) | 0.0006 dB | 0.0006 dB | 1 % | ![Pass][cv-pass] Pass |
 | ISO 717-1 Annex C, Table C.1 | Weighted sound reduction index Rw (C;Ctr) | Rw 30 (C -2; Ctr -3) | Rw 30 (C -2; Ctr -3), unfavourable sum 31.8 dB | exact | 0 % | ![Pass][cv-pass] Pass |
 | ISO 717-1:2020 Annex C, Table C.2 | Enlarged range 50-5000 Hz: Rw (C; Ctr; C50-5000; Ctr,50-5000) | Rw 30 (C -2; Ctr -3; C50-5000 -2; Ctr,50-5000 -4) | Rw 30 (C -2; Ctr -3; C50-5000 -2; Ctr,50-5000 -4) | exact | - | ![Pass][cv-pass] Pass |

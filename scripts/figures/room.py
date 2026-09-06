@@ -9,9 +9,12 @@ noise the room is left with. Everything here is embedded by a page under
 ``buildings/rooms/``.
 """
 
+from typing import TYPE_CHECKING, cast
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
+from matplotlib.patches import Rectangle
 from scipy import signal as scipy_signal
 
 from phonometry._plot.common import format_frequency_axis, theme_fill
@@ -29,6 +32,9 @@ from .theme import (
     save_figure,
     series_colors,
 )
+
+if TYPE_CHECKING:
+    from matplotlib.projections.polar import PolarAxes
 
 
 def generate_schroeder_decay(output_dir: str) -> None:
@@ -3319,4 +3325,158 @@ def generate_stage_support_windows(output_dir: str) -> None:
 
     plt.tight_layout()
     save_figure(output_dir, "stage_support_windows.svg")
+    plt.close()
+
+
+def generate_directivity_and_tables(output_dir: str) -> None:
+    """ISO 3382-1 Table 1 and Table A.1: qualifying a source, and averaging."""
+    print("Generating directivity_and_tables...")
+    from phonometry import room
+
+    _fig = plt.figure(figsize=(15.2, 4.8))
+    ax = cast("PolarAxes", _fig.add_subplot(1, 3, 1, projection="polar"))
+    ax2 = _fig.add_subplot(1, 3, 2)
+    ax3 = _fig.add_subplot(1, 3, 3)
+
+    # A dodecahedron source is close to omnidirectional where its faces are
+    # small against the wavelength and lobed where they are not, which is
+    # exactly the shape of the Table 1 limits: 1 dB at 125 Hz, 6 dB at 4 kHz.
+    step = room.DIRECTIVITY_STEP_DEG
+    bearings = np.arange(round(360.0 / step)) * step
+    radians = np.deg2rad(bearings)
+    # Eight lobes, not twelve: a twelve-lobe pattern has a 30 degree period
+    # and the 30 degree arc averages exactly one of them at every bearing,
+    # which would make the middle panel a flat line by coincidence.
+    patterns = {
+        125.0: 0.9 * np.cos(8.0 * radians),
+        4000.0: 7.5 * np.cos(8.0 * radians) + 2.4 * np.cos(16.0 * radians),
+    }
+    colours = {125.0: COLOR_PRIMARY, 4000.0: COLOR_SECONDARY}
+
+    closed = np.concatenate([radians, radians[:1]])
+    for centre, pattern in patterns.items():
+        values = np.concatenate([pattern, pattern[:1]])
+        ax.plot(
+            closed,
+            values,
+            color=colours[centre],
+            lw=1.8,
+            label="125 Hz survey" if centre < 1000 else "4 kHz survey",
+        )
+    ax.set_theta_zero_location("N")
+    ax.set_rlim(-6.5, 6.5)
+    ax.set_rticks([-6, -3, 0, 3, 6])
+    ax.set_title("A source measured every 5 degrees")
+    ax.grid(color=COLOR_GRID, ls="--", alpha=0.6)
+    ax.legend(loc="lower left", bbox_to_anchor=(-0.15, -0.12), fontsize=9)
+
+    # -- Middle: the gliding arcs against the printed limits.
+    for centre, pattern in patterns.items():
+        deviation = room.gliding_directivity_deviation(94.0 + pattern)
+        limit = room.source_directivity_limit(centre)
+        label = "125 Hz" if centre < 1000 else "4 kHz"
+        ax2.plot(
+            bearings,
+            deviation,
+            color=colours[centre],
+            lw=1.8,
+            label=f"{label}, arcs",
+        )
+        for sign in (1.0, -1.0):
+            ax2.axhline(
+                sign * limit,
+                color=colours[centre],
+                ls="--",
+                lw=1.2,
+                label=f"{label}, Table 1 limit $\\pm${limit:.0f} dB"
+                if sign > 0
+                else None,
+            )
+    ax2.set_xlim(0.0, 360.0)
+    ax2.set_xticks([0, 90, 180, 270, 360])
+    ax2.set_ylim(-8.0, 8.0)
+    ax2.set_xlabel("Bearing of the arc (degrees)")
+    ax2.set_ylabel("Deviation from the whole turn (dB)")
+    ax2.set_title("Gliding 30 degree arcs against Table 1")
+    ax2.grid(color=COLOR_GRID, ls="--", alpha=0.5)
+    ax2.set_axisbelow(True)
+    ax2.annotate(
+        "the arcs average energy, and so does the\n"
+        "reference: a 360 degree average in the plane",
+        xy=(0.5, 0.03),
+        xycoords="axes fraction",
+        ha="center",
+        va="bottom",
+        fontsize=8.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.32",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=6,
+    )
+    ax2.legend(loc="upper right", fontsize=8)
+
+    # -- Right: which bands each single number of Table A.1 averages.
+    octaves = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
+    symbols = ["G", "EDT", "C80", "D50", "Ts", "J_LF", "L_J"]
+    labels = {
+        "G": "$G$",
+        "EDT": "EDT",
+        "C80": "$C_{80}$",
+        "D50": "$D_{50}$",
+        "Ts": "$T_S$",
+        "J_LF": "$J_{LF}$",
+        "L_J": "$L_J$",
+    }
+    for row, symbol in enumerate(symbols):
+        quantity = room.TABLE_A1[symbol]
+        for column, band in enumerate(octaves):
+            inside = band in quantity.averaging_bands_hz
+            ax3.add_patch(
+                Rectangle(
+                    (column - 0.42, row - 0.38),
+                    0.84,
+                    0.76,
+                    facecolor=theme_fill(
+                        COLOR_SECONDARY if quantity.energy_averaged else COLOR_PRIMARY,
+                        ax3,
+                    )
+                    if inside
+                    else "none",
+                    edgecolor=COLOR_GRID,
+                    lw=0.8,
+                    zorder=1,
+                )
+            )
+    ax3.set_xlim(-0.6, len(octaves) - 0.4)
+    ax3.set_ylim(-0.7, len(symbols) + 0.9)
+    ax3.set_xticks(range(len(octaves)))
+    ax3.set_xticklabels(["125", "250", "500", "1k", "2k", "4k"])
+    ax3.set_yticks(range(len(symbols)))
+    ax3.set_yticklabels([labels[s] for s in symbols])
+    ax3.invert_yaxis()
+    ax3.set_xlabel(LABEL_FREQ_HZ)
+    ax3.set_title("What each single number of Table A.1 averages")
+    ax3.grid(False)
+    ax3.annotate(
+        "five quantities average two bands and two average four;\n"
+        "only the red row is averaged over energy, by Equation (A.17)",
+        xy=(0.5, 0.015),
+        xycoords="axes fraction",
+        ha="center",
+        va="bottom",
+        fontsize=8.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.32",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=6,
+    )
+
+    plt.tight_layout()
+    save_figure(output_dir, "directivity_and_tables.svg")
     plt.close()

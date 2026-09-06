@@ -4460,6 +4460,76 @@ in the same order.
   change nothing.
 - **Status:** unreported.
 
+## ISO 3382-1:2009, Table 1 and A.4 (the same limits are called maximum in one clause and minimum in the other)
+
+- **Location:** the caption of Table 1 and the paragraph of 4.2.1 above it,
+  printed folio 3 (PDF page 11), against the fourth paragraph of A.4,
+  printed folio 19 (PDF page 27).
+- **The print:** 4.2.1 says "Table 1 lists the **maximum** acceptable
+  deviations from omnidirectionality when averaged over 'gliding' 30° arcs
+  in a free sound field", and the table's own caption reads "Table 1 —
+  **Maximum** deviation of directivity of source in decibels for excitation
+  with octave bands of pink noise and measured in free field". A.4 says "If
+  the source directivity is close to the **minimum** limits given in Table 1,
+  the measurement should be repeated with the source turned in at least
+  three steps totally."
+- **The problem:** one table, two opposite words for what its numbers are.
+  The values are ceilings, as their own caption and 4.2.1 both say, and A.4
+  calls them a floor.
+- **Consequence:** A.4's sentence is the one that tells a laboratory when to
+  do extra work, and read as printed it says the opposite of what it means.
+  A source "close to the minimum limits" would be a near-perfect one, which
+  is the case that needs no repetition at all; what A.4 is asking for is the
+  repetition of a survey whose source only just clears the ceiling, because
+  that is where the orientation of the source starts to matter to the
+  answer. A reader who takes the word literally repeats the measurement for
+  the wrong sources and skips it for the right ones.
+- **Evidence:** Verified on PDF pages 11 and 27 (printed pp. 3 and 19) of
+  BS EN ISO 3382-1:2009.
+- **Library behaviour:**
+  [`MAX_SOURCE_DIRECTIVITY_DEVIATION_DB`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/room/auditorium.py)
+  and [`source_directivity_limit`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/room/auditorium.py) carry
+  them as the maxima their own caption makes them. The three-orientation
+  repeat of A.4 is a procedure, not a computation, and the library does not
+  implement it.
+- **Status:** unreported.
+
+## ISO 3382-1:2009, 4.2.1 (a gliding average whose window has no stated phase)
+
+- **Location:** 4.2.1, the paragraph immediately above Table 1, printed
+  folio 3 (PDF page 11).
+- **The print:** "Table 1 lists the maximum acceptable deviations from
+  omnidirectionality when averaged over 'gliding' 30° arcs in a free sound
+  field. In case a turntable cannot be used, measurements per 5° should be
+  performed, followed by 'gliding' averages, each covering six neighbouring
+  points."
+- **The problem:** six 5° points cover 30° of arc read as six sectors, and
+  25° read as the span between the first and the last, so the two sentences
+  agree only under the sector reading. More to the point, nothing says where
+  those six points sit relative to the arc they average: a window may lead
+  its bearing, trail it, or straddle it, and the clause does not choose. Nor
+  does it say how the six are combined, although the reference they are
+  compared with is explicitly "a 360° energetic average".
+- **Consequence:** over a full turn the six-point windows are one cyclic set
+  whichever end of its arc a window is pinned to, so the phase moves the
+  bearing each deviation is reported against by up to half a window, 15° of
+  the pattern, and leaves the deviations themselves alone. For a source near
+  its Table 1 limit that is still what decides whether the largest deviation
+  is reported on a lobe or between two of them, which is the orientation A.4
+  then asks to be turned and measured again. The other two silences do move
+  the number: the span reading and the combination law both change what an
+  arc averages, so two laboratories that follow the clause can report
+  different maximum deviations for one source, and the standard gives no way
+  to tell which of them read it right.
+- **Evidence:** Verified on PDF page 11 (printed p. 3) of
+  BS EN ISO 3382-1:2009.
+- **Library behaviour:**
+  [`gliding_directivity_deviation`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/room/auditorium.py)
+  takes the sector reading, averages the arcs energetically as the reference
+  is, and starts each window at the bearing it is reported against, wrapping
+  round the turn. Its docstring says all three choices are choices.
+- **Status:** unreported.
+
 ## Related source properties that are not errata
 
 Recorded here to prevent future "fixes" that would break agreement with the

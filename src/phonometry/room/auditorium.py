@@ -1394,3 +1394,462 @@ def stage_support(
         )
 
     return StageSupportResult(frequency=frequency, early=early, late=late)
+
+
+#: Maximum deviation of source directivity in dB, by octave band centre in
+#: Hz (ISO 3382-1:2009, Table 1). The table prints six bands and no more, so
+#: a 63 Hz or 8 kHz survey has no printed limit to be held to.
+MAX_SOURCE_DIRECTIVITY_DEVIATION_DB = {
+    125.0: 1.0,
+    250.0: 1.0,
+    500.0: 1.0,
+    1000.0: 3.0,
+    2000.0: 5.0,
+    4000.0: 6.0,
+}
+
+#: Arc each gliding average of 4.2.1 covers, in degrees.
+DIRECTIVITY_ARC_DEG = 30.0
+
+#: Angular step 4.2.1 asks for when a turntable is not available, in
+#: degrees. Unlike the 12,5 of the note under Equation (A.4), it divides a
+#: full turn exactly, into 72.
+DIRECTIVITY_STEP_DEG = 5.0
+
+#: Shortest source-to-microphone distance 4.2.1 allows during a directivity
+#: survey, in metres.
+DIRECTIVITY_SURVEY_DISTANCE_M = 1.5
+
+#: Fewest bearings a gliding arc can be averaged over and still be an
+#: average of more than one reading.
+_MINIMUM_ARC_BEARINGS = 2
+
+#: The octave pairs A.5 offers as a more concise presentation, each averaged
+#: arithmetically, in Hz.
+OCTAVE_PAIRS_HZ = {
+    "low": (125.0, 250.0),
+    "mid": (500.0, 1000.0),
+    "high": (2000.0, 4000.0),
+}
+
+#: The six one-third-octave bands Clause 9.1 offers as the alternative route
+#: to a single-number reverberation time, in Hz.
+MID_FREQUENCY_THIRD_OCTAVES_HZ = (400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0)
+
+#: The two octave bands Clause 9.1 averages for T30,mid, in Hz.
+MID_FREQUENCY_OCTAVES_HZ = (500.0, 1000.0)
+
+#: The information Clause 9.2 says a test report shall include, in the order
+#: it lists them, a) to o). Clause 9 is normative, unlike every annex this
+#: module otherwise implements, and this is the only "shall" in it that
+#: concerns what is written down rather than what is measured.
+TEST_REPORT_ITEMS = (
+    "a statement that the measurements were made in conformity with ISO 3382-1",
+    "name and place of the room tested",
+    "sketch plan of the room, with an indication of the scale",
+    "volume of the room, with an explanation of how it is defined if the "
+    "room is not completely enclosed",
+    "for rooms for speech and music, the number and type of seats, their "
+    "upholstery and covering, and which parts of the seat are covered",
+    "a description of the shape and material of the walls and the ceiling",
+    "state or states of occupancy during measurements, and the number of occupants",
+    "condition of any variable equipment, such as curtains, public-address "
+    "or electronic reverberation enhancement systems",
+    "for theatres, whether the safety curtain or decorative curtains were up or down",
+    "description, where appropriate, of the stage furnishing, including any "
+    "concert enclosure",
+    "temperature and relative humidity in the room during the measurement",
+    "description of measuring apparatus, source and microphones, and "
+    "whether tape recorders were employed",
+    "description of the sound signal used",
+    "coverage chosen, including the source and microphone positions and "
+    "their heights, preferably shown on a plan",
+    "date of measurement and name of the measuring organization",
+)
+
+
+@dataclass(frozen=True)
+class AuditoriumQuantity:
+    """One row of ISO 3382-1:2009, Table A.1.
+
+    ``symbol`` is the quantity as the table prints it, ``aspect`` the
+    subjective listener aspect it is grouped under, and
+    ``averaging_bands_hz`` the octave bands its single number is the average
+    over, which is **not** the same set for every row: five quantities
+    average two bands and two average four.
+
+    ``just_noticeable_difference`` is ``None`` for the late lateral sound
+    level, whose JND the table prints as "Not known"; it is a fraction
+    rather than an absolute difference when ``relative_jnd`` is True, which
+    is only the early decay time's "Rel. 5 %". ``energy_averaged`` is True
+    only for the late lateral level, which footnote a sends to
+    Equation (A.17) while every other row is averaged arithmetically.
+
+    ``typical_range`` is the pair the table prints, and footnote b conditions
+    it: frequency-averaged values at single positions in unoccupied concert
+    and multi-purpose halls up to 25 000 m³. It is not a range for one band,
+    for an occupied hall, or for a spatial average.
+    """
+
+    symbol: str
+    aspect: str
+    averaging_bands_hz: tuple[float, ...]
+    just_noticeable_difference: float | None
+    relative_jnd: bool
+    typical_range: tuple[float, float]
+    energy_averaged: bool
+    unit: str
+
+
+#: The one listener aspect of Table A.1 that spans more than one quantity:
+#: clarity is judged by C80, by D50 and by the centre time together, so the
+#: three rows carry the same aspect and the table cannot be keyed by it.
+_CLARITY_ASPECT = "Perceived clarity of sound"
+
+#: ISO 3382-1:2009, Table A.1, keyed by the symbol the standard prints.
+#: Five listener aspects and seven quantities: "Perceived clarity of sound"
+#: carries three of them, and the early lateral energy fraction is one row
+#: with two alternative symbols.
+TABLE_A1 = {
+    "G": AuditoriumQuantity(
+        symbol="G",
+        aspect="Subjective level of sound",
+        averaging_bands_hz=(500.0, 1000.0),
+        just_noticeable_difference=1.0,
+        relative_jnd=False,
+        typical_range=(-2.0, 10.0),
+        energy_averaged=False,
+        unit="dB",
+    ),
+    "EDT": AuditoriumQuantity(
+        symbol="EDT",
+        aspect="Perceived reverberance",
+        averaging_bands_hz=(500.0, 1000.0),
+        just_noticeable_difference=0.05,
+        relative_jnd=True,
+        typical_range=(1.0, 3.0),
+        energy_averaged=False,
+        unit="s",
+    ),
+    "C80": AuditoriumQuantity(
+        symbol="C80",
+        aspect=_CLARITY_ASPECT,
+        averaging_bands_hz=(500.0, 1000.0),
+        just_noticeable_difference=1.0,
+        relative_jnd=False,
+        typical_range=(-5.0, 5.0),
+        energy_averaged=False,
+        unit="dB",
+    ),
+    "D50": AuditoriumQuantity(
+        symbol="D50",
+        aspect=_CLARITY_ASPECT,
+        averaging_bands_hz=(500.0, 1000.0),
+        just_noticeable_difference=0.05,
+        relative_jnd=False,
+        typical_range=(0.3, 0.7),
+        energy_averaged=False,
+        unit="",
+    ),
+    "Ts": AuditoriumQuantity(
+        symbol="Ts",
+        aspect=_CLARITY_ASPECT,
+        averaging_bands_hz=(500.0, 1000.0),
+        just_noticeable_difference=0.010,
+        relative_jnd=False,
+        typical_range=(0.060, 0.260),
+        energy_averaged=False,
+        unit="s",
+    ),
+    "J_LF": AuditoriumQuantity(
+        symbol="J_LF",
+        aspect="Apparent source width (ASW)",
+        averaging_bands_hz=(125.0, 250.0, 500.0, 1000.0),
+        just_noticeable_difference=0.05,
+        relative_jnd=False,
+        typical_range=(0.05, 0.35),
+        energy_averaged=False,
+        unit="",
+    ),
+    "L_J": AuditoriumQuantity(
+        symbol="L_J",
+        aspect="Listener envelopment (LEV)",
+        averaging_bands_hz=(125.0, 250.0, 500.0, 1000.0),
+        just_noticeable_difference=None,
+        relative_jnd=False,
+        typical_range=(-14.0, 1.0),
+        energy_averaged=True,
+        unit="dB",
+    ),
+}
+
+
+#: The alternative symbol Table A.1 prints inside a row it shares. "Early
+#: lateral energy fraction, J_LF or J_LFC" is one row, with one band set, one
+#: just-noticeable difference and one typical range, so the cosine-weighted
+#: variant of Equation (A.15) is looked up through the row of Equation (A.14)
+#: rather than being given an eighth row of its own.
+_TABLE_A1_ALIASES = {"J_LFC": "J_LF"}
+
+
+def _band_positions(
+    frequency: ArrayLike, wanted: tuple[float, ...], name: str
+) -> list[int]:
+    """Where the named nominal bands sit on a measured band axis."""
+    centres = np.asarray(frequency, dtype=np.float64)
+    if centres.ndim != 1 or centres.size == 0:
+        msg = f"'{name}' must be a non-empty one-dimensional band axis in Hz."
+        raise ValueError(msg)
+    if not np.all(np.isfinite(centres)):
+        # A NaN defeats both halves of the lookup below: np.min returns NaN,
+        # so the "does not carry the band" comparison is False, and np.argmin
+        # then hands back its own index for every band asked for. What comes
+        # out is a real reading from an arbitrary band, which is worse than
+        # an error because it looks right.
+        msg = f"'{name}' must be a band axis of finite centre frequencies in Hz."
+        raise ValueError(msg)
+    found = []
+    for band in wanted:
+        distance = np.abs(centres - band)
+        if float(np.min(distance)) > 0.06 * band:
+            missing = ", ".join(f"{value:g}" for value in wanted)
+            msg = (
+                f"The result does not carry the {band:g} Hz band; this "
+                f"average is printed over {missing} Hz and cannot be taken "
+                "over anything else."
+            )
+            raise ValueError(msg)
+        found.append(int(np.argmin(distance)))
+    return found
+
+
+def single_number_average(
+    symbol: str, values: ArrayLike, frequency: ArrayLike
+) -> float:
+    r"""The Table A.1 single number of one auditorium quantity.
+
+    Footnote a of ISO 3382-1:2009, Table A.1 makes this the arithmetical
+    average over the octave bands the table names for that quantity, with
+    one exception: the late lateral sound level, which
+    :func:`late_lateral_average` energy-averages through Equation (A.17).
+    A.5 asks for the index "m" to be applied to the symbol of the result.
+
+    The band set is per quantity and is not always the mid pair. The sound
+    strength, early decay time, clarity, definition and centre time average
+    the 500 Hz and 1 kHz octaves; the lateral quantities average 125 Hz to
+    1 kHz, four bands. A.5 prints both cases as examples for exactly that
+    reason, :math:`G_m` over two bands and :math:`J_{\mathrm{LF}m}` over
+    four, and an accessor that hard-codes the mid pair is wrong for half the
+    table.
+
+    :param symbol: The quantity, as :data:`TABLE_A1` keys it. ``"J_LFC"``
+        is taken too: Table A.1 prints the early lateral energy fraction as
+        one row, "J_LF or J_LFC", so both weightings of
+        :func:`early_lateral_energy_fraction` share its four bands, its
+        just-noticeable difference and its typical range.
+    :param values: Its per-band values, one per entry of ``frequency``.
+    :param frequency: The band centre frequencies in Hz, as a result carries
+        them.
+    :return: The single number, in the quantity's own unit.
+    :raises ValueError: If the symbol is not one Table A.1 prints, if the two
+        arrays disagree in length, or if the band axis does not carry every
+        band the quantity averages.
+    """
+    quantity = _table_a1_row(symbol)
+    readings = np.asarray(values, dtype=np.float64)
+    centres = np.asarray(frequency, dtype=np.float64)
+    if readings.shape != centres.shape:
+        msg = (
+            f"'values' has {readings.size} entries and 'frequency' has "
+            f"{centres.size}; they are the two axes of one result."
+        )
+        raise ValueError(msg)
+    picked = _band_positions(centres, quantity.averaging_bands_hz, "frequency")
+    if quantity.energy_averaged:
+        return late_lateral_average(readings[picked])
+    return float(np.mean(readings[picked]))
+
+
+def octave_pair_averages(values: ArrayLike, frequency: ArrayLike) -> dict[str, float]:
+    """The low, mid and high pair averages of ISO 3382-1:2009, A.5.
+
+    A more concise presentation than a full band table: the 125 Hz and
+    250 Hz results averaged into a low-frequency one, 500 Hz and 1 kHz into
+    a mid-frequency one, and 2 kHz and 4 kHz into a high-frequency one, all
+    arithmetically.
+
+    This is a different product from the single number of
+    :func:`single_number_average`, and the two must not be confused. They
+    coincide for the five quantities Table A.1 averages over 500 Hz and
+    1 kHz, and they do not for the lateral ones, whose single number spans
+    four bands. A.5 also warns that lateral energy fractions in the 4 kHz
+    octave are not usually thought to be subjectively important, so the high
+    pair means little for them.
+
+    :param values: Per-band values, one per entry of ``frequency``.
+    :param frequency: The band centre frequencies in Hz.
+    :return: ``{"low": ..., "mid": ..., "high": ...}`` in the values' unit.
+    :raises ValueError: If the two arrays disagree in length, or if the band
+        axis does not carry all six octaves from 125 Hz to 4 kHz.
+    """
+    readings = np.asarray(values, dtype=np.float64)
+    centres = np.asarray(frequency, dtype=np.float64)
+    if readings.shape != centres.shape:
+        msg = (
+            f"'values' has {readings.size} entries and 'frequency' has "
+            f"{centres.size}; they are the two axes of one result."
+        )
+        raise ValueError(msg)
+    return {
+        label: float(np.mean(readings[_band_positions(centres, pair, "frequency")]))
+        for label, pair in OCTAVE_PAIRS_HZ.items()
+    }
+
+
+def perceptibly_different(symbol: str, first: ArrayLike, second: ArrayLike) -> bool:
+    """Whether two values of a quantity differ by its Table A.1 JND.
+
+    The comparison is absolute for every quantity but the early decay time,
+    whose JND the table prints as "Rel. 5 %", a fraction of the value rather
+    than a difference in seconds. The late lateral sound level has no JND at
+    all, printed as "Not known", and this function refuses to invent one.
+
+    :param symbol: The quantity, as :data:`TABLE_A1` keys it. ``"J_LFC"``
+        is taken too: Table A.1 prints the early lateral energy fraction as
+        one row, "J_LF or J_LFC", so both weightings of
+        :func:`early_lateral_energy_fraction` share its four bands, its
+        just-noticeable difference and its typical range.
+    :param first: One value, in the quantity's unit.
+    :param second: The other, of the same shape.
+    :return: True when the two differ by at least the just-noticeable
+        difference, so a listener could be expected to hear it.
+    :raises ValueError: If the symbol is not one Table A.1 prints, or if the
+        table prints no just-noticeable difference for it.
+    """
+    quantity = _table_a1_row(symbol)
+    if quantity.just_noticeable_difference is None:
+        msg = (
+            f"ISO 3382-1:2009, Table A.1 prints the just-noticeable "
+            f"difference of {quantity.symbol} as 'Not known', so two values "
+            "of it cannot be compared against one."
+        )
+        raise ValueError(msg)
+    a = np.asarray(first, dtype=np.float64)
+    b = np.asarray(second, dtype=np.float64)
+    limit = quantity.just_noticeable_difference
+    if quantity.relative_jnd:
+        # "Rel. 5 %" of what is not printed; the mean of the two is the
+        # reading that does not depend on which one is called the reference.
+        reference = 0.5 * np.abs(a + b)
+        return bool(np.all(np.abs(a - b) >= limit * reference))
+    return bool(np.all(np.abs(a - b) >= limit))
+
+
+def _table_a1_row(symbol: str) -> AuditoriumQuantity:
+    """One row of Table A.1, by either symbol the standard prints for it."""
+    key = _TABLE_A1_ALIASES.get(symbol, symbol)
+    if key not in TABLE_A1:
+        printed = ", ".join(sorted([*TABLE_A1, *_TABLE_A1_ALIASES]))
+        msg = f"ISO 3382-1:2009, Table A.1 prints {printed}; got {symbol!r}."
+        raise ValueError(msg)
+    return TABLE_A1[key]
+
+
+def minimum_receiver_positions(seats: ArrayLike) -> NDArray[np.float64] | float:
+    r"""Fewest microphone positions a hall of a given size wants (Table A.2).
+
+    ISO 3382-1:2009, Table A.2 prints three pairs, 500 seats to 6 positions,
+    1 000 to 8 and 2 000 to 10. They lie exactly on a straight line in the
+    logarithm of the seat count, two positions per doubling:
+
+    .. math::
+
+       N_\mathrm{min} = 6 + 2 \lg_2 (S / 500)
+
+    which reproduces all three printed integers to the last bit. A.4 caps
+    what that line may be used for: it asks for "a minimum of between 6 and
+    10 representative microphone positions", so the result is clamped to the
+    range the table covers, and this function will not extrapolate a
+    5 000-seat arena to thirteen positions on the strength of three rows.
+
+    A.4 also says the positions are to be evenly distributed over all
+    audience seating areas, and that a hall broken into separate areas such
+    as balconies and under-balcony areas will need more than this.
+
+    :param seats: The number of seats in the hall.
+    :return: The minimum number of positions, not rounded, clamped to the
+        6 to 10 the table and A.4 between them authorise.
+    :raises ValueError: If a seat count is not a positive, finite number.
+    """
+    count = np.asarray(seats, dtype=np.float64)
+    if not np.all(np.isfinite(count)) or np.any(count <= 0.0):
+        msg = "'seats' must be a positive, finite number of seats."
+        raise ValueError(msg)
+    line = 6.0 + 2.0 * np.log2(count / 500.0)
+    positions = np.asarray(np.clip(line, 6.0, 10.0), dtype=np.float64)
+    return float(positions) if positions.ndim == 0 else positions
+
+
+def gliding_directivity_deviation(levels: ArrayLike) -> NDArray[np.float64]:
+    """Deviation of each gliding arc from the whole-turn reference (4.2.1).
+
+    ISO 3382-1:2009, 4.2.1 qualifies a source by averaging its free-field
+    output over "gliding" 30 degree arcs and comparing each of them with the
+    reference, which is "a 360 degree energetic average in the measurement
+    plane". Where no turntable is available it asks for measurements every
+    5 degrees, and for gliding averages "each covering six neighbouring
+    points", which is 30 degrees of a 72-point survey.
+
+    Both averages here are energetic, which is what the printed word makes
+    of the reference and what the arcs must therefore be for the comparison
+    to mean anything. The standard does not say so of the arcs, and it does
+    not say whether the six points of a window lead, trail or straddle their
+    arc either; the window here starts at each measured bearing and runs
+    forwards, and it wraps, so a survey of ``N`` bearings gives ``N``
+    deviations.
+
+    :param levels: Sound pressure levels around the source, in dB, one per
+        bearing, evenly spaced over a full turn.
+    :return: One deviation per bearing, in dB, of the arc that starts there
+        against the whole-turn reference.
+    :raises ValueError: If the bearings do not divide the arc a whole number
+        of times, or there are too few of them to make one.
+    """
+    values = require_finite_array(levels, "levels")
+    bearings = values.size
+    step = 360.0 / bearings
+    span = DIRECTIVITY_ARC_DEG / step
+    if not float(span).is_integer() or span < _MINIMUM_ARC_BEARINGS:
+        msg = (
+            f"{bearings} bearings put {step:g} degrees between them, and "
+            f"the {DIRECTIVITY_ARC_DEG:g} degree arc of ISO 3382-1:2009, "
+            "4.2.1 has to be a whole number of them; the clause's own "
+            f"survey uses {round(360.0 / DIRECTIVITY_STEP_DEG)}."
+        )
+        raise ValueError(msg)
+    energies = 10.0 ** (values / 10.0)
+    window = int(span)
+    wrapped = np.concatenate([energies, energies[: window - 1]])
+    arcs = np.convolve(wrapped, np.ones(window) / window, mode="valid")
+    return np.asarray(10.0 * np.log10(arcs / float(np.mean(energies))))
+
+
+def source_directivity_limit(centre: float) -> float:
+    """The Table 1 limit for one octave band, in dB.
+
+    :param centre: Nominal octave band centre frequency in Hz.
+    :return: The maximum deviation from omnidirectionality the table prints.
+    :raises ValueError: If Table 1 has no row for that band. It prints six,
+        125 Hz to 4 kHz, and a survey in the 63 Hz or 8 kHz octave has no
+        printed limit to be held to rather than the nearest one.
+    """
+    if centre not in MAX_SOURCE_DIRECTIVITY_DEVIATION_DB:
+        printed = ", ".join(
+            f"{band:g}" for band in sorted(MAX_SOURCE_DIRECTIVITY_DEVIATION_DB)
+        )
+        msg = (
+            f"ISO 3382-1:2009, Table 1 prints a directivity limit for the "
+            f"{printed} Hz octave bands and no others; got {centre!r} Hz."
+        )
+        raise ValueError(msg)
+    return MAX_SOURCE_DIRECTIVITY_DEVIATION_DB[centre]
