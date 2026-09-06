@@ -1,0 +1,294 @@
+---
+title: "Impresión espacial (ISO 3382-1)"
+description: "Lo que mide un segundo micrófono y uno solo no puede: la fracción de energía lateral temprana, el nivel lateral tardío y la correlación cruzada interaural, y los tres caracteres impresos que la capa de texto de un PDF borra de ellos."
+references:
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2009
+    title: "Acoustics — Measurement of room acoustic parameters — Part 1: Performance spaces"
+    designation: "ISO 3382-1:2009"
+    url: "https://www.iso.org/standard/40979.html"
+    note: "A.2.4, A.2.5 y el anexo B: las medidas de energía lateral, el nivel lateral tardío y el coeficiente de correlación cruzada interaural."
+  - type: article
+    authors: ["Barron, M.", "Marshall, A. H."]
+    year: 1981
+    title: "Spatial impression due to early lateral reflections in concert halls: The derivation of a physical measure"
+    journal: "Journal of Sound and Vibration"
+    volume: 77
+    issue: 2
+    pages: "211-232"
+    doi: "10.1016/S0022-460X(81)80020-X"
+    note: "De dónde viene la fracción de energía lateral temprana, y los experimentos subjetivos que fijaron su ventana de 80 ms."
+  - type: article
+    authors: ["Bradley, J. S.", "Soulodre, G. A."]
+    year: 1995
+    title: "Objective measures of listener envelopment"
+    journal: "The Journal of the Acoustical Society of America"
+    volume: 98
+    issue: 5
+    pages: "2590-2597"
+    doi: "10.1121/1.413225"
+    note: "Los experimentos tras el nivel lateral tardío y su frontera de 80 ms."
+  - type: article
+    authors: ["Hidaka, T.", "Beranek, L. L.", "Okano, T."]
+    year: 1995
+    title: "Interaural cross-correlation, lateral fraction, and low- and high-frequency sound levels as measures of acoustical quality in concert halls"
+    journal: "The Journal of the Acoustical Society of America"
+    volume: 98
+    issue: 2
+    pages: "988-1007"
+    doi: "10.1121/1.414451"
+    note: "La comparación del coeficiente interaural con la fracción lateral en que se apoyan las ventanas temporales del anexo B."
+---
+
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import SeeAlso from '../../../../../components/SeeAlso.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+Dos salas pueden tener el mismo tiempo de reverberación, la misma claridad y
+la misma [fuerza sonora](/phonometry/es/buildings/rooms/sound-strength/) y no
+sonar en nada parecido, porque esas magnitudes no atienden a **de dónde**
+llega el sonido. Una sala estrecha lanza las reflexiones tempranas a los
+oídos del oyente desde los lados; una ancha las lanza desde arriba y desde
+delante. La primera suena amplia y envolvente, la segunda suena plana, y
+ningún micrófono omnidireccional puede distinguirlas.
+
+La ISO 3382-1 mide la diferencia con un segundo micrófono. El anexo A.2.4 y
+el A.2.5 usan uno de patrón en ocho junto al omnidireccional, y el anexo B
+usa una cabeza con un micrófono en la entrada de cada canal auditivo.
+
+## 1. Dos ponderaciones para una reflexión
+
+El micrófono en ocho se orienta con su **nulo** hacia la fuente, de modo que
+el sonido directo no pesa nada y su salida sigue el coseno del ángulo con
+que llega cada reflexión. Elevar la presión al cuadrado, como hace la
+Ecuación (A.14), pondera esa reflexión por $\cos^2 \theta$:
+
+$$
+J_\mathrm{LF} = \frac{\int_{0,005}^{0,080} p_L^2(t)\ \mathrm{d}t}
+                     {\int_{0}^{0,080} p^2(t)\ \mathrm{d}t}.
+$$
+
+Multiplicarla en cambio por la respuesta omnidireccional, como hace la
+Ecuación (A.15), la pondera por el coseno mismo, que A.2.4 califica de
+subjetivamente más preciso:
+
+$$
+J_\mathrm{LFC} = \frac{\int_{0,005}^{0,080}
+                       \left| p_L(t) \cdot p(t) \right|\ \mathrm{d}t}
+                      {\int_{0}^{0,080} p^2(t)\ \mathrm{d}t}.
+$$
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lateral_energy_measures.svg" alt="Tres paneles. A la izquierda, el peso que lleva una reflexión frente a su ángulo de incidencia desde el nulo del micrófono en ocho, como el cuadrado del coseno para la fracción lateral y como el coseno mismo para la variante ponderada por coseno, ambos con máximo en uno donde apunta el nulo. En el centro, las dos fracciones banda a banda para una sala con dos segundos de decaimiento, sobre el rango habitual sombreado de 0,05 a 0,35 de la Tabla A.1. A la derecha, la función de correlación interaural de la banda de octava de 500 Hz en la ventana de búsqueda de más menos un milisegundo, para una señal llevada a los dos oídos y para dos independientes, con el máximo de cada una marcado" width="100%" />
+
+*Las dos ponderaciones, las dos fracciones banda a banda, y la ventana sobre
+la que el coeficiente interaural es el máximo.*
+
+```python
+import numpy as np
+from phonometry import room
+
+fs = 48000
+# Una reflexión de la mitad de la amplitud directa, 20 ms más tarde, que
+# llega a 45 grados del nulo. El micrófono en ocho la ve a 0,5 cos(45); el
+# omnidireccional, a 0,5, sobre el directo unitario.
+n = int(0.3 * fs)
+omni, lateral = np.zeros(n), np.zeros(n)
+omni[100] = 1.0
+omni[100 + int(0.020 * fs)] = 0.5
+lateral[100 + int(0.020 * fs)] = 0.5 * np.cos(np.deg2rad(45.0))
+
+squared = room.early_lateral_energy_fraction(omni, lateral, fs, limits=None)
+cosine = room.early_lateral_energy_fraction(
+    omni, lateral, fs, weighting="cosine", limits=None
+)
+print(squared.energy_fraction.round(4))     # [0.1]     = 0,25 cos^2(45) / 1,25
+print(cosine.energy_fraction.round(4))      # [0.1414]  = 0,25 cos(45) / 1,25
+```
+
+**Los dos límites inferiores son distintos, y así está impreso.** El
+numerador arranca en 5 ms y el denominador en 0: el sonido directo pertenece
+a la energía temprana total pero no a la parte lateral, y los 5 ms dejan
+fuera del numerador lo que se cuele por el nulo del micrófono.
+
+**El tiempo cero viene de la respuesta omnidireccional.** Un micrófono en
+ocho orientado como pide A.2.4 no tiene sonido directo en que dispararse, así
+que su propio detector de inicio cae en la primera reflexión fuerte y
+desplaza los dos límites de integración otro tanto. Las dos funciones toman
+aquí su tiempo cero de la respuesta que se pasa primero.
+
+## 2. El módulo que borra una capa de texto
+
+La Ecuación (A.15) imprime un módulo alrededor de $p_L(t) \cdot p(t)$. Es
+fácil perderlo, porque `pdftotext` devuelve ese mismo numerador sin él, y
+perderlo invierte el significado de la magnitud: un micrófono en ocho
+responde con signo opuesto a los dos lados, así que dos reflexiones
+simétricas se cancelan **exactamente a cero** en lugar de sumarse.
+
+```python
+import numpy as np
+from phonometry import room
+
+fs = 48000
+n = int(0.3 * fs)
+omni, lateral = np.zeros(n), np.zeros(n)
+omni[100] = 1.0
+for time, side in ((0.020, +1.0), (0.030, -1.0)):
+    omni[100 + int(time * fs)] = 0.5
+    lateral[100 + int(time * fs)] = side * 0.5 * np.cos(np.deg2rad(45.0))
+
+result = room.early_lateral_energy_fraction(
+    omni, lateral, fs, weighting="cosine", limits=None
+)
+print(result.energy_fraction.round(4))      # [0.2357], el doble de una
+
+signed = (0.25 * np.cos(np.deg2rad(45.0)) - 0.25 * np.cos(np.deg2rad(45.0))) / 1.5
+print(round(signed, 12))                    # 0.0, la lectura equivocada
+```
+
+Dos salas, una con reflexiones por la izquierda y otra con reflexiones por
+los dos lados, saldrían idénticas y a cero. La biblioteca lee la página.
+
+## 3. Envolvimiento: el nivel de lo que llega tarde
+
+$J_\mathrm{LF}$ es una fracción, así que cancela su propia calibración. El
+nivel lateral tardío de la Ecuación (A.16) es un nivel y no la cancela: es la
+energía lateral posterior a la ventana temprana frente a la referencia de
+campo libre a 10 m, la misma referencia que usa la fuerza sonora.
+
+$$
+L_J = 10 \lg \frac{\int_{0,080}^{\infty} p_L^2(t)\ \mathrm{d}t}
+                  {\int_{0}^{\infty} p_{10}^2(t)\ \mathrm{d}t}\ \text{dB}.
+$$
+
+La Ecuación (A.17) lo promedia sobre las bandas de octava de 125 Hz, 250 Hz,
+500 Hz y 1 kHz con un factor 0,25, que es un cuarto, así que es una media
+**energética**:
+
+$$
+L_{J,\mathrm{avg}} = 10 \lg \left[ 0{,}25
+                     \sum_{i=1}^{4} 10^{L_{J_i}/10} \right]\ \text{dB}.
+$$
+
+La nota a al pie de la Tabla A.1 hace de esto la única excepción de toda la
+tabla: cualquier otra magnitud de ella se promedia aritméticamente sobre sus
+bandas, y sólo $L_J$ se promedia sobre la energía. Las dos no se parecen
+cuando las bandas discrepan.
+
+```python
+import numpy as np
+from phonometry import room
+
+print(round(room.late_lateral_average([-8.0] * 4), 4))     # -8.0, sin cambio
+print(round(room.late_lateral_average([0.0, 0.0, 0.0, 6.0206]), 4))   # 2.4304
+
+bands = [-14.0, -8.0, -5.0, 1.0]
+print(round(room.late_lateral_average(bands), 4))          # -3.5324, energética
+print(round(float(np.mean(bands)), 4))                     # -6.5, aritmética
+```
+
+Casi 3 dB de diferencia, y la Tabla A.1 no imprime ninguna diferencia apenas
+perceptible para $L_J$: dice «Not known».
+
+## 4. Dos oídos, un coeficiente
+
+El anexo B mide el mismo aspecto con una cabeza artificial. La Ecuación (B.1)
+es la correlación cruzada normalizada de las dos respuestas auriculares,
+
+$$
+\mathrm{IACF}_{t_1,t_2}(\tau) =
+    \frac{\int_{t_1}^{t_2} p_l(t)\, p_r(t + \tau)\ \mathrm{d}t}
+         {\sqrt{\int_{t_1}^{t_2} p_l^2(t)\ \mathrm{d}t
+                \int_{t_1}^{t_2} p_r^2(t)\ \mathrm{d}t}},
+$$
+
+y la Ecuación (B.2) toma su mayor magnitud dentro de un milisegundo en torno
+a la coincidencia, que es aproximadamente el retardo interaural de una
+cabeza:
+
+$$
+\mathrm{IACC}_{t_1,t_2} = \max \left| \mathrm{IACF}_{t_1,t_2} \right|
+    \quad \text{para } -1\ \text{ms} < \tau < +1\ \text{ms}.
+$$
+
+**Tanto la raíz cuadrada como el módulo están impresos, y una capa de texto
+pierde los dos.** La raíz es lo que acota la función por uno; sin ella el
+resultado no es una correlación en absoluto y escala con la ganancia de
+cualquiera de los dos oídos. El módulo es lo que hace que dos oídos en
+oposición de fase puntúen 1: son tan distintos como dos señales pueden serlo
+sólo en el signo, y 0 sería la respuesta equivocada para ellos.
+
+```python
+import numpy as np
+from phonometry import room
+
+fs = 48000
+t = np.arange(int(1.5 * fs)) / fs
+rng = np.random.default_rng(3382)
+ear = rng.standard_normal(t.size) * np.exp(-3.0 * np.log(10.0) * t / 2.0)
+
+print(room.interaural_cross_correlation(ear, ear, fs, limits=None).coefficient)
+# [1.]  la raíz cuadrada es lo que hace que esto sea exactamente uno
+print(room.interaural_cross_correlation(-ear, ear, fs, limits=None).coefficient)
+# [1.]  el módulo es lo que hace que esto sea uno y no cero
+
+delayed = np.concatenate([np.zeros(int(0.0005 * fs)), ear])[: ear.size]
+found = room.interaural_cross_correlation(ear, delayed, fs, limits=None)
+print(found.delay * 1000.0)                 # [0.5]  ms, el oído derecho va delante
+```
+
+B.4 imprime tres ventanas: la general, del sonido directo hasta un tiempo del
+orden del tiempo de reverberación, que es la de por defecto; la temprana,
+`IACC_EARLY_WINDOW_S`, de 0 a 80 ms; y la reverberante, desde
+`IACC_LATE_START_S`. Sitúa el rango en las bandas de octava de 125 Hz a
+4 kHz y supone una diferencia apenas perceptible de 0,075.
+
+Una correlación de banda ancha es un pico y dice muy poco. Hay que medir por
+bandas, que es lo que hace la opción por defecto y lo que dibuja el panel de
+la derecha de arriba.
+
+## 5. Qué tiene que ser el segundo micrófono
+
+Las dos medidas laterales necesitan que los dos micrófonos registren un mismo
+suceso en un mismo punto, así que la biblioteca rechaza dos respuestas de
+distinta longitud. $L_J$ necesita además que su sensibilidad relativa se haya
+calibrado en campo libre (A.3.2), porque es un nivel y la respuesta en ocho
+lleva su propia ganancia dentro. $J_\mathrm{LF}$ no: un factor común a las
+dos se cancela en el cociente, y un factor sólo sobre la respuesta en ocho
+aparece como un escalado limpio de la fracción.
+
+Las ventanas de 80 ms son las impresas, y una respuesta que se acaba antes
+levanta un error en lugar de acortarse: una integral de 80 ms tomada sobre
+los 48 ms que se grabaron no es la magnitud impresa, y es mayor que ella,
+porque la cola que falta sólo aparece en el denominador.
+
+<SeeAlso
+  links={[
+    { href: '/phonometry/es/buildings/rooms/sound-strength/', label: 'Fuerza sonora G' },
+    { href: '/phonometry/es/buildings/rooms/room-acoustics/', label: 'Parámetros acústicos de salas' },
+    { href: '/phonometry/es/buildings/rooms/room-impulse-response/', label: 'Medición de la respuesta al impulso' },
+    { href: '/phonometry/es/buildings/rooms/room-image-sources/', label: 'Fuentes imagen y campo estacionario' },
+  ]}
+/>
+
+## Qué cubre esta guía
+
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Las medidas espaciales de la ISO 3382-1:2009: la fracción de energía lateral
+temprana de la Ecuación (A.14) y su variante ponderada por coseno de la
+Ecuación (A.15), con el módulo que esta última imprime; el nivel lateral
+tardío de la Ecuación (A.16) frente a la referencia de campo libre a 10 m, y
+su media energética sobre cuatro bandas de octava de la Ecuación (A.17); y la
+función de correlación cruzada interaural normalizada de la Ecuación (B.1) con
+el coeficiente de la Ecuación (B.2), con la raíz cuadrada y el módulo que las
+dos imprimen, sobre cualquiera de las tres ventanas temporales que nombra B.4.
+</ScopeClaim>
+<ScopeClaim status="not-covered" label="Todavía no cubierto">
+El equipo y la geometría que pide la medición: la geometría de la cabeza
+artificial de B.3, los límites de directividad de la fuente de la Tabla 1, el
+soporte de escenario del anexo C y la incertidumbre de medición del
+Capítulo 7.
+</ScopeClaim>
+</Scope>

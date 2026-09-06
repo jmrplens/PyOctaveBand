@@ -35,7 +35,12 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
 
     from ..room.acoustics import DecayCurve, RoomAcousticsResult
-    from ..room.auditorium import SoundStrengthResult
+    from ..room.auditorium import (
+        InterauralCorrelationResult,
+        LateLateralResult,
+        LateralEnergyResult,
+        SoundStrengthResult,
+    )
     from ..room.crowd_noise import CrowdNoiseResult
     from ..room.enclosed_space_absorption import ReverberationResult
     from ..room.image_source import ImageSourceResult
@@ -89,6 +94,19 @@ _STRENGTH_TYPICAL_RANGE_DB = (-2.0, 10.0)
 #: Octave bands Table A.1 averages the sound strength, EDT, clarity,
 #: definition and centre time over, in Hz.
 _SINGLE_NUMBER_BANDS_HZ = (500.0, 1000.0)
+
+#: Typical range of the early lateral energy fraction in the same halls
+#: (ISO 3382-1:2009, Table A.1), dimensionless. Like every range in that
+#: table it is the range of the single number, here the mean over the
+#: 125 Hz to 1 kHz octaves.
+_LATERAL_TYPICAL_RANGE = (0.05, 0.35)
+
+#: Octave bands Table A.1 averages the lateral quantities over, in Hz.
+_LATERAL_SINGLE_NUMBER_BANDS_HZ = (125.0, 250.0, 500.0, 1000.0)
+
+#: Typical range of the late lateral sound level in the same halls, in dB
+#: (ISO 3382-1:2009, Table A.1), again for its single number.
+_LATE_LATERAL_TYPICAL_RANGE_DB = (-14.0, 1.0)
 
 #: Spanish translations of the fixed strings rendered by the room ``.plot()``
 #: renderers, keyed by their verbatim English text.  ``_t`` returns the English
@@ -176,6 +194,27 @@ _STRINGS: dict[str, str] = {
     "Exposure level [dB]": "Nivel de exposición [dB]",
     r"In the hall, $L_{pE}$": r"En la sala, $L_{pE}$",
     r"Free field at 10 m, $L_{pE,10}$": r"Campo libre a 10 m, $L_{pE,10}$",
+    # --- Lateral energy and interaural correlation (A.2.4, A.2.5, Annex B) ---
+    "Early lateral energy fraction": "Fracción de energía lateral temprana",
+    "ISO 3382-1 early lateral energy": "Energía lateral temprana ISO 3382-1",
+    r"Measured $J_\mathrm{LF}$": r"$J_\mathrm{LF}$ medida",
+    r"Measured $J_\mathrm{LFC}$": r"$J_\mathrm{LFC}$ medida",
+    r"Late lateral sound level $L_J$ [dB]": r"Nivel lateral tardío $L_J$ [dB]",
+    "ISO 3382-1 late lateral sound level": "Nivel lateral tardío ISO 3382-1",
+    r"Measured $L_J$": r"$L_J$ medido",
+    r"Energy average, $L_{J,\mathrm{avg}}$": r"Media energética, $L_{J,\mathrm{avg}}$",
+    r"Single number, $J_\mathrm{LFm}$ (125 Hz to 1 kHz)": (
+        r"Número único, $J_\mathrm{LFm}$ (125 Hz a 1 kHz)"
+    ),
+    r"Single number, $J_\mathrm{LFCm}$ (125 Hz to 1 kHz)": (
+        r"Número único, $J_\mathrm{LFCm}$ (125 Hz a 1 kHz)"
+    ),
+    "Interaural cross correlation": "Correlación cruzada interaural",
+    "ISO 3382-1 interaural cross correlation": (
+        "Correlación cruzada interaural ISO 3382-1"
+    ),
+    r"Interaural delay $\tau$ [ms]": r"Retardo interaural $\tau$ [ms]",
+    r"$\mathrm{IACF}(\tau)$": r"$\mathrm{IACF}(\tau)$",
 }
 
 
@@ -298,25 +337,35 @@ def plot_room_acoustics(
 
 
 def _single_number(
-    frequency: ArrayLike | None, values: NDArray[np.float64]
+    frequency: ArrayLike | None,
+    values: NDArray[np.float64],
+    bands: tuple[float, ...] = _SINGLE_NUMBER_BANDS_HZ,
 ) -> float | None:
     """The Table A.1 single number: the mean over the bands it names.
 
-    ``None`` when the result does not carry both of them, which is when
-    there is no single number to draw and the shaded range has nothing it
-    applies to.
+    ``None`` when the result does not carry all of them, which is when there
+    is no single number to draw and the shaded range has nothing it applies
+    to. Footnote a of Table A.1 makes this mean arithmetic for every
+    quantity but the late lateral level, whose plot draws Equation (A.17)
+    instead.
     """
+    picked = _band_indices(frequency, bands)
+    return None if picked is None else float(np.mean(values[picked]))
+
+
+def _band_indices(
+    frequency: ArrayLike | None, bands: tuple[float, ...]
+) -> list[int] | None:
+    """Where the named nominal bands sit on a result's band axis."""
     if frequency is None:
         return None
     centres = np.asarray(frequency, dtype=np.float64)
     picked = [
         int(np.argmin(np.abs(centres - wanted)))
-        for wanted in _SINGLE_NUMBER_BANDS_HZ
+        for wanted in bands
         if float(np.min(np.abs(centres - wanted))) < 0.06 * wanted
     ]
-    if len(picked) != len(_SINGLE_NUMBER_BANDS_HZ):
-        return None
-    return float(np.mean(values[picked]))
+    return picked if len(picked) == len(bands) else None
 
 
 def plot_sound_strength(
@@ -415,6 +464,187 @@ def plot_sound_strength(
     _localize_band_axes(ax_strength, language)
     _localize_band_axes(ax_levels, language)
     return axes
+
+
+def plot_lateral_energy(
+    result: LateralEnergyResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Per-band early lateral energy fraction over the Table A.1 range.
+
+    :param result: A
+        :class:`~phonometry.room.auditorium.LateralEnergyResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: ``"en"`` or ``"es"``.
+    :param kwargs: Forwarded to the curve's ``plot`` call.
+    :return: The axes.
+    """
+    values = np.asarray(result.energy_fraction, dtype=np.float64)
+    labels, use_freq_axis = _band_labels(result.frequency, values.size, language)
+    positions = np.arange(values.size, dtype=np.float64)
+    ax = ax if ax is not None else _new_axes()
+
+    low, high = _LATERAL_TYPICAL_RANGE
+    ax.axhspan(
+        low,
+        high,
+        color=_C_PRIMARY_LIGHT,
+        alpha=0.3,
+        label=_t("Typical range of the single number (Table A.1)", language),
+    )
+    single_number = _single_number(
+        result.frequency, values, _LATERAL_SINGLE_NUMBER_BANDS_HZ
+    )
+    if single_number is not None:
+        ax.axhline(
+            single_number,
+            color=_C_SECONDARY,
+            ls="--",
+            lw=1.4,
+            zorder=2,
+            label=_t(
+                r"Single number, $J_\mathrm{LFCm}$ (125 Hz to 1 kHz)"
+                if result.weighting == "cosine"
+                else r"Single number, $J_\mathrm{LFm}$ (125 Hz to 1 kHz)",
+                language,
+            ),
+        )
+    symbol = r"Measured $J_\mathrm{LF}$"
+    if result.weighting == "cosine":
+        symbol = r"Measured $J_\mathrm{LFC}$"
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("label", _t(symbol, language))
+    ax.plot(positions, values, "o-", zorder=3, **kwargs)
+    ax.set_ylabel(_t("Early lateral energy fraction", language))
+    ax.set_title(_t("ISO 3382-1 early lateral energy", language))
+    _band_axis(
+        ax,
+        labels,
+        xlabel=_t(_FREQUENCY_LABEL if use_freq_axis else "Band", language),
+        language=language,
+    )
+    ax.grid(True, axis="y", alpha=0.3)
+    ax.legend(loc="best", fontsize="small")
+    _localize_band_axes(ax, language)
+    return ax
+
+
+def plot_late_lateral(
+    result: LateLateralResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Per-band late lateral sound level over the Table A.1 range.
+
+    Draws the Equation (A.17) energy average of the four octave bands from
+    125 Hz to 1 kHz as a horizontal line whenever the result spans them.
+
+    :param result: A :class:`~phonometry.room.auditorium.LateLateralResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: ``"en"`` or ``"es"``.
+    :param kwargs: Forwarded to the curve's ``plot`` call.
+    :return: The axes.
+    """
+    from ..room.auditorium import (
+        LATE_LATERAL_AVERAGE_BANDS_HZ,
+        late_lateral_average,
+    )
+
+    values = np.asarray(result.level, dtype=np.float64)
+    labels, use_freq_axis = _band_labels(result.frequency, values.size, language)
+    positions = np.arange(values.size, dtype=np.float64)
+    ax = ax if ax is not None else _new_axes()
+
+    low, high = _LATE_LATERAL_TYPICAL_RANGE_DB
+    ax.axhspan(
+        low,
+        high,
+        color=_C_PRIMARY_LIGHT,
+        alpha=0.3,
+        label=_t("Typical range of the single number (Table A.1)", language),
+    )
+    picked = _band_indices(result.frequency, LATE_LATERAL_AVERAGE_BANDS_HZ)
+    if picked is not None:
+        ax.axhline(
+            late_lateral_average(values[picked]),
+            color=_C_SECONDARY,
+            ls="--",
+            lw=1.4,
+            zorder=2,
+            label=_t(r"Energy average, $L_{J,\mathrm{avg}}$", language),
+        )
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("label", _t(r"Measured $L_J$", language))
+    ax.plot(positions, values, "o-", zorder=3, **kwargs)
+    ax.set_ylabel(_t(r"Late lateral sound level $L_J$ [dB]", language))
+    ax.set_title(_t("ISO 3382-1 late lateral sound level", language))
+    _band_axis(
+        ax,
+        labels,
+        xlabel=_t(_FREQUENCY_LABEL if use_freq_axis else "Band", language),
+        language=language,
+    )
+    ax.grid(True, axis="y", alpha=0.3)
+    ax.legend(loc="best", fontsize="small")
+    _localize_band_axes(ax, language)
+    return ax
+
+
+def plot_interaural_correlation(
+    result: InterauralCorrelationResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """The interaural correlation function over the (B.2) search window.
+
+    One curve per band across the +/-1 ms the coefficient is the maximum
+    magnitude over, with the maximum of each marked.
+
+    :param result: An
+        :class:`~phonometry.room.auditorium.InterauralCorrelationResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: ``"en"`` or ``"es"``.
+    :param kwargs: Forwarded to each band's ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+
+    curves = np.asarray(result.correlation, dtype=np.float64)
+    lag_ms = np.asarray(result.lag, dtype=np.float64) * 1000.0
+    labels, _ = _band_labels(result.frequency, curves.shape[0], language)
+    ax = ax if ax is not None else _new_axes()
+
+    palette = (
+        _C_PRIMARY,
+        _C_SECONDARY,
+        _C_TERTIARY,
+        _C_QUATERNARY,
+        _C_REFERENCE,
+        _C_MUTED,
+    )
+    for index, (curve, label) in enumerate(zip(curves, labels, strict=True)):
+        colour = palette[index % len(palette)]
+        ax.plot(lag_ms, curve, color=colour, label=label, zorder=3, **kwargs)
+        ax.plot(
+            [float(result.delay[index]) * 1000.0],
+            [float(curve[int(np.argmax(np.abs(curve)))])],
+            "o",
+            color=colour,
+            markersize=5,
+            zorder=4,
+        )
+    ax.set_xlabel(_t(r"Interaural delay $\tau$ [ms]", language))
+    ax.set_ylabel(_t(r"$\mathrm{IACF}(\tau)$", language))
+    ax.set_title(_t("ISO 3382-1 interaural cross correlation", language))
+    ax.set_xlim(float(lag_ms[0]), float(lag_ms[-1]))
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc="best", fontsize="small", ncol=2)
+    localize_axes(ax, language)
+    return ax
 
 
 def plot_decay_curve(

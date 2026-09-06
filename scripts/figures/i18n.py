@@ -3851,6 +3851,31 @@ _ES_EXACT = {
     "Sound strength $G$ (dB)": "Fuerza sonora $G$ (dB)",
     "direct sound alone": "solo el sonido directo",
     "$G$": "$G$",
+    # --- lateral_energy_measures (A.2.4, A.2.5, Annex B) ---
+    "Two weightings for one reflection": "Dos ponderaciones para una reflexión",
+    "$J_{LF}$: $\\cos^2\\theta$  (A.14)": "$J_{LF}$: $\\cos^2\\theta$  (A.14)",
+    "$J_{LFC}$: $|\\cos\\theta|$  (A.15)": "$J_{LFC}$: $|\\cos\\theta|$  (A.15)",
+    "the null points at the source,\nso the direct sound weighs nothing": (
+        "el nulo apunta a la fuente,\nasí que el sonido directo no pesa nada"
+    ),
+    "Angle of incidence from the null (degrees)": (
+        "Ángulo de incidencia desde el nulo (grados)"
+    ),
+    "Weight of one reflection": "Peso de una reflexión",
+    "A hall with 2.0 s of decay": "Una sala con 2,0 s de decaimiento",
+    "Early lateral energy fraction": "Fracción de energía lateral temprana",
+    "$J_{LF}$": "$J_{LF}$",
+    "$J_{LFC}$": "$J_{LFC}$",
+    "the shaded band is the typical range of Table A.1,\n"
+    "0.05 to 0.35, and it is the range of the single number": (
+        "la banda sombreada es el rango habitual de la Tabla A.1,\n"
+        "de 0,05 a 0,35, y es el rango del número único"
+    ),
+    "The 500 Hz band over the $\\pm$1 ms search window": (
+        "La banda de 500 Hz en la ventana de búsqueda de $\\pm$1 ms"
+    ),
+    "Interaural delay $\\tau$ (ms)": "Retardo interaural $\\tau$ (ms)",
+    "$\\mathrm{IACF}(\\tau)$": "$\\mathrm{IACF}(\\tau)$",
     "the shaded band is the typical range of Table A.1,\n"
     "$-$2 dB to $+$10 dB in unoccupied halls": (
         "la banda sombreada es el rango habitual de la Tabla A.1,\n"
@@ -3864,6 +3889,15 @@ _ES_PATTERNS = [
     # computed, so only the words around the number can be tabled.
     (r"^critical distance, (\d+)\.(\d+) m$", r"distancia crítica, \1,\2 m"),
     (r"^(\d+)\.(\d+) dB$", r"\1,\2 dB"),
+    # lateral_energy_measures: the legend carries the computed coefficient.
+    (
+        r"^one signal in both ears: IACC = (\d+)\.(\d+)$",
+        r"una señal en los dos oídos: IACC = \1,\2",
+    ),
+    (
+        r"^two independent ears: IACC = (\d+)\.(\d+)$",
+        r"dos oídos independientes: IACC = \1,\2",
+    ),
     # vdi2081_flow_noise: the annotation and the legend carry the duty point.
     (
         r"^the worked example runs at (\d+)\.(\d+) m/s;\nhalving that is worth "

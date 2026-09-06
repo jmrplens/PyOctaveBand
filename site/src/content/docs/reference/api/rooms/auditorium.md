@@ -15,10 +15,12 @@ definition everyone quotes, and that is what this module implements.
 Reverberation time says what the room does to energy over time and nothing
 about how loud the room is. Sound strength, G, is the quantity that does:
 the energy of the measured impulse response against the energy the same
-source puts out at 10 m in a free field (A.2.1, Equation (A.1)). It is the
-one measure in Table A.1 that needs a calibrated source, and it is the
-reason the annex spends four equations on how to obtain that free-field
-reference when there is no anechoic room 10 m across to measure it in.
+source puts out at 10 m in a free field (A.2.1, Equation (A.1)). It is one
+of the two measures in Table A.1 that need a calibrated source, the other
+being the late lateral sound level of A.2.5, which is referred to the same
+place; and it is the reason the annex spends four equations on how to obtain
+that free-field reference when there is no anechoic room 10 m across to
+measure it in.
 
 The three printed routes to the reference are all here, and they are
 routes to the same number:
@@ -115,6 +117,86 @@ band per row when it is handed a two-dimensional survey.
 | :--- | :--- |
 | ValueError | If fewer than `ceil(360 / 12,5) = 29` bearings lie along `axis`, or the levels are empty or non-finite. |
 
+## EARLY_ENERGY_LIMIT_S
+
+*Constant* (`float`).
+
+```python
+EARLY_ENERGY_LIMIT_S = 0.08
+```
+
+## early_lateral_energy_fraction
+
+```python
+early_lateral_energy_fraction(
+    ir: Signal | list[float] | NDArray[np.float64],
+    lateral_ir: Signal | list[float] | NDArray[np.float64],
+    fs: int | None = None,
+    *,
+    weighting: str = 'squared',
+    limits: tuple[float, float] | None = (125.0, 4000.0),
+    fraction: int = 1,
+) -> LateralEnergyResult
+```
+
+Early lateral energy fraction of a pair of responses, per band.
+
+ISO 3382-1:2009, Equation (A.14), the share of the first 80 ms that
+arrives from the side:
+
+$$
+J_\mathrm{LF} = \frac{\int_{0,005}^{0,080} p_L^2(t)\ \mathrm{d}t} {\int_{0}^{0,080} p^2(t)\ \mathrm{d}t}
+$$
+
+and Equation (A.15), the cosine-weighted variant that A.2.4 calls
+subjectively more accurate:
+
+$$
+J_\mathrm{LFC} = \frac{\int_{0,005}^{0,080} \left| p_L(t) \cdot p(t) \right|\ \mathrm{d}t} {\int_{0}^{0,080} p^2(t)\ \mathrm{d}t}
+$$
+
+The modulus in (A.15) is printed and it matters: the figure-of-eight
+response changes sign with the side a reflection comes from, so without
+it two mirror-image reflections cancel to zero instead of adding.
+
+The two lower limits differ. The numerator starts at 5 ms because the
+null of the figure-of-eight microphone is pointed at the source and the
+5 ms keeps whatever leaks through it out of the lateral share; the
+denominator starts at 0 because the direct sound belongs to the total.
+
+**Time zero comes from the omnidirectional response.** A figure-of-eight
+microphone aimed as A.2.4 asks has no direct sound to trigger on, so its
+own onset would land on the first strong reflection and shift both
+limits by that much. Both integrals here are timed from the direct sound
+of `ir`, band by band.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ir` | Impulse response measured with the omnidirectional microphone at the measurement point (1D). |
+| `lateral_ir` | Impulse response measured at the same point with a figure-of-eight microphone whose null points at the source (1D). |
+| `fs` | Sample rate in Hz. Required for bare arrays; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own. |
+| `weighting` | `"squared"` for $J_\mathrm{LF}$, Equation (A.14), whose contributions vary as the square of the cosine of the angle of incidence; `"cosine"` for $J_\mathrm{LFC}$, Equation (A.15), whose contributions vary as the cosine itself. |
+| `limits` | `(f_min, f_max)` band-centre limits in Hz; default the octave bands 125 Hz to 4 kHz. Table A.1 averages this quantity over 125 Hz to 1 kHz. `None` measures the broadband responses. |
+| `fraction` | Bandwidth fraction (1 = octave, 3 = one-third octave). |
+
+**Returns:** A [`LateralEnergyResult`](/phonometry/reference/api/rooms/auditorium/#lateralenergyresult) with one entry per band.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If `weighting` is not one of [`LATERAL_WEIGHTINGS`](/phonometry/reference/api/rooms/auditorium/#lateral_weightings), if a response is not one-dimensional or is silent, if the two responses do not split into the same number of bands or are of different lengths, or if they are too short for the 80 ms window. |
+
+## EARLY_LATERAL_WINDOW_S
+
+*Constant* (`tuple`).
+
+```python
+EARLY_LATERAL_WINDOW_S = (0.005, 0.08)
+```
+
 ## free_field_reference_level
 
 ```python
@@ -158,6 +240,329 @@ its docstring says what the printed step does and does not determine.
 | Exception | When |
 | :--- | :--- |
 | ValueError | If `distance` is not a positive, finite length. |
+
+## IACC_EARLY_WINDOW_S
+
+*Constant* (`tuple`).
+
+```python
+IACC_EARLY_WINDOW_S = (0.0, 0.08)
+```
+
+## IACC_JND
+
+*Constant* (`float`).
+
+```python
+IACC_JND = 0.075
+```
+
+## IACC_LATE_START_S
+
+*Constant* (`float`).
+
+```python
+IACC_LATE_START_S = 0.08
+```
+
+## IACC_SEARCH_S
+
+*Constant* (`float`).
+
+```python
+IACC_SEARCH_S = 0.001
+```
+
+## interaural_cross_correlation
+
+```python
+interaural_cross_correlation(
+    left: Signal | list[float] | NDArray[np.float64],
+    right: Signal | list[float] | NDArray[np.float64],
+    fs: int | None = None,
+    *,
+    window: tuple[float, float | None] = (0.0, None),
+    limits: tuple[float, float] | None = (125.0, 4000.0),
+    fraction: int = 1,
+) -> InterauralCorrelationResult
+```
+
+Interaural cross correlation of a binaural response, per band.
+
+ISO 3382-1:2009, Equation (B.1) defines the normalised function
+
+$$
+\mathrm{IACF}_{t_1,t_2}(\tau) = \frac{\int_{t_1}^{t_2} p_l(t)\, p_r(t + \tau)\ \mathrm{d}t} {\sqrt{\int_{t_1}^{t_2} p_l^2(t)\ \mathrm{d}t \int_{t_1}^{t_2} p_r^2(t)\ \mathrm{d}t}}
+$$
+
+and Equation (B.2) takes the coefficient from it:
+
+$$
+\mathrm{IACC}_{t_1,t_2} = \max \left| \mathrm{IACF}_{t_1,t_2} \right| \quad \text{for } -1\ \mathrm{ms} < \tau < +1\ \mathrm{ms}
+$$
+
+Both the square root and the modulus are printed, and both matter. The
+root is what bounds the function by one; a text layer that drops it
+leaves a quantity that is not a correlation at all. The modulus is what
+makes two anti-phase ears give 1 rather than 0, which is the answer that
+matches what they describe, two signals as dissimilar as they can be
+only in sign.
+
+B.4 puts three windows to it. The general form runs from the direct
+sound to a time of the order of the reverberation time, which is the
+default here; [`IACC_EARLY_WINDOW_S`](/phonometry/reference/api/rooms/auditorium/#iacc_early_window_s) is the early coefficient and
+[`IACC_LATE_START_S`](/phonometry/reference/api/rooms/auditorium/#iacc_late_start_s) starts the reverberant one. Time zero is the
+direct sound, located on the two channels together so that a listener
+turned away from the source does not move it.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `left` | Impulse response at the entrance to the left ear canal (1D). |
+| `right` | Impulse response at the entrance to the right ear canal (1D), of the same length. |
+| `fs` | Sample rate in Hz. Required for bare arrays; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own. |
+| `window` | `(t_1, t_2)` in seconds from the direct sound, with `t_2` `None` for the end of the response. |
+| `limits` | `(f_min, f_max)` band-centre limits in Hz; default the octave bands 125 Hz to 4 kHz, which is the range B.4 names. `None` correlates the broadband responses. |
+| `fraction` | Bandwidth fraction (1 = octave, 3 = one-third octave). |
+
+**Returns:** An [`InterauralCorrelationResult`](/phonometry/reference/api/rooms/auditorium/#interauralcorrelationresult) with one entry per band.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If a response is not one-dimensional or is silent, if the two channels are of different lengths, if the window is empty or reversed, or if a band has no energy inside it. |
+
+## InterauralCorrelationResult
+
+```python
+InterauralCorrelationResult(
+    frequency: NDArray[np.float64] | None,
+    coefficient: NDArray[np.float64],
+    delay: NDArray[np.float64],
+    lag: NDArray[np.float64],
+    correlation: NDArray[np.float64],
+)
+```
+
+Per-band interaural cross correlation (ISO 3382-1:2009, Annex B).
+
+`frequency` holds the exact band centre frequencies in Hz, or is
+`None` for a broadband measurement. `coefficient` is the IACC of
+Equation (B.2), the largest magnitude the normalised correlation
+function reaches inside the +/-1 ms search window, and `delay` the lag
+in seconds at which it reaches it: positive when the right ear leads,
+because (B.1) evaluates the right channel at $t + \tau$.
+
+`lag` and `correlation` carry the function itself over the search
+window, one row per band, so it can be drawn rather than summarised.
+B.4 assumes a just-noticeable difference of 0,075.
+
+### InterauralCorrelationResult.plot()
+
+```python
+InterauralCorrelationResult.plot(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Plot the correlation function over the search window, per band.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+## late_lateral_average
+
+```python
+late_lateral_average(levels: ArrayLike) -> float
+```
+
+Frequency-average the late lateral level over its four octave bands.
+
+ISO 3382-1:2009, Equation (A.17):
+
+$$
+L_{J,\mathrm{avg}} = 10 \lg \left[ 0{,}25 \sum_{i=1}^{4} 10^{L_{J_i}/10} \right] \ \mathrm{dB}
+$$
+
+The 0,25 is one quarter, so this is an energy **mean** and four equal
+band values return that value unchanged. It is the one exception
+footnote a of Table A.1 makes: every other quantity in that table is
+averaged arithmetically over its bands, and only $L_J$ is averaged
+over energy. The four bands are the 125 Hz, 250 Hz, 500 Hz and 1 kHz
+octaves, in that order.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `levels` | The four octave-band values of $L_J$, in dB, in the order of [`LATE_LATERAL_AVERAGE_BANDS_HZ`](/phonometry/reference/api/rooms/auditorium/#late_lateral_average_bands_hz). |
+
+**Returns:** $L_{J,\mathrm{avg}}$ in dB.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If four values are not given, or they are not finite. |
+
+## LATE_LATERAL_AVERAGE_BANDS_HZ
+
+*Constant* (`tuple`).
+
+```python
+LATE_LATERAL_AVERAGE_BANDS_HZ = (125.0, 250.0, 500.0, 1000.0)
+```
+
+## late_lateral_sound_level
+
+```python
+late_lateral_sound_level(
+    ir: Signal | list[float] | NDArray[np.float64],
+    lateral_ir: Signal | list[float] | NDArray[np.float64],
+    reference_ir: Signal | list[float] | NDArray[np.float64] | None = None,
+    fs: int | None = None,
+    *,
+    reference_level: ArrayLike | None = None,
+    limits: tuple[float, float] | None = (125.0, 4000.0),
+    fraction: int = 1,
+) -> LateLateralResult
+```
+
+Late lateral sound level of a measured response, per band.
+
+ISO 3382-1:2009, Equation (A.16), the level of the lateral energy that
+arrives after the early window, against the same free-field reference
+the sound strength uses:
+
+$$
+L_J = 10 \lg \frac{\int_{0,080}^{\infty} p_L^2(t)\ \mathrm{d}t} {\int_{0}^{\infty} p_{10}^2(t)\ \mathrm{d}t} \ \mathrm{dB}
+$$
+
+Where $J_\mathrm{LF}$ is a fraction and cancels its own
+calibration, $L_J$ is a level and does not: it needs the
+calibrated omnidirectional source of A.2.1 and a free-field reference,
+which reaches this function the same two ways it reaches
+[`sound_strength`](/phonometry/reference/api/rooms/auditorium/#sound_strength). It also needs the relative sensitivity of the
+two microphones to have been calibrated in a free field (A.3.2).
+
+**Time zero comes from the omnidirectional response**, for the reason
+given under [`early_lateral_energy_fraction`](/phonometry/reference/api/rooms/auditorium/#early_lateral_energy_fraction): a figure-of-eight
+microphone aimed as A.2.5 asks has no direct sound to trigger on, and an
+80 ms boundary placed on its first reflection is not the printed one.
+`ir` supplies that time zero and nothing else.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ir` | Impulse response measured with the omnidirectional microphone at the measurement point (1D), for its direct sound. |
+| `lateral_ir` | Impulse response measured at the same point with a figure-of-eight microphone whose null points at the source (1D). |
+| `reference_ir` | Impulse response of the same source at 10 m in a free field (1D). Mutually exclusive with `reference_level`. |
+| `fs` | Sample rate in Hz. Required for bare arrays; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own. |
+| `reference_level` | The free-field reference exposure level $L_{pE,10}$ in dB, as a scalar or one value per band. Mutually exclusive with `reference_ir`. |
+| `limits` | `(f_min, f_max)` band-centre limits in Hz; default the octave bands 125 Hz to 4 kHz. Equation (A.17) averages this quantity over 125 Hz to 1 kHz. `None` measures the broadband responses. |
+| `fraction` | Bandwidth fraction (1 = octave, 3 = one-third octave). |
+
+**Returns:** A [`LateLateralResult`](/phonometry/reference/api/rooms/auditorium/#latelateralresult) with one entry per band.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If neither or both reference forms are given, if a response is not one-dimensional or is silent, if the two hall responses are of different lengths, or if they are too short to reach the 80 ms boundary. |
+
+## LATE_LATERAL_START_S
+
+*Constant* (`float`).
+
+```python
+LATE_LATERAL_START_S = 0.08
+```
+
+## LateLateralResult
+
+```python
+LateLateralResult(
+    frequency: NDArray[np.float64] | None,
+    level: NDArray[np.float64],
+    reference_level: NDArray[np.float64],
+)
+```
+
+Per-band late lateral sound level (ISO 3382-1:2009, A.2.5).
+
+`frequency` holds the exact band centre frequencies in Hz, or is
+`None` for a broadband measurement. `level` is
+$L_J$ in dB (Equation (A.16)) and `reference_level` the sound
+pressure exposure level of the free-field response at 10 m it is
+referred to, however that was obtained. Table A.1 gives
+$L_J$ a typical range of -14 dB to +1 dB over the 125 Hz to 1 kHz
+octave bands and no just-noticeable difference at all: "Not known".
+
+### LateLateralResult.plot()
+
+```python
+LateLateralResult.plot(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Plot the per-band late lateral level against the Table A.1 range.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+## LATERAL_WEIGHTINGS
+
+*Constant* (`tuple`).
+
+```python
+LATERAL_WEIGHTINGS = ('squared', 'cosine')
+```
+
+## LateralEnergyResult
+
+```python
+LateralEnergyResult(
+    frequency: NDArray[np.float64] | None,
+    energy_fraction: NDArray[np.float64],
+    weighting: str,
+)
+```
+
+Per-band early lateral energy fraction (ISO 3382-1:2009, A.2.4).
+
+`frequency` holds the exact band centre frequencies in Hz, or is
+`None` for a broadband measurement. `energy_fraction` is
+$J_\mathrm{LF}$ or $J_\mathrm{LFC}$ depending on
+`weighting`, which is `"squared"` for Equation (A.14) and
+`"cosine"` for Equation (A.15). Both are dimensionless and Table A.1
+gives them a just-noticeable difference of 0,05 and a typical range of
+0,05 to 0,35 over the 125 Hz to 1 kHz octave bands.
+
+### LateralEnergyResult.plot()
+
+```python
+LateralEnergyResult.plot(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Plot the per-band lateral fraction against the Table A.1 range.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
 
 ## MAXIMUM_DIRECTIVITY_STEP_DEG
 

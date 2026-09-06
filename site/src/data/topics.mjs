@@ -203,6 +203,7 @@ export const topics = [
           'buildings/rooms/room-impulse-response',
           'buildings/rooms/room-acoustics',
           'buildings/rooms/sound-strength',
+          'buildings/rooms/spatial-impression',
           'buildings/rooms/open-plan-acoustics',
           'buildings/rooms/room-image-sources',
           'buildings/rooms/room-noise',

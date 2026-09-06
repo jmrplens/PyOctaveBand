@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 792 numerical conformance checks against 395 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 797 numerical conformance checks against 395 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 792 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 67 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 797 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 67 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -140,6 +140,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Reverberation-time prediction (Sabine · Eyring · Fitzroy · Arau-Puchades)](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/)
 - [Sound absorption in enclosed spaces (EN 12354-6)](https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/)
 - [Sound strength G (ISO 3382-1)](https://jmrplens.github.io/phonometry/buildings/rooms/sound-strength/)
+- [Spatial impression (ISO 3382-1)](https://jmrplens.github.io/phonometry/buildings/rooms/spatial-impression/)
 
 ### Sound insulation
 
@@ -10429,6 +10430,9 @@ speech intelligibility a room affords is quantified by the
 - [Sound strength G (ISO 3382-1)](https://jmrplens.github.io/phonometry/buildings/rooms/sound-strength/):
   how loud the hall is, against the same source at 10 m in a free field, and
   the three printed routes to that reference.
+- [Spatial impression (ISO 3382-1)](https://jmrplens.github.io/phonometry/buildings/rooms/spatial-impression/):
+  where the sound comes from, measured with a figure-of-eight microphone
+  beside the omnidirectional one and with a head that has two.
 - [Open-Plan Office Acoustics (ISO 3382-3)](https://jmrplens.github.io/phonometry/buildings/rooms/open-plan-acoustics/):
   the spatial decay rate of speech and the distraction and privacy distances.
 - [Image sources and the steady-state room field](https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/):
@@ -12876,7 +12880,8 @@ nothing about how **loud** the hall is: two rooms with the same T30 can sit
 20 dB apart at the same seat. Sound strength, $G$, is the quantity that
 closes that gap, and it is one of only two measures in ISO 3382-1 Table A.1
 that a calibrated source is needed for, the other being the late lateral
-sound level. Everything else on the
+sound level, which is referred to the same free field. Everything else on
+the
 [room acoustic parameters page](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/)
 — EDT, T20, T30, C50, C80, D50, $T_\mathrm{s}$ — is a decay time, a ratio of
 energies or a centre time read from one recording alone, and survives any
@@ -12959,7 +12964,7 @@ the recording says so.
 An anechoic room 10 m across is rare, so A.2.1 prints three ways to obtain
 $L_{pE,10}$ without one.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_strength_routes_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_strength_routes.svg" alt="Left: three printed routes to the free-field reference level at 10 m, plotted on a decibel axis 0.04 dB wide, landing 0.0206 dB apart around the exact value. Right: sound strength against source-receiver distance in a 15 000 cubic metre hall, with the direct-sound contribution alone and the Table A.1 typical range shaded" width="100%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_strength_routes_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_strength_routes.svg" alt="Left: three printed routes to the free-field reference level at 10 m, plotted on a decibel axis 0.030 dB wide, landing 0.0206 dB apart around the exact value. Right: sound strength against source-receiver distance in a 15 000 cubic metre hall, with the direct-sound contribution alone and the Table A.1 typical range shaded" width="100%"></picture>
 
 *The same source, measured three ways. The spread on the left is 0.0206 dB
 and it is not a rounding error in the library: see section 3. The shaded
@@ -13170,8 +13175,9 @@ $G$ is a difference of two absolute levels, so it only survives a gain that
 is applied to **both** recordings. `sound_strength` computes both exposure
 levels from the responses it is given, so:
 
-- a common calibration factor on the pair cancels exactly, and the library
-  has a conformance row holding it to that;
+- a common calibration factor on the pair cancels exactly, and the
+  [conformance report](https://jmrplens.github.io/phonometry/reference/conformance/) has a row holding
+  it to that;
 - a factor on one of them does not cancel, and shows up as a straight
   offset in every band of $G$;
 - when the reference arrives as a *level* rather than as a response, the
@@ -13212,6 +13218,251 @@ everyone quotes, and nothing about G is normative in ISO 3382-1. Validated
 against closed forms and the standard's own printed offsets in the
 [conformance report](https://jmrplens.github.io/phonometry/reference/conformance/); the two defects the annex carries
 are in the [errata register](https://jmrplens.github.io/phonometry/reference/errata/).
+
+---
+
+
+<!-- source: docs/buildings/rooms/spatial-impression.md | canonical: https://jmrplens.github.io/phonometry/buildings/rooms/spatial-impression/ -->
+Source: https://jmrplens.github.io/phonometry/buildings/rooms/spatial-impression/
+
+# Spatial impression (ISO 3382-1)
+
+Two halls can have the same reverberation time, the same clarity and the
+same [sound strength](https://jmrplens.github.io/phonometry/buildings/rooms/sound-strength/) and still
+sound nothing alike, because those quantities do not care **where** the
+sound comes from. A narrow hall throws early reflections at the listener's
+ears from the side; a wide one throws them from above and in front. The
+first sounds broad and enveloping, the second sounds flat, and no
+omnidirectional microphone can tell them apart.
+
+ISO 3382-1 measures the difference with a second microphone. Annex A.2.4
+and A.2.5 use a figure-of-eight pattern alongside the omnidirectional one,
+and Annex B uses a head with a microphone at each ear canal.
+
+## 1. Two weightings for one reflection
+
+The figure-of-eight microphone is aimed with its **null** at the source, so
+the direct sound weighs nothing and its output follows the cosine of the
+angle each reflection arrives at. Squaring the pressure, as Equation (A.14)
+does, weights that reflection by $\cos^2 \theta$:
+
+$$
+J_\mathrm{LF} = \frac{\int_{0,005}^{0,080} p_L^2(t)\ \mathrm{d}t}
+                     {\int_{0}^{0,080} p^2(t)\ \mathrm{d}t}.
+$$
+
+Multiplying it by the omnidirectional response instead, as Equation (A.15)
+does, weights it by the cosine itself, which A.2.4 calls subjectively more
+accurate:
+
+$$
+J_\mathrm{LFC} = \frac{\int_{0,005}^{0,080}
+                       \left| p_L(t) \cdot p(t) \right|\ \mathrm{d}t}
+                      {\int_{0}^{0,080} p^2(t)\ \mathrm{d}t}.
+$$
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lateral_energy_measures_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lateral_energy_measures.svg" alt="Three panels. Left: the weight one reflection carries against its angle of incidence from the null of the figure-of-eight microphone, as the square of the cosine for the lateral fraction and as the cosine itself for the cosine-weighted variant, both peaking at one where the null points. Middle: both fractions band by band for a hall with two seconds of decay, over the shaded 0.05 to 0.35 typical range of Table A.1. Right: the interaural correlation function of the 500 Hz octave band across the plus and minus one millisecond search window, for one signal fed to both ears and for two independent ones, with the maximum of each marked" width="100%"></picture>
+
+*The two weightings, both fractions band by band, and the window the
+interaural coefficient is the maximum over.*
+
+```python
+import numpy as np
+from phonometry import room
+
+fs = 48000
+# One reflection of half the direct amplitude, 20 ms late, arriving at 45
+# degrees from the null. The figure-of-eight microphone sees it at
+# 0.5 cos(45); the omnidirectional one at 0.5, on top of the unit direct.
+n = int(0.3 * fs)
+omni, lateral = np.zeros(n), np.zeros(n)
+omni[100] = 1.0
+omni[100 + int(0.020 * fs)] = 0.5
+lateral[100 + int(0.020 * fs)] = 0.5 * np.cos(np.deg2rad(45.0))
+
+squared = room.early_lateral_energy_fraction(omni, lateral, fs, limits=None)
+cosine = room.early_lateral_energy_fraction(
+    omni, lateral, fs, weighting="cosine", limits=None
+)
+print(squared.energy_fraction.round(4))     # [0.1]     = 0.25 cos^2(45) / 1.25
+print(cosine.energy_fraction.round(4))      # [0.1414]  = 0.25 cos(45) / 1.25
+```
+
+**The two lower limits differ, and that is printed.** The numerator starts
+at 5 ms and the denominator at 0: the direct sound belongs to the total
+early energy but not to the lateral share, and the 5 ms keeps whatever
+leaks through the microphone's null out of the numerator.
+
+**Time zero comes from the omnidirectional response.** A figure-of-eight
+microphone aimed as A.2.4 asks has no direct sound to trigger on, so its own
+onset detector lands on the first strong reflection and shifts both
+integration limits by that much. Both functions here take their time zero
+from the response you pass first.
+
+## 2. The modulus that a text layer deletes
+
+Equation (A.15) prints a modulus around $p_L(t) \cdot p(t)$. It is easy to
+lose, because `pdftotext` renders the same numerator without it, and losing
+it inverts the meaning of the quantity: a figure-of-eight microphone
+responds with opposite sign to the two sides, so two mirror-image
+reflections cancel to **exactly zero** instead of adding.
+
+```python
+import numpy as np
+from phonometry import room
+
+fs = 48000
+n = int(0.3 * fs)
+omni, lateral = np.zeros(n), np.zeros(n)
+omni[100] = 1.0
+for time, side in ((0.020, +1.0), (0.030, -1.0)):
+    omni[100 + int(time * fs)] = 0.5
+    lateral[100 + int(time * fs)] = side * 0.5 * np.cos(np.deg2rad(45.0))
+
+result = room.early_lateral_energy_fraction(
+    omni, lateral, fs, weighting="cosine", limits=None
+)
+print(result.energy_fraction.round(4))      # [0.2357], twice one reflection
+
+signed = (0.25 * np.cos(np.deg2rad(45.0)) - 0.25 * np.cos(np.deg2rad(45.0))) / 1.5
+print(round(signed, 12))                    # 0.0, the misreading
+```
+
+Two rooms, one with reflections from the left and one with reflections from
+both sides, would come out identical and zero. The library reads the page.
+
+## 3. Envelopment: the level of what arrives late
+
+$J_\mathrm{LF}$ is a fraction, so it cancels its own calibration. The late
+lateral sound level of Equation (A.16) is a level and does not: it is the
+lateral energy after the early window against the free-field reference at
+10 m, the same reference the sound strength uses.
+
+$$
+L_J = 10 \lg \frac{\int_{0,080}^{\infty} p_L^2(t)\ \mathrm{d}t}
+                  {\int_{0}^{\infty} p_{10}^2(t)\ \mathrm{d}t}\ \text{dB}.
+$$
+
+Equation (A.17) averages it over the 125 Hz, 250 Hz, 500 Hz and 1 kHz
+octave bands with a factor of 0,25, which is one quarter, so it is an
+energy **mean**:
+
+$$
+L_{J,\mathrm{avg}} = 10 \lg \left[ 0{,}25
+                     \sum_{i=1}^{4} 10^{L_{J_i}/10} \right]\ \text{dB}.
+$$
+
+Footnote a of Table A.1 makes this the one exception in the whole table:
+every other quantity in it is averaged arithmetically over its bands, and
+only $L_J$ is averaged over energy. The two are not close when the bands
+disagree.
+
+```python
+import numpy as np
+from phonometry import room
+
+print(round(room.late_lateral_average([-8.0] * 4), 4))     # -8.0, unchanged
+print(round(room.late_lateral_average([0.0, 0.0, 0.0, 6.0206]), 4))   # 2.4304
+
+bands = [-14.0, -8.0, -5.0, 1.0]
+print(round(room.late_lateral_average(bands), 4))          # -3.5324, energy
+print(round(float(np.mean(bands)), 4))                     # -6.5, arithmetic
+```
+
+Nearly 3 dB apart, and Table A.1 does not print a just-noticeable
+difference for $L_J$ at all: it says "Not known".
+
+## 4. Two ears, one coefficient
+
+Annex B measures the same aspect with a dummy head. Equation (B.1) is the
+normalised cross correlation of the two ear responses,
+
+$$
+\mathrm{IACF}_{t_1,t_2}(\tau) =
+    \frac{\int_{t_1}^{t_2} p_l(t)\, p_r(t + \tau)\ \mathrm{d}t}
+         {\sqrt{\int_{t_1}^{t_2} p_l^2(t)\ \mathrm{d}t
+                \int_{t_1}^{t_2} p_r^2(t)\ \mathrm{d}t}},
+$$
+
+and Equation (B.2) takes its largest magnitude within a millisecond of
+coincidence, which is about the interaural delay of a head:
+
+$$
+\mathrm{IACC}_{t_1,t_2} = \max \left| \mathrm{IACF}_{t_1,t_2} \right|
+    \quad \text{for } -1\ \text{ms} < \tau < +1\ \text{ms}.
+$$
+
+**Both the square root and the modulus are printed, and both are lost by a
+text layer.** The root is what bounds the function by one; without it the
+result is not a correlation at all and scales with the gain of either ear.
+The modulus is what makes two anti-phase ears score 1: they are as
+dissimilar as two signals can be in sign alone, and 0 would be the wrong
+answer for them.
+
+```python
+import numpy as np
+from phonometry import room
+
+fs = 48000
+t = np.arange(int(1.5 * fs)) / fs
+rng = np.random.default_rng(3382)
+ear = rng.standard_normal(t.size) * np.exp(-3.0 * np.log(10.0) * t / 2.0)
+
+print(room.interaural_cross_correlation(ear, ear, fs, limits=None).coefficient)
+# [1.]  the square root is what makes this exactly one
+print(room.interaural_cross_correlation(-ear, ear, fs, limits=None).coefficient)
+# [1.]  the modulus is what makes this one and not zero
+
+delayed = np.concatenate([np.zeros(int(0.0005 * fs)), ear])[: ear.size]
+found = room.interaural_cross_correlation(ear, delayed, fs, limits=None)
+print(found.delay * 1000.0)                 # [0.5]  ms, the right ear leads
+```
+
+B.4 prints three windows: the general one from the direct sound to a time of
+the order of the reverberation time, which is the default; the early one,
+`IACC_EARLY_WINDOW_S`, from 0 to 80 ms; and the reverberant one from
+`IACC_LATE_START_S` onwards. It puts the range at the 125 Hz to 4 kHz
+octave bands and assumes a just-noticeable difference of 0,075.
+
+A broadband correlation is a spike and says very little. Measure in bands,
+which is what the default does and what the right-hand panel above draws.
+
+## 5. What the second microphone has to be
+
+Both lateral measures need the two microphones to record one event at one
+point, so the library refuses two responses of different lengths. $L_J$
+additionally needs their relative sensitivity to have been calibrated in a
+free field (A.3.2), because it is a level and the figure-of-eight response
+carries its own gain into it. $J_\mathrm{LF}$ does not: a common factor on
+both cancels in the ratio, and a factor on the figure-of-eight alone shows
+up as a straight scaling of the fraction.
+
+The 80 ms windows are the printed ones, and a response that stops before
+them raises rather than shortening itself: an 80 ms integral taken over the
+48 ms that were recorded is not the printed quantity, and it is larger than
+it, because the missing tail only ever appears in the denominator.
+
+## See also
+
+- [Sound strength G (ISO 3382-1)](https://jmrplens.github.io/phonometry/buildings/rooms/sound-strength/): the other quantity of
+  Annex A that needs a calibrated source and the same free-field reference.
+- [Room Acoustic Parameters](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the decay times and energy
+  ratios one microphone is enough for.
+- [Measuring the Room Impulse Response](https://jmrplens.github.io/phonometry/buildings/rooms/room-impulse-response/): the
+  ISO 18233 acquisition of the responses this page pairs up.
+- [Image sources and the steady-state room field](https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/):
+  where the early reflections this page weighs come from.
+- API reference: [`room.auditorium`](https://jmrplens.github.io/phonometry/reference/api/rooms/auditorium/).
+
+## Standards
+
+ISO 3382-1:2009, Annex A (informative) A.2.4 and A.2.5 and Annex B
+(informative): the early lateral energy fraction of Equations (A.14) and
+(A.15), the late lateral sound level of Equation (A.16) with the energy
+average of Equation (A.17), and the interaural cross correlation of
+Equations (B.1) and (B.2). Validated against closed-form reflection
+geometries and against the printed characters a text layer deletes, in the
+[conformance report](https://jmrplens.github.io/phonometry/reference/conformance/).
 
 ---
 
@@ -37535,9 +37786,25 @@ documents, one page per module.
 | `SoundStrengthResult` | `dataclass` | **Per-band sound strength.**<br>• `frequency` [Hz] or None<br>• `strength`: G [dB]<br>• `exposure_level`: L_pE [dB]<br>• `reference_level`: L_pE,10 [dB]<br>• `.plot()`: G against the Table A.1 typical range | `res.strength, res.exposure_level`<br><br>• `strength == exposure_level - reference_level` |
 | `sound_pressure_exposure_level` | `function` | **L_pE of an impulse response (ISO 3382-1 Eq. (A.2)).**<br>• `ir`: Impulse response (1D)<br>• `fs`: Sample rate [Hz]<br>• `limits`: (f_min, f_max) or None (Default: (125, 4000))<br>• `fraction`: 1 or 3 (Default: 1) | `lpe = room.sound_pressure_exposure_level(ir, fs)`<br><br>• [dB] re 20 uPa, one per band |
 | `free_field_reference_level` | `function` | **Refer a free-field level to 10 m (ISO 3382-1 Eqs. (A.4)/(A.8)).**<br>• `level`: measured level [dB]<br>• `distance`: of that measurement [m], printed for >= 3 m | `room.free_field_reference_level(75.03, 5.0)`<br><br>• `69.0094` dB |
-| `reverberation_room_reference_level` | `function` | **Free-field reference from a diffuse-field reading (ISO 3382-1 Eq. (A.5)).**<br>• `exposure_level`: spatial-average L_pE in the room [dB]<br>• `absorption_area`: A [m2] | `room.reverberation_room_reference_level(80.0, 10.0)`<br><br>• `53.0` dB |
+| `reverberation_room_reference_level` | `function` | **Free-field reference from a diffuse-field reading (ISO 3382-1 Eq. (A.5)).**<br>• `reverberation_room_level`: spatial-average L_pE in that room [dB]<br>• `absorption_area`: A [m2] | `room.reverberation_room_reference_level(80.0, 10.0)`<br><br>• `53.0` dB |
 | `sound_strength_from_power` | `function` | **G from the source's power level (ISO 3382-1 Eq. (A.9)).**<br>• `pressure_level`: L_p in the room [dB]<br>• `power_level`: L_W of the source [dB] | `room.sound_strength_from_power(80.0, 100.0)`<br><br>• `11.0` dB |
 | `directivity_energy_average` | `function` | **Energy mean over bearings round the source (ISO 3382-1, note to Eq. (A.4)).**<br>• `levels`: one per bearing [dB], evenly spaced over a full turn, at least 29 | `room.directivity_energy_average(levels)`<br><br>• [dB]; raises below 29 bearings |
+| `early_lateral_energy_fraction` | `function` | **Early lateral energy fraction (ISO 3382-1 Eqs. (A.14)/(A.15)).**<br>• `ir`: omnidirectional response at the point (1D), which also sets t = 0<br>• `lateral_ir`: figure-of-eight response at the same point (1D)<br>• `fs`: Sample rate [Hz]<br>• `weighting`: 'squared' (J_LF) or 'cosine' (J_LFC)<br>• `limits`: (f_min, f_max) or None (Default: (125, 4000))<br>• `fraction`: 1 or 3 (Default: 1) | `res = room.early_lateral_energy_fraction(omni, fig8, fs)`<br><br>• `LateralEnergyResult` per band |
+| `LateralEnergyResult` | `dataclass` | **Per-band lateral energy fraction.**<br>• `frequency` [Hz] or None<br>• `energy_fraction`: J_LF or J_LFC, dimensionless<br>• `weighting`: which of the two was computed<br>• `.plot()`: against the Table A.1 range | `res.energy_fraction, res.weighting` |
+| `LATERAL_WEIGHTINGS` | `constant` | **('squared', 'cosine')**, the two angular weightings Eqs. (A.14) and (A.15) print. | `room.LATERAL_WEIGHTINGS` |
+| `EARLY_LATERAL_WINDOW_S` | `constant` | **(0.005, 0.080) s**, the numerator window of Eqs. (A.14)/(A.15) from the direct sound. | `room.EARLY_LATERAL_WINDOW_S` |
+| `EARLY_ENERGY_LIMIT_S` | `constant` | **0.080 s**, the upper limit of their denominator. | `room.EARLY_ENERGY_LIMIT_S` |
+| `late_lateral_sound_level` | `function` | **Late lateral sound level (ISO 3382-1 Eq. (A.16)).**<br>• `ir`: omnidirectional response at the point (1D), for t = 0<br>• `lateral_ir`: figure-of-eight response at the same point (1D)<br>• `reference_ir`: same source at 10 m in a free field (1D)<br>• `fs`: Sample rate [Hz]<br>• `reference_level`: L_pE,10 [dB] instead of `reference_ir`<br>• `limits`, `fraction`: as above | `res = room.late_lateral_sound_level(omni, fig8, ref, fs)`<br><br>• `LateLateralResult` per band |
+| `LateLateralResult` | `dataclass` | **Per-band late lateral level.**<br>• `frequency` [Hz] or None<br>• `level`: L_J [dB]<br>• `reference_level`: L_pE,10 [dB]<br>• `.plot()`: against the Table A.1 range, with the Eq. (A.17) average | `res.level, res.reference_level` |
+| `late_lateral_average` | `function` | **Energy average of L_J over four octave bands (ISO 3382-1 Eq. (A.17)).**<br>• `levels`: the 125 Hz, 250 Hz, 500 Hz and 1 kHz values [dB], exactly four | `room.late_lateral_average([-8.0] * 4)`<br><br>• `-8.0` dB; four equal values are unchanged |
+| `LATE_LATERAL_START_S` | `constant` | **0.080 s**, where the numerator of Eq. (A.16) starts. | `room.LATE_LATERAL_START_S` |
+| `LATE_LATERAL_AVERAGE_BANDS_HZ` | `constant` | **(125, 250, 500, 1000) Hz**, the four bands Eq. (A.17) averages. | `room.LATE_LATERAL_AVERAGE_BANDS_HZ` |
+| `interaural_cross_correlation` | `function` | **Interaural cross correlation (ISO 3382-1 Eqs. (B.1)/(B.2)).**<br>• `left`, `right`: ear-canal responses (1D, same length)<br>• `fs`: Sample rate [Hz]<br>• `window`: (t1, t2) [s] from the direct sound, t2 None for the end (Default: (0.0, None))<br>• `limits`, `fraction`: as above | `res = room.interaural_cross_correlation(left, right, fs)`<br><br>• `InterauralCorrelationResult` per band |
+| `InterauralCorrelationResult` | `dataclass` | **Per-band interaural correlation.**<br>• `frequency` [Hz] or None<br>• `coefficient`: IACC<br>• `delay`: lag of the maximum [s], positive when the right ear leads<br>• `lag` [s] and `correlation`: the function itself, one row per band<br>• `.plot()`: the function over the search window | `res.coefficient, res.delay` |
+| `IACC_SEARCH_S` | `constant` | **0.001 s**, the half-width of the Eq. (B.2) search window. | `room.IACC_SEARCH_S` |
+| `IACC_EARLY_WINDOW_S` | `constant` | **(0.0, 0.080) s**, the early window of B.4. | `room.IACC_EARLY_WINDOW_S` |
+| `IACC_LATE_START_S` | `constant` | **0.080 s**, where B.4's reverberant window starts. | `room.IACC_LATE_START_S` |
+| `IACC_JND` | `constant` | **0.075**, the just-noticeable difference B.4 assumes for IACC. | `room.IACC_JND` |
 | `AuditoriumWarning` | `class` | **A measurement outside the conditions ISO 3382-1 prints for it.**<br>• raised for a room response cut short of the 30 dB of A.2.1<br>• for a response of either kind that ends before its lowest band's filter has rung down<br>• and for a free-field distance under 3 m | `warnings.simplefilter('error', room.AuditoriumWarning)` |
 | `REFERENCE_DISTANCE_M` | `constant` | **10.0 m**, the free-field distance G is referenced to (ISO 3382-1 A.2.1). | `room.REFERENCE_DISTANCE_M` → `10.0` |
 | `MINIMUM_REFERENCE_DISTANCE_M` | `constant` | **3.0 m**, the shortest distance Eqs. (A.4)/(A.8) are printed for. | `room.MINIMUM_REFERENCE_DISTANCE_M` → `3.0` |
@@ -53016,7 +53283,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 792 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 797 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -53385,7 +53652,7 @@ sample from the metrology core:
 | IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()`; IEC 61252:2025 has since superseded this print, and the transcription still targets the 1993+A2 text | `tests/signals/test_levels.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-792 numerical conformance checks across 67 domains and 395 standards, covering
+797 numerical conformance checks across 67 domains and 395 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise

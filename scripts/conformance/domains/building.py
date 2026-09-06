@@ -200,6 +200,119 @@ def _chk_iso3382_1_directivity_energy_mean() -> Outcome:
     )
 
 
+def _lateral_pair(
+    angles_deg: list[float], amplitudes: list[float], times_s: list[float]
+) -> tuple[np.ndarray, np.ndarray]:
+    """An omnidirectional and a figure-of-eight response of known geometry.
+
+    The direct sound is a unit arrival the figure-of-eight microphone does
+    not see, because ISO 3382-1:2009 A.2.4 points its null at the source.
+    Each reflection reaches the omnidirectional microphone at its amplitude
+    and the figure-of-eight one at that amplitude times the cosine of its
+    angle of incidence, which is the law A.2.4 prints beside (A.14).
+    """
+    n = round(0.3 * _FS)
+    omni, lateral = np.zeros(n), np.zeros(n)
+    omni[100] = 1.0
+    for angle, amplitude, time in zip(angles_deg, amplitudes, times_s, strict=True):
+        index = 100 + round(time * _FS)
+        omni[index] += amplitude
+        lateral[index] += amplitude * math.cos(math.radians(angle))
+    return omni, lateral
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 Annex A (informative) Eq. (A.14)",
+    "Early lateral energy fraction of one reflection at 45 degrees",
+)
+def _chk_iso3382_1_lateral_fraction() -> Outcome:
+    # Early energy 1 + 0,25; the lateral share is that 0,25 times cos^2(45).
+    omni, lateral = _lateral_pair([45.0], [0.5], [0.020])
+    expected = 0.25 * math.cos(math.radians(45.0)) ** 2 / 1.25
+    res = ph.room.early_lateral_energy_fraction(omni, lateral, _FS, limits=None)
+    return numeric(expected, float(res.energy_fraction[0]), 1e-12, places=6)
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 Annex A (informative) Eq. (A.15)",
+    "Cosine-weighted lateral fraction of two mirror-image reflections",
+)
+def _chk_iso3382_1_lateral_fraction_cosine() -> Outcome:
+    # The modulus is printed in the numerator. Two reflections of equal
+    # amplitude at +45 and -45 degrees reach the figure-of-eight microphone
+    # with opposite sign, so without it the numerator is exactly zero; with
+    # it their contributions add.
+    omni, lateral = _lateral_pair([45.0, 135.0], [0.5, 0.5], [0.020, 0.030])
+    expected = 2.0 * 0.25 * math.cos(math.radians(45.0)) / 1.5
+    res = ph.room.early_lateral_energy_fraction(
+        omni, lateral, _FS, weighting="cosine", limits=None
+    )
+    return numeric(expected, float(res.energy_fraction[0]), 1e-12, places=6)
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 Annex A (informative) Eq. (A.16)",
+    "Late lateral sound level of one arrival past the early window",
+)
+def _chk_iso3382_1_late_lateral_level() -> Outcome:
+    # One lateral arrival of amplitude 0,25 at 120 ms against a unit
+    # free-field reference: the level is 20 lg 0,25 with nothing else in it.
+    omni, lateral = _lateral_pair([90.0], [0.5], [0.020])
+    omni = np.concatenate([omni, np.zeros(round(0.2 * _FS))])
+    lateral = np.concatenate([lateral, np.zeros(round(0.2 * _FS))])
+    lateral[100 + round(0.120 * _FS)] = 0.25
+    reference = np.zeros(round(0.2 * _FS))
+    reference[480] = 1.0
+    res = ph.room.late_lateral_sound_level(omni, lateral, reference, _FS, limits=None)
+    return numeric(
+        20.0 * math.log10(0.25), float(res.level[0]), 1e-9, unit="dB", places=6
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 Annex A (informative) Eq. (A.17)",
+    "Energy average of the four late lateral octave bands",
+)
+def _chk_iso3382_1_late_lateral_average() -> Outcome:
+    # 0, 0, 0 and 6,0206 dB are energies 1, 1, 1 and 4, so a quarter of
+    # their sum is 1,75 and the average is 10 lg 1,75. The arithmetic mean
+    # of the same four values is 1,5051 dB, which the check separates from.
+    levels = [0.0, 0.0, 0.0, 20.0 * math.log10(2.0)]
+    return numeric(
+        10.0 * math.log10(1.75),
+        ph.room.late_lateral_average(levels),
+        1e-12,
+        unit="dB",
+        places=6,
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 Annex B (informative) Eqs. (B.1)/(B.2)",
+    "Interaural correlation of two channels in anti-phase",
+)
+def _chk_iso3382_1_interaural_correlation() -> Outcome:
+    # The square root of (B.1) is what bounds the function by one, and the
+    # modulus of (B.2) is what makes two anti-phase ears give 1: the
+    # function itself reaches -1 and never +1.
+    t = np.arange(round(0.5 * _FS)) / _FS
+    rng = np.random.default_rng(3382)
+    x = rng.standard_normal(t.size) * np.exp(-3.0 * math.log(10.0) * t)
+    res = ph.room.interaural_cross_correlation(x, -x, _FS, limits=None)
+    return record(
+        {"IACC": 1.0, "min IACF": -1.0},
+        {
+            "IACC": round(float(res.coefficient[0]), 12),
+            "min IACF": round(float(np.min(res.correlation[0])), 12),
+        },
+    )
+
+
 @register(
     "Room & building acoustics",
     "ISO 18233:2006 (swept-sine method)",

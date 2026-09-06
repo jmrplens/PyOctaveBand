@@ -2984,3 +2984,171 @@ def generate_sound_strength_routes(output_dir: str) -> None:
     plt.tight_layout()
     save_figure(output_dir, "sound_strength_routes.svg")
     plt.close()
+
+
+def generate_lateral_energy_measures(output_dir: str) -> None:
+    """ISO 3382-1 A.2.4/A.2.5 and Annex B: what the second microphone is for."""
+    print("Generating lateral_energy_measures...")
+    from phonometry import room
+
+    _fig, axes = plt.subplots(1, 3, figsize=(15.0, 4.6))
+
+    # -- Left: the two angular weightings the annex prints, side by side.
+    #
+    # The figure-of-eight microphone has its null pointed at the source, so
+    # its output follows the cosine of the angle of incidence. Equation
+    # (A.14) squares the pressure and weights each reflection by cos^2;
+    # Equation (A.15) multiplies it by the omnidirectional response instead
+    # and weights it by the cosine itself.
+    ax = axes[0]
+    angle = np.linspace(-90.0, 90.0, 400)
+    cosine = np.abs(np.cos(np.deg2rad(angle)))
+    ax.plot(
+        angle,
+        cosine**2,
+        color=COLOR_PRIMARY,
+        lw=2.2,
+        label="$J_{LF}$: $\\cos^2\\theta$  (A.14)",
+    )
+    ax.plot(
+        angle,
+        cosine,
+        color=COLOR_SECONDARY,
+        ls="--",
+        lw=1.8,
+        label="$J_{LFC}$: $|\\cos\\theta|$  (A.15)",
+    )
+    ax.axvline(0.0, color=COLOR_MUTED, ls=":", lw=1.4)
+    ax.annotate(
+        "the null points at the source,\nso the direct sound weighs nothing",
+        xy=(0.0, 0.02),
+        xytext=(-86.0, 0.62),
+        textcoords="data",
+        fontsize=8.5,
+        color=COLOR_FG,
+        ha="left",
+        va="top",
+        arrowprops={"arrowstyle": "->", "color": COLOR_FG, "linewidth": 1.1},
+        bbox={
+            "boxstyle": "round,pad=0.3",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=6,
+    )
+    ax.set_xlim(-90.0, 90.0)
+    ax.set_ylim(0.0, 1.05)
+    ax.set_xticks([-90, -45, 0, 45, 90])
+    ax.set_xlabel("Angle of incidence from the null (degrees)")
+    ax.set_ylabel("Weight of one reflection")
+    ax.set_title("Two weightings for one reflection")
+    ax.grid(color=COLOR_GRID, ls="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right", fontsize=9)
+
+    # -- Middle: both fractions per band, for a synthetic hall.
+    #
+    # A 2,0 s decay whose lateral component is a fixed share of the total,
+    # so the two fractions differ only by the weighting above.
+    ax2 = axes[1]
+    fs = 48000
+    rng = np.random.default_rng(3382)
+    n = int(1.5 * fs)
+    t = np.arange(n) / fs
+    envelope = np.exp(-3.0 * np.log(10.0) * t / 2.0)
+    omni = rng.standard_normal(n) * envelope
+    omni[480] += 6.0
+    lateral = 0.45 * rng.standard_normal(n) * envelope
+    squared = room.early_lateral_energy_fraction(omni, lateral, fs)
+    cosine_weighted = room.early_lateral_energy_fraction(
+        omni, lateral, fs, weighting="cosine"
+    )
+    bands = np.arange(squared.energy_fraction.size)
+    ax2.axhspan(0.05, 0.35, color=theme_fill(COLOR_TERTIARY, ax2), zorder=0)
+    ax2.plot(
+        bands,
+        squared.energy_fraction,
+        "o-",
+        color=COLOR_PRIMARY,
+        lw=2.0,
+        label="$J_{LF}$",
+    )
+    ax2.plot(
+        bands,
+        cosine_weighted.energy_fraction,
+        "s--",
+        color=COLOR_SECONDARY,
+        lw=1.6,
+        label="$J_{LFC}$",
+    )
+    ax2.set_xticks(bands)
+    ax2.set_xticklabels(["125", "250", "500", "1k", "2k", "4k"][: bands.size])
+    ax2.set_ylim(0.0, 0.6)
+    ax2.set_xlabel(LABEL_FREQ_HZ)
+    ax2.set_ylabel("Early lateral energy fraction")
+    ax2.set_title("A hall with 2.0 s of decay")
+    ax2.grid(axis="y", color=COLOR_GRID, ls="--", alpha=0.5)
+    ax2.set_axisbelow(True)
+    ax2.annotate(
+        "the shaded band is the typical range of Table A.1,\n"
+        "0.05 to 0.35, and it is the range of the single number",
+        xy=(0.5, 0.03),
+        xycoords="axes fraction",
+        ha="center",
+        va="bottom",
+        fontsize=8.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.32",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=6,
+    )
+    ax2.legend(loc="upper right", fontsize=9)
+
+    # -- Right: the correlation function the coefficient is read off.
+    ax3 = axes[2]
+    # In the 500 Hz octave band, which is where B.4 says the coefficient is
+    # measured: a broadband correlation is a spike and says nothing.
+    band = (500.0, 700.0)
+    left = rng.standard_normal(n) * envelope
+    same = room.interaural_cross_correlation(left, left, fs, limits=band)
+    apart = room.interaural_cross_correlation(
+        left, rng.standard_normal(n) * envelope, fs, limits=band
+    )
+    for result, colour, label in (
+        (same, COLOR_PRIMARY, "one signal in both ears"),
+        (apart, COLOR_SECONDARY, "two independent ears"),
+    ):
+        ax3.plot(
+            result.lag * 1000.0,
+            result.correlation[0],
+            color=colour,
+            lw=2.0,
+            label=f"{label}: IACC = {float(result.coefficient[0]):.2f}",
+        )
+        ax3.plot(
+            [float(result.delay[0]) * 1000.0],
+            [
+                float(
+                    result.correlation[0][int(np.argmax(np.abs(result.correlation[0])))]
+                )
+            ],
+            "o",
+            color=colour,
+            markersize=7,
+            zorder=4,
+        )
+    ax3.set_xlim(-1.0, 1.0)
+    ax3.set_ylim(-1.05, 1.05)
+    ax3.set_xlabel("Interaural delay $\\tau$ (ms)")
+    ax3.set_ylabel("$\\mathrm{IACF}(\\tau)$")
+    ax3.set_title("The 500 Hz band over the $\\pm$1 ms search window")
+    ax3.grid(color=COLOR_GRID, ls="--", alpha=0.5)
+    ax3.set_axisbelow(True)
+    ax3.legend(loc="lower right", fontsize=9)
+
+    plt.tight_layout()
+    save_figure(output_dir, "lateral_energy_measures.svg")
+    plt.close()

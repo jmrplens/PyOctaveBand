@@ -87,6 +87,9 @@ speech intelligibility a room affords is quantified by the
 - [Sound strength G (ISO 3382-1)](sound-strength.md):
   how loud the hall is, against the same source at 10 m in a free field, and
   the three printed routes to that reference.
+- [Spatial impression (ISO 3382-1)](spatial-impression.md):
+  where the sound comes from, measured with a figure-of-eight microphone
+  beside the omnidirectional one and with a head that has two.
 - [Open-Plan Office Acoustics (ISO 3382-3)](open-plan-acoustics.md):
   the spatial decay rate of speech and the distraction and privacy distances.
 - [Image sources and the steady-state room field](room-image-sources.md):
