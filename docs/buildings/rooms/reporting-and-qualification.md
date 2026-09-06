@@ -185,9 +185,9 @@ print(room.MID_FREQUENCY_THIRD_OCTAVES_HZ)
 ```
 
 What a one-third-octave analysis must not do is average the two
-one-third-octave bands that happen to be called 500 Hz and 1 kHz. That is a
-sixth of the band the octave route covers, and it is neither of the printed
-routes. The
+one-third-octave bands that happen to be called 500 Hz and 1 kHz. That is
+two thirds of an octave against the two octaves either printed route covers,
+a third of the band, and it is neither of them. The
 [accredited fiche](room-acoustics.md) takes the
 six-band route when the analysis is in thirds and names it on the sheet.
 
