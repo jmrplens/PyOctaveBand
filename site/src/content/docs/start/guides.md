@@ -1,6 +1,6 @@
 ---
 title: "Guides"
-description: "The 115 guides of phonometry, grouped into the twelve topics the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
+description: "The 116 guides of phonometry, grouped into the twelve topics the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
 head:
   - tag: script
     attrs:
@@ -110,7 +110,7 @@ makes, then runnable code and the figure it draws. Nothing here is a survey of
 the field; each page is the working documentation of a module, written so that
 a result can be defended clause by clause rather than trusted.
 
-This page is the map. A hundred and fifteen guides sit in twelve topics, and each topic has its
+This page is the map. A hundred and sixteen guides sit in twelve topics, and each topic has its
 own overview page with the longer story of how its pieces fit together. If you
 are arriving without a specific question, read
 [Getting Started](/phonometry/start/getting-started/) first: it runs one signal
@@ -661,6 +661,11 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 and EBU R 128.
   correction of Annex A and the plane-wave relation of clause 8.
 - [Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/):
   the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
+- [Emission Sound Pressure at a Work Station](/phonometry/devices/emission/workstation-emission/):
+  the ISO 11200 group, which turns a reading at the operator's position into
+  what the machine alone puts there: the background correction with this
+  group's own thresholds, the piecewise local environmental correction and its
+  two routes, and the 4 dB boundary between grade 2 and grade 3.
 - [Sound power from surface vibration (ISO/TS 7849)](/phonometry/devices/emission/vibration-sound-power/):
   the surface-velocity route, for the machine that cannot be moved into a
   qualified room: the radiated power from the surface-averaged velocity level

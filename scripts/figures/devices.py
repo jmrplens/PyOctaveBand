@@ -6213,3 +6213,127 @@ def generate_vdi2081_flow_noise(output_dir: str) -> None:
     plt.tight_layout()
     save_figure(output_dir, "vdi2081_flow_noise.svg")
     plt.close()
+
+
+def generate_workstation_emission(output_dir: str) -> None:
+    """ISO 11200 group: where the correction comes from, and what it takes off."""
+    print("Generating workstation_emission...")
+    from phonometry import emission
+
+    _fig, axes = plt.subplots(1, 2, figsize=(11.4, 5.4))
+
+    # -- Left: K3 against the ratio it is a function of, with its three branches.
+    ax = axes[0]
+    z = np.logspace(np.log10(0.05), np.log10(3.0), 800)
+    k3 = np.asarray(emission.local_environmental_correction(z))
+    ax.semilogx(z, k3, color=COLOR_PRIMARY, lw=2.0, zorder=4)
+
+    # The 4 dB boundary: at or below it the determination is grade 2.
+    ax.axhline(
+        emission.GRADE_2_MAX_K3_DB,
+        color=COLOR_SECONDARY,
+        ls="--",
+        lw=1.4,
+        zorder=3,
+        label="grade 2 boundary: 4 dB",
+    )
+    z_grade2 = 10.0 ** (-emission.GRADE_2_MAX_K3_DB / 10.0)
+    ax.axvspan(z_grade2, 3.0, color=theme_fill(COLOR_TERTIARY, ax), zorder=0)
+    ax.axvspan(0.05, z_grade2, color=theme_fill(COLOR_SECONDARY, ax), zorder=0)
+
+    ax.set_xlim(0.05, 3.0)
+    ax.set_ylim(-0.4, 8.0)
+    ax.set_xlabel("Ratio $z$")
+    ax.set_ylabel("Local environmental correction $K_3$ (dB)")
+    ax.set_title("What the room adds, and where grade 2 ends")
+    ax.grid(True, which="both", color=COLOR_GRID, ls="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.annotate(
+        "capped at 7 dB, which is\n$-10\\,\\lg 0.2$ to a tenth of a decibel",
+        xy=(0.2, emission.MAX_K3_DB),
+        xytext=(0.30, 6.4),
+        textcoords="data",
+        fontsize=8.5,
+        color=COLOR_FG,
+        ha="left",
+        va="top",
+        arrowprops={"arrowstyle": "->", "color": COLOR_FG, "linewidth": 1.1},
+        bbox={
+            "boxstyle": "round,pad=0.3",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=6,
+    )
+    ax.legend(loc="lower left", fontsize=8.5)
+
+    # -- Right: the worked example, as the subtraction it is.
+    ax2 = axes[1]
+    surface = 2.0 * np.pi * 1.6**2
+    absorption = 0.16 * (11.0 * 8.0 * 4.0) / 1.2
+    correction = float(
+        emission.local_environmental_correction(
+            emission.environmental_ratio_from_absorption(absorption, surface)
+        )
+    )
+    readings = np.array([77.5, 76.0, 77.2, 77.7, 75.9])
+    measured = float(10.0 * np.log10(np.mean(np.power(10.0, readings / 10.0))))
+    level = float(
+        emission.emission_sound_pressure_level(measured, local_correction_db=correction)
+    )
+
+    bars = ax2.bar(
+        [0, 1, 2],
+        [measured, correction, level],
+        bottom=[0.0, level, 0.0],
+        color=[COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TERTIARY],
+        edgecolor=COLOR_FG,
+        width=0.55,
+        zorder=3,
+    )
+    for bar, value, sign in zip(
+        bars, (measured, correction, level), ("", "−", ""), strict=True
+    ):
+        ax2.annotate(
+            f"{sign}{value:.1f}",
+            xy=(bar.get_x() + bar.get_width() / 2.0, bar.get_y() + bar.get_height()),
+            xytext=(0, 4),
+            textcoords="offset points",
+            ha="center",
+            va="bottom",
+            fontsize=10,
+            color=COLOR_FG,
+            zorder=5,
+        )
+    ax2.set_xticks([0, 1, 2])
+    ax2.set_xticklabels(
+        [
+            "measured\n$L'_{pA}$",
+            "room\n$K_{3A}$",
+            "emission\n$L_{pA}$",
+        ]
+    )
+    ax2.set_ylim(0.0, 88.0)
+    ax2.set_ylabel("A-weighted sound pressure level (dB)")
+    ax2.set_title("A work station 1.6 m from the source")
+    ax2.grid(axis="y", color=COLOR_GRID, ls="--", alpha=0.5)
+    ax2.set_axisbelow(True)
+    ax2.annotate(
+        "the room is 11 m $\\times$ 8 m $\\times$ 4 m\nwith a 1.2 s reverberation time",
+        xy=(0.5, 0.06),
+        xycoords="axes fraction",
+        ha="center",
+        va="bottom",
+        fontsize=8.5,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.32",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+        zorder=6,
+    )
+
+    plt.tight_layout()
+    save_figure(output_dir, "workstation_emission.svg")
+    plt.close()

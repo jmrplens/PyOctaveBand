@@ -260,6 +260,7 @@ export const apiSections = {
       'reference/api/power/intensity',
       'reference/api/power/intensity-compliance',
       'reference/api/power/vibration-sound-power',
+      'reference/api/power/workstation',
       'reference/api/power/declaration',
     ],
   },

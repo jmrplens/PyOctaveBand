@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 779 numerical conformance checks against 392 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 785 numerical conformance checks against 394 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 779 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 66 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 785 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 67 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -275,6 +275,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Sound Power in Situ by Comparison (ISO 3747)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-in-situ/)
 - [Sound Power in a Duct (ISO 5136)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-in-duct/)
 - [Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/)
+- [Emission Sound Pressure at a Work Station (ISO 11200 group)](https://jmrplens.github.io/phonometry/devices/emission/workstation-emission/)
 
 ### Sound intensity and sound power from it
 
@@ -503,6 +504,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [power/sound-power-intensity-points](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-intensity-points/)
 - [power/sound-power-reverberation](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-reverberation/)
 - [power/vibration-sound-power](https://jmrplens.github.io/phonometry/reference/api/power/vibration-sound-power/)
+- [power/workstation](https://jmrplens.github.io/phonometry/reference/api/power/workstation/)
 - [psychoacoustics/annoyance](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/annoyance/)
 - [psychoacoustics/contours](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/contours/)
 - [psychoacoustics/ecma](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/ecma/)
@@ -15451,6 +15453,14 @@ through openings, intakes and outlets — and it is the natural bridge to the
 structure-borne pages, since the same surface velocity is what
 [Vibration and structure-borne sound](https://jmrplens.github.io/phonometry/vibration/) measures.
 
+The sound power level is not, however, what the person operating the machine
+is exposed to. That is the **emission sound pressure level** at the work
+station, the number the ISO 4871 declaration prints beside the power level and
+the Machinery Directive asks for above 70 dB(A).
+[Emission Sound Pressure at a Work Station](https://jmrplens.github.io/phonometry/devices/emission/workstation-emission/)
+covers the ISO 11200 group that determines it: the same reading less a
+background correction and a correction for the reflections the room sent back.
+
 Behind the intensity-based routes sits **sound intensity** itself: the signed
 power flux that can localise sources and separate them from background noise,
 measured with a two-microphone probe per IEC 61043 and qualified by the
@@ -15494,6 +15504,10 @@ judged against.
   value.
 - [Sound Power by Intensity Scanning](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/):
   the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
+- [Emission Sound Pressure at a Work Station](https://jmrplens.github.io/phonometry/devices/emission/workstation-emission/):
+  the ISO 11200 group, which turns a reading at the operator's position into
+  what the machine alone puts there, with the background and local
+  environmental corrections and the grade each earns.
 
 ## What this section does not cover
 
@@ -19402,6 +19416,166 @@ $L_W = 10\log_{10}(P/P_0)$, and the fixed impedance term.
 ---
 
 
+<!-- source: docs/devices/emission/workstation-emission.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/workstation-emission/ -->
+Source: https://jmrplens.github.io/phonometry/devices/emission/workstation-emission/
+
+# Emission Sound Pressure at a Work Station (ISO 11200 group)
+
+The sound power level says how much noise a machine makes. It is the right
+number for comparing machines and for feeding a room prediction, and it is the
+wrong number for the person standing at the machine. What that person is
+exposed to is the **emission sound pressure level**: the level at the work
+station, with the background noise taken out and the room's reflections taken
+out, so that what is left belongs to the machine. It is the number a datasheet
+prints, and the [ISO 4871 declaration](https://jmrplens.github.io/phonometry/devices/emission/sound-power/) carries it beside
+$L_{W\mathrm{A}}$.
+
+Five standards determine it, and they differ in exactly one thing: how they get
+rid of the room. ISO 11201 qualifies the environment until there is no room to
+get rid of; ISO 11202 corrects for it approximately, by two routes; ISO 11204
+corrects for it accurately; ISO 11203 derives the level from the sound power
+level, so nothing is measured at the work station itself; ISO 11205 uses intensity and is not
+implemented here.
+
+## 1. One law, printed three times
+
+$$
+L_p = L'_p - K_1 - K_3
+$$
+
+$L'_p$ is what the meter read, $K_1$ removes the background noise and $K_3$
+removes the reflections the room sent back. It is Equation (7) of ISO 11201,
+(10) of ISO 11202 and (9) of ISO 11204. ISO 11201 prints it without the $K_3$
+term, not because the term is absent but because its environment is qualified
+so that the term is negligible.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/workstation_emission_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/workstation_emission.svg" alt="Two panels. On the left, the local environmental correction K3 against the dimensionless ratio z on a logarithmic axis from 0.05 to 3: a curve flat at 7 decibels up to z = 0.2, then falling as minus ten times the logarithm of z until it reaches zero at z = 1 and stays there. A dashed horizontal line marks the 4 decibel boundary between accuracy grade 2 and grade 3, with the region left of it shaded pink and the region right of it shaded green, and an annotation points at the corner to say the 7 decibel cap is minus ten times the logarithm of 0.2 to a tenth of a decibel. On the right, three bars for the worked example of a work station 1.6 metres from the source: a measured level of 76.9 decibels, a room correction of minus 3.7 floating between the other two, and the emission level of 73.2 that is left." width="100%"></picture>
+
+A peak level takes **no correction at all**: ISO 11202 clause 8 and ISO 11204
+clause 7 both say so, because both corrections are derived from mean-square
+pressures and neither has a meaning for a single largest excursion.
+
+## 2. The background, and where a determination stops being one
+
+$$
+K_1 = -10 \lg \left( 1 - 10^{-0.1 \Delta L} \right), \qquad
+\Delta L = L'_p - L_p(\mathrm{B})
+$$
+
+Past 15 dB of margin the background is negligible and $K_1$ is zero. Below 6 dB
+(grade 2) or 3 dB (grade 3) the correction is held at its value there and the
+level becomes an upper bound; the second return value says so.
+
+```python
+from phonometry import emission
+
+k1, upper_bound = emission.background_noise_correction_at_workstation(79.0, 70.0)
+print(round(k1, 1), upper_bound)          # 0.6 False
+```
+
+## 3. The room, and the one ratio it comes down to
+
+$$
+K_3 = \begin{cases}
+  7\ \mathrm{dB}, & z \le 0.2 \\
+  -10 \lg z\ \mathrm{dB}, & 0.2 < z \le 1 \\
+  0\ \mathrm{dB}, & z > 1
+\end{cases}
+$$
+
+The 7 dB cap is the curve's own value rounded, not a separate rule:
+$-10 \lg 0.2$ is 6.99 dB. With no directivity the correction follows the room's
+own $K_2$ exactly, but only as far as that cap: a room with $K_2 = 10$ dB still
+gets $K_3 = 7$ dB. Two roads reach $z$ and they are the same road, which
+ISO 11204 A.1.2 states and the algebra confirms under the ISO 3744 definition
+of $K_2$:
+
+```python
+import math
+from phonometry import emission
+
+absorption, surface = 47.0, 16.0
+k2 = 10.0 * math.log10(1.0 + 4.0 * surface / absorption)
+
+by_k2 = emission.environmental_ratio_from_k2(k2)
+by_area = emission.environmental_ratio_from_absorption(absorption, surface)
+print(round(by_k2, 9) == round(by_area, 9))     # True
+```
+
+## 4. The worked example, end to end
+
+ISO 11200:2014 Annex B Table B.2: a machine with a clearly identifiable
+dominating source in an 11 m by 8 m by 4 m assembly workshop of 1.2 s
+reverberation time, the work station 1.6 m from that source.
+
+```python
+import math
+
+import numpy as np
+from phonometry import emission
+
+surface = 2.0 * math.pi * 1.6**2
+absorption = 0.16 * (11.0 * 8.0 * 4.0) / 1.2
+k3 = emission.local_environmental_correction(
+    emission.environmental_ratio_from_absorption(absorption, surface)
+)
+
+readings = np.array([77.5, 76.0, 77.2, 77.7, 75.9])
+measured = 10.0 * np.log10(np.mean(np.power(10.0, readings / 10.0)))
+level = emission.emission_sound_pressure_level(measured, local_correction_db=k3)
+sigma = emission.total_standard_deviation(1.5, 1.0)
+
+print(round(k3, 1), round(float(measured), 1), round(float(level), 1))
+print(round(sigma, 1), round(emission.emission_expanded_uncertainty(sigma), 1))
+print(emission.grade_from_local_correction(k3))
+# 3.7 76.9 73.2
+# 1.8 2.9
+# engineering
+```
+
+Every one of those numbers is printed in Table B.2. Three gates decide the
+grade and the worst wins: a class 2 meter makes it grade 3 whatever else is
+true, the background must clear 6 dB, and $K_3$ must not exceed 4 dB.
+
+## 5. A cycle of operating periods
+
+$$
+L_p = 10 \lg \left[ \frac{1}{T} \sum_{i=1}^{N} T_i\, 10^{0.1 L_{p,T_i}} \right]
+$$
+
+```python
+from phonometry import emission
+
+print(round(emission.subinterval_level([80.0, 90.0], [10.0, 1.0]), 1))    # 82.6
+```
+
+Ten seconds at 80 dB carry the same energy as one second at 90, so the cycle
+lands at 82.6 dB; counting the two states equally would give 87.4.
+
+## 6. Where the standard argues with itself
+
+The two case studies of Annex B compute the same standard deviation two
+different ways. Equation (C.1) is the sample standard deviation with
+$1/(N-1)$; Table B.3 agrees and Table B.1 divides by $N$. With the figure the
+equation gives, Table B.1's own expanded uncertainty would be 2.5 dB rather
+than the 2.4 dB it prints. The library follows the equation, and
+[the errata register](https://jmrplens.github.io/phonometry/reference/errata/) records the rest.
+
+## Standards
+
+ISO 11200:2014, *Guidelines for the use of basic standards for the
+determination of emission sound pressure levels at a work station and at other
+specified positions*: the selection guide, and the four worked case studies of
+Annex B.
+
+ISO 11201:2010, the free-field method; ISO 11202:2010, the approximate
+environmental corrections of methods A.1 and A.2; ISO 11203:1995, the level
+derived from the sound power level; ISO 11204:2010, the accurate environmental
+corrections.
+
+---
+
+
 <!-- source: docs/devices/index.md | canonical: https://jmrplens.github.io/phonometry/devices/ -->
 Source: https://jmrplens.github.io/phonometry/devices/
 
@@ -22287,7 +22461,7 @@ percentile levels (Annex I) and rejects inverted percentile orderings.
 
 **Measurement uncertainty (Clause 4, Annex F).** `combined_standard_uncertainty()`
 forms $u = \sqrt{\sum (c_j u_j)^2}$ (Formula (2)) and
-`expanded_uncertainty()` applies $k = 2$ (95 %) or $k = 1.3$ (80 %);
+`environmental_expanded_uncertainty()` applies $k = 2$ (95 %) or $k = 1.3$ (80 %);
 `residual_correction_uncertainty()` carries the residual-correction sensitivity
 (Formulae (F.7)/(F.8)) and `uncertainty_from_repeated_measurements()` the
 repeated-measurement standard uncertainty: the primary energy-domain route
@@ -22309,7 +22483,7 @@ corr.corrected_level, corr.reliable
 
 # Combine an uncertainty budget and expand to 95 %:
 u = environment.combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])  # 2.18 dB (G.2)
-environment.expanded_uncertainty(u)                            # 4.36 dB (k = 2)
+environment.environmental_expanded_uncertainty(u)                            # 4.36 dB (k = 2)
 ```
 
 ## Quick answers
@@ -36951,7 +37125,7 @@ documents, one page per module.
 | `residual_sound_correction` | `function` | **Residual-noise correction L = 10 lg(10^(L'/10)−10^(Lres/10)) (Formula 16).**<br>• `measured_level` L', `residual_level` Lres [dB] | `res = environment.residual_sound_correction(58.0, 50.0)`<br><br>• `ResidualCorrectionResult` (`.corrected_level`, `.reportable_upper_bound`, `.reliable`) |
 | `gaussian_residual_level` | `function` | **Residual Leq from percentiles (ISO 1996-2 Annex I).**<br>• `l50` [dB]; exactly one of `l90` / `l95` (must not exceed `l50`) | `gaussian_residual_level(50.0, l90=40.0)` |
 | `combined_standard_uncertainty` | `function` | **u = √(Σ(cj·uj)²) (ISO 1996-2 Formula 2).**<br>• `contributions`: cj·uj products or (uj, cj) pairs | `u = environment.combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])  # 2.18` |
-| `expanded_uncertainty` | `function` | **U = k·u (ISO 1996-2 §4).**<br>• `standard_uncertainty` [dB], `confidence` 0.95 (k=2) / 0.80 (k=1.3) | `environment.expanded_uncertainty(2.18)  # 4.36` |
+| `environmental_expanded_uncertainty` | `function` | **U = k·u (ISO 1996-2 §4).**<br>• `standard_uncertainty` [dB], `confidence` 0.95 (k=2) / 0.80 (k=1.3) | `environment.environmental_expanded_uncertainty(2.18)  # 4.36` |
 | `residual_correction_uncertainty` | `function` | **Uncertainty of the residual-corrected level (Formulae F.7-F.9).**<br>• `measured_level`, `residual_level`, `measured_uncertainty`, `residual_uncertainty` [dB] | `residual_correction_uncertainty(58, 50, 0.5, 2.0)` |
 | `uncertainty_from_repeated_measurements` | `function` | **Energy mean & uncertainty from repeats: primary Formulae (17)+(19) route, Formula (20) approximation alongside.**<br>• `levels` [dB] (≥ 2); warns when they spread > 3 dB | `res = environment.uncertainty_from_repeated_measurements(levels)`<br><br>• `RepeatedMeasurementResult` |
 | `TonalAssessmentResult` | `dataclass` | **Tonal assessment (ISO 1996-2).**<br>• `audibility` ΔLta, `adjustment` Kt [dB]<br>• `centre_frequency`, `critical_bandwidth`; `.plot()` | `res.audibility, res.adjustment` |
@@ -37234,6 +37408,20 @@ documents, one page per module.
 | `sound_power_pressure` | `function` | **Sound power from surface pressure (ISO 3744/3746).**<br>• `levels_positions`: (NM, NB) SPL [dB]<br>• `surface`: 'hemisphere' / 'box'<br>• `radius` [m] or `dimensions`+`distance` [m]<br>• `reflecting_planes`: 1/2/3 (Default: 1)<br>• `background_levels`: for K1<br>• `frequencies` [Hz]: for LWA<br>• `room`: `RoomEnvironment` for K2 (Default: None → free field)<br>• `grade`: 'engineering' (Default) / 'survey'<br>• `omc_uncertainty` [dB] (Default: 0) | `res = emission.sound_power_pressure(levels, 'hemisphere', radius=1.5, frequencies=f)`<br><br>• `SoundPowerResult` |
 | `measurement_positions` | `function` | **Hemisphere mic coordinates (ISO 3744 Annex B).**<br>• `surface`: 'hemisphere'<br>• `radius` [m]<br>• `reflecting_planes`: 1/2/3<br>• `tones`: Table B.1 vs B.2 (Default: True)<br>• `grade`: 'engineering'/'survey' | `xyz = emission.measurement_positions('hemisphere', radius=1.5)`<br><br>• (N, 3) coordinates [m] |
 | `plot_microphone_positions` | `function` | **3-D microphone array on its measurement surface.**<br>• `positions`: (N, 3) [m] from `measurement_positions`/`precision_positions`<br>• `radius` [m] (Default: largest norm)<br>• `language` | `plot_microphone_positions(emission.measurement_positions('hemisphere', radius=2.0), radius=2.0)`<br><br>• Numbered points + hemisphere/sphere wireframe + reflecting plane |
+| `emission_sound_pressure_level` | `function` | **L_p at a work station: the reading less both corrections (ISO 11201 Eq. 7, ISO 11202 Eq. 10, ISO 11204 Eq. 9).**<br>• `measured_level_db` [dB]<br>• `background_correction_db` K1 [dB], `local_correction_db` K3 [dB]<br>Never for a peak level: neither correction is permitted on one | `emission.emission_sound_pressure_level(76.9, local_correction_db=3.7)  # 73.2` |
+| `background_noise_correction_at_workstation` | `function` | **K1 with the ISO 11200 group's own thresholds.**<br>• `measured_level_db`, `background_level_db` [dB]<br>• `grade`: 'engineering' (6 dB floor) / 'survey' (3 dB)<br>Past 15 dB of margin K1 is zero; below the floor it is held there and the level becomes an upper bound | `k1, held = emission.background_noise_correction_at_workstation(79.0, 70.0)` |
+| `local_environmental_correction` | `function` | **K3, the piecewise correction of ISO 11202 Eq. (A.5) and ISO 11204 Eqs. (A.2)/(A.5).**<br>• `ratio`: the dimensionless z<br>7 dB for z ≤ 0,2, −10 lg z up to 1, then 0; continuous where the cap takes over | `emission.local_environmental_correction(0.5)  # 3.01` |
+| `environmental_ratio_from_k2` | `function` | **z from the environmental correction of the test room (ISO 11202 Eq. A.4, ISO 11204 Eq. A.3).**<br>• `environmental_correction_db` K2 [dB]<br>• `directivity_index_db` [dB] (Default: 0)<br>With no directivity K3 comes out equal to K2 | `emission.environmental_ratio_from_k2(3.73)` |
+| `environmental_ratio_from_absorption` | `function` | **The same z from the equivalent absorption area (ISO 11204 Eq. A.6).**<br>• `absorption_area_m2` A, `measurement_surface_m2` S_M<br>• `directivity_index_db` [dB] (Default: 0)<br>Identically equal to the K2 route under the ISO 3744 definition of K2 | `emission.environmental_ratio_from_absorption(47.0, 16.0)` |
+| `grade_from_local_correction` | `function` | **The accuracy grade K3 earns (ISO 11202 A.1.3).**<br>• `local_correction_db` [dB]; the worst band decides<br>4 dB or less is grade 2, more is grade 3 | `emission.grade_from_local_correction(3.7)  # 'engineering'` |
+| `operating_standard_deviation` | `function` | **sigma_omc of repeated readings, Equation (C.1).**<br>• `levels_db`: at least two readings [dB]<br>Sample standard deviation, 1/(N−1), as printed; see `docs/ERRATA.md` on the two Annex B tables | `emission.operating_standard_deviation([79.0, 80.2, 82.9])  # 2.0` |
+| `total_standard_deviation` | `function` | **sigma_tot = sqrt(sigma_R0² + sigma_omc²).**<br>• `reproducibility_db` of the method, `operating_db` of the machine [dB] | `emission.total_standard_deviation(1.5, 1.0)  # 1.80` |
+| `emission_expanded_uncertainty` | `function` | **U = k·sigma_tot for the ISO 11200 group.**<br>• `total_standard_deviation_db` [dB]<br>• `coverage_factor` (Default: 1.6, what the worked examples print) | `emission.emission_expanded_uncertainty(1.8)  # 2.88` |
+| `subinterval_level` | `function` | **One level for a cycle of operating periods of different lengths.**<br>• `levels_db`, `durations_s`<br>Energy average weighted by duration, not by count | `emission.subinterval_level([80.0, 90.0], [10.0, 1.0])` |
+| `EmissionPressureResult` | `dataclass` | **An emission sound pressure level and the two corrections behind it.**<br>• `level_db`, `measured_level_db`, `background_correction_db`, `local_correction_db`<br>• `grade`, `upper_bound`, `standard`<br>• `.plot()`: the reading, both corrections and what is left, as a waterfall | `res.level_db, res.upper_bound` |
+| `NEGLIGIBLE_BACKGROUND_MARGIN_DB` / `MINIMUM_BACKGROUND_MARGIN_DB` | `constant` / `mapping` | **The two background thresholds of the group: 15 dB above which K1 is zero, and the 6 dB (grade 2) / 3 dB (grade 3) floor a determination may be claimed from.** | `emission.MINIMUM_BACKGROUND_MARGIN_DB['engineering']  # 6.0` |
+| `MAX_K3_DB` / `GRADE_2_MAX_K3_DB` | `constant` | **The 7 dB cap on K3, and the 4 dB above which the result is grade 3 rather than grade 2.** | `emission.GRADE_2_MAX_K3_DB  # 4.0` |
+| `DEFAULT_COVERAGE_FACTOR` | `constant` | **k = 1,6, the factor the ISO 11200 group's worked examples print.** | `emission.DEFAULT_COVERAGE_FACTOR  # 1.6` |
 | `background_noise_correction` | `function` | **Background correction K1 (ISO 3744 Eq. 16).**<br>• `source_levels` [dB]<br>• `background_levels` [dB]<br>• `grade`: 'engineering'/'survey' | `k1 = emission.background_noise_correction(src, bg)`<br><br>• K1 per band [dB] |
 | `environmental_correction` | `function` | **Environmental correction K2 (ISO 3744 Eq. A.2).**<br>• `surface_area` S [m²]<br>• `absorption_area` A, or `reverberation_time`+`volume`, or `mean_absorption_coefficient`+`room_surface` | `k2 = emission.environmental_correction(14.1, reverberation_time=0.6, volume=300)`<br><br>• K2 [dB] |
 | `SoundPowerResult` | `dataclass` | **Surface-pressure sound power.**<br>• `sound_power_level` [dB]<br>• `surface_pressure_level`, `mean_pressure_level` [dB]<br>• `background_correction`, `environmental_correction` [dB]<br>• `directivity_index` [dB] `(NM, NB)`<br>• `surface_area` [m²]<br>• `sound_power_level_a` [dB]<br>• `uncertainty` [dB]<br>• `grade`<br>• `declare(...)` → `NoiseEmissionDeclaration` | `res.sound_power_level, res.sound_power_level_a` |
@@ -52460,7 +52648,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 779 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 785 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -52829,7 +53017,7 @@ sample from the metrology core:
 | IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()`; IEC 61252:2025 has since superseded this print, and the transcription still targets the 1993+A2 text | `tests/signals/test_levels.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-779 numerical conformance checks across 66 domains and 392 standards, covering
+785 numerical conformance checks across 67 domains and 394 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise

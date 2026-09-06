@@ -38,6 +38,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The emission sound pressure level at a work station, which is the number a
+  machine is declared and bought by, and which nothing in the library computed.
+  `emission.declaration` has been able to *declare* `L_pA` since the ISO 4871
+  work; the producer of that value was missing.
+
+  Five standards determine it and differ only in how they get rid of the room,
+  so what they share is transcribed once in `emission.workstation`: the law
+  `L_p = L'_p - K_1 - K_3`, printed as Equation (7) in ISO 11201, (10) in
+  ISO 11202 and (9) in ISO 11204; the background correction with this group's
+  own thresholds, where 15 dB of margin makes it negligible and 6 dB (grade 2)
+  or 3 dB (grade 3) is as far down as a determination may be claimed; the
+  piecewise local environmental correction, identical in ISO 11202 Equation
+  (A.5) and ISO 11204 Equations (A.2) and (A.5); the two routes to the ratio it
+  is a function of; and the uncertainty pair `sigma_tot = sqrt(sigma_R0^2 +
+  sigma_omc^2)`, `U = k sigma_tot`.
+
+  The two routes to that ratio are one quantity, and the library says so rather
+  than carrying the expression twice: ISO 11204 A.1.2 states that the route
+  through `K_2` and the route through the absorption area rest on the same
+  assumptions, and under the ISO 3744 definition of `K_2` they are identically
+  equal. A conformance row holds them to it. The piecewise correction is
+  continuous where its 7 dB cap takes over, `-10 lg 0,2` being 6,9897 dB, so
+  the cap is the curve's own value rounded rather than a separate rule; that
+  0,0103 dB step is pinned exactly, because a real discontinuity there would be
+  a defect and a rounded assertion would not notice one appear.
+
+  Six conformance rows, against the worked examples of ISO 11200:2014 Annex B,
+  which print every intermediate: the 3,7 dB correction of a work station
+  1,6 m from a dominating source in an 11 by 8 by 4 metre workshop, the 73,2 dB
+  it leaves, the 2,9 dB expanded uncertainty, and the 0,6 dB background
+  correction of the second case. The emission domain is the sixty-seventh.
+
+- `docs/ERRATA.md` records that the two case studies of ISO 11200:2014 Annex B
+  compute the same standard deviation two different ways. Table B.1 and
+  Table B.3 carry a row labelled identically, and Equation (C.1) of ISO 11201,
+  11202 and 11204 prints the sample standard deviation, with `1/(N-1)`.
+  Table B.3 agrees with it; Table B.1 divides by `N`. It is not cosmetic: with
+  the value the equation gives, Table B.1's own expanded uncertainty would be
+  2,5 dB rather than the 2,4 dB it prints, so a reader reproducing the example
+  from the equations does not obtain the uncertainty the example publishes. The
+  library follows the equation and the tests pin both halves.
+
 - `noise_control.flow_noise_straight_duct_overall`, the two closed forms VDI
   2081 Section 5.2.1 prints for the flow noise of a straight run: Equation (16)
   for the unweighted overall sound power level and Equation (17) for the

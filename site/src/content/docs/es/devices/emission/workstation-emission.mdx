@@ -1,0 +1,272 @@
+---
+title: "Presión sonora de emisión en el puesto"
+description: "El grupo ISO 11200: el nivel de presión sonora de emisión que una máquina pone en el oído de quien la maneja, las correcciones de fondo y ambiental local que separan la máquina de la sala, el K3 a trozos y sus dos rutas, la frontera de 4 dB entre grado 2 y grado 3, y la incertidumbre que arrastra la declaración ISO 4871."
+references:
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2014
+    title: "Acoustics — Noise emitted by machinery and equipment — Guidelines for the use of basic standards for the determination of emission sound pressure levels at a work station and at other specified positions"
+    designation: "ISO 11200:2014"
+    url: "https://www.iso.org/standard/54573.html"
+    note: "La guía de selección de todo el grupo, y los cuatro casos resueltos del anexo B contra los que se comprueba cada número de esta página."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2010
+    title: "Acoustics — Noise emitted by machinery and equipment — Determination of emission sound pressure levels at a work station and at other specified positions in an essentially free field over a reflecting plane with negligible environmental corrections"
+    designation: "ISO 11201:2010"
+    url: "https://www.iso.org/standard/54576.html"
+    note: "El método en campo libre: la Ecuación (7), la corrección de fondo del 5.4.2 y la incertidumbre del capítulo 11."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2010
+    title: "Acoustics — Noise emitted by machinery and equipment — Determination of emission sound pressure levels at a work station and at other specified positions applying approximate environmental corrections"
+    designation: "ISO 11202:2010"
+    url: "https://www.iso.org/standard/54577.html"
+    note: "Los métodos A.1 y A.2: la Ecuación (10), el K3 del anexo A y la frontera de 4 dB del A.1.3."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2010
+    title: "Acoustics — Noise emitted by machinery and equipment — Determination of emission sound pressure levels at a work station and at other specified positions applying accurate environmental corrections"
+    designation: "ISO 11204:2010"
+    url: "https://www.iso.org/standard/54579.html"
+    note: "La ruta exacta: la Ecuación (9), el K3 a trozos de las Ecuaciones (A.2) y (A.5), y la segunda ruta al cociente en la Ecuación (A.6)."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 1995
+    title: "Acoustics — Noise emitted by machinery and equipment — Determination of emission sound pressure levels at a work station and at other specified positions from the sound power level"
+    designation: "ISO 11203:1995"
+    url: "https://www.iso.org/standard/1708.html"
+    note: "La ruta que no mide presión sonora en el puesto: L_p = L_W - Q, con Q la única expresión impresa que el documento lleva."
+---
+
+import Scope from '../../../../../components/Scope.astro';
+import ScopeClaim from '../../../../../components/ScopeClaim.astro';
+import SeeAlso from '../../../../../components/SeeAlso.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+El nivel de potencia acústica dice cuánto ruido hace una máquina. Es el número
+correcto para comparar máquinas y para alimentar una predicción de sala, y es
+el número equivocado para quien está de pie delante de ella. A lo que esa
+persona está expuesta es al **nivel de presión sonora de emisión**: el nivel en
+el puesto de trabajo, con el ruido de fondo quitado y las reflexiones de la
+sala quitadas, de modo que lo que queda pertenece a la máquina.
+
+Es el número que imprime una ficha técnica. La
+[declaración de emisión sonora](/phonometry/es/devices/emission/sound-power/)
+de ISO 4871 lleva $L_{p\mathrm{A}}$ junto a $L_{W\mathrm{A}}$, y la Directiva
+de Máquinas lo exige siempre que supere los 70 dB(A). Lo determinan cinco
+normas, y se diferencian en una sola cosa: en cómo se quitan la sala de encima.
+
+## 1. Una ley, impresa tres veces
+
+Cada parte que mide del grupo imprime la misma resta:
+
+$$
+L_p = L'_p - K_1 - K_3
+$$
+
+$L'_p$ es lo que leyó el sonómetro. $K_1$ quita el ruido de fondo, $K_3$ quita
+las reflexiones que devolvió la sala, y la diferencia es la máquina. ISO 11201
+la imprime sin el término $K_3$, no porque el término no exista sino porque su
+entorno está cualificado para que sea despreciable: un campo esencialmente
+libre sobre un plano reflectante no tiene nada que devolver.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/workstation_emission.svg"
+  alt="Dos paneles. A la izquierda, la corrección ambiental local K3 frente al cociente adimensional z en eje logarítmico de 0,05 a 3: una curva plana en 7 decibelios hasta z = 0,2, que después cae como menos diez veces el logaritmo de z hasta llegar a cero en z = 1 y quedarse ahí. Una línea horizontal discontinua marca la frontera de 4 decibelios entre el grado 2 y el grado 3, con la región a su izquierda sombreada en rosa y la de su derecha en verde, y una anotación señala el codo para decir que el tope de 7 decibelios es menos diez veces el logaritmo de 0,2 con una décima de decibelio. A la derecha, tres barras del ejemplo resuelto de un puesto de trabajo a 1,6 metros de la fuente: un nivel medido de 76,9 decibelios, una corrección de sala de menos 3,7 flotando entre las otras dos, y el nivel de emisión de 73,2 que queda."
+  width="100%"
+/>
+
+*La corrección de sala está topada en 7 dB y desaparece por encima de un
+cociente de uno; donde supera los 4 dB la determinación baja de grado 2 a
+grado 3.*
+
+Hay una regla absoluta y fácil de incumplir: **un nivel de pico no admite
+corrección alguna**. Lo dicen el capítulo 8 de ISO 11202 y el 7 de ISO 11204.
+$L_{p\mathrm{C,peak}}$ se informa exactamente como se midió, porque las dos
+correcciones se derivan de presiones cuadráticas medias y ninguna tiene sentido
+para una única excursión máxima.
+
+## 2. El fondo, y dónde una determinación deja de serlo
+
+La corrección de fondo es la misma forma cerrada que usa el lado de la
+potencia,
+
+$$
+K_1 = -10 \lg \left( 1 - 10^{-0{,}1 \Delta L} \right), \qquad
+\Delta L = L'_p - L_p(\mathrm{B})
+$$
+
+pero este grupo le pone sus propios umbrales. Pasados los 15 dB de margen el
+fondo es despreciable y $K_1$ se toma como cero. Por debajo de 6 dB (grado 2) o
+3 dB (grado 3) la corrección se *retiene* en el valor que tiene ahí, y el nivel
+deja de ser una determinación y pasa a ser una cota superior. La biblioteca
+devuelve ese hecho en vez de fallar, porque la lectura sigue mereciendo
+informarse; lo que no puede es salir sin etiquetar.
+
+```python
+from phonometry import emission
+
+k1, upper_bound = emission.background_noise_correction_at_workstation(79.0, 70.0)
+print(round(k1, 1), upper_bound)
+# 0.6 False
+```
+
+## 3. La sala, y el único cociente al que se reduce
+
+Tanto el método A.2 de ISO 11202 como ISO 11204 imprimen las mismas tres
+líneas, función de un único cociente adimensional $z$:
+
+$$
+K_3 = \begin{cases}
+  7\ \mathrm{dB}, & z \le 0{,}2 \\
+  -10 \lg z\ \mathrm{dB}, & 0{,}2 < z \le 1 \\
+  0\ \mathrm{dB}, & z > 1
+\end{cases}
+$$
+
+El tope de 7 dB no es una regla aparte atornillada a la curva: $-10 \lg 0{,}2$
+son 6,99 dB, así que el tope es el propio valor de la curva redondeado a la
+décima de decibelio con la que la norma imprime sus correcciones. La rama
+superior es un suelo por la misma razón por la que una corrección no puede ser
+negativa, ya que una sala solo puede añadir a lo que oye el micrófono.
+
+Dos caminos llegan a $z$, y son el mismo camino. La Ecuación (A.4) de
+ISO 11202 y la (A.3) de ISO 11204 pasan por la corrección ambiental $K_2$ de la
+sala de ensayo y por la directividad $D^*_{I,\mathrm{op}}$ que ve el puesto; la
+Ecuación (A.6) de ISO 11204 pasa directamente por el área de absorción
+equivalente. El apartado A.1.2 de ISO 11204 dice que las dos descansan sobre
+las mismas hipótesis, y bajo la definición $K_2 = 10 \lg (1 + 4 S_M / A)$ de
+ISO 3744 son idénticamente iguales:
+
+```python
+import math
+from phonometry import emission
+
+absorption, surface = 47.0, 16.0          # m^2, la sala y la superficie
+k2 = 10.0 * math.log10(1.0 + 4.0 * surface / absorption)
+
+by_k2 = emission.environmental_ratio_from_k2(k2)
+by_area = emission.environmental_ratio_from_absorption(absorption, surface)
+print(round(by_k2, 9) == round(by_area, 9))
+# True
+```
+
+Sin directividad apreciable la expresión colapsa a $z = 10^{-0{,}1 K_2}$, con
+lo que $K_3 = K_2$: un puesto que no ve la máquina con más fuerza que la
+superficie de medida necesita justo la corrección que necesitaba la superficie.
+Sólo hasta el tope, eso sí. En $K_2 = 7$ dB el cociente llega a 0,2 y la
+corrección deja de seguirlo: una sala con $K_2 = 10$ dB sigue recibiendo
+$K_3 = 7$ dB, porque el tope es sobre $K_3$ y no sobre la sala.
+
+## 4. Qué decide el grado
+
+Lo deciden tres puertas y gana la peor. Un sonómetro de clase 2 hace el
+resultado de grado 3 pase lo que pase con las demás. El fondo tiene que dejar
+6 dB para el grado 2 y 3 dB para el grado 3. Y la corrección ambiental local no
+puede pasar de 4 dB: el A.1.3 de ISO 11202 pone la frontera ahí directamente, y
+el método A.2 llega a los mismos 4 dB por su Condición (A.6), que es la misma
+desigualdad una vez sustituidas en ella la (A.4) y la (A.5).
+
+```python
+from phonometry import emission
+
+print(emission.grade_from_local_correction(3.7))
+print(emission.grade_from_local_correction(5.2))
+# engineering
+# survey
+```
+
+## 5. El ejemplo resuelto, de principio a fin
+
+El anexo B de ISO 11200:2014 imprime cuatro casos con todos los valores
+intermedios. Este es el segundo: una máquina con una fuente dominante
+claramente identificable en un taller de montaje de 11 m por 8 m por 4 m cuyo
+tiempo de reverberación es 1,2 s, con el puesto a 1,6 m de esa fuente.
+
+```python
+import math
+
+import numpy as np
+from phonometry import emission
+
+surface = 2.0 * math.pi * 1.6**2            # el hemisferio alrededor de la fuente
+absorption = 0.16 * (11.0 * 8.0 * 4.0) / 1.2
+
+ratio = emission.environmental_ratio_from_absorption(absorption, surface)
+k3 = emission.local_environmental_correction(ratio)
+
+readings = np.array([77.5, 76.0, 77.2, 77.7, 75.9])
+measured = 10.0 * np.log10(np.mean(np.power(10.0, readings / 10.0)))
+level = emission.emission_sound_pressure_level(measured, local_correction_db=k3)
+
+sigma = emission.total_standard_deviation(1.5, 1.0)
+print(round(k3, 1), round(float(measured), 1), round(float(level), 1))
+print(round(sigma, 1), round(emission.emission_expanded_uncertainty(sigma), 1))
+# 3.7 76.9 73.2
+# 1.8 2.9
+```
+
+Los cinco números están impresos en la tabla B.2, y seis filas de conformidad
+sujetan la biblioteca a ellos.
+
+## 6. Un ciclo de periodos de funcionamiento
+
+Una máquina que ralentiza, corta y vuelve pasa un tiempo distinto en cada
+estado, y el nivel del ciclo entero es la media energética ponderada por
+duración, no por número:
+
+$$
+L_p = 10 \lg \left[ \frac{1}{T} \sum_{i=1}^{N} T_i\, 10^{0{,}1 L_{p,T_i}} \right],
+\qquad T = \sum_i T_i
+$$
+
+```python
+from phonometry import emission
+
+print(round(emission.subinterval_level([80.0, 90.0], [10.0, 1.0]), 1))
+# 82.6
+```
+
+Diez segundos a 80 dB llevan la misma energía que uno a 90, así que el ciclo
+cae en 82,6 dB. Contar los dos estados por igual daría 87,4.
+
+## 7. Donde la norma discute consigo misma
+
+Los dos casos del anexo B calculan la misma desviación típica de dos maneras
+distintas. La Ecuación (C.1), impresa idéntica en ISO 11201, ISO 11202 e
+ISO 11204, es la desviación típica muestral con $1/(N-1)$; la tabla B.3 está de
+acuerdo con ella y la tabla B.1 divide entre $N$. No es cosmético, porque el
+valor se propaga: con la cifra que da la ecuación, la incertidumbre expandida
+de la propia tabla B.1 sería 2,5 dB en vez de los 2,4 dB que imprime. La
+biblioteca sigue la ecuación y
+[el registro de erratas](/phonometry/es/reference/errata/) cuenta el resto.
+
+<SeeAlso
+  links={[
+    { href: '/phonometry/es/devices/emission/sound-power/', label: 'Potencia acústica' },
+    { href: '/phonometry/es/devices/emission/sound-power-pressure/', label: 'Potencia acústica por métodos de presión' },
+    { href: '/phonometry/es/perception/hearing/occupational-exposure/', label: 'Exposición laboral al ruido' },
+  ]}
+/>
+
+## Qué cubre esta guía
+
+<Scope>
+<ScopeClaim status="covered" label="Cubierto">
+Las magnitudes que comparte el grupo ISO 11200: el nivel de presión sonora de
+emisión `L_p = L'_p - K_1 - K_3` de la Ecuación (7) de ISO 11201, la (10) de
+ISO 11202 y la (9) de ISO 11204; la corrección de fondo con los márgenes
+despreciable y mínimo propios de este grupo; la corrección ambiental local a
+trozos de la Ecuación (A.5) de ISO 11202 y las (A.2) y (A.5) de ISO 11204, con
+las dos rutas impresas al cociente del que es función; la frontera de grado en
+4 dB; la desviación típica total y la incertidumbre expandida; y la suma
+ponderada por duración de un ciclo de periodos de funcionamiento.
+</ScopeClaim>
+<ScopeClaim status="not-covered" label="Todavía no cubierto">
+Los procedimientos de medida de cada parte: las posiciones de micrófono y la
+cualificación del entorno de ISO 11201, el barrido de directividad del método
+A.2 de ISO 11202, la determinación exacta de `K_2` en ISO 11204, la medida de
+propagación `Q` de ISO 11203 y la ruta por intensidad de ISO 11205.
+</ScopeClaim>
+</Scope>

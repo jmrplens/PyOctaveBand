@@ -152,7 +152,7 @@ percentile levels (Annex I) and rejects inverted percentile orderings.
 
 **Measurement uncertainty (Clause 4, Annex F).** `combined_standard_uncertainty()`
 forms $u = \sqrt{\sum (c_j u_j)^2}$ (Formula (2)) and
-`expanded_uncertainty()` applies $k = 2$ (95 %) or $k = 1.3$ (80 %);
+`environmental_expanded_uncertainty()` applies $k = 2$ (95 %) or $k = 1.3$ (80 %);
 `residual_correction_uncertainty()` carries the residual-correction sensitivity
 (Formulae (F.7)/(F.8)) and `uncertainty_from_repeated_measurements()` the
 repeated-measurement standard uncertainty: the primary energy-domain route
@@ -174,7 +174,7 @@ corr.corrected_level, corr.reliable
 
 # Combine an uncertainty budget and expand to 95 %:
 u = environment.combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])  # 2.18 dB (G.2)
-environment.expanded_uncertainty(u)                            # 4.36 dB (k = 2)
+environment.environmental_expanded_uncertainty(u)                            # 4.36 dB (k = 2)
 ```
 
 ## Quick answers

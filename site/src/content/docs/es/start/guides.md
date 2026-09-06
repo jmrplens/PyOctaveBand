@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 115 guías de phonometry, agrupadas en los doce temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 116 guías de phonometry, agrupadas en los doce temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -111,7 +111,7 @@ hay ninguna panorámica del campo: cada página es la documentación de trabajo 
 un módulo, escrita para que un resultado se pueda defender apartado por
 apartado en lugar de darlo por bueno.
 
-Esta página es el mapa. Ciento quince guías repartidas en doce temas, y cada
+Esta página es el mapa. Ciento dieciséis guías repartidas en doce temas, y cada
 área tiene su propio índice con el relato largo de cómo encajan sus piezas. Si
 llegas sin una pregunta concreta, lee primero la
 [introducción](/phonometry/es/start/getting-started/): recorre una señal por toda la
@@ -695,6 +695,11 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 y EBU R 128.
   del apartado 8.
 - [Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/):
   el barrido in situ de ISO 9614-2 y el grado de precisión ISO 9614-3.
+- [Presión sonora de emisión en el puesto](/phonometry/es/devices/emission/workstation-emission/):
+  el grupo ISO 11200, que convierte una lectura en la posición del operario en
+  lo que pone ahí la máquina sola: la corrección de fondo con los umbrales
+  propios del grupo, la corrección ambiental local a trozos y sus dos rutas, y
+  la frontera de 4 dB entre el grado 2 y el grado 3.
 - [Potencia acústica a partir de la vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
   la vía de velocidad superficial, para la máquina que no se puede llevar a un
   recinto cualificado: la potencia radiada a partir del nivel de velocidad

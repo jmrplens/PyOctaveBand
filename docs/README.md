@@ -252,6 +252,7 @@ silencers.
 - [Sound power in situ by comparison](devices/emission/sound-power-in-situ.md): the ISO 3747 comparison against a reference sound source where the machine works, with the sound energy level of an impulsive source
 - [Sound power in a duct](devices/emission/sound-power-in-duct.md): the ISO 5136 in-duct method for fans, with the sampling-tube flow and modal correction $C_{3,4}$ of Annex A, the plane-wave relation and the Table 2 reproducibility
 - [Sound power by intensity scanning](devices/emission/sound-power-intensity.md): the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade
+- [Emission sound pressure at a work station](devices/emission/workstation-emission.md): the ISO 11200 group, which turns a reading at the operator's position into what the machine alone puts there, with the background and local environmental corrections and the grade each earns
 - [Sound power from surface vibration](devices/emission/vibration-sound-power.md): the ISO/TS 7849 estimation of a machine's radiated airborne sound power from its surface vibratory velocity and a radiation factor: the velocity level and calibration, the surface mean, and the Part 1 upper limit ($\varepsilon = 1$) versus the Part 2 engineering value
 
 **[Electroacoustics](devices/electroacoustics/index.md)**

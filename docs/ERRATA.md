@@ -4269,6 +4269,54 @@ in the same order.
 - **Library behaviour:** none; the library cites Section 7.2.3.2.
 - **Status:** unreported.
 
+## ISO 11200:2014, Annex B (the two case studies compute the same standard deviation two different ways)
+
+- **Location:** Annex B, Table B.1 on printed folio 27 (PDF page 33) and
+  Table B.3 on printed folio 30 (PDF page 36). Both tables carry a row labelled
+  identically, "Standard deviation of the three values measured, $\sigma_{omc}$".
+- **The print:** Table B.1 lists the three readings 94,5 dB; 94,3 dB; 93,8 dB
+  and gives $\sigma_{omc} = 0{,}3$ dB. Table B.3 lists 79,0 dB; 80,2 dB;
+  82,9 dB and gives $\sigma_{omc} = 2$ dB.
+- **The problem:** the two use different estimators. Equation (C.1), printed
+  identically in ISO 11201:2010, ISO 11202:2010 and ISO 11204:2010, is the
+  **sample** standard deviation,
+
+  $$
+  \sigma_\mathrm{omc} = \sqrt{\frac{1}{N-1}
+  \sum_{j=1}^{N} \left( L'_{p,j} - \overline{L'_p} \right)^2}
+  $$
+
+  With $1/(N-1)$ the first triple gives 0,3606 dB, which rounds to **0,4**, not
+  the 0,3 the table prints; the second gives 1,9975 dB, which rounds to the
+  **2,0** the table prints. With $1/N$ the first gives 0,2944 → **0,3**, the
+  printed value, and the second 1,6310 → 1,6, which is not printed. Table B.1
+  therefore divides by $N$ and Table B.3 by $N-1$, in the same annex, under the
+  same label, for the same quantity.
+- **Consequence:** it is not cosmetic, because the value propagates. Table B.1
+  goes on to print $\sigma_\mathrm{tot} = 1{,}5$ dB and $U = 2{,}4$ dB from
+  $\sigma_{R0} = 1{,}5$ dB. With the 0,4 dB that Equation (C.1) gives,
+  $\sigma_\mathrm{tot} = \sqrt{1{,}5^2 + 0{,}4^2} = 1{,}552 \to 1{,}6$ dB and
+  $U = 1{,}6 \times 1{,}552 = 2{,}48 \to 2{,}5$ dB, the coverage factor
+  applying to the unrounded total rather than to the decibel it is reported
+  as. A reader reproducing the example from the equations does not obtain the
+  uncertainty the example publishes.
+- **The likely mechanism:** three readings is the smallest sample the equation
+  admits, and it is exactly where the two divisors differ most: $\sqrt{3/2}$ is
+  a 22 % gap. A spreadsheet's population-standard-deviation function reaches
+  for $1/N$ by default, and at three points the slip is large enough to change
+  the rounded decibel.
+- **Evidence:** both tables read from the printed page, not from extracted
+  text. Verified on PDF pages 33 and 36 (printed pp. 27 and 30) of
+  ISO 11200:2014, against Equation (C.1) on PDF page 32 (printed p. 26) of
+  ISO 11201:2010.
+- **Library behaviour:**
+  [`operating_standard_deviation`](../src/phonometry/emission/workstation.py)
+  implements Equation (C.1) as printed, with $1/(N-1)$. It reproduces
+  Table B.3 and deliberately does not reproduce Table B.1's 0,3 dB;
+  `tests/emission/test_workstation.py` pins both halves so the choice cannot
+  drift.
+- **Status:** unreported.
+
 ## Related source properties that are not errata
 
 Recorded here to prevent future "fixes" that would break agreement with the

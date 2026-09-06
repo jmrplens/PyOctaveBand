@@ -48,6 +48,7 @@ if TYPE_CHECKING:
         ReverberationSoundPowerResult,
     )
     from ..emission.vibration_sound_power import VibrationSoundPowerResult
+    from ..emission.workstation import EmissionPressureResult
 
 #: Shared frequency-axis label of the spectral renderers.
 _FREQ_LABEL = "Frequency [Hz]"
@@ -110,6 +111,15 @@ _STRINGS: dict[str, str] = {
     "processor": "procesador",
     "complete instrument": "instrumento completo",
     "Frequency [Hz]": "Frecuencia [Hz]",
+    "Measured $L'_p$": "$L'_p$ medido",
+    "Background $K_1$": "Fondo $K_1$",
+    "Room $K_3$": "Sala $K_3$",
+    "Emission $L_p$": "$L_p$ de emisión",
+    "Sound pressure level [dB]": "Nivel de presión sonora [dB]",
+    "Emission sound pressure level at the work station ({std})": "Nivel de presión sonora de emisión en el puesto de trabajo ({std})",
+    "upper bound: the background is too close": "cota superior: el fondo está demasiado cerca",
+    "grade 2 (engineering)": "grado 2 (ingeniería)",
+    "grade 3 (survey)": "grado 3 (control)",
 }
 
 
@@ -117,6 +127,131 @@ def _t(text: str, language: str = "en", **fmt: Any) -> str:
     """Localise a fixed string; English is returned verbatim (byte-identical)."""
     s = _STRINGS.get(text, text) if language == "es" else text
     return s.format(**fmt) if fmt else s
+
+
+def plot_emission_pressure(
+    result: EmissionPressureResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """The reading, the two corrections taken off it, and what is left.
+
+    A waterfall, because that is the shape of the arithmetic: ISO 11201/11202/
+    11204 all print :math:`L_p = L'_p - K_1 - K_3`, and a reader wants to see
+    which of the two corrections did the work. The measured bar and the
+    emission bar stand on the axis; the two correction bars float between them,
+    each starting where the previous one ended.
+
+    A determination whose background margin fell below the grade's minimum is
+    hatched, since the level drawn is an upper bound and the figure has to say
+    so as plainly as the report does.
+
+    :param result: An
+        :class:`~phonometry.emission.workstation.EmissionPressureResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to :meth:`~matplotlib.axes.Axes.bar`.
+    :return: The axes.
+    :raises ValueError: If the result carries per-band arrays rather than the
+        single overall level this figure draws.
+    """
+    from matplotlib.patches import Patch
+
+    from .._i18n import format_number, localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    values = [
+        float(np.asarray(result.measured_level_db).reshape(-1)[0]),
+        float(np.asarray(result.background_correction_db).reshape(-1)[0]),
+        float(np.asarray(result.local_correction_db).reshape(-1)[0]),
+        float(np.asarray(result.level_db).reshape(-1)[0]),
+    ]
+    if np.asarray(result.level_db).size != 1:
+        msg = (
+            "plot_emission_pressure draws one determination; this result holds "
+            f"{np.asarray(result.level_db).size} bands. Pass a single level."
+        )
+        raise ValueError(msg)
+
+    measured, k1, k3, level = values
+    # The two corrections hang from where the previous step left off, so the
+    # bars read as one subtraction rather than as four unrelated numbers.
+    after_k1 = measured - k1
+    bottoms = [0.0, after_k1, level, 0.0]
+    heights = [measured, k1, k3, level]
+    colours = [_C_PRIMARY, _C_SECONDARY, _C_TERTIARY, _C_PRIMARY]
+    labels = [
+        _t("Measured $L'_p$", language),
+        _t("Background $K_1$", language),
+        _t("Room $K_3$", language),
+        _t("Emission $L_p$", language),
+    ]
+    # The three names this figure positions itself are refused rather than
+    # silently overridden, because a bar chart whose bottoms come from the
+    # caller is not this figure any more. Everything the caller may reasonably
+    # want, colour included, goes through setdefault so a kwarg wins.
+    fixed = {"x", "height", "bottom"} & set(kwargs)
+    if fixed:
+        msg = (
+            f"plot_emission_pressure positions its own bars; "
+            f"{', '.join(sorted(fixed))} cannot be overridden."
+        )
+        raise TypeError(msg)
+    kwargs.setdefault("width", 0.62)
+    kwargs.setdefault("color", colours)
+    kwargs.setdefault("edgecolor", _C_EDGE)
+    bars = ax.bar(range(len(heights)), heights, bottom=bottoms, **kwargs)
+    if result.upper_bound:
+        _hatch_invalid(bars, np.array([True, False, False, True]))
+
+    for index, (bar, value) in enumerate(zip(bars, heights, strict=True)):
+        # A correction is written with its sign, because the figure is about
+        # what came off; a level is written as the level it is.
+        shown = (
+            f"-{format_number(value, language, decimals=1)}"
+            if index in (1, 2)
+            else format_number(value, language, decimals=1)
+        )
+        ax.annotate(
+            shown,
+            xy=(bar.get_x() + bar.get_width() / 2.0, bar.get_y() + bar.get_height()),
+            xytext=(0, 4),
+            textcoords="offset points",
+            ha="center",
+            va="bottom",
+            fontsize=9,
+        )
+
+    ax.set_xticks(range(len(labels)))
+    ax.set_xticklabels(labels)
+    ax.set_ylabel(_t("Sound pressure level [dB]", language))
+    ax.set_title(
+        _t(
+            "Emission sound pressure level at the work station ({std})",
+            language,
+            std=result.standard,
+        )
+    )
+    grade = _t(
+        "grade 2 (engineering)"
+        if result.grade == "engineering"
+        else "grade 3 (survey)",
+        language,
+    )
+    handles: list[Any] = [Patch(facecolor=_C_MUTED, edgecolor=_C_EDGE, label=grade)]
+    if result.upper_bound:
+        handles.append(
+            Patch(
+                facecolor=_C_PRIMARY,
+                edgecolor=_C_EDGE,
+                hatch="///",
+                label=_t("upper bound: the background is too close", language),
+            )
+        )
+    ax.legend(handles=handles, loc="upper right", fontsize=8)
+    localize_axes(ax, language)
+    return ax
 
 
 def plot_sound_power(
