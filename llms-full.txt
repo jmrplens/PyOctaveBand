@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 818 numerical conformance checks against 396 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 820 numerical conformance checks against 396 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 818 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 68 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 820 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 68 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -21125,6 +21125,91 @@ a constant: NOTE 1 gives 0,93 for straight pattern globe valves, says some
 rotary valves may be as low as 0,7, and admits there are no data for the rest.
 `Expander` defaults to the 0,93 and to Table 4's own *expander* row, which is
 $A_\eta = -3{,}0$ and not the valve's figure.
+## 6. Trims designed to be quiet
+
+Everything above is Clause 5, which is a valve with ordinary trim. A valve
+bought to be quiet is not that, and Clause 6 says how it differs: **not by a
+different method**, but by what is fed into the same one.
+
+There are three families and each substitutes something.
+
+**A drilled cage** (6.2) makes many small jets instead of one large one, and
+Equation (26) replaces the pressure recovery factor of Equation (9) with a
+geometry, $[0{,}9 - 0{,}06\,(l/d)]$, where $l$ and $d$ are the length and
+diameter of one hole. A long hole recovers less than a short one, and NOTE 1
+caps the ratio at 4 because the bracket would otherwise reach zero at 15.
+
+```python
+from phonometry import noise_control
+
+# 6.2's own example: 48 rectangular passages, 10 mm by 2 mm.
+area = 0.010 * 0.002
+perimeter = 2.0 * 0.010 + 2.0 * 0.002
+print(round(4.0 * area / perimeter, 4))          # 0.0033  m, the hydraulic d
+print(round(noise_control.multiple_passage_jet_diameter(
+    90.0, 0.094, 0.020, 0.010), 5))              # 0.00362 m
+```
+
+**A multistage trim** (6.3) drops most of its pressure before the stage that
+makes the noise, so the method is run on that stage: the stagnation pressure
+$p_n$ at its inlet stands in for $p_1$, the density there for $\rho_1$, and
+the flow coefficient of the last stage for the valve's.
+
+$$
+C_n = N_{16} A_n, \qquad
+p_n = \sqrt{\left(\frac{p_1 C}{1{,}155 C_n}\right)^2 + p_2^2}, \qquad
+\rho_n = \rho_1 \frac{p_n}{p_1}
+$$
+
+Which equation gives $p_n$ is a **two-step reading** and not a formula. NOTE 3
+says that with $p_1/p_2 \ge 2$ you assume $p_n/p_2 < 2$, take Equation (28a),
+and fall through to (28b) if the answer turns out to be $2 p_2$ or more; below
+a valve ratio of two, (28c) applies directly. The result says which branch it
+took, because a report should not have to guess.
+
+```python
+from phonometry import noise_control
+
+conditions = noise_control.multistage_trim_conditions(
+    inlet_pressure=7.0e6, outlet_pressure=1.4e6, inlet_density=55.3,
+    flow_coefficient=81.5,
+    last_stage_coefficient=noise_control.last_stage_flow_coefficient(6.44e-3),
+)
+print(round(conditions.flow_coefficient))        # 315
+print(round(conditions.stagnation_pressure))     # 2102410  Pa
+print(round(conditions.stagnation_density, 1))   # 16.6     kg/m3
+print(conditions.equation)                       # 28a
+```
+
+Those three then go into `valve_aerodynamic_noise` in place of the valve's own
+inlet. That is Annex A's example 7, a 432-passage cage on a 70 bar vapour
+line, and it closes at the printed **89 dB(A)** with a jet 2,2 mm across and a
+peak at 14,4 kHz.
+
+**A multipath, multistage trim** (6.4) is both at once, and it is what example
+7 actually is. It adds nothing new to the substitution: Equations (32) and
+(33) restate the regime I Mach number and peak frequency with the last stage's
+recovery factor, which is what the substitution has already put there.
+
+For 6.3 there is one thing more. Clause 5 has been run on the last stage
+alone, so Equation (31) puts the others back:
+
+$$
+L_{pi} = L_{pi,n} + \frac{1}{(n-1)^{0{,}125}}\,10 \lg\frac{p_1}{p_n}
+$$
+
+```python
+from phonometry import noise_control
+
+print(round(noise_control.stage_level_correction(150.0, 3, 7.0e6, 2.1e6), 1))
+# 154.8  dB
+```
+
+The exponent is 0,125, so the number of stages barely enters: two stages and
+eight differ by a quarter of a term that is itself only a few decibels. What
+the correction really tracks is $p_1/p_n$, the pressure the earlier stages
+took out.
+
 
 ## See also
 
@@ -21144,12 +21229,14 @@ $A_\eta = -3{,}0$ and not the valve's figure.
 IEC 60534-8-3:2010, Clause 5, for a valve with standard trim: the pressure
 ratios of 5.1 and 5.2, the geometry of 5.3, the regime-dependent quantities of
 Table 3, the internal level and spectrum of 5.4, the pipe transmission loss of
-5.5 and the external level of 5.6, with Tables 1, 4, 5, 6 and 7. Validated
-against the seven worked examples of Annex A in the
+5.5 and the external level of 5.6, with Tables 1, 4, 5, 6 and 7. Clause 6 for
+the trims built to be quiet: the drilled cage of 6.2, the multistage
+substitution of 6.3 and the multipath multistage case of 6.4. And the
+outlet-flow half of Clause 7, for the flow leaving a valve outlet that has
+passed Mach 0,3. Validated against all seven worked examples of Annex A in the
 [conformance report](https://jmrplens.github.io/phonometry/reference/conformance/); the three defects that annex
-carries are in the [errata register](https://jmrplens.github.io/phonometry/reference/errata/). The noise-reducing
-trims of Clause 6, the high Mach number procedure and expander of Clause 7,
-and the hydrodynamic case of IEC 60534-8-4 are not implemented yet.
+carries are in the [errata register](https://jmrplens.github.io/phonometry/reference/errata/). Clause 8, Clause 9 and
+the hydrodynamic case of IEC 60534-8-4 are not implemented yet.
 
 ---
 
@@ -39199,6 +39286,10 @@ documents, one page per module.
 | `internal_spectrum` | `function` | **Eq. (19): the internal level spread over the third-octave bands around the peak.**<br>• `internal_level` [dB], `peak_frequency` [Hz], `frequency` [Hz]<br>• Falls as f^-2.5 above the peak and f^1.7 below it | `noise_control.internal_spectrum(155.3, 7778.0, bands)` |
 | `pipe_transmission_loss` | `function` | **Eq. (20a): what the pipe wall keeps in, band by band (negative).**<br>• `frequency` [Hz]<br>• `internal_diameter`, `wall_thickness`, `valve_outlet_diameter` [m]<br>• `downstream_density` [kg/m3], `downstream_sound_speed` [m/s], `pipe_density` [kg/m3]<br>• `pipe_sound_speed`, `air_sound_speed`, `atmospheric_pressure`, `standard_pressure` | `noise_control.pipe_transmission_loss(bands, internal_diameter=0.2, ...)` |
 | `coincidence_frequencies` / `PipeFrequencies` | `function` / `dataclass` | **The ring and two coincidence frequencies of Eqs. (21) to (23) that shape the transmission loss.**<br>• `internal_diameter`, `wall_thickness`, `downstream_sound_speed`<br>• `ring` f_r, `internal_coincidence` f_o, `external_coincidence` f_g | `noise_control.coincidence_frequencies(0.2, 0.008, 408.0)` |
+| `multistage_trim_conditions` / `MultistageConditions` | `function` / `dataclass` | **Clause 6.3: what a multistage trim hands Clause 5 in place of the valve inlet (Eqs. (27) to (29)).**<br>• `inlet_pressure`, `outlet_pressure` [Pa], `inlet_density` [kg/m3]<br>• `flow_coefficient` C of the valve, `last_stage_coefficient` C_n<br>• result: `flow_coefficient`, `stagnation_pressure` p_n, `stagnation_density` rho_n, and `equation` — which of '28a', '28b', '28c' NOTE 3 selected | `noise_control.multistage_trim_conditions(inlet_pressure=7e6, ...)` |
+| `last_stage_flow_coefficient` / `LAST_STAGE_AREA_CONSTANTS` | `function` / `constant` | **Eq. (27): C_n = N_16 A_n, the flow coefficient of the last stage from its total flow area.**<br>• `total_area` A_n [m2]<br>• `coefficient`: 'Cv' (Default) or 'Kv', selecting N_16 from Table 1<br>6.3 asks for this only when the manufacturer states no C_n | `noise_control.last_stage_flow_coefficient(6.44e-3)` → `315` |
+| `multiple_passage_jet_diameter` / `MAXIMUM_PASSAGE_ASPECT` | `function` / `constant` | **Eq. (26): the jet diameter of a single-stage, many-passage trim, where [0.9 - 0.06 l/d] replaces the pressure recovery factor.**<br>• `flow_coefficient`, `style_modifier`, `passage_length` l [m], `passage_diameter` d [m]<br>• `coefficient`: 'Cv' (Default) or 'Kv'<br>• l/d capped at **4** by NOTE 1, since the bracket would reach zero at 15 | `noise_control.multiple_passage_jet_diameter(90.0, 0.094, 0.02, 0.01)` |
+| `stage_level_correction` | `function` | **Eq. (31): what the stages before the last one add back.**<br>• `last_stage_level` L_pi,n [dB], `stages` n (≥ 2), `inlet_pressure` p_1, `stagnation_pressure` p_n [Pa]<br>`L_pi = L_pi,n + 10 lg(p_1/p_n)/(n-1)^0.125`, so the stage count barely moves it | `noise_control.stage_level_correction(150.0, 3, 7e6, 2.1e6)` |
 | `expander_noise` / `ExpanderNoise` | `function` / `dataclass` | **Clause 7: what the flow leaving the valve outlet makes (Eqs. (34) to (42)).**<br>• `frequency` [Hz]<br>• `mass_flow`, `downstream_density`, `downstream_sound_speed`<br>• `internal_diameter` D_i, `throat_diameter` d_i (the smaller of valve outlet and expander inlet) [m]<br>• `velocity_correction` L_g [dB], `expander`<br>• result: `pipe_velocity` (capped at Mach 0.8), `inlet_velocity` (capped at c_2), `mach`, `stream_power`, `acoustical_efficiency`, `sound_power`, `peak_frequency`, `internal_level`, `band_internal_level` | `noise_control.expander_noise(bands, mass_flow=0.89, ...)` |
 | `Expander` / `DEFAULT_EXPANDER` | `dataclass` / `constant` | **The transition piece downstream of the valve, limited by 7.1 to 30 degrees of total included angle.**<br>• `contraction` beta (Default: 0.93, the NOTE 1 figure for straight pattern globe valves; some rotary valves reach 0.7)<br>• `efficiency_correction` A_eta (Default: -3.0, Table 4's own *expander* row)<br>• `strouhal_number` St_p (Default: 0.2) | `noise_control.Expander(contraction=0.7)` |
 | `combine_internal_levels` | `function` | **Eq. (43): two spectra at the same pipe wall, added in energy.**<br>• `*levels`: two or more band level arrays of one shape [dB]<br>The valve trim and the outlet flow are two sources inside one pipe, and only the sum crosses the wall | `noise_control.combine_internal_levels(trim, outlet)` |
@@ -54164,7 +54255,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 818 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 820 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -54533,7 +54624,7 @@ sample from the metrology core:
 | IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()`; IEC 61252:2025 has since superseded this print, and the transcription still targets the 1993+A2 text | `tests/signals/test_levels.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-818 numerical conformance checks across 68 domains and 396 standards, covering
+820 numerical conformance checks across 68 domains and 396 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise

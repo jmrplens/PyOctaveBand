@@ -636,3 +636,247 @@ class TestPrintedTables:
 
     def test_table_one_holds_both_flow_coefficients(self) -> None:
         assert valves.FLOW_COEFFICIENT_CONSTANTS == {"Cv": 4.6e-3, "Kv": 4.9e-3}
+
+
+#: Annex A.3's example 7: a multipath, multistage cage in a DN 200 line.
+EXAMPLE_7 = {
+    "mass_flow": 23.1,
+    "inlet_pressure": 7.0e6,
+    "outlet_pressure": 1.4e6,
+    "inlet_density": 55.3,
+    "inlet_temperature": 290.0,
+    "specific_heat_ratio": 1.31,
+    "molecular_mass": 19.0,
+    "flow_coefficient": 81.5,
+    "last_stage_area": 6.44e-3,
+    "passages": 432,
+    "hydraulic_diameter": 0.0025,
+    "last_stage_recovery": 0.98,
+    "diameter": 0.200,
+    "wall_thickness": 0.008,
+    "pipe_density": 8000.0,
+    # Table 4's "Globe, multihole drilled plug or cage, to open"; the annex
+    # takes the Strouhal number at the bottom of the 0,1 to 0,3 range 5.4.2
+    # prints for free jets rather than from the table.
+    "efficiency_correction": -4.8,
+    "strouhal_number": 0.1,
+}
+
+
+def _example_seven() -> valves.AerodynamicValveNoise:
+    """Example 7, through Clause 6's substitution and then Clause 5."""
+    case = EXAMPLE_7
+    conditions = valves.multistage_trim_conditions(
+        inlet_pressure=case["inlet_pressure"],
+        outlet_pressure=case["outlet_pressure"],
+        inlet_density=case["inlet_density"],
+        flow_coefficient=case["flow_coefficient"],
+        last_stage_coefficient=valves.last_stage_flow_coefficient(
+            case["last_stage_area"]
+        ),
+    )
+    area = case["last_stage_area"] / case["passages"]
+    modifier = valves.valve_style_modifier(
+        area, 4.0 * area / case["hydraulic_diameter"], case["passages"]
+    )
+    return valves.valve_aerodynamic_noise(
+        mass_flow=case["mass_flow"],
+        inlet_pressure=conditions.stagnation_pressure,
+        outlet_pressure=case["outlet_pressure"],
+        inlet_density=conditions.stagnation_density,
+        inlet_temperature=case["inlet_temperature"],
+        specific_heat_ratio=case["specific_heat_ratio"],
+        molecular_mass=case["molecular_mass"],
+        flow_coefficient=conditions.flow_coefficient,
+        style_modifier=modifier,
+        pressure_recovery=case["last_stage_recovery"],
+        valve_outlet_diameter=case["diameter"],
+        internal_diameter=case["diameter"],
+        wall_thickness=case["wall_thickness"],
+        pipe_density=case["pipe_density"],
+        efficiency_correction=case["efficiency_correction"],
+        strouhal_number=case["strouhal_number"],
+    )
+
+
+class TestMultistageTrim:
+    """Clause 6, against example 7 of Annex A.
+
+    A multistage trim drops most of its pressure before the stage that makes
+    the noise, so 6.3 runs Clause 5 on that stage: the stagnation pressure at
+    its inlet stands in for the valve inlet, and the flow coefficient of the
+    last stage for the valve's.
+    """
+
+    def test_the_last_stage_coefficient_is_the_printed_one(self) -> None:
+        assert valves.last_stage_flow_coefficient(6.44e-3) == pytest.approx(
+            315.0, abs=0.5
+        )
+
+    def test_the_two_flow_coefficients_scale_the_same_area(self) -> None:
+        as_cv = valves.last_stage_flow_coefficient(6.44e-3, coefficient="Cv")
+        as_kv = valves.last_stage_flow_coefficient(6.44e-3, coefficient="Kv")
+        assert as_cv > as_kv
+        assert as_cv / as_kv == pytest.approx(1.156, rel=0.01)
+
+    def test_the_stagnation_pressure_takes_the_first_branch(self) -> None:
+        # NOTE 3: p_1/p_2 is 5, so (28a) is tried first, and its answer is
+        # 1,5 times p_2, which is below the 2 that would send it to (28b).
+        found = valves.multistage_trim_conditions(
+            inlet_pressure=7.0e6,
+            outlet_pressure=1.4e6,
+            inlet_density=55.3,
+            flow_coefficient=81.5,
+            last_stage_coefficient=315.0,
+        )
+        assert found.equation == "28a"
+        assert found.stagnation_pressure == pytest.approx(2.1e6, rel=0.01)
+        assert found.stagnation_density == pytest.approx(16.6, abs=0.1)
+
+    def test_a_trim_that_barely_throttles_takes_the_third_branch(self) -> None:
+        found = valves.multistage_trim_conditions(
+            inlet_pressure=1.5e6,
+            outlet_pressure=1.0e6,
+            inlet_density=10.0,
+            flow_coefficient=80.0,
+            last_stage_coefficient=300.0,
+        )
+        assert found.equation == "28c"
+
+    def test_a_last_stage_that_passes_little_takes_the_second_branch(
+        self,
+    ) -> None:
+        # With C_n close to C the first branch overshoots 2 p_2 and NOTE 3
+        # falls through to (28b).
+        found = valves.multistage_trim_conditions(
+            inlet_pressure=7.0e6,
+            outlet_pressure=1.4e6,
+            inlet_density=55.3,
+            flow_coefficient=81.5,
+            last_stage_coefficient=90.0,
+        )
+        assert found.equation == "28b"
+        assert found.stagnation_pressure == pytest.approx(7.0e6 * 81.5 / 90.0, rel=1e-9)
+
+    def test_it_refuses_a_trim_that_does_not_drop_pressure(self) -> None:
+        with pytest.raises(ValueError, match="drops pressure"):
+            valves.multistage_trim_conditions(
+                inlet_pressure=1.0e6,
+                outlet_pressure=1.2e6,
+                inlet_density=10.0,
+                flow_coefficient=80.0,
+                last_stage_coefficient=300.0,
+            )
+
+    @pytest.mark.parametrize(
+        ("name", "expected"),
+        [
+            ("pressure_ratio", 0.334),
+            ("vena_contracta_pressure", 1371038.0),
+            ("sound_power", 10.3),
+            ("internal_level", 156.9),
+            ("peak_frequency", 14381.0),
+            ("jet_diameter", 0.0022),
+        ],
+    )
+    def test_every_printed_intermediate_of_example_seven(
+        self, name: str, expected: float
+    ) -> None:
+        # The annex prints the jet diameter to two figures, so the tolerance
+        # is half of its last printed place rather than a relative one.
+        tolerance = 5e-5 if name == "jet_diameter" else abs(expected) * 2e-3
+        found = float(getattr(_example_seven(), name))
+        assert found == pytest.approx(expected, abs=tolerance)
+
+    def test_example_seven_lands_in_regime_one(self) -> None:
+        assert _example_seven().regime == 1
+
+    def test_example_seven_closes_at_the_printed_level(self) -> None:
+        assert round(_example_seven().external_level) == 89
+
+    @pytest.mark.parametrize(
+        ("index", "expected"),
+        [(1, 102), (5, 109), (10, 117), (15, 126), (20, 134)],
+    )
+    def test_the_printed_internal_spectrum_of_example_seven(
+        self, index: int, expected: int
+    ) -> None:
+        assert round(_example_seven().band_internal_level[index - 1]) == expected
+
+    def test_the_style_modifier_of_a_four_hundred_hole_cage(self) -> None:
+        area = 6.44e-3 / 432
+        modifier = valves.valve_style_modifier(area, 4.0 * area / 0.0025, 432)
+        assert modifier == pytest.approx(0.028, abs=5e-4)
+
+
+class TestMultiplePassageTrim:
+    """Clause 6.2, which replaces the pressure recovery with a geometry."""
+
+    def test_the_printed_example_of_a_drilled_cage(self) -> None:
+        # 6.2's own EXAMPLE: 48 rectangular passages 10 mm by 2 mm. It prints
+        # every step, and it rounds the hydraulic diameter before dividing:
+        # 0,0033/0,035 is the 0,094 it gives, where the unrounded 1/300 m
+        # gives 0,095. Both are recorded here so a reader who reproduces one
+        # is not left wondering about the other.
+        area = 0.010 * 0.002
+        perimeter = 2.0 * 0.010 + 2.0 * 0.002
+        assert area == pytest.approx(0.00002)
+        assert perimeter == pytest.approx(0.024)
+        hydraulic = 4.0 * area / perimeter
+        assert hydraulic == pytest.approx(0.0033, abs=5e-5)
+        assert 0.0033 / 0.035 == pytest.approx(0.094, abs=5e-4)
+        assert hydraulic / 0.035 == pytest.approx(0.095, abs=5e-4)
+
+    def test_a_longer_passage_makes_a_smaller_jet(self) -> None:
+        short = valves.multiple_passage_jet_diameter(90.0, 0.094, 0.005, 0.010)
+        long = valves.multiple_passage_jet_diameter(90.0, 0.094, 0.030, 0.010)
+        assert long < short
+
+    def test_the_aspect_ratio_stops_at_four(self) -> None:
+        # NOTE 1 caps l/d at 4, so a deeper hole changes nothing; without the
+        # cap the bracket would reach zero at l/d = 15.
+        at_cap = valves.multiple_passage_jet_diameter(90.0, 0.094, 0.040, 0.010)
+        past_cap = valves.multiple_passage_jet_diameter(90.0, 0.094, 0.400, 0.010)
+        assert past_cap == pytest.approx(at_cap, rel=1e-12)
+
+    def test_the_bracket_is_what_replaces_the_recovery_factor(self) -> None:
+        # At l/d = 4 the bracket is 0,9 - 0,24 = 0,66, so Equation (26) is
+        # Equation (9) with that in place of F_LP/F_p.
+        printed = valves.jet_diameter(90.0, 0.094, 0.66)
+        assert valves.multiple_passage_jet_diameter(
+            90.0, 0.094, 0.040, 0.010
+        ) == pytest.approx(printed, rel=1e-12)
+
+    def test_it_refuses_a_coefficient_table_one_does_not_print(self) -> None:
+        with pytest.raises(ValueError, match="coefficient"):
+            valves.multiple_passage_jet_diameter(
+                90.0, 0.094, 0.005, 0.010, coefficient="Av"
+            )
+
+
+class TestStageCorrection:
+    """Equation (31), which puts back the stages Clause 5 did not see."""
+
+    def test_it_adds_what_the_earlier_stages_dropped(self) -> None:
+        assert valves.stage_level_correction(150.0, 3, 7.0e6, 2.1e6) > 150.0
+
+    def test_it_adds_nothing_when_the_last_stage_sees_the_inlet(self) -> None:
+        assert valves.stage_level_correction(150.0, 2, 7.0e6, 7.0e6) == pytest.approx(
+            150.0
+        )
+
+    def test_more_stages_barely_change_it(self) -> None:
+        # The exponent is 0,125, so eight stages give 26 % less than two of a
+        # term that is only a few decibels to begin with.
+        two = valves.stage_level_correction(150.0, 2, 7.0e6, 2.1e6) - 150.0
+        eight = valves.stage_level_correction(150.0, 8, 7.0e6, 2.1e6) - 150.0
+        assert eight / two == pytest.approx(1.0 / 7.0**0.125, rel=1e-9)
+
+    @pytest.mark.parametrize("bad", [1, 0, -2, 2.5])
+    def test_it_refuses_a_stage_count_below_two(self, bad: float) -> None:
+        with pytest.raises(ValueError, match="two or more"):
+            valves.stage_level_correction(150.0, bad, 7.0e6, 2.1e6)  # type: ignore[arg-type]
+
+    def test_it_refuses_a_stagnation_pressure_above_the_inlet(self) -> None:
+        with pytest.raises(ValueError, match="cannot exceed the valve inlet"):
+            valves.stage_level_correction(150.0, 3, 2.1e6, 7.0e6)

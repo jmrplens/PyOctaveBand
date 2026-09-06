@@ -336,6 +336,91 @@ rotary valves may be as low as 0,7, and admits there are no data for the rest.
 `Expander` defaults to the 0,93 and to Table 4's own *expander* row, which is
 $A_\eta = -3{,}0$ and not the valve's figure.
 
+## 6. Trims designed to be quiet
+
+Everything above is Clause 5, which is a valve with ordinary trim. A valve
+bought to be quiet is not that, and Clause 6 says how it differs: **not by a
+different method**, but by what is fed into the same one.
+
+There are three families and each substitutes something.
+
+**A drilled cage** (6.2) makes many small jets instead of one large one, and
+Equation (26) replaces the pressure recovery factor of Equation (9) with a
+geometry, $[0{,}9 - 0{,}06\,(l/d)]$, where $l$ and $d$ are the length and
+diameter of one hole. A long hole recovers less than a short one, and NOTE 1
+caps the ratio at 4 because the bracket would otherwise reach zero at 15.
+
+```python
+from phonometry import noise_control
+
+# 6.2's own example: 48 rectangular passages, 10 mm by 2 mm.
+area = 0.010 * 0.002
+perimeter = 2.0 * 0.010 + 2.0 * 0.002
+print(round(4.0 * area / perimeter, 4))          # 0.0033  m, the hydraulic d
+print(round(noise_control.multiple_passage_jet_diameter(
+    90.0, 0.094, 0.020, 0.010), 5))              # 0.00362 m
+```
+
+**A multistage trim** (6.3) drops most of its pressure before the stage that
+makes the noise, so the method is run on that stage: the stagnation pressure
+$p_n$ at its inlet stands in for $p_1$, the density there for $\rho_1$, and
+the flow coefficient of the last stage for the valve's.
+
+$$
+C_n = N_{16} A_n, \qquad
+p_n = \sqrt{\left(\frac{p_1 C}{1{,}155 C_n}\right)^2 + p_2^2}, \qquad
+\rho_n = \rho_1 \frac{p_n}{p_1}
+$$
+
+Which equation gives $p_n$ is a **two-step reading** and not a formula. NOTE 3
+says that with $p_1/p_2 \ge 2$ you assume $p_n/p_2 < 2$, take Equation (28a),
+and fall through to (28b) if the answer turns out to be $2 p_2$ or more; below
+a valve ratio of two, (28c) applies directly. The result says which branch it
+took, because a report should not have to guess.
+
+```python
+from phonometry import noise_control
+
+conditions = noise_control.multistage_trim_conditions(
+    inlet_pressure=7.0e6, outlet_pressure=1.4e6, inlet_density=55.3,
+    flow_coefficient=81.5,
+    last_stage_coefficient=noise_control.last_stage_flow_coefficient(6.44e-3),
+)
+print(round(conditions.flow_coefficient))        # 315
+print(round(conditions.stagnation_pressure))     # 2102410  Pa
+print(round(conditions.stagnation_density, 1))   # 16.6     kg/m3
+print(conditions.equation)                       # 28a
+```
+
+Those three then go into `valve_aerodynamic_noise` in place of the valve's own
+inlet. That is Annex A's example 7, a 432-passage cage on a 70 bar vapour
+line, and it closes at the printed **89 dB(A)** with a jet 2,2 mm across and a
+peak at 14,4 kHz.
+
+**A multipath, multistage trim** (6.4) is both at once, and it is what example
+7 actually is. It adds nothing new to the substitution: Equations (32) and
+(33) restate the regime I Mach number and peak frequency with the last stage's
+recovery factor, which is what the substitution has already put there.
+
+For 6.3 there is one thing more. Clause 5 has been run on the last stage
+alone, so Equation (31) puts the others back:
+
+$$
+L_{pi} = L_{pi,n} + \frac{1}{(n-1)^{0{,}125}}\,10 \lg\frac{p_1}{p_n}
+$$
+
+```python
+from phonometry import noise_control
+
+print(round(noise_control.stage_level_correction(150.0, 3, 7.0e6, 2.1e6), 1))
+# 154.8  dB
+```
+
+The exponent is 0,125, so the number of stages barely enters: two stages and
+eight differ by a quarter of a term that is itself only a few decibels. What
+the correction really tracks is $p_1/p_n$, the pressure the earlier stages
+took out.
+
 <SeeAlso
   links={[
     { href: '/phonometry/devices/noise-control/silencers/', label: 'Reactive Silencers' },
@@ -349,19 +434,27 @@ $A_\eta = -3{,}0$ and not the valve's figure.
 
 <Scope>
 <ScopeClaim status="covered" label="Covered">
-The whole of IEC 60534-8-3:2010, Clause 5, for a valve with standard trim: the
+IEC 60534-8-3:2010, Clause 5, Clause 6 and the outlet-flow half of Clause 7,
+against all seven worked examples of Annex A. Clause 5 for a valve with
+standard trim: the
 pressure ratios of 5.1 and 5.2 with the five regimes they define, the valve
 style modifier and jet diameter of 5.3, the regime-dependent stream power,
 acoustical efficiency and peak frequency of Table 3, the internal level at the
 pipe wall of Equation (18), the third-octave spectrum of Equation (19), the
 pipe transmission loss of 5.5 with its ring and coincidence frequencies, and
-the external level of 5.6 in bands and as one A-weighted number.
+the external level of 5.6 in bands and as one A-weighted number. Clause 6 for
+a trim built to be quiet: the drilled cage of 6.2 with Equation (26), the
+multistage substitution of 6.3 with Equations (27) to (29) and its NOTE 3
+branch, the stage correction of Equation (31), and the multipath multistage
+case of 6.4. And Clause 7 for the flow leaving the valve outlet once it passes
+Mach 0,3, with the transition piece, its stream power and efficiency, and
+Equation (43), which adds it to the trim inside the pipe.
 </ScopeClaim>
 <ScopeClaim status="not-covered" label="Not covered yet">
-The rest of the standard and its sibling: the noise-reducing trims of Clause 6,
-the high Mach number procedure and the downstream expander of Clause 7, the
-experimentally determined efficiency factors of Clause 8, and the hydrodynamic
-case of IEC 60534-8-4, where the fluid is a liquid and cavitation rather than a
-jet is what makes the noise.
+The experimentally determined efficiency factors of Clause 8, which are a
+laboratory procedure rather than a calculation; Clause 9, which combines a
+valve with two or more fixed-area stages installed downstream of it; and the
+hydrodynamic case of IEC 60534-8-4, where the fluid is a liquid and cavitation
+rather than a jet is what makes the noise.
 </ScopeClaim>
 </Scope>

@@ -77,6 +77,7 @@ __all__ = [
     "DEFAULT_EXPANDER",
     "EXPANDER_PIPE_MACH_LIMIT",
     "FLOW_COEFFICIENT_CONSTANTS",
+    "LAST_STAGE_AREA_CONSTANTS",
     "GLOBE_CONTRACTION_COEFFICIENT",
     "MACH_LIMIT_STANDARD_TRIM",
     "PIPE_SOUND_SPEED_M_S",
@@ -93,6 +94,7 @@ __all__ = [
     "AerodynamicValveNoise",
     "Expander",
     "ExpanderNoise",
+    "MultistageConditions",
     "PipeFrequencies",
     "RegimeBoundaries",
     "ValveNoiseWarning",
@@ -100,9 +102,13 @@ __all__ = [
     "combine_internal_levels",
     "expander_noise",
     "flow_regime",
+    "last_stage_flow_coefficient",
     "internal_spectrum",
     "jet_diameter",
+    "multiple_passage_jet_diameter",
+    "multistage_trim_conditions",
     "pressure_ratio_boundaries",
+    "stage_level_correction",
     "pipe_transmission_loss",
     "valve_aerodynamic_noise",
     "valve_style_modifier",
@@ -170,6 +176,26 @@ MACH_LIMIT_STANDARD_TRIM = 0.3
 #: NOTE 2 to Equation (16): the pipe Mach number is limited to this value
 #: when the velocity correction is computed, however fast the pipe runs.
 PIPE_WALL_MACH_LIMIT = 0.3
+
+#: Table 1's numerical constant :math:`N_{16}` of Equation (27), which turns
+#: the total flow area of the last stage into its flow coefficient, keyed by
+#: the coefficient wanted. It is the reciprocal of an area per unit
+#: coefficient, so the two figures differ by the same conversion as
+#: :data:`FLOW_COEFFICIENT_CONSTANTS`.
+LAST_STAGE_AREA_CONSTANTS = {"Cv": 4.89e4, "Kv": 4.23e4}
+
+#: Equation (28a)'s printed constant, which is what makes the first branch of
+#: NOTE 3 differ from a plain quadrature sum.
+_STAGNATION_COEFFICIENT = 1.155
+
+#: NOTE 3 to Equation (28) branches on this pressure ratio, twice: once on
+#: the valve's own and once on the last stage's.
+_STAGNATION_BRANCH_RATIO = 2.0
+
+#: NOTE 1 to Equation (26): the length-to-diameter ratio of a flow passage is
+#: capped here, because the bracket it sits in would otherwise go negative
+#: and the jet diameter with it.
+MAXIMUM_PASSAGE_ASPECT = 4.0
 
 #: NOTE 1 to Equation (34): the downstream pipe velocity of Clause 7 is
 #: capped at this Mach number however fast the pipe would otherwise run.
@@ -746,6 +772,230 @@ def pipe_transmission_loss(
     inside = _TRANSMISSION_COEFFICIENT * ratio * g_x / (stiffness + 1.0)
     loss = 10.0 * np.log10(inside * (ambient / reference))
     return np.asarray(loss - _damping_factor(outlet), dtype=np.float64)
+
+
+def last_stage_flow_coefficient(total_area: float, *, coefficient: str = "Cv") -> float:
+    r"""Equation (27): the flow coefficient of the last stage, from its area.
+
+    .. math::
+
+       C_n = N_{16} A_n
+
+    6.3 asks for :math:`C_n` in place of :math:`C` everywhere in Clause 5,
+    and says to use this only when the manufacturer does not state one.
+
+    :param total_area: :math:`A_n`, the total flow area of the last stage,
+        in m².
+    :param coefficient: Which flow coefficient to return, ``"Cv"`` or
+        ``"Kv"``, which selects :math:`N_{16}` from Table 1.
+    :return: :math:`C_n`.
+    :raises ValueError: If the area is not positive and finite, or the
+        coefficient is not one Table 1 prints a constant for.
+    """
+    kind = require_choice(coefficient, "coefficient", tuple(LAST_STAGE_AREA_CONSTANTS))
+    area = require_positive(total_area, "total_area")
+    if not math.isfinite(area):
+        msg = "'total_area' must be a positive, finite area in m^2."
+        raise ValueError(msg)
+    return float(LAST_STAGE_AREA_CONSTANTS[kind] * area)
+
+
+@dataclass(frozen=True)
+class MultistageConditions:
+    r"""What a multistage trim hands Clause 5 in place of the valve inlet.
+
+    :ivar flow_coefficient: :math:`C_n` of the last stage, Equation (27).
+    :ivar stagnation_pressure: :math:`p_n` at the inlet of the last stage,
+        in Pa, from whichever of Equations (28a) to (28c) NOTE 3 selects.
+    :ivar stagnation_density: :math:`\rho_n` there, in kg/m³,
+        Equation (29).
+    :ivar equation: Which of ``"28a"``, ``"28b"`` and ``"28c"`` was used,
+        because the branch is a reading of NOTE 3 rather than an arithmetic
+        fact and a report should say which one it took.
+    """
+
+    flow_coefficient: float
+    stagnation_pressure: float
+    stagnation_density: float
+    equation: str
+
+
+def multistage_trim_conditions(
+    *,
+    inlet_pressure: float,
+    outlet_pressure: float,
+    inlet_density: float,
+    flow_coefficient: float,
+    last_stage_coefficient: float,
+) -> MultistageConditions:
+    r"""Equations (27) to (29): the last stage seen as a valve of its own.
+
+    A multistage trim drops most of the pressure before the stage that makes
+    the noise, so Clause 5 is run on that stage: 6.3 substitutes the
+    stagnation pressure :math:`p_n` at its inlet for :math:`p_1`, the density
+    :math:`\rho_n` there for :math:`\rho_1`, and :math:`C_n` for :math:`C`.
+
+    Which equation gives :math:`p_n` is NOTE 3's, and it is a two-step
+    reading rather than a formula:
+
+    .. math::
+
+       p_n = \sqrt{\left(\frac{p_1 C}{1{,}155 C_n}\right)^2 + p_2^2}
+       \quad (28a), \qquad
+       p_n = p_1 \frac{C}{C_n} \quad (28b)
+
+    .. math::
+
+       p_n = \sqrt{\left(\frac{C}{C_n}\right)^2 (p_1^2 - p_2^2) + p_2^2}
+       \quad (28c)
+
+    With :math:`p_1/p_2 \ge 2` the note says to assume :math:`p_n/p_2 < 2`,
+    take (28a), and fall through to (28b) if the answer it gives turns out to
+    be :math:`2 p_2` or more. Below a valve ratio of two, (28c) applies
+    directly.
+
+    :param inlet_pressure: :math:`p_1` at the valve inlet, absolute, in Pa.
+    :param outlet_pressure: :math:`p_2` at the valve outlet, in Pa.
+    :param inlet_density: :math:`\rho_1` at the valve inlet, in kg/m³.
+    :param flow_coefficient: :math:`C` of the whole valve.
+    :param last_stage_coefficient: :math:`C_n` of the last stage, from
+        :func:`last_stage_flow_coefficient` or from the manufacturer.
+    :return: A :class:`MultistageConditions` to pass to
+        :func:`valve_aerodynamic_noise` in place of the valve's own inlet.
+    :raises ValueError: If a value is not positive and finite, or the outlet
+        pressure is not below the inlet.
+    """
+    p1 = require_positive(inlet_pressure, "inlet_pressure")
+    p2 = require_positive(outlet_pressure, "outlet_pressure")
+    rho1 = require_positive(inlet_density, "inlet_density")
+    capacity = require_positive(flow_coefficient, "flow_coefficient")
+    last = require_positive(last_stage_coefficient, "last_stage_coefficient")
+    if p2 >= p1:
+        msg = (
+            "A multistage trim drops pressure, so 'outlet_pressure' must be "
+            f"below 'inlet_pressure'; got {outlet_pressure!r} and "
+            f"{inlet_pressure!r} Pa."
+        )
+        raise ValueError(msg)
+
+    ratio = capacity / last
+    if p1 / p2 >= _STAGNATION_BRANCH_RATIO:
+        pressure = math.sqrt(
+            (p1 * capacity / (_STAGNATION_COEFFICIENT * last)) ** 2 + p2**2
+        )
+        equation = "28a"
+        if pressure >= _STAGNATION_BRANCH_RATIO * p2:
+            pressure = p1 * ratio
+            equation = "28b"
+    else:
+        pressure = math.sqrt(ratio**2 * (p1**2 - p2**2) + p2**2)
+        equation = "28c"
+    return MultistageConditions(
+        flow_coefficient=float(last),
+        stagnation_pressure=float(pressure),
+        stagnation_density=float(rho1 * (pressure / p1)),
+        equation=equation,
+    )
+
+
+def multiple_passage_jet_diameter(
+    flow_coefficient: float,
+    style_modifier: float,
+    passage_length: float,
+    passage_diameter: float,
+    *,
+    coefficient: str = "Cv",
+) -> float:
+    r"""Equation (26): the jet diameter of a single-stage, many-passage trim.
+
+    .. math::
+
+       D_j = N_{14} F_d \sqrt{C\left[0{,}9 - 0{,}06\,(l/d)\right]}
+
+    6.2 replaces the pressure recovery factor of Equation (9) with that
+    bracket, which is what a drilled cage does instead: a long hole recovers
+    less than a short one, and NOTE 1 caps the ratio at 4 because the bracket
+    would otherwise reach zero at 15.
+
+    NOTE 2 adds two conditions on the geometry rather than on the arithmetic,
+    and neither is checked here: above a pressure ratio of 4 the valve style
+    modifier only holds when the wall between passages is thicker than
+    :math:`0{,}7 d`, and it fails altogether once the outlet Mach number
+    passes 0,2.
+
+    :param flow_coefficient: :math:`C` of the valve.
+    :param style_modifier: :math:`F_d`, from :func:`valve_style_modifier`.
+    :param passage_length: :math:`l` of one flow passage, in m.
+    :param passage_diameter: :math:`d` of one flow passage, in m; the
+        hydraulic diameter for a passage that is not round.
+    :param coefficient: ``"Cv"`` or ``"Kv"``, selecting :math:`N_{14}`.
+    :return: :math:`D_j`, in m.
+    :raises ValueError: If a value is not positive and finite, or the
+        coefficient is not one Table 1 prints a constant for.
+    """
+    kind = require_choice(coefficient, "coefficient", tuple(FLOW_COEFFICIENT_CONSTANTS))
+    capacity = require_positive(flow_coefficient, "flow_coefficient")
+    modifier = require_positive(style_modifier, "style_modifier")
+    length = require_positive(passage_length, "passage_length")
+    diameter = require_positive(passage_diameter, "passage_diameter")
+    if not all(
+        math.isfinite(value) for value in (capacity, modifier, length, diameter)
+    ):
+        msg = "The jet diameter needs finite arguments."
+        raise ValueError(msg)
+    aspect = min(length / diameter, MAXIMUM_PASSAGE_ASPECT)
+    recovery = 0.9 - 0.06 * aspect
+    return float(
+        FLOW_COEFFICIENT_CONSTANTS[kind] * modifier * math.sqrt(capacity * recovery)
+    )
+
+
+def stage_level_correction(
+    last_stage_level: float,
+    stages: int,
+    inlet_pressure: float,
+    stagnation_pressure: float,
+) -> float:
+    r"""Equation (31): what the stages before the last one add.
+
+    .. math::
+
+       L_{pi} = L_{pi,n}
+              + \frac{1}{(n-1)^{0{,}125}}\,10 \lg\frac{p_1}{p_n}
+
+    Clause 5 is run on the last stage alone, and this puts the others back.
+    The exponent is small, so the correction barely notices how many stages
+    there are: two stages and eight differ by 26 % of a term that is itself
+    only a few decibels.
+
+    :param last_stage_level: :math:`L_{pi,n}` of Equation (18) computed on
+        the last stage, in dB.
+    :param stages: :math:`n`, the number of throttling stages, at least two.
+    :param inlet_pressure: :math:`p_1` at the valve inlet, in Pa.
+    :param stagnation_pressure: :math:`p_n` at the last stage, in Pa.
+    :return: :math:`L_{pi}` for the whole trim, in dB.
+    :raises ValueError: If the stage count is below two, or a pressure is not
+        positive and finite, or the stagnation pressure exceeds the inlet.
+    """
+    count = int(stages)
+    if count != stages or count < _MINIMUM_SOURCES:
+        msg = (
+            "Equation (31) puts back the stages before the last one, so "
+            f"'stages' must be a whole number of two or more; got {stages!r}."
+        )
+        raise ValueError(msg)
+    p1 = require_positive(inlet_pressure, "inlet_pressure")
+    pn = require_positive(stagnation_pressure, "stagnation_pressure")
+    if pn > p1:
+        msg = (
+            "The stagnation pressure at the last stage cannot exceed the "
+            f"valve inlet; got {stagnation_pressure!r} against "
+            f"{inlet_pressure!r} Pa."
+        )
+        raise ValueError(msg)
+    return float(
+        last_stage_level + (1.0 / (count - 1) ** 0.125) * 10.0 * math.log10(p1 / pn)
+    )
 
 
 @dataclass(frozen=True)

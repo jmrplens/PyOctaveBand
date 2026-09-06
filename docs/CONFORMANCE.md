@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**818/818 conformance checks pass** across 68 domains and 396 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**820/820 conformance checks pass** across 68 domains and 396 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -1333,7 +1333,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>Control valve noise (IEC 60534-8-3)</b>: 100% (11/11)</summary>
+<summary><b>Control valve noise (IEC 60534-8-3)</b>: 100% (13/13)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -1348,6 +1348,8 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | IEC 60534-8-3:2010 | A-weighted level 1 m from the pipe wall, examples 1 to 5 (Eq. (25)) | example 1 = 92 dB; example 2 = 93 dB; example 3 = 98 dB; example 4 = 94 dB; example 5 = 97 dB | example 1 = 92 dB; example 2 = 93 dB; example 3 = 98 dB; example 4 = 94 dB; example 5 = 97 dB | exact | 0 % | ![Pass][cv-pass] Pass |
 | IEC 60534-8-3:2010 | Expander chain of Clause 7, example 6 (Eqs. (34) to (41)) | U_p = 190; U_R = 460; M_R = 0.96; W_mR = 47854; eta_R = 0.0009; W_aR = 42; f_pR = 920; L_piR = 151 | U_p = 190; U_R = 460; M_R = 0.96; W_mR = 47854; eta_R = 0.0009; W_aR = 42; f_pR = 920; L_piR = 151 | exact | 0 % | ![Pass][cv-pass] Pass |
 | IEC 60534-8-3:2010 | A-weighted level with the expander, example 6 (Eqs. (43) and (25)) | 94 dB(A), where the trim alone gives 93 | 94 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-3:2010 | Multistage trim substitution, example 7 (Eqs. (27) to (29)) | C_n = 315 from Equation (27), then (28a) for p_n | 315 | 0 | 0 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-3:2010 | Multipath multistage trim, example 7 (Table A.2) | x = 0.334; p_vc = 1371038; W_a = 10.3; L_pi = 156.9; f_p = 14381; L_pAe = 89 | x = 0.334; p_vc = 1371038; W_a = 10.3; L_pi = 156.9; f_p = 14381; L_pAe = 89 | exact | 0 % | ![Pass][cv-pass] Pass |
 
 </details>
 

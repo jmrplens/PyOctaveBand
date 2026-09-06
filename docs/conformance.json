@@ -3,8 +3,8 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 818,
-    "passing": 818,
+    "checks": 820,
+    "passing": 820,
     "failing": 0,
     "domains": 68,
     "standards": 396,
@@ -468,8 +468,8 @@
     {
       "id": "control-valve-noise-iec-60534-8-3",
       "title": "Control valve noise (IEC 60534-8-3)",
-      "checks": 11,
-      "passing": 11
+      "checks": 13,
+      "passing": 13
     },
     {
       "id": "hvac-noise-vdi-2081",
@@ -21861,6 +21861,77 @@
         "value": 94.0
       },
       "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-3/iec-60534-8-3-2010/multistage-trim-substitution-example-7-eqs-27-to-29",
+      "domain": "control-valve-noise-iec-60534-8-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-3",
+        "edition": "2010",
+        "cite": "IEC 60534-8-3:2010"
+      },
+      "quantity": "Multistage trim substitution, example 7 (Eqs. (27) to (29))",
+      "kind": "scalar",
+      "expected": {
+        "value": 315.0,
+        "label": "C_n = 315 from Equation (27), then (28a) for p_n"
+      },
+      "computed": {
+        "value": 315.0
+      },
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.5
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-3/iec-60534-8-3-2010/multipath-multistage-trim-example-7-table-a-2",
+      "domain": "control-valve-noise-iec-60534-8-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-3",
+        "edition": "2010",
+        "cite": "IEC 60534-8-3:2010"
+      },
+      "quantity": "Multipath multistage trim, example 7 (Table A.2)",
+      "kind": "record",
+      "expected": {
+        "label": "x = 0.334; p_vc = 1371038; W_a = 10.3; L_pi = 156.9; f_p = 14381; L_pAe = 89",
+        "record": {
+          "x": 0.334,
+          "p_vc": 1371038.0,
+          "W_a": 10.3,
+          "L_pi": 156.9,
+          "f_p": 14381.0,
+          "L_pAe": 89.0
+        }
+      },
+      "computed": {
+        "label": "x = 0.334; p_vc = 1371038; W_a = 10.3; L_pi = 156.9; f_p = 14381; L_pAe = 89",
+        "record": {
+          "x": 0.334,
+          "p_vc": 1371038.0,
+          "W_a": 10.3,
+          "L_pi": 156.9,
+          "f_p": 14381.0,
+          "L_pAe": 89.0
+        }
+      },
       "tolerance": {
         "mode": "absolute",
         "value": 0.0
