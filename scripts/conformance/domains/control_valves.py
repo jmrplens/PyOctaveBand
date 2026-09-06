@@ -118,12 +118,16 @@ _PRINTED_EXTERNAL_LEVEL = {1: 92.0, 2: 93.0, 3: 98.0, 4: 94.0, 5: 97.0}
 #: Equations (21), (22) and (23) of example 7, in Hz.
 _PRINTED_PIPE_FREQUENCIES = {"f_r": 7958.0, "f_o": 2365.0, "f_g": 1622.0}
 
-#: Equation (20a) of example 7, bands 1 to 24, in dB. The annex prints the
-#: remaining nine on the following folio.
+#: Equation (20a) of example 7, all 33 bands, in dB: the annex prints the
+#: first 24 on one folio and the remaining nine on the next. The column turns
+#: at band 24, where the loss is least, which is the 7 958 Hz ring frequency
+#: of this pipe showing through.
 _PRINTED_TRANSMISSION_LOSS = (
     -94.1, -92.0, -90.0, -88.1, -86.1, -84.1, -82.2, -80.2,
     -78.1, -76.2, -74.3, -72.2, -70.4, -68.5, -66.5, -64.5,
     -62.6, -60.7, -58.7, -56.9, -55.1, -53.0, -51.2, -49.4,
+    -51.1, -52.8, -54.4, -56.1, -57.9, -60.0, -62.2, -64.6,
+    -66.8,
 )  # fmt: skip
 
 
@@ -259,10 +263,10 @@ def _chk_pipe_frequencies() -> Outcome:
 @register(
     _IEC60534,
     "IEC 60534-8-3:2010",
-    "Pipe transmission loss, example 7, 24 bands (Eq. (20a))",
+    "Pipe transmission loss, example 7, 33 bands (Eq. (20a))",
 )
 def _chk_transmission_loss() -> Outcome:
-    """Equation (20a) across the 24 bands the annex prints on one folio.
+    """Equation (20a) across all 33 bands the annex prints.
 
     The loss depends on the pipe and on the fluid leaving the valve, not on
     the trim, so this row runs example 7's pipe without example 7's valve.
@@ -280,7 +284,7 @@ def _chk_transmission_loss() -> Outcome:
         0.1,
         unit="dB",
         places=2,
-        expected_label=f"band {index + 1} at {bands[index]:g} Hz, the worst of 24",
+        expected_label=f"band {index + 1} at {bands[index]:g} Hz, the worst of 33",
     )
 
 

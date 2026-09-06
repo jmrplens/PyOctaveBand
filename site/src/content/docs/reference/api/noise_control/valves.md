@@ -34,8 +34,8 @@ frequency through the ring and coincidence frequencies of Equations (21) to
 level at 1 m. The band set is the 33 one-third-octave bands from 12,5 Hz to
 20 kHz, printed as Table 5.
 
-**Two things in Annex A do not reproduce themselves**, and both are recorded
-in `docs/ERRATA.md`:
+**Three things in Annex A do not reproduce themselves**, and all three are
+recorded in `docs/ERRATA.md`:
 
 * The piping geometry factor is printed as $F_p = 0{,}98$, but every one
   of the six printed vena contracta pressures needs $0{,}984$ to come
@@ -48,6 +48,11 @@ in `docs/ERRATA.md`:
   printed on the next row, $F_d = 0{,}30$, is the ratio of the printed
   $d_H = 0{,}030$ m to $0{,}102$ m, so the annex computed with the
   larger value and printed the smaller one.
+* Two frequency factors of Table A.2 are printed one power of ten low,
+  $G_{x,5}$ and $G_{x,10}$, in a column Table 6 makes
+  proportional to $f_i^4$ and which therefore has to rise. The
+  transmission losses printed two rows below them are what the corrected
+  factors give.
 
 This module implements Clause 5, the standard trim case. The noise-reducing
 trims of Clause 6, the expander of Clause 7 and the hydrodynamic case of
@@ -103,7 +108,7 @@ What IEC 60534-8-3 Clause 5 says about one operating point.
 | `vena_contracta_pressure` | $p_{vc}$ of Equation (2), in Pa. It goes negative past the choking point, where the equation is being read outside the range it means anything in. |
 | `jet_diameter` | $D_j$ of Equation (9), in m. |
 | `mach` | The Mach number Table 3 uses in this regime. |
-| `acoustical_efficiency` | $\\eta$, the fraction of the stream power that leaves as sound. |
+| `acoustical_efficiency` | $\eta$, the fraction of the stream power that leaves as sound. |
 | `stream_power` | $W_m$, in W. |
 | `sound_power` | $W_a$ of Equation (11), in W. |
 | `sound_power_level` | $L_{wi}$ of Equation (12), in dB. |
@@ -478,7 +483,7 @@ The four pressure ratios that cut Clause 5.2 into five regimes.
 | `critical` | $x_C$, the same point seen from the valve inlet, Equation (4). |
 | `break_point` | $x_B$, where the jet stops growing and shock cells take over, Equation (6). |
 | `constant_efficiency` | $x_{CE}$, where the acoustical efficiency stops rising with pressure ratio, Equation (7). |
-| `recovery` | $\\alpha$, the recovery correction factor of Equation (5), which the other two are written in terms of. |
+| `recovery` | $\alpha$, the recovery correction factor of Equation (5), which the other two are written in terms of. |
 
 ## STRUCTURAL_LOSS_REFERENCE_HZ
 

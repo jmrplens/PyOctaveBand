@@ -71,7 +71,7 @@ function spell(n, lang) {
 	// some of them ("veintidós", "veintiséis"), and it agrees the last digit
 	// with the noun: 121 guides are "ciento veintiuna guías", not "veintiuno".
 	// The three endings are all the number, so the pattern takes any of them.
-	const es20s = ['veinte', 'veintiun(?:o|a|ó)', 'veintidós', 'veintitrés',
+	const es20s = ['veinte', 'veinti(?:uno|una|ún)', 'veintidós', 'veintitrés',
 		'veinticuatro', 'veinticinco', 'veintiséis', 'veintisiete', 'veintiocho',
 		'veintinueve'];
 	const below100 = (v) => {

@@ -331,11 +331,16 @@ class TestPipeTransmission:
         "pipe_density": 8000.0,
     }
 
-    #: Table A.2's printed TL, bands 1 to 24, in dB.
+    #: Table A.2's printed TL, all 33 bands, in dB. The column turns at band
+    #: 24: the loss is least at -49,4 dB and grows again above it, which is
+    #: the ring frequency of this pipe, 7 958 Hz, showing through between
+    #: bands 24 and 25.
     PRINTED = (
         -94.1, -92.0, -90.0, -88.1, -86.1, -84.1, -82.2, -80.2,
         -78.1, -76.2, -74.3, -72.2, -70.4, -68.5, -66.5, -64.5,
         -62.6, -60.7, -58.7, -56.9, -55.1, -53.0, -51.2, -49.4,
+        -51.1, -52.8, -54.4, -56.1, -57.9, -60.0, -62.2, -64.6,
+        -66.8,
     )  # fmt: skip
 
     def test_the_three_pipe_frequencies_are_the_printed_ones(self) -> None:

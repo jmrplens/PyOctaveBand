@@ -61,8 +61,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
   Annex A is an unusually complete oracle, and eight conformance rows now run
   against it: six operating points that walk the five regimes in order, with
-  their regimes, sound powers and internal levels, and a seventh example whose
-  pipe pins the transmission loss in 24 bands to within 0,07 dB.
+  their regimes, sound powers and internal levels, the valve style modifier,
+  the jet diameter and the vena contracta pressure of those columns, and a
+  seventh example whose pipe pins the ring and coincidence frequencies and the
+  transmission loss in all 33 bands to within 0,07 dB.
 
   Three things in that annex do not reproduce themselves and are in the errata
   register. The piping geometry factor is printed rounded to 0,98 and the

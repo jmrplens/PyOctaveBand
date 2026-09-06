@@ -28,8 +28,8 @@ frequency through the ring and coincidence frequencies of Equations (21) to
 level at 1 m. The band set is the 33 one-third-octave bands from 12,5 Hz to
 20 kHz, printed as Table 5.
 
-**Two things in Annex A do not reproduce themselves**, and both are recorded
-in ``docs/ERRATA.md``:
+**Three things in Annex A do not reproduce themselves**, and all three are
+recorded in ``docs/ERRATA.md``:
 
 * The piping geometry factor is printed as :math:`F_p = 0{,}98`, but every one
   of the six printed vena contracta pressures needs :math:`0{,}984` to come
@@ -42,6 +42,11 @@ in ``docs/ERRATA.md``:
   printed on the next row, :math:`F_d = 0{,}30`, is the ratio of the printed
   :math:`d_H = 0{,}030` m to :math:`0{,}102` m, so the annex computed with the
   larger value and printed the smaller one.
+* Two frequency factors of Table A.2 are printed one power of ten low,
+  :math:`G_{x,5}` and :math:`G_{x,10}`, in a column Table 6 makes
+  proportional to :math:`f_i^4` and which therefore has to rise. The
+  transmission losses printed two rows below them are what the corrected
+  factors give.
 
 This module implements Clause 5, the standard trim case. The noise-reducing
 trims of Clause 6, the expander of Clause 7 and the hydrodynamic case of
@@ -81,6 +86,7 @@ __all__ = [
     "UNIVERSAL_GAS_CONSTANT",
     "VALVE_ACOUSTIC_STYLES",
     "AerodynamicValveNoise",
+    "PipeFrequencies",
     "RegimeBoundaries",
     "coincidence_frequencies",
     "flow_regime",
@@ -229,7 +235,7 @@ class RegimeBoundaries:
         cells take over, Equation (6).
     :ivar constant_efficiency: :math:`x_{CE}`, where the acoustical
         efficiency stops rising with pressure ratio, Equation (7).
-    :ivar recovery: :math:`\\alpha`, the recovery correction factor of
+    :ivar recovery: :math:`\alpha`, the recovery correction factor of
         Equation (5), which the other two are written in terms of.
     """
 
@@ -723,7 +729,7 @@ class AerodynamicValveNoise:
         read outside the range it means anything in.
     :ivar jet_diameter: :math:`D_j` of Equation (9), in m.
     :ivar mach: The Mach number Table 3 uses in this regime.
-    :ivar acoustical_efficiency: :math:`\\eta`, the fraction of the stream
+    :ivar acoustical_efficiency: :math:`\eta`, the fraction of the stream
         power that leaves as sound.
     :ivar stream_power: :math:`W_m`, in W.
     :ivar sound_power: :math:`W_a` of Equation (11), in W.
@@ -773,7 +779,7 @@ def _third_octave_bands() -> NDArray[np.float64]:
     return np.asarray(normalized_frequencies(3), dtype=np.float64)
 
 
-def valve_aerodynamic_noise(  # noqa: PLR0913 - the standard's own inputs
+def valve_aerodynamic_noise(  # noqa: PLR0913
     *,
     mass_flow: float,
     inlet_pressure: float,
