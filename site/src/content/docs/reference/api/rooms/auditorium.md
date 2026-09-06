@@ -894,8 +894,7 @@ describes the early support as "the reflected energy within the first
 interval; C.2.2 describes the late support as "the reflected energy
 after the first 0,1 s" with no upper bound, but (C.2) stops at one
 second, which matters in any hall whose reverberation time is longer
-than that. The equations govern, and
-:doc:`the errata register </reference/errata>` records the rest.
+than that. The equations govern, and `docs/ERRATA.md` records the rest.
 
 **Parameters**
 

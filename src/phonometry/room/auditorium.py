@@ -1353,8 +1353,7 @@ def stage_support(
     interval; C.2.2 describes the late support as "the reflected energy
     after the first 0,1 s" with no upper bound, but (C.2) stops at one
     second, which matters in any hall whose reverberation time is longer
-    than that. The equations govern, and
-    :doc:`the errata register </reference/errata>` records the rest.
+    than that. The equations govern, and ``docs/ERRATA.md`` records the rest.
 
     :param ir: Impulse response measured on the platform (1D), 1,0 m from
         the acoustic centre of an omnidirectional source.
