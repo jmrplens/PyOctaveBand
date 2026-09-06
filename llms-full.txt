@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 816 numerical conformance checks against 396 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 818 numerical conformance checks against 396 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 816 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 68 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 818 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 68 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -21043,19 +21043,20 @@ a convention chosen here.
 Equation (20a) squared, so halving it is worth about 6 dB in every band, which
 is the cheapest and most often forgotten line in a valve noise budget.
 
-## 5. What the method will not do
+## 5. When the outlet runs fast: the second source
 
-Clause 5 has limits, and two of them bite in practice. The valve outlet Mach
-number $M_o$ of Equation (15) must stay below 0,3, and above that NOTE 1 says
-accuracy cannot be maintained and Clause 7 is used instead. The pipe Mach
-number $M_2$ of Equation (17) is not a limit but a clamp: NOTE 2 caps it at
-0,3 before the velocity correction of Equation (16) is computed, however fast
-the pipe actually runs.
+Clause 5 has limits, and two of them bite. The pipe Mach number $M_2$ of
+Equation (17) is not really a limit but a clamp: NOTE 2 caps it at 0,3 before
+the velocity correction of Equation (16), however fast the pipe actually runs.
+The valve outlet Mach number $M_o$ of Equation (15) is a limit, and it is the
+one that matters, because past 0,3 the flow leaving the outlet stops being a
+detail and becomes **a second noise source** in its own right. NOTE 1 sends
+the calculation to Clause 7 for it.
 
 ```python
 from phonometry import noise_control
 
-sixth = noise_control.valve_aerodynamic_noise(
+case = dict(
     mass_flow=0.89, inlet_pressure=1.0e6, outlet_pressure=5.0e4,
     inlet_density=5.3, inlet_temperature=450.0, specific_heat_ratio=1.22,
     molecular_mass=19.8, flow_coefficient=30.0,
@@ -21064,14 +21065,66 @@ sixth = noise_control.valve_aerodynamic_noise(
     internal_diameter=0.15, wall_thickness=0.008, pipe_density=8000.0,
     efficiency_correction=-3.8, strouhal_number=0.2,
 )
-print(round(sixth.outlet_mach, 2))   # 0.89, far past the 0.3 of NOTE 1
-print(round(sixth.pipe_mach, 2))     # 0.4, clamped to 0.3 for the correction
+both = noise_control.valve_aerodynamic_noise(
+    **case, expander=noise_control.Expander()
+)
+
+print(round(both.outlet_mach, 2))     # 0.89, far past the 0.3 of NOTE 1
+print(round(both.pipe_mach, 2))       # 0.4, clamped to 0.3 for the correction
+print(round(both.external_level))     # 94  dB(A), trim and outlet together
 ```
 
-That is Annex A's example 6, which the annex prints anyway. The library does
-the same and reports both numbers rather than refusing, because the printed
-column is what an implementation has to reproduce, but a reading with
-$M_o = 0{,}89$ is a reading Clause 5 does not stand behind.
+That is Annex A's example 6, and 94 dB(A) is what the annex prints for it.
+Without the `expander` the same call gives 93 and warns that a source is
+missing: the level is the trim alone, which is not what a valve running at
+Mach 0,89 sounds like.
+
+Clause 7 is a small chain of its own. The flow is accelerated through the
+narrower outlet, capped at Mach 0,8 in the pipe and at the speed of sound at
+the outlet, and what it makes is Equations (34) to (41):
+
+$$
+U_R = \frac{U_p D_i^2}{\beta d_i^2}, \qquad
+W_{mR} = \frac{\dot m U_R^2}{2}
+         \left[\left(1 - \frac{d_i^2}{D_i^2}\right)^2 + 0{,}2\right],
+\qquad
+\eta_R = 10^{A_\eta} M_R^3
+$$
+
+```python
+from phonometry import noise_control
+
+outlet = both.expander
+print(round(outlet.inlet_velocity))            # 460  m/s
+print(round(outlet.mach, 2))                   # 0.96
+print(round(outlet.stream_power))              # 47854  W
+print(round(outlet.sound_power, 1))            # 42.0   W
+print(round(outlet.peak_frequency))            # 920    Hz
+print(round(outlet.internal_level))            # 151    dB
+```
+
+Every one of those is printed in the sixth column of Table A.1. Note the
+company the outlet keeps: 42 W of sound against the 218 W the trim makes, but
+at 920 Hz instead of 7,9 kHz, which is why it moves the A-weighted answer at
+all.
+
+**The two sources add in energy, not in level.** Equation (43) sums them
+inside the pipe, and Equation (24) then takes the sum through the wall once,
+because there is only one wall.
+
+$$
+L_{piS}(f_i) = 10 \lg\left(
+  10^{L_{pi}(f_i)/10} + 10^{L_{piR}(f_i)/10}\right)
+$$
+
+Two other things about Clause 7 are worth knowing before using it. Its 7.1
+limits the transition piece to **30 degrees of total included angle**, because
+a steeper cone makes the flow unstable in ways the standard does not model.
+And the contraction coefficient $\beta$ of Equation (35) is a measurement, not
+a constant: NOTE 1 gives 0,93 for straight pattern globe valves, says some
+rotary valves may be as low as 0,7, and admits there are no data for the rest.
+`Expander` defaults to the 0,93 and to Table 4's own *expander* row, which is
+$A_\eta = -3{,}0$ and not the valve's figure.
 
 ## See also
 
@@ -39146,6 +39199,11 @@ documents, one page per module.
 | `internal_spectrum` | `function` | **Eq. (19): the internal level spread over the third-octave bands around the peak.**<br>• `internal_level` [dB], `peak_frequency` [Hz], `frequency` [Hz]<br>• Falls as f^-2.5 above the peak and f^1.7 below it | `noise_control.internal_spectrum(155.3, 7778.0, bands)` |
 | `pipe_transmission_loss` | `function` | **Eq. (20a): what the pipe wall keeps in, band by band (negative).**<br>• `frequency` [Hz]<br>• `internal_diameter`, `wall_thickness`, `valve_outlet_diameter` [m]<br>• `downstream_density` [kg/m3], `downstream_sound_speed` [m/s], `pipe_density` [kg/m3]<br>• `pipe_sound_speed`, `air_sound_speed`, `atmospheric_pressure`, `standard_pressure` | `noise_control.pipe_transmission_loss(bands, internal_diameter=0.2, ...)` |
 | `coincidence_frequencies` / `PipeFrequencies` | `function` / `dataclass` | **The ring and two coincidence frequencies of Eqs. (21) to (23) that shape the transmission loss.**<br>• `internal_diameter`, `wall_thickness`, `downstream_sound_speed`<br>• `ring` f_r, `internal_coincidence` f_o, `external_coincidence` f_g | `noise_control.coincidence_frequencies(0.2, 0.008, 408.0)` |
+| `expander_noise` / `ExpanderNoise` | `function` / `dataclass` | **Clause 7: what the flow leaving the valve outlet makes (Eqs. (34) to (42)).**<br>• `frequency` [Hz]<br>• `mass_flow`, `downstream_density`, `downstream_sound_speed`<br>• `internal_diameter` D_i, `throat_diameter` d_i (the smaller of valve outlet and expander inlet) [m]<br>• `velocity_correction` L_g [dB], `expander`<br>• result: `pipe_velocity` (capped at Mach 0.8), `inlet_velocity` (capped at c_2), `mach`, `stream_power`, `acoustical_efficiency`, `sound_power`, `peak_frequency`, `internal_level`, `band_internal_level` | `noise_control.expander_noise(bands, mass_flow=0.89, ...)` |
+| `Expander` / `DEFAULT_EXPANDER` | `dataclass` / `constant` | **The transition piece downstream of the valve, limited by 7.1 to 30 degrees of total included angle.**<br>• `contraction` beta (Default: 0.93, the NOTE 1 figure for straight pattern globe valves; some rotary valves reach 0.7)<br>• `efficiency_correction` A_eta (Default: -3.0, Table 4's own *expander* row)<br>• `strouhal_number` St_p (Default: 0.2) | `noise_control.Expander(contraction=0.7)` |
+| `combine_internal_levels` | `function` | **Eq. (43): two spectra at the same pipe wall, added in energy.**<br>• `*levels`: two or more band level arrays of one shape [dB]<br>The valve trim and the outlet flow are two sources inside one pipe, and only the sum crosses the wall | `noise_control.combine_internal_levels(trim, outlet)` |
+| `ValveNoiseWarning` | `class` | **A valve read outside the conditions IEC 60534-8-3 prints for it.**<br>• raised when the valve outlet passes the Mach 0.3 of NOTE 1 to Eq. (15) and no `expander` was given, so the second source is missing from the answer | `warnings.simplefilter('error', noise_control.ValveNoiseWarning)` |
+| `EXPANDER_PIPE_MACH_LIMIT` / `GLOBE_CONTRACTION_COEFFICIENT` | `constant` | **0.8**, the Mach number Eq. (34) caps the downstream pipe velocity at, and **0.93**, the contraction coefficient NOTE 1 to Eq. (35) gives for straight pattern globe valves. | `noise_control.EXPANDER_PIPE_MACH_LIMIT` |
 | `VALVE_ACOUSTIC_STYLES` | `constant` | **Table 4**: (A_eta, St_p) for the thirteen valve styles the table prints, from the globe parabolic plug to the expander. | `noise_control.VALVE_ACOUSTIC_STYLES['globe ported cage']` → `(-3.8, 0.2)` |
 | `FLOW_COEFFICIENT_CONSTANTS` | `constant` | **Table 1**: N_14 for the two flow coefficients, `{'Cv': 4.6e-3, 'Kv': 4.9e-3}`. Both are rounded to two digits, so the same valve rated either way differs by 1 %. | `noise_control.FLOW_COEFFICIENT_CONSTANTS` |
 | `AERODYNAMIC_A_WEIGHTING_DB` | `constant` | **Table 7**: the A weighting the standard prints for its own 33 bands, which Eq. (25) sums with. | `noise_control.AERODYNAMIC_A_WEIGHTING_DB[19]` → `0.0` |
@@ -54106,7 +54164,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 816 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 818 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -54475,7 +54533,7 @@ sample from the metrology core:
 | IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()`; IEC 61252:2025 has since superseded this print, and the transcription still targets the 1993+A2 text | `tests/signals/test_levels.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-816 numerical conformance checks across 68 domains and 396 standards, covering
+818 numerical conformance checks across 68 domains and 396 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise

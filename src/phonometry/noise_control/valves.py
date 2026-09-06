@@ -56,6 +56,7 @@ IEC 60534-8-4 are separate.
 from __future__ import annotations
 
 import math
+import warnings
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -65,6 +66,7 @@ from .._internal.validation import (
     require_choice,
     require_positive,
 )
+from .._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from numpy.typing import NDArray
@@ -72,7 +74,10 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
 __all__ = [
     "AERODYNAMIC_A_WEIGHTING_DB",
     "AIR_SOUND_SPEED_M_S",
+    "DEFAULT_EXPANDER",
+    "EXPANDER_PIPE_MACH_LIMIT",
     "FLOW_COEFFICIENT_CONSTANTS",
+    "GLOBE_CONTRACTION_COEFFICIENT",
     "MACH_LIMIT_STANDARD_TRIM",
     "PIPE_SOUND_SPEED_M_S",
     "PIPE_WALL_MACH_LIMIT",
@@ -86,9 +91,14 @@ __all__ = [
     "UNIVERSAL_GAS_CONSTANT",
     "VALVE_ACOUSTIC_STYLES",
     "AerodynamicValveNoise",
+    "Expander",
+    "ExpanderNoise",
     "PipeFrequencies",
     "RegimeBoundaries",
+    "ValveNoiseWarning",
     "coincidence_frequencies",
+    "combine_internal_levels",
+    "expander_noise",
     "flow_regime",
     "internal_spectrum",
     "jet_diameter",
@@ -161,6 +171,20 @@ MACH_LIMIT_STANDARD_TRIM = 0.3
 #: when the velocity correction is computed, however fast the pipe runs.
 PIPE_WALL_MACH_LIMIT = 0.3
 
+#: NOTE 1 to Equation (34): the downstream pipe velocity of Clause 7 is
+#: capped at this Mach number however fast the pipe would otherwise run.
+EXPANDER_PIPE_MACH_LIMIT = 0.8
+
+#: The contraction coefficient of NOTE 1 to Equation (35), for straight
+#: pattern globe valves. The note puts some rotary valves as low as 0,7 and
+#: says there are no data for the rest, so this is a default and not a fact
+#: about a valve on a bench.
+GLOBE_CONTRACTION_COEFFICIENT = 0.93
+
+#: Equation (36)'s additive constant, which keeps the stream power finite
+#: when the expander opens into a pipe of its own diameter.
+_EXPANDER_RESIDUAL = 0.2
+
 #: The five regimes of Clause 5.2, by the number the clause prints. Regime I
 #: is subsonic in the vena contracta, II and III are choked with a growing
 #: jet, and IV and V are the shock-cell regimes where the peak frequency is
@@ -215,12 +239,19 @@ _SPECTRUM_LOW_EXPONENT = 1.7
 _UNDAMPED_OUTLET_M = 0.15
 _FULLY_DAMPED_OUTLET_M = 0.05
 
+#: Equation (43) combines at least the valve trim with the expander.
+_MINIMUM_SOURCES = 2
+
 #: The peak-frequency coefficient of regimes IV and V in Table 3.
 _SHOCK_PEAK_COEFFICIENT = 1.4
 
 #: Table 3's exponent on the jet Mach number in regimes II and III, and on
 #: the root of two in regimes IV and V.
 _EFFICIENCY_MACH_EXPONENT = 6.6
+
+
+class ValveNoiseWarning(PhonometryWarning):
+    """A valve read outside the conditions IEC 60534-8-3 prints for it."""
 
 
 @dataclass(frozen=True)
@@ -718,6 +749,188 @@ def pipe_transmission_loss(
 
 
 @dataclass(frozen=True)
+class Expander:
+    r"""The transition piece downstream of the valve (Clause 7).
+
+    A valve whose outlet is narrower than the pipe it discharges into makes a
+    second jet, at the step. Clause 7 is the method for it, and 7.1 limits
+    the method to a transition of 30 degrees total included angle: a steeper
+    cone makes the flow unstable in ways the standard does not model.
+
+    :ivar contraction: :math:`\beta` of Equation (35). NOTE 1 puts it at 0,93
+        for straight pattern globe valves and as low as 0,7 for some rotary
+        ones, and says there are no data for the rest.
+    :ivar efficiency_correction: :math:`A_\eta` for the expander, which is its
+        own row of Table 4 and not the valve's: the table prints -3,0.
+    :ivar strouhal_number: :math:`St_p` for the expander, 0,2 in Table 4.
+    """
+
+    contraction: float = GLOBE_CONTRACTION_COEFFICIENT
+    efficiency_correction: float = -3.0
+    strouhal_number: float = 0.2
+
+
+#: The straight pattern globe valve of NOTE 1 with the expander row of
+#: Table 4, which is what Annex A's sixth example is and what a caller who
+#: does not say otherwise gets.
+DEFAULT_EXPANDER = Expander()
+
+
+@dataclass(frozen=True)
+class ExpanderNoise:
+    r"""What Clause 7 says the flow leaving the valve outlet makes.
+
+    :ivar pipe_velocity: :math:`U_p` of Equation (34), in m/s, after the
+        Mach 0,8 cap.
+    :ivar inlet_velocity: :math:`U_R` of Equation (35), in m/s, after the
+        sonic cap.
+    :ivar mach: :math:`M_R` of Equation (39).
+    :ivar stream_power: :math:`W_{mR}` of Equation (36), in W.
+    :ivar acoustical_efficiency: :math:`\eta_R` of Equation (38).
+    :ivar sound_power: :math:`W_{aR}` of Equation (40), in W.
+    :ivar peak_frequency: :math:`f_{pR}` of Equation (37), in Hz.
+    :ivar internal_level: :math:`L_{piR}` of Equation (41), in dB.
+    :ivar band_internal_level: :math:`L_{piR}(f_i)` of Equation (42), in dB.
+    """
+
+    pipe_velocity: float
+    inlet_velocity: float
+    mach: float
+    stream_power: float
+    acoustical_efficiency: float
+    sound_power: float
+    peak_frequency: float
+    internal_level: float
+    band_internal_level: NDArray[np.float64]
+
+
+def expander_noise(  # noqa: PLR0913
+    frequency: NDArray[np.float64],
+    *,
+    mass_flow: float,
+    downstream_density: float,
+    downstream_sound_speed: float,
+    internal_diameter: float,
+    throat_diameter: float,
+    velocity_correction: float,
+    expander: Expander = DEFAULT_EXPANDER,
+) -> ExpanderNoise:
+    r"""Clause 7: the noise the flow makes leaving the valve outlet.
+
+    .. math::
+
+       U_p = \frac{4 \dot m}{\pi \rho_2 D_i^2}, \qquad
+       U_R = \frac{U_p D_i^2}{\beta d_i^2}, \qquad
+       M_R = \frac{U_R}{c_2}
+
+    .. math::
+
+       W_{mR} = \frac{\dot m U_R^2}{2}
+                \left[\left(1 - \frac{d_i^2}{D_i^2}\right)^2
+                + 0{,}2\right],
+       \qquad
+       \eta_R = 10^{A_\eta} M_R^3, \qquad
+       f_{pR} = \frac{St_p U_R}{d_i}
+
+    The two caps are the clause's: :math:`U_p` is limited to Mach 0,8 and
+    :math:`U_R` to the sonic velocity, so a step that would otherwise be
+    computed as supersonic is computed at Mach one instead.
+
+    :param frequency: The band centre frequencies, in Hz.
+    :param mass_flow: :math:`\dot m`, in kg/s.
+    :param downstream_density: :math:`\rho_2`, in kg/m³.
+    :param downstream_sound_speed: :math:`c_2`, in m/s.
+    :param internal_diameter: :math:`D_i` of the downstream pipe, in m.
+    :param throat_diameter: :math:`d_i`, the smaller of the valve outlet and
+        the expander inlet, in m.
+    :param velocity_correction: :math:`L_g` of Equation (16), in dB, which
+        Equation (41) adds exactly as Equation (18) does.
+    :param expander: The transition piece.
+    :return: An :class:`ExpanderNoise`.
+    :raises ValueError: If a value is not positive and finite, or the throat
+            is wider than the pipe.
+    """
+    bands = np.asarray(frequency, dtype=np.float64)
+    flow = require_positive(mass_flow, "mass_flow")
+    rho2 = require_positive(downstream_density, "downstream_density")
+    c2 = require_positive(downstream_sound_speed, "downstream_sound_speed")
+    bore = require_positive(internal_diameter, "internal_diameter")
+    throat = require_positive(throat_diameter, "throat_diameter")
+    beta = require_positive(expander.contraction, "expander.contraction")
+    if throat > bore:
+        msg = (
+            "'throat_diameter' is the smaller of the valve outlet and the "
+            f"expander inlet, so it cannot exceed the pipe bore; got "
+            f"{throat_diameter!r} m against {internal_diameter!r} m."
+        )
+        raise ValueError(msg)
+
+    pipe_velocity = min(
+        4.0 * flow / (math.pi * rho2 * bore**2),
+        EXPANDER_PIPE_MACH_LIMIT * c2,
+    )
+    inlet_velocity = min(pipe_velocity * bore**2 / (beta * throat**2), c2)
+    mach = inlet_velocity / c2
+    area_ratio = throat**2 / bore**2
+    stream_power = (
+        flow * inlet_velocity**2 / 2.0 * ((1.0 - area_ratio) ** 2 + _EXPANDER_RESIDUAL)
+    )
+    efficiency = 10.0**expander.efficiency_correction * mach**3
+    sound_power = efficiency * stream_power
+    peak = expander.strouhal_number * inlet_velocity / throat
+    internal_level = (
+        10.0
+        * math.log10(_INTERNAL_LEVEL_COEFFICIENT * sound_power * rho2 * c2 / bore**2)
+        + velocity_correction
+    )
+    return ExpanderNoise(
+        pipe_velocity=float(pipe_velocity),
+        inlet_velocity=float(inlet_velocity),
+        mach=float(mach),
+        stream_power=float(stream_power),
+        acoustical_efficiency=float(efficiency),
+        sound_power=float(sound_power),
+        peak_frequency=float(peak),
+        internal_level=float(internal_level),
+        band_internal_level=internal_spectrum(internal_level, peak, bands),
+    )
+
+
+def combine_internal_levels(
+    *levels: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    r"""Equation (43): two internal spectra at the same pipe wall, added.
+
+    .. math::
+
+       L_{piS}(f_i) = 10 \lg\left(
+         10^{L_{pi}(f_i)/10} + 10^{L_{piR}(f_i)/10}\right)
+
+    The valve trim and the expander are two sources inside one pipe, so they
+    add in energy and not in level, and the sum is what Equation (24) then
+    takes through the wall.
+
+    :param levels: Two or more band level arrays of the same shape, in dB.
+    :return: Their energy sum, in dB.
+    :raises ValueError: If fewer than two are given, or they disagree in
+        shape.
+    """
+    if len(levels) < _MINIMUM_SOURCES:
+        msg = (
+            "Equation (43) combines the valve trim with the expander, so "
+            f"'levels' needs at least two spectra; got {len(levels)}."
+        )
+        raise ValueError(msg)
+    arrays = [np.asarray(level, dtype=np.float64) for level in levels]
+    shapes = {array.shape for array in arrays}
+    if len(shapes) != 1:
+        msg = f"Every spectrum must have the same shape; got {sorted(shapes)}."
+        raise ValueError(msg)
+    total = sum(10.0 ** (array / 10.0) for array in arrays)
+    return np.asarray(10.0 * np.log10(total), dtype=np.float64)
+
+
+@dataclass(frozen=True)
 class AerodynamicValveNoise:
     r"""What IEC 60534-8-3 Clause 5 says about one operating point.
 
@@ -747,6 +960,10 @@ class AerodynamicValveNoise:
     :ivar external_level: :math:`L_{pAe,1m}` of Equation (25), in dB.
     :ivar pipe_frequencies: The ring and coincidence frequencies the
         transmission loss is shaped by.
+    :ivar expander: What Clause 7 says the flow leaving the valve outlet
+        makes, or ``None`` when no expander was given. When it is present its
+        spectrum is already in ``band_external_level`` and in
+        ``external_level``, combined with the trim by Equation (43).
     """
 
     regime: int
@@ -770,6 +987,7 @@ class AerodynamicValveNoise:
     band_external_level: NDArray[np.float64]
     external_level: float
     pipe_frequencies: PipeFrequencies
+    expander: ExpanderNoise | None
 
 
 def _third_octave_bands() -> NDArray[np.float64]:
@@ -798,6 +1016,7 @@ def valve_aerodynamic_noise(  # noqa: PLR0913
     efficiency_correction: float,
     strouhal_number: float,
     coefficient: str = "Cv",
+    expander: Expander | None = None,
     pipe_sound_speed: float = PIPE_SOUND_SPEED_M_S,
     air_sound_speed: float = AIR_SOUND_SPEED_M_S,
     atmospheric_pressure: float = 1.01325e5,
@@ -828,6 +1047,11 @@ def valve_aerodynamic_noise(  # noqa: PLR0913
     :param efficiency_correction: :math:`A_\eta` from Table 4.
     :param strouhal_number: :math:`St_p` from Table 4.
     :param coefficient: ``"Cv"`` or ``"Kv"``, selecting :math:`N_{14}`.
+    :param expander: The transition piece downstream of the valve. Give one
+        when the valve outlet is narrower than the pipe and the outlet Mach
+        number has passed 0,3, which is when NOTE 1 to Equation (15) sends
+        the calculation to Clause 7; the flow leaving the outlet is then a
+        second source and Equation (43) adds it to the trim.
     :param pipe_sound_speed: :math:`c_s`, in m/s.
     :param air_sound_speed: :math:`c_a`, in m/s.
     :param atmospheric_pressure: :math:`p_a`, in Pa.
@@ -905,6 +1129,30 @@ def valve_aerodynamic_noise(  # noqa: PLR0913
 
     bands = _third_octave_bands()
     band_internal = internal_spectrum(internal_level, peak, bands)
+    outlet_noise: ExpanderNoise | None = None
+    if expander is not None:
+        outlet_noise = expander_noise(
+            bands,
+            mass_flow=flow,
+            downstream_density=rho2,
+            downstream_sound_speed=c2,
+            internal_diameter=bore,
+            throat_diameter=min(outlet, bore),
+            velocity_correction=velocity_correction,
+            expander=expander,
+        )
+        band_internal = combine_internal_levels(
+            band_internal, outlet_noise.band_internal_level
+        )
+    elif outlet_mach > MACH_LIMIT_STANDARD_TRIM:
+        warnings.warn(
+            f"The valve outlet is at Mach {outlet_mach:.2g} and NOTE 1 to "
+            f"Equation (15) holds Clause 5 to {MACH_LIMIT_STANDARD_TRIM:g}, "
+            "so the flow leaving the outlet is a second source this result "
+            "does not carry. Pass an 'expander' to add the Clause 7 term.",
+            ValveNoiseWarning,
+            stacklevel=2,
+        )
     band_loss = pipe_transmission_loss(
         bands,
         internal_diameter=bore,
@@ -957,4 +1205,5 @@ def valve_aerodynamic_noise(  # noqa: PLR0913
         band_external_level=np.asarray(band_external, dtype=np.float64),
         external_level=float(external_level),
         pipe_frequencies=pipe,
+        expander=outlet_noise,
     )

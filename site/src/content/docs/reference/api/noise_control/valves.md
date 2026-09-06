@@ -93,6 +93,7 @@ AerodynamicValveNoise(
     band_external_level: NDArray[np.float64],
     external_level: float,
     pipe_frequencies: PipeFrequencies,
+    expander: ExpanderNoise | None,
 )
 ```
 
@@ -123,6 +124,7 @@ What IEC 60534-8-3 Clause 5 says about one operating point.
 | `band_external_level` | $L_{pe,1m}(f_i)$ of Equation (24), in dB. |
 | `external_level` | $L_{pAe,1m}$ of Equation (25), in dB. |
 | `pipe_frequencies` | The ring and coincidence frequencies the transmission loss is shaped by. |
+| `expander` | What Clause 7 says the flow leaving the valve outlet makes, or `None` when no expander was given. When it is present its spectrum is already in `band_external_level` and in `external_level`, combined with the trim by Equation (43). |
 
 ## AIR_SOUND_SPEED_M_S
 
@@ -169,6 +171,156 @@ $$
 | :--- | :--- |
 | ValueError | If any argument is not positive and finite. |
 
+## combine_internal_levels
+
+```python
+combine_internal_levels(*levels: NDArray[np.float64]) -> NDArray[np.float64]
+```
+
+Equation (43): two internal spectra at the same pipe wall, added.
+
+$$
+L_{piS}(f_i) = 10 \lg\left( 10^{L_{pi}(f_i)/10} + 10^{L_{piR}(f_i)/10}\right)
+$$
+
+The valve trim and the expander are two sources inside one pipe, so they
+add in energy and not in level, and the sum is what Equation (24) then
+takes through the wall.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `levels` | Two or more band level arrays of the same shape, in dB. |
+
+**Returns:** Their energy sum, in dB.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If fewer than two are given, or they disagree in shape. |
+
+## DEFAULT_EXPANDER
+
+*Constant* (`phonometry.noise_control.valves.Expander`).
+
+## Expander
+
+```python
+Expander(
+    contraction: float = 0.93,
+    efficiency_correction: float = -3.0,
+    strouhal_number: float = 0.2,
+)
+```
+
+The transition piece downstream of the valve (Clause 7).
+
+A valve whose outlet is narrower than the pipe it discharges into makes a
+second jet, at the step. Clause 7 is the method for it, and 7.1 limits
+the method to a transition of 30 degrees total included angle: a steeper
+cone makes the flow unstable in ways the standard does not model.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `contraction` | $\beta$ of Equation (35). NOTE 1 puts it at 0,93 for straight pattern globe valves and as low as 0,7 for some rotary ones, and says there are no data for the rest. |
+| `efficiency_correction` | $A_\eta$ for the expander, which is its own row of Table 4 and not the valve's: the table prints -3,0. |
+| `strouhal_number` | $St_p$ for the expander, 0,2 in Table 4. |
+
+## expander_noise
+
+```python
+expander_noise(
+    frequency: NDArray[np.float64],
+    *,
+    mass_flow: float,
+    downstream_density: float,
+    downstream_sound_speed: float,
+    internal_diameter: float,
+    throat_diameter: float,
+    velocity_correction: float,
+    expander: Expander = ...,
+) -> ExpanderNoise
+```
+
+Clause 7: the noise the flow makes leaving the valve outlet.
+
+$$
+U_p = \frac{4 \dot m}{\pi \rho_2 D_i^2}, \qquad U_R = \frac{U_p D_i^2}{\beta d_i^2}, \qquad M_R = \frac{U_R}{c_2}
+$$
+
+$$
+W_{mR} = \frac{\dot m U_R^2}{2} \left[\left(1 - \frac{d_i^2}{D_i^2}\right)^2 + 0{,}2\right], \qquad \eta_R = 10^{A_\eta} M_R^3, \qquad f_{pR} = \frac{St_p U_R}{d_i}
+$$
+
+The two caps are the clause's: $U_p$ is limited to Mach 0,8 and
+$U_R$ to the sonic velocity, so a step that would otherwise be
+computed as supersonic is computed at Mach one instead.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `frequency` | The band centre frequencies, in Hz. |
+| `mass_flow` | $\dot m$, in kg/s. |
+| `downstream_density` | $\rho_2$, in kg/m³. |
+| `downstream_sound_speed` | $c_2$, in m/s. |
+| `internal_diameter` | $D_i$ of the downstream pipe, in m. |
+| `throat_diameter` | $d_i$, the smaller of the valve outlet and the expander inlet, in m. |
+| `velocity_correction` | $L_g$ of Equation (16), in dB, which Equation (41) adds exactly as Equation (18) does. |
+| `expander` | The transition piece. |
+
+**Returns:** An [`ExpanderNoise`](/phonometry/reference/api/noise_control/valves/#expandernoise).
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If a value is not positive and finite, or the throat is wider than the pipe. |
+
+## EXPANDER_PIPE_MACH_LIMIT
+
+*Constant* (`float`).
+
+```python
+EXPANDER_PIPE_MACH_LIMIT = 0.8
+```
+
+## ExpanderNoise
+
+```python
+ExpanderNoise(
+    pipe_velocity: float,
+    inlet_velocity: float,
+    mach: float,
+    stream_power: float,
+    acoustical_efficiency: float,
+    sound_power: float,
+    peak_frequency: float,
+    internal_level: float,
+    band_internal_level: NDArray[np.float64],
+)
+```
+
+What Clause 7 says the flow leaving the valve outlet makes.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `pipe_velocity` | $U_p$ of Equation (34), in m/s, after the Mach 0,8 cap. |
+| `inlet_velocity` | $U_R$ of Equation (35), in m/s, after the sonic cap. |
+| `mach` | $M_R$ of Equation (39). |
+| `stream_power` | $W_{mR}$ of Equation (36), in W. |
+| `acoustical_efficiency` | $\eta_R$ of Equation (38). |
+| `sound_power` | $W_{aR}$ of Equation (40), in W. |
+| `peak_frequency` | $f_{pR}$ of Equation (37), in Hz. |
+| `internal_level` | $L_{piR}$ of Equation (41), in dB. |
+| `band_internal_level` | $L_{piR}(f_i)$ of Equation (42), in dB. |
+
 ## FLOW_COEFFICIENT_CONSTANTS
 
 *Constant* (`dict`).
@@ -209,6 +361,14 @@ normative text and its list is consistent, so this follows the clause;
 | Exception | When |
 | :--- | :--- |
 | ValueError | If the pressure ratio is not a finite number in (0, 1). |
+
+## GLOBE_CONTRACTION_COEFFICIENT
+
+*Constant* (`float`).
+
+```python
+GLOBE_CONTRACTION_COEFFICIENT = 0.93
+```
 
 ## internal_spectrum
 
@@ -531,6 +691,7 @@ valve_aerodynamic_noise(
     efficiency_correction: float,
     strouhal_number: float,
     coefficient: str = 'Cv',
+    expander: Expander | None = None,
     pipe_sound_speed: float = 5000.0,
     air_sound_speed: float = 343.0,
     atmospheric_pressure: float = 101325.0,
@@ -566,6 +727,7 @@ the external level of 5.6, which are common to every regime.
 | `efficiency_correction` | $A_\eta$ from Table 4. |
 | `strouhal_number` | $St_p$ from Table 4. |
 | `coefficient` | `"Cv"` or `"Kv"`, selecting $N_{14}$. |
+| `expander` | The transition piece downstream of the valve. Give one when the valve outlet is narrower than the pipe and the outlet Mach number has passed 0,3, which is when NOTE 1 to Equation (15) sends the calculation to Clause 7; the flow leaving the outlet is then a second source and Equation (43) adds it to the trim. |
 | `pipe_sound_speed` | $c_s$, in m/s. |
 | `air_sound_speed` | $c_a$, in m/s. |
 | `atmospheric_pressure` | $p_a$, in Pa. |
@@ -615,3 +777,7 @@ a single large port has $F_d$ near one.
 | Exception | When |
 | :--- | :--- |
 | ValueError | If an argument is not positive and finite, or if the passage count is not a whole number. |
+
+## ValveNoiseWarning
+
+A valve read outside the conditions IEC 60534-8-3 prints for it.

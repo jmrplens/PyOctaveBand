@@ -15,6 +15,7 @@ the annex self-consistent and say so where they do.
 from __future__ import annotations
 
 import math
+import warnings
 from typing import Any
 
 import numpy as np
@@ -108,14 +109,27 @@ def _style_modifier() -> float:
     return valves.valve_style_modifier(0.00137, 0.181, 6)
 
 
-def _run(index: int) -> valves.AerodynamicValveNoise:
-    """Example ``index`` of Table A.1, one to six."""
+def _case(index: int) -> dict[str, Any]:
+    """The given data of example ``index``, ready to splat."""
     case = dict(EXAMPLES[index - 1])
     case.pop("example")
     case.pop("regime")
-    return valves.valve_aerodynamic_noise(
-        **COMMON, **case, style_modifier=_style_modifier()
-    )
+    return case
+
+
+def _run(index: int) -> valves.AerodynamicValveNoise:
+    """Example ``index`` of Table A.1, one to six, trim only.
+
+    The sixth column is past the Mach limit of NOTE 1 to Equation (15), so it
+    warns that the outlet flow is a source this result does not carry. That
+    is the point of the warning and it is checked in its own test; here it
+    would only be noise.
+    """
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", valves.ValveNoiseWarning)
+        return valves.valve_aerodynamic_noise(
+            **COMMON, **_case(index), style_modifier=_style_modifier()
+        )
 
 
 class TestRegimeBoundaries:
@@ -479,6 +493,124 @@ class TestWholeChain:
                 internal_diameter=0.2031,
                 style_modifier=_style_modifier(),
             )
+
+
+class TestExpander:
+    """Clause 7, against the sixth column of Table A.1.
+
+    Example 6 is the only one the annex works Clause 7 for, because it is the
+    only one whose outlet Mach number passes the 0,3 of NOTE 1 to
+    Equation (15). Every intermediate of that column is printed.
+    """
+
+    def _with_expander(self) -> valves.AerodynamicValveNoise:
+        return valves.valve_aerodynamic_noise(
+            **COMMON,
+            **_case(6),
+            style_modifier=_style_modifier(),
+            expander=valves.Expander(),
+        )
+
+    def test_the_printed_defaults_are_the_ones_the_notes_give(self) -> None:
+        # NOTE 1 to Equation (35) for the contraction, and Table 4's own
+        # "Expander" row for the other two, which is not the valve's row.
+        assert valves.DEFAULT_EXPANDER.contraction == pytest.approx(0.93)
+        assert valves.DEFAULT_EXPANDER.efficiency_correction == pytest.approx(-3.0)
+        assert valves.DEFAULT_EXPANDER.strouhal_number == pytest.approx(0.2)
+        assert valves.VALVE_ACOUSTIC_STYLES["expander"] == (-3.0, 0.2)
+
+    def test_every_printed_intermediate_of_the_sixth_column(self) -> None:
+        found = self._with_expander().expander
+        assert found is not None
+        assert found.pipe_velocity == pytest.approx(190.0, abs=0.5)
+        assert found.inlet_velocity == pytest.approx(460.0, abs=0.5)
+        assert found.mach == pytest.approx(0.96, abs=5e-3)
+        assert found.stream_power == pytest.approx(47854.0, abs=5.0)
+        assert found.acoustical_efficiency == pytest.approx(8.8e-4, rel=0.01)
+        assert found.sound_power == pytest.approx(42.0, abs=0.05)
+        assert found.peak_frequency == pytest.approx(920.0, abs=0.5)
+        assert found.internal_level == pytest.approx(151.0, abs=0.5)
+
+    def test_it_closes_the_one_example_clause_five_cannot(self) -> None:
+        # 93 dB(A) from the trim alone, 94 with the outlet flow added, which
+        # is what the annex prints.
+        assert round(_run(6).external_level) == 93
+        assert round(self._with_expander().external_level) == 94
+
+    def test_the_expander_only_ever_adds(self) -> None:
+        # Equation (43) sums two energies, so the combined spectrum sits at or
+        # above the trim alone in every band.
+        alone = _run(6)
+        both = self._with_expander()
+        assert np.all(both.band_internal_level >= alone.band_internal_level)
+
+    def test_a_valve_past_the_mach_limit_says_so_when_asked_for_nothing(
+        self,
+    ) -> None:
+        with pytest.warns(valves.ValveNoiseWarning, match="Clause 7"):
+            valves.valve_aerodynamic_noise(
+                **COMMON, **_case(6), style_modifier=_style_modifier()
+            )
+
+    def test_a_valve_inside_the_limit_says_nothing(self) -> None:
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", valves.ValveNoiseWarning)
+            valves.valve_aerodynamic_noise(
+                **COMMON, **_case(1), style_modifier=_style_modifier()
+            )
+
+    def test_the_pipe_velocity_is_capped_at_mach_eight_tenths(self) -> None:
+        # Equation (34) is capped, so a pipe that would run supersonic is
+        # computed as if it ran at 0,8.
+        fast = valves.expander_noise(
+            np.array([1000.0]),
+            mass_flow=50.0,
+            downstream_density=0.265,
+            downstream_sound_speed=480.0,
+            internal_diameter=0.15,
+            throat_diameter=0.1,
+            velocity_correction=0.0,
+        )
+        assert fast.pipe_velocity == pytest.approx(
+            valves.EXPANDER_PIPE_MACH_LIMIT * 480.0
+        )
+
+    def test_the_inlet_velocity_is_capped_at_the_speed_of_sound(self) -> None:
+        fast = valves.expander_noise(
+            np.array([1000.0]),
+            mass_flow=50.0,
+            downstream_density=0.265,
+            downstream_sound_speed=480.0,
+            internal_diameter=0.15,
+            throat_diameter=0.05,
+            velocity_correction=0.0,
+        )
+        assert fast.inlet_velocity == pytest.approx(480.0)
+        assert fast.mach == pytest.approx(1.0)
+
+    def test_it_refuses_a_throat_wider_than_the_pipe(self) -> None:
+        with pytest.raises(ValueError, match="cannot exceed the pipe bore"):
+            valves.expander_noise(
+                np.array([1000.0]),
+                mass_flow=1.0,
+                downstream_density=1.0,
+                downstream_sound_speed=340.0,
+                internal_diameter=0.1,
+                throat_diameter=0.2,
+                velocity_correction=0.0,
+            )
+
+    def test_two_equal_spectra_combine_to_three_decibels_more(self) -> None:
+        one = np.array([80.0, 90.0])
+        assert valves.combine_internal_levels(one, one) == pytest.approx(one + 3.0103)
+
+    def test_it_refuses_a_combination_of_one(self) -> None:
+        with pytest.raises(ValueError, match="at least two spectra"):
+            valves.combine_internal_levels(np.array([80.0]))
+
+    def test_it_refuses_spectra_of_different_shapes(self) -> None:
+        with pytest.raises(ValueError, match="same shape"):
+            valves.combine_internal_levels(np.zeros(3), np.zeros(4))
 
 
 class TestPrintedTables:

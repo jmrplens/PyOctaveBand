@@ -38,6 +38,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The second noise source a fast valve outlet is, which closes the last of the
+  seven worked examples.
+
+  Past a valve outlet Mach number of 0,3 the flow leaving the outlet stops
+  being a detail of the trim and becomes a source of its own, and IEC
+  60534-8-3 sends the calculation to Clause 7 for it. `Expander` describes the
+  transition piece, `expander_noise` runs Equations (34) to (42) on it, and
+  `combine_internal_levels` adds the two spectra inside the pipe by
+  Equation (43) before the wall takes the sum through once, because there is
+  only one wall.
+
+  `valve_aerodynamic_noise` takes an optional `expander` and does all of that
+  itself. Without one it warns when the outlet has passed the limit, because
+  the answer is then the trim alone and a valve running at Mach 0,89 does not
+  sound like its trim.
+
+  That is the sixth example of Annex A, the only column the annex works
+  Clause 7 for, and every printed intermediate of it now has a conformance
+  row: 460 m/s at the expander inlet, 47 854 W of stream power, 42,0 W of
+  sound, a peak at 920 Hz where the trim peaks at 7,9 kHz, and 151 dB inside
+  the pipe. With them the column closes at the 94 dB(A) the annex prints,
+  where the trim alone gives 93.
+
 - What a control valve does to a pipe, which is where a plant's loudest noise
   usually comes from and which nothing in the library predicted.
 

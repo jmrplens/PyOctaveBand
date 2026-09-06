@@ -258,20 +258,20 @@ de pared entra al cuadrado en la Ecuación (20a), así que reducirlo a la mitad
 vale unos 6 dB en todas las bandas, que es la línea más barata y más olvidada
 de un presupuesto de ruido de válvula.
 
-## 5. Lo que el método no hace
+## 5. Cuando la salida corre: la segunda fuente
 
-El apartado 5 tiene límites, y dos aprietan en la práctica. El número de Mach
-a la salida de la válvula, $M_o$ de la Ecuación (15), tiene que quedarse por
-debajo de 0,3, y por encima la NOTA 1 dice que no se puede mantener la
-exactitud y que se use el apartado 7. El número de Mach en la tubería, $M_2$
-de la Ecuación (17), no es un límite sino un tope: la NOTA 2 lo recorta a 0,3
-antes de calcular la corrección de velocidad de la Ecuación (16), por rápido
-que vaya la tubería en realidad.
+El apartado 5 tiene límites, y dos aprietan. El número de Mach en la tubería,
+$M_2$ de la Ecuación (17), más que un límite es un tope: la NOTA 2 lo recorta
+a 0,3 antes de la corrección de velocidad de la Ecuación (16), por rápido que
+vaya la tubería en realidad. El número de Mach a la salida de la válvula,
+$M_o$ de la Ecuación (15), sí es un límite, y es el que importa, porque
+pasado 0,3 el flujo que sale por la salida deja de ser un detalle y pasa a
+ser **una segunda fuente de ruido**. La NOTA 1 manda el cálculo al apartado 7.
 
 ```python
 from phonometry import noise_control
 
-sixth = noise_control.valve_aerodynamic_noise(
+case = dict(
     mass_flow=0.89, inlet_pressure=1.0e6, outlet_pressure=5.0e4,
     inlet_density=5.3, inlet_temperature=450.0, specific_heat_ratio=1.22,
     molecular_mass=19.8, flow_coefficient=30.0,
@@ -280,14 +280,67 @@ sixth = noise_control.valve_aerodynamic_noise(
     internal_diameter=0.15, wall_thickness=0.008, pipe_density=8000.0,
     efficiency_correction=-3.8, strouhal_number=0.2,
 )
-print(round(sixth.outlet_mach, 2))   # 0.89, muy pasado el 0.3 de la NOTA 1
-print(round(sixth.pipe_mach, 2))     # 0.4, recortado a 0.3 para la corrección
+both = noise_control.valve_aerodynamic_noise(
+    **case, expander=noise_control.Expander()
+)
+
+print(round(both.outlet_mach, 2))     # 0.89, muy pasado el 0.3 de la NOTA 1
+print(round(both.pipe_mach, 2))       # 0.4, recortado a 0.3 para la corrección
+print(round(both.external_level))     # 94  dB(A), obturador y salida juntos
 ```
 
-Ese es el ejemplo 6 del anexo A, que el anexo imprime igualmente. La
-biblioteca hace lo mismo y devuelve los dos números en vez de negarse, porque
-la columna impresa es lo que una implementación tiene que reproducir, pero una
-lectura con $M_o = 0{,}89$ es una lectura que el apartado 5 no respalda.
+Ese es el ejemplo 6 del anexo A, y 94 dB(A) es lo que el anexo imprime para
+él. Sin el `expander` la misma llamada da 93 y avisa de que falta una fuente:
+el nivel es el del obturador solo, que no es lo que suena una válvula con la
+salida a Mach 0,89.
+
+El apartado 7 es una cadena pequeña por su cuenta. El flujo se acelera al
+pasar por la salida, más estrecha, con topes de Mach 0,8 en la tubería y de la
+velocidad del sonido en la salida, y lo que hace son las Ecuaciones (34) a
+(41):
+
+$$
+U_R = \frac{U_p D_i^2}{\beta d_i^2}, \qquad
+W_{mR} = \frac{\dot m U_R^2}{2}
+         \left[\left(1 - \frac{d_i^2}{D_i^2}\right)^2 + 0{,}2\right],
+\qquad
+\eta_R = 10^{A_\eta} M_R^3
+$$
+
+```python
+from phonometry import noise_control
+
+outlet = both.expander
+print(round(outlet.inlet_velocity))            # 460  m/s
+print(round(outlet.mach, 2))                   # 0.96
+print(round(outlet.stream_power))              # 47854  W
+print(round(outlet.sound_power, 1))            # 42.0   W
+print(round(outlet.peak_frequency))            # 920    Hz
+print(round(outlet.internal_level))            # 151    dB
+```
+
+Todos están impresos en la sexta columna de la Tabla A.1. Fíjate en la
+compañía que tiene la salida: 42 W de sonido frente a los 218 W del obturador,
+pero a 920 Hz en vez de a 7,9 kHz, que es por lo que llega a mover la
+respuesta ponderada A.
+
+**Las dos fuentes se suman en energía, no en nivel.** La Ecuación (43) las
+suma dentro de la tubería, y la Ecuación (24) lleva luego la suma a través de
+la pared una sola vez, porque pared no hay más que una.
+
+$$
+L_{piS}(f_i) = 10 \lg\left(
+  10^{L_{pi}(f_i)/10} + 10^{L_{piR}(f_i)/10}\right)
+$$
+
+Otras dos cosas del apartado 7 conviene saberlas antes de usarlo. Su 7.1
+limita la pieza de transición a **30 grados de ángulo total**, porque un cono
+más abrupto vuelve el flujo inestable de formas que la norma no modela. Y el
+coeficiente de contracción $\beta$ de la Ecuación (35) es una medida, no una
+constante: la NOTA 1 da 0,93 para válvulas de globo de paso recto, dice que
+algunas rotativas pueden bajar a 0,7 y admite que del resto no hay datos.
+`Expander` toma por defecto ese 0,93 y la fila *expander* de la propia Tabla
+4, que es $A_\eta = -3{,}0$ y no la cifra de la válvula.
 
 <SeeAlso
   links={[
