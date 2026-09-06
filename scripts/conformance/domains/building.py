@@ -431,6 +431,133 @@ def _chk_iso3382_1_reliable_limit() -> Outcome:
 
 @register(
     "Room & building acoustics",
+    "ISO 3382-1:2009 Table A.1",
+    "The single number of each quantity averages the bands the table names",
+)
+def _chk_iso3382_1_single_number_bands() -> Outcome:
+    # A.5 prints two examples for exactly this reason: G_m averages the two
+    # mid octaves and J_LFm averages four bands from 125 Hz, both under the
+    # same subscript. A library that hard-codes the mid pair gets the second
+    # wrong, so the check drives both through one call.
+    freqs = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+    values = np.array([0.2, 0.3, 0.4, 0.5, 9.0, 9.0])
+    return record(
+        {"G_m": 0.45, "J_LFm": 0.35},
+        {
+            "G_m": round(ph.room.single_number_average("G", values, freqs), 12),
+            "J_LFm": round(ph.room.single_number_average("J_LF", values, freqs), 12),
+        },
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 Table A.1 footnote a",
+    "Only the late lateral level is energy averaged, and it differs",
+)
+def _chk_iso3382_1_energy_average_exception() -> Outcome:
+    # Footnote a sends L_J to Equation (A.17) and every other row to an
+    # arithmetic mean. On four bands that disagree, the two answers are
+    # nearly 3 dB apart, so the exception is not cosmetic.
+    freqs = np.array([125.0, 250.0, 500.0, 1000.0])
+    values = np.array([-14.0, -8.0, -5.0, 1.0])
+    energetic = ph.room.single_number_average("L_J", values, freqs)
+    return numeric(
+        10.0 * math.log10(0.25 * float(np.sum(10.0 ** (values / 10.0)))),
+        energetic,
+        1e-12,
+        unit="dB",
+        places=6,
+        computed_label=(
+            f"{energetic:.4f} dB, against {float(np.mean(values)):.4f} dB arithmetic"
+        ),
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 Table A.2",
+    "Minimum receiver positions at the three printed hall sizes",
+)
+def _chk_iso3382_1_receiver_positions() -> Outcome:
+    return record(
+        {"500 seats": 6.0, "1000 seats": 8.0, "2000 seats": 10.0},
+        {
+            f"{seats} seats": round(
+                float(np.asarray(ph.room.minimum_receiver_positions(seats))), 12
+            )
+            for seats in (500, 1000, 2000)
+        },
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 4.2.1",
+    "A gliding directivity survey references the whole-turn energy mean",
+)
+def _chk_iso3382_1_directivity_reference() -> Outcome:
+    # 4.2.1 puts the reference at "a 360 degree energetic average in the
+    # measurement plane", so the energy mean of the deviations is exactly
+    # one whatever the pattern: every arc is measured against the same turn.
+    bearings = round(360.0 / ph.room.DIRECTIVITY_STEP_DEG)
+    angles = np.arange(bearings) * 2.0 * math.pi / bearings
+    levels = 20.0 * np.log10(np.abs(np.cos(angles)) + 1e-9)
+    deviations = ph.room.gliding_directivity_deviation(levels)
+    return numeric(
+        1.0,
+        float(np.mean(10.0 ** (deviations / 10.0))),
+        1e-9,
+        places=9,
+        expected_label="1 (+/-1e-09)",
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 3382-1:2009 Clause 9.1",
+    "A one-third-octave fiche averages the six bands, not two of them",
+)
+def _chk_iso3382_1_third_octave_mid() -> Outcome:
+    # 9.1 prints two routes to a single-number reverberation time and no
+    # third: the two octave bands, or "averages over the six one-third-octave
+    # bands from 400 Hz to 1 250 Hz". What a one-third-octave analysis must
+    # not do is average the two one-third-octave bands that happen to be
+    # called 500 Hz and 1 kHz, which is a sixth of the band the octave route
+    # covers. The check is on which bands the route selects, because that is
+    # what the two readings differ in.
+    t60 = 1.4
+    t = np.arange(round(4.0 * t60 * _FS)) / _FS
+    rng = np.random.default_rng(3382)
+    decay = rng.standard_normal(t.size) * np.exp(-0.5 * _A60 * t / t60)
+    res = ph.room.room_parameters(decay, _FS, limits=(100.0, 5000.0), fraction=3)
+    freqs = np.asarray(res.frequency, dtype=np.float64)
+    picked = [
+        float(freqs[int(np.argmin(np.abs(freqs - band)))])
+        for band in ph.room.MID_FREQUENCY_THIRD_OCTAVES_HZ
+    ]
+    return record(
+        {
+            f"band {index + 1}": band
+            for index, band in enumerate((400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0))
+        },
+        {
+            f"band {index + 1}": float(np.round(_nominal_third_octave(centre), 0))
+            for index, centre in enumerate(picked)
+        },
+        unit="Hz",
+    )
+
+
+def _nominal_third_octave(centre: float) -> float:
+    """The nominal one-third-octave centre nearest an exact band centre."""
+    from phonometry.filters.frequencies import _nominal_freq_for_band
+
+    return float(_nominal_freq_for_band(centre, 3.0))
+
+
+@register(
+    "Room & building acoustics",
     "ISO 18233:2006 (swept-sine method)",
     "Sweep deconvolution recovers a known IIR response",
 )

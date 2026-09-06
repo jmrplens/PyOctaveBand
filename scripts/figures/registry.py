@@ -410,6 +410,7 @@ from .room import (
     generate_decay_range_bias,
     generate_decay_signatures,
     generate_deconvolution_snr_gain,
+    generate_directivity_and_tables,
     generate_enclosed_space_absorption,
     generate_enclosed_space_air_term,
     generate_enclosed_space_objects,
@@ -1094,6 +1095,9 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # Annex C and Clause 7: the three windows the stage supports divide, and
     # what the randomness of an interrupted-noise excitation costs a T30.
     generate_stage_support_windows,
+    # Table 1 and Table A.1: qualifying a source against the printed
+    # directivity limits, and which bands each single number averages.
+    generate_directivity_and_tables,
     generate_fdtd_room_modes,
     # Building & structure-borne result figures (guide figure coverage):
     # ISO 717 enlarged range, ISO 16283 field chains, ISO 10052 survey impact,

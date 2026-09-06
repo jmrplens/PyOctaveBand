@@ -38,6 +38,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The four tables ISO 3382-1 prints, and the rules that go with them.
+
+  Table 1 says how far from omnidirectional a source may be before it stops
+  measuring the hall and starts measuring itself, and 4.2.1 says how to find
+  out: gliding 30 degree arcs against a whole-turn energetic reference.
+  `gliding_directivity_deviation` runs that survey and
+  `source_directivity_limit` holds it to the six bands the table prints, and
+  to no others: a survey in the 63 Hz or 8 kHz octave has no printed limit
+  rather than the nearest one.
+
+  Table A.1 is now data rather than prose. Each of its seven rows carries the
+  bands its single number averages, which are not the same set for every
+  quantity: five average two octaves and two average four, and A.5 prints
+  `G_m` and `J_LFm` side by side for exactly that reason. `TABLE_A1` also
+  carries the two exceptions that a table read casually loses. Only the late
+  lateral level is energy averaged, through Equation (A.17); only the early
+  decay time's just-noticeable difference is relative, "Rel. 5 %"; and the
+  late lateral level has none at all, printed as "Not known", which
+  `perceptibly_different` refuses to invent.
+
+  Table A.2's three rows lie exactly on a straight line in the logarithm of
+  the seat count, two microphone positions per doubling, so
+  `minimum_receiver_positions` can answer for a hall between them. It will
+  not answer past them: A.4 asks for "a minimum of between 6 and 10", and a
+  5 000-seat arena does not get thirteen positions on the strength of three
+  rows.
+
+  Clause 9 is the one normative part of all this. Its 9.1 prints two routes
+  to a single-number reverberation time and no third, and the accredited
+  fiche was taking neither for a one-third-octave analysis: it averaged the
+  two one-third-octave bands called 500 Hz and 1 kHz, which is a sixth of the
+  band the octave route covers. It now takes the printed route, the six bands
+  from 400 Hz to 1 250 Hz, and says so on the sheet. Its 9.2 lists fifteen
+  things a test report shall carry, and `TEST_REPORT_ITEMS` carries them in
+  order.
+
+  Two errata. The same limits are the "maximum acceptable deviation" in 4.2.1
+  and in the caption of Table 1, and "the minimum limits given in Table 1" in
+  A.4, which asks for extra measurements of a marginal source and, read
+  literally, asks for them on the sources that need them least. And the
+  gliding average of 4.2.1 never says where its six points sit relative to
+  the arc they are reported against, which moves every deviation by up to
+  half a window.
+
+  Five conformance rows.
+
 - What ISO 3382-1 says about the measurement itself, which is a stage the
   library had nothing for.
 

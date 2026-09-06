@@ -93,6 +93,9 @@ speech intelligibility a room affords is quantified by the
 - [Stage support and uncertainty (ISO 3382-1)](stage-and-uncertainty.md):
   the two measures taken on the platform with the source a metre away, and
   the uncertainty Clause 7 puts on a measured reverberation time.
+- [Reporting and source qualification (ISO 3382-1)](reporting-and-qualification.md):
+  Table 1 and the gliding directivity survey, the receiver counts of
+  Table A.2, and which bands each single number of Table A.1 averages.
 - [Open-Plan Office Acoustics (ISO 3382-3)](open-plan-acoustics.md):
   the spatial decay rate of speech and the distraction and privacy distances.
 - [Image sources and the steady-state room field](room-image-sources.md):

@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 119 guías de phonometry, agrupadas en los doce temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 120 guías de phonometry, agrupadas en los doce temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -111,7 +111,7 @@ hay ninguna panorámica del campo: cada página es la documentación de trabajo 
 un módulo, escrita para que un resultado se pueda defender apartado por
 apartado en lugar de darlo por bueno.
 
-Esta página es el mapa. Ciento diecinueve guías repartidas en doce temas, y cada
+Esta página es el mapa. Ciento veinte guías repartidas en doce temas, y cada
 área tiene su propio índice con el relato largo de cómo encajan sus piezas. Si
 llegas sin una pregunta concreta, lee primero la
 [introducción](/phonometry/es/start/getting-started/): recorre una señal por toda la
@@ -371,6 +371,9 @@ ANSI/ASA S12.2 y ASTM E413/E1414.
 - [Soporte de escenario e incertidumbre (ISO 3382-1)](/phonometry/es/buildings/rooms/stage-and-uncertainty/):
   lo que oye un intérprete de su propio instrumento en el escenario, y lo que
   la aleatoriedad de la excitación le cuesta a un tiempo de reverberación.
+- [Informe y cualificación de la fuente (ISO 3382-1)](/phonometry/es/buildings/rooms/reporting-and-qualification/):
+  las tablas impresas, desde la directividad que una fuente debe salvar hasta
+  los quince puntos que tiene que llevar un informe de ensayo.
 - [Acústica de oficinas diáfanas (ISO 3382-3)](/phonometry/es/buildings/rooms/open-plan-acoustics/):
   la tasa de decaimiento espacial del habla y las distancias de distracción y
   de privacidad de una planta diáfana.

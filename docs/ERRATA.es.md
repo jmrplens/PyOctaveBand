@@ -4769,6 +4769,72 @@ dos ediciones con las mismas entradas y en el mismo orden.
   llegada en el hueco y otra pasado el techo y exige que ninguna cambie nada.
 - **Estado:** sin comunicar.
 
+## ISO 3382-1:2009, Tabla 1 y A.4 (los mismos límites son máximos en un apartado y mínimos en el otro)
+
+- **Ubicación:** el título de la Tabla 1 y el párrafo de 4.2.1 que la
+  precede, folio impreso 3 (página 11 del PDF), frente al cuarto párrafo de
+  A.4, folio impreso 19 (página 27 del PDF).
+- **Lo impreso:** 4.2.1 dice «Table 1 lists the **maximum** acceptable
+  deviations from omnidirectionality when averaged over "gliding" 30° arcs in
+  a free sound field», y el título de la propia tabla reza «Table 1 —
+  **Maximum** deviation of directivity of source in decibels for excitation
+  with octave bands of pink noise and measured in free field». A.4 dice «If
+  the source directivity is close to the **minimum** limits given in Table 1,
+  the measurement should be repeated with the source turned in at least three
+  steps totally».
+- **El problema:** una tabla, dos palabras opuestas para lo que son sus
+  números. Los valores son techos, como dicen su propio título y 4.2.1, y A.4
+  los llama suelos.
+- **Consecuencia:** la frase de A.4 es la que le dice a un laboratorio cuándo
+  hacer trabajo de más, y leída tal cual dice lo contrario de lo que quiere
+  decir. Una fuente «close to the minimum limits» sería una casi perfecta, que
+  es justo el caso que no necesita repetición ninguna; lo que pide A.4 es
+  repetir el barrido de una fuente que apenas pasa el techo, porque ahí es
+  donde la orientación de la fuente empieza a importarle a la respuesta. Quien
+  tome la palabra al pie de la letra repite la medición con las fuentes
+  equivocadas y se la salta con las que la necesitan.
+- **Evidencia:** verificado en las páginas 11 y 27 del PDF (folios impresos 3
+  y 19) de BS EN ISO 3382-1:2009.
+- **Comportamiento de la biblioteca:**
+  [`MAX_SOURCE_DIRECTIVITY_DEVIATION_DB`](../src/phonometry/room/auditorium.py)
+  y [`source_directivity_limit`](../src/phonometry/room/auditorium.py) los
+  llevan como los máximos que su propio título hace de ellos. La repetición
+  con tres orientaciones de A.4 es un procedimiento, no un cálculo, y la
+  biblioteca no lo implementa.
+- **Estado:** sin comunicar.
+
+## ISO 3382-1:2009, 4.2.1 (un promedio deslizante cuya ventana no tiene fase declarada)
+
+- **Ubicación:** 4.2.1, el párrafo inmediatamente anterior a la Tabla 1, folio
+  impreso 3 (página 11 del PDF).
+- **Lo impreso:** «Table 1 lists the maximum acceptable deviations from
+  omnidirectionality when averaged over "gliding" 30° arcs in a free sound
+  field. In case a turntable cannot be used, measurements per 5° should be
+  performed, followed by "gliding" averages, each covering six neighbouring
+  points.»
+- **El problema:** seis puntos de 5° cubren 30° de arco leídos como seis
+  sectores, y 25° leídos como la distancia entre el primero y el último, así
+  que las dos frases sólo concuerdan con la lectura por sectores. Y, sobre
+  todo, nada dice dónde se sitúan esos seis puntos respecto del arco que
+  promedian: la ventana puede adelantarse a su acimut, retrasarse o quedar
+  centrada, y el apartado no elige. Tampoco dice cómo se combinan los seis,
+  aunque la referencia con la que se comparan sea explícitamente «a 360°
+  energetic average».
+- **Consecuencia:** la fase desplaza toda desviación reportada hasta media
+  ventana, 15° del patrón, lo que en una fuente cercana a su límite de la
+  Tabla 1 puede decidir si la desviación máxima cae sobre un lóbulo o entre
+  dos. Dos laboratorios que sigan los dos el apartado pueden dar desviaciones
+  máximas distintas para una misma fuente, y la norma no da forma de saber
+  cuál de los dos la leyó bien.
+- **Evidencia:** verificado en la página 11 del PDF (folio impreso 3) de
+  BS EN ISO 3382-1:2009.
+- **Comportamiento de la biblioteca:**
+  [`gliding_directivity_deviation`](../src/phonometry/room/auditorium.py) toma
+  la lectura por sectores, promedia los arcos energéticamente igual que la
+  referencia, y empieza cada ventana en el acimut contra el que se reporta,
+  dando la vuelta al círculo. Su docstring dice que las tres son elecciones.
+- **Estado:** sin comunicar.
+
 ## Propiedades de las fuentes, relacionadas, que no son erratas
 
 Registradas aquí para prevenir futuros «arreglos» que romperían la

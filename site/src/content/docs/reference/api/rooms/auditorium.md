@@ -53,6 +53,41 @@ hall, and this module does not make them follow the weather.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
+## AuditoriumQuantity
+
+```python
+AuditoriumQuantity(
+    symbol: str,
+    aspect: str,
+    averaging_bands_hz: tuple[float, ...],
+    just_noticeable_difference: float | None,
+    relative_jnd: bool,
+    typical_range: tuple[float, float],
+    energy_averaged: bool,
+    unit: str,
+)
+```
+
+One row of ISO 3382-1:2009, Table A.1.
+
+`symbol` is the quantity as the table prints it, `aspect` the
+subjective listener aspect it is grouped under, and
+`averaging_bands_hz` the octave bands its single number is the average
+over, which is **not** the same set for every row: five quantities
+average two bands and two average four.
+
+`just_noticeable_difference` is `None` for the late lateral sound
+level, whose JND the table prints as "Not known"; it is a fraction
+rather than an absolute difference when `relative_jnd` is True, which
+is only the early decay time's "Rel. 5 %". `energy_averaged` is True
+only for the late lateral level, which footnote a sends to
+Equation (A.17) while every other row is averaged arithmetically.
+
+`typical_range` is the pair the table prints, and footnote b conditions
+it: frequency-averaged values at single positions in unoccupied concert
+and multi-purpose halls up to 25 000 m³. It is not a range for one band,
+for an occupied hall, or for a spatial average.
+
 ## AuditoriumWarning
 
 A measurement outside the conditions ISO 3382-1:2009 prints for it.
@@ -63,6 +98,14 @@ A measurement outside the conditions ISO 3382-1:2009 prints for it.
 
 ```python
 DIFFUSE_FIELD_REFERENCE_OFFSET_DB = 37.0
+```
+
+## DIRECTIVITY_ARC_DEG
+
+*Constant* (`float`).
+
+```python
+DIRECTIVITY_ARC_DEG = 30.0
 ```
 
 ## directivity_energy_average
@@ -116,6 +159,22 @@ band per row when it is handed a two-dimensional survey.
 | Exception | When |
 | :--- | :--- |
 | ValueError | If fewer than `ceil(360 / 12,5) = 29` bearings lie along `axis`, or the levels are empty or non-finite. |
+
+## DIRECTIVITY_STEP_DEG
+
+*Constant* (`float`).
+
+```python
+DIRECTIVITY_STEP_DEG = 5.0
+```
+
+## DIRECTIVITY_SURVEY_DISTANCE_M
+
+*Constant* (`float`).
+
+```python
+DIRECTIVITY_SURVEY_DISTANCE_M = 1.5
+```
 
 ## EARLY_ENERGY_LIMIT_S
 
@@ -248,6 +307,43 @@ its docstring says what the printed step does and does not determine.
 | Exception | When |
 | :--- | :--- |
 | ValueError | If `distance` is not a positive, finite length. |
+
+## gliding_directivity_deviation
+
+```python
+gliding_directivity_deviation(levels: ArrayLike) -> NDArray[np.float64]
+```
+
+Deviation of each gliding arc from the whole-turn reference (4.2.1).
+
+ISO 3382-1:2009, 4.2.1 qualifies a source by averaging its free-field
+output over "gliding" 30 degree arcs and comparing each of them with the
+reference, which is "a 360 degree energetic average in the measurement
+plane". Where no turntable is available it asks for measurements every
+5 degrees, and for gliding averages "each covering six neighbouring
+points", which is 30 degrees of a 72-point survey.
+
+Both averages here are energetic, which is what the printed word makes
+of the reference and what the arcs must therefore be for the comparison
+to mean anything. The standard does not say so of the arcs, and it does
+not say whether the six points of a window lead, trail or straddle their
+arc either; the window here starts at each measured bearing and runs
+forwards, and it wraps, so a survey of `N` bearings gives `N`
+deviations.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `levels` | Sound pressure levels around the source, in dB, one per bearing, evenly spaced over a full turn. |
+
+**Returns:** One deviation per bearing, in dB, of the arc that starts there against the whole-turn reference.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the bearings do not divide the arc a whole number of times, or there are too few of them to make one. |
 
 ## IACC_EARLY_WINDOW_S
 
@@ -581,6 +677,14 @@ Plot the per-band lateral fraction against the Table A.1 range.
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.
 
+## MAX_SOURCE_DIRECTIVITY_DEVIATION_DB
+
+*Constant* (`dict`).
+
+```python
+MAX_SOURCE_DIRECTIVITY_DEVIATION_DB = {125.0: 1.0, 250.0: 1.0, 500.0: 1.0, 1000.0: 3.0, 2000.0: 5.0, 4000.0: 6.0}
+```
+
 ## MAXIMUM_DIRECTIVITY_STEP_DEG
 
 *Constant* (`float`).
@@ -589,6 +693,62 @@ Requires matplotlib (`pip install phonometry[plot]`); returns the
 MAXIMUM_DIRECTIVITY_STEP_DEG = 12.5
 ```
 
+## MID_FREQUENCY_OCTAVES_HZ
+
+*Constant* (`tuple`).
+
+```python
+MID_FREQUENCY_OCTAVES_HZ = (500.0, 1000.0)
+```
+
+## MID_FREQUENCY_THIRD_OCTAVES_HZ
+
+*Constant* (`tuple`).
+
+```python
+MID_FREQUENCY_THIRD_OCTAVES_HZ = (400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0)
+```
+
+## minimum_receiver_positions
+
+```python
+minimum_receiver_positions(seats: ArrayLike) -> NDArray[np.float64] | float
+```
+
+Fewest microphone positions a hall of a given size wants (Table A.2).
+
+ISO 3382-1:2009, Table A.2 prints three pairs, 500 seats to 6 positions,
+1 000 to 8 and 2 000 to 10. They lie exactly on a straight line in the
+logarithm of the seat count, two positions per doubling:
+
+$$
+N_\mathrm{min} = 6 + 2 \lg_2 (S / 500)
+$$
+
+which reproduces all three printed integers to the last bit. A.4 caps
+what that line may be used for: it asks for "a minimum of between 6 and
+10 representative microphone positions", so the result is clamped to the
+range the table covers, and this function will not extrapolate a
+5 000-seat arena to thirteen positions on the strength of three rows.
+
+A.4 also says the positions are to be evenly distributed over all
+audience seating areas, and that a hall broken into separate areas such
+as balconies and under-balcony areas will need more than this.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `seats` | The number of seats in the hall. |
+
+**Returns:** The minimum number of positions, not rounded, clamped to the 6 to 10 the table and A.4 between them authorise.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If a seat count is not positive. |
+
 ## MINIMUM_REFERENCE_DISTANCE_M
 
 *Constant* (`float`).
@@ -596,6 +756,86 @@ MAXIMUM_DIRECTIVITY_STEP_DEG = 12.5
 ```python
 MINIMUM_REFERENCE_DISTANCE_M = 3.0
 ```
+
+## octave_pair_averages
+
+```python
+octave_pair_averages(
+    values: ArrayLike,
+    frequency: ArrayLike,
+) -> dict[str, float]
+```
+
+The low, mid and high pair averages of ISO 3382-1:2009, A.5.
+
+A more concise presentation than a full band table: the 125 Hz and
+250 Hz results averaged into a low-frequency one, 500 Hz and 1 kHz into
+a mid-frequency one, and 2 kHz and 4 kHz into a high-frequency one, all
+arithmetically.
+
+This is a different product from the single number of
+[`single_number_average`](/phonometry/reference/api/rooms/auditorium/#single_number_average), and the two must not be confused. They
+coincide for the five quantities Table A.1 averages over 500 Hz and
+1 kHz, and they do not for the lateral ones, whose single number spans
+four bands. A.5 also warns that lateral energy fractions in the 4 kHz
+octave are not usually thought to be subjectively important, so the high
+pair means little for them.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `values` | Per-band values, one per entry of `frequency`. |
+| `frequency` | The band centre frequencies in Hz. |
+
+**Returns:** `{"low": ..., "mid": ..., "high": ...}` in the values' unit.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the two arrays disagree in length, or if the band axis does not carry all six octaves from 125 Hz to 4 kHz. |
+
+## OCTAVE_PAIRS_HZ
+
+*Constant* (`dict`).
+
+```python
+OCTAVE_PAIRS_HZ = {'low': (125.0, 250.0), 'mid': (500.0, 1000.0), 'high': (2000.0, 4000.0)}
+```
+
+## perceptibly_different
+
+```python
+perceptibly_different(
+    symbol: str,
+    first: ArrayLike,
+    second: ArrayLike,
+) -> bool
+```
+
+Whether two values of a quantity differ by its Table A.1 JND.
+
+The comparison is absolute for every quantity but the early decay time,
+whose JND the table prints as "Rel. 5 %", a fraction of the value rather
+than a difference in seconds. The late lateral sound level has no JND at
+all, printed as "Not known", and this function refuses to invent one.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `symbol` | The quantity, as [`TABLE_A1`](/phonometry/reference/api/rooms/auditorium/#table_a1) keys it. |
+| `first` | One value, in the quantity's unit. |
+| `second` | The other, of the same shape. |
+
+**Returns:** True when the two differ by at least the just-noticeable difference, so a listener could be expected to hear it.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the symbol is not one Table A.1 prints, or if the table prints no just-noticeable difference for it. |
 
 ## REFERENCE_DISTANCE_M
 
@@ -659,6 +899,48 @@ reproduces the method rather than quietly improving it.
 | Exception | When |
 | :--- | :--- |
 | ValueError | If the absorption area is not a positive, finite area. |
+
+## single_number_average
+
+```python
+single_number_average(
+    symbol: str,
+    values: ArrayLike,
+    frequency: ArrayLike,
+) -> float
+```
+
+The Table A.1 single number of one auditorium quantity.
+
+Footnote a of ISO 3382-1:2009, Table A.1 makes this the arithmetical
+average over the octave bands the table names for that quantity, with
+one exception: the late lateral sound level, which
+[`late_lateral_average`](/phonometry/reference/api/rooms/auditorium/#late_lateral_average) energy-averages through Equation (A.17).
+A.5 asks for the index "m" to be applied to the symbol of the result.
+
+The band set is per quantity and is not always the mid pair. The sound
+strength, early decay time, clarity, definition and centre time average
+the 500 Hz and 1 kHz octaves; the lateral quantities average 125 Hz to
+1 kHz, four bands. A.5 prints both cases as examples for exactly that
+reason, $G_m$ over two bands and $J_{\mathrm{LF}m}$ over
+four, and an accessor that hard-codes the mid pair is wrong for half the
+table.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `symbol` | The quantity, as [`TABLE_A1`](/phonometry/reference/api/rooms/auditorium/#table_a1) keys it. |
+| `values` | Its per-band values, one per entry of `frequency`. |
+| `frequency` | The band centre frequencies in Hz, as a result carries them. |
+
+**Returns:** The single number, in the quantity's own unit.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the symbol is not one Table A.1 prints, if the two arrays disagree in length, or if the band axis does not carry every band the quantity averages. |
 
 ## sound_pressure_exposure_level
 
@@ -852,6 +1134,28 @@ second panel shows the two levels G is the difference of. Requires
 matplotlib (`pip install phonometry[plot]`); returns the
 `Axes` (or an array of two).
 
+## source_directivity_limit
+
+```python
+source_directivity_limit(centre: float) -> float
+```
+
+The Table 1 limit for one octave band, in dB.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `centre` | Nominal octave band centre frequency in Hz. |
+
+**Returns:** The maximum deviation from omnidirectionality the table prints.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If Table 1 has no row for that band. It prints six, 125 Hz to 4 kHz, and a survey in the 63 Hz or 8 kHz octave has no printed limit to be held to rather than the nearest one. |
+
 ## STAGE_DIRECT_WINDOW_S
 
 *Constant* (`tuple`).
@@ -996,3 +1300,15 @@ Plot both supports per band against the Table C.1 ranges.
 
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.
+
+## TABLE_A1
+
+*Constant* (`dict`).
+
+## TEST_REPORT_ITEMS
+
+*Constant* (`tuple`).
+
+```python
+TEST_REPORT_ITEMS = ('a statement that the measurements were made in conformity with ISO 3382-1', 'name and place of the room tested', 'sketch plan of the room, with an indication of the scale', 'volume of the room, with an explanation of how it is defined if the room is not completely enclosed', 'for rooms for speech and music, the number and type of seats, their upholstery and covering, and which parts of the seat are covered', 'a description of the shape and material of the walls and the ceiling', 'state or states of occupancy during measurements, and the number of occupants', 'condition of any variable equipment, such as curtains, public-address or electronic reverberation enhancement systems', 'for theatres, whether the safety curtain or decorative curtains were up or down', 'description, where appropriate, of the stage furnishing, including any concert enclosure', 'temperature and relative humidity in the room during the measurement', 'description of measuring apparatus, source and microphones, and whether tape recorders were employed', 'description of the sound signal used', 'coverage chosen, including the source and microphone positions and their heights, preferably shown on a plan', 'date of measurement and name of the measuring organization')
+```

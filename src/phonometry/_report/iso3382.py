@@ -76,6 +76,14 @@ if TYPE_CHECKING:
 #: accordingly by the statement).
 _TMID_BANDS = (500.0, 1000.0)
 
+#: The other route ISO 3382-1:2009, 9.1 prints to a single-number
+#: reverberation time: "averages over the six one-third-octave bands from
+#: 400 Hz to 1 250 Hz". The clause prints these two routes and no third, so
+#: a one-third-octave analysis takes this one rather than a mean of the two
+#: one-third-octave bands that happen to be called 500 Hz and 1 kHz, which
+#: is a sixth of the band the octave route averages.
+_TMID_THIRD_OCTAVE_BANDS = (400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0)
+
 #: Tolerance (Hz, relative) for matching a band centre to a nominal frequency.
 _BAND_MATCH_REL = 0.06
 
@@ -325,29 +333,34 @@ def _band_fraction(frequency: np.ndarray | None) -> int:
 
 
 def _reverberation_descriptor(
-    result: RoomAcousticsResult, values: np.ndarray
+    result: RoomAcousticsResult, values: np.ndarray, fraction: int = 1
 ) -> tuple[float, bool, float]:
     """Return ``(value, is_mid, band)`` for the boxed reverberation descriptor.
 
-    When the result carries frequency bands and both the 500 Hz and 1000 Hz
-    band centres are present and finite, the descriptor is the mid-frequency
-    mean of those two bands (T_mid / EDT_mid, the customary ISO 3382 room
-    descriptor; for a one-third-octave analysis these are the 500 Hz and
-    1 kHz one-third-octave bands and the fiche labels them as such) and
-    ``is_mid`` is True (``band`` is NaN). For a broadband result
-    (``frequency is None``) or a band range that does not span both mid
-    bands, the descriptor is the first finite value with ``is_mid`` False and
-    ``band`` its exact band centre (NaN for broadband), so the fiche never
-    makes a false mid-frequency claim about a value that was not averaged
-    over those bands and always names the band the fallback value came from.
+    ISO 3382-1:2009, 9.1 prints two routes to a single-number reverberation
+    time and no third: the mean of the 500 Hz and 1 kHz **octave** bands, or
+    "averages over the six one-third-octave bands from 400 Hz to 1 250 Hz".
+    The descriptor takes whichever route the analysis bandwidth calls for,
+    and ``is_mid`` is True when it could (``band`` is NaN).
+
+    For a broadband result (``frequency is None``) or a band range that does
+    not span the whole route, the descriptor is the first finite value with
+    ``is_mid`` False and ``band`` its exact band centre (NaN for broadband),
+    so the fiche never makes a false mid-frequency claim about a value that
+    was not averaged over those bands and always names the band the fallback
+    value came from.
     """
     freq = result.frequency
     arr = np.asarray(values, dtype=np.float64)
     if freq is not None:
-        low = _band_value(freq, arr, _TMID_BANDS[0])
-        high = _band_value(freq, arr, _TMID_BANDS[1])
-        if math.isfinite(low) and math.isfinite(high):
-            return 0.5 * (low + high), True, float("nan")
+        wanted = (
+            _TMID_THIRD_OCTAVE_BANDS
+            if fraction == _THIRD_OCTAVE_FRACTION
+            else _TMID_BANDS
+        )
+        readings = [_band_value(freq, arr, band) for band in wanted]
+        if all(math.isfinite(value) for value in readings):
+            return float(np.mean(readings)), True, float("nan")
     finite = np.flatnonzero(np.isfinite(arr))
     if not finite.size:
         return float("nan"), False, float("nan")
@@ -377,19 +390,19 @@ def _statement(
     """
     fraction = _band_fraction(result.frequency)
     t_value, t_is_mid, t_band = _reverberation_descriptor(
-        result, np.asarray(result.t30, dtype=np.float64)
+        result, np.asarray(result.t30, dtype=np.float64), fraction
     )
     edt_value, edt_is_mid, edt_band = _reverberation_descriptor(
-        result, np.asarray(result.edt, dtype=np.float64)
+        result, np.asarray(result.edt, dtype=np.float64), fraction
     )
     if t_is_mid and fraction == 1:
         statement = t(
             "T<sub>mid</sub> (500-1000 Hz) = <b>{value} s</b>", language
         ).format(value=_cell(t_value, 2, language))
     elif t_is_mid:
-        # One-third-octave data: only the 500 Hz and 1 kHz one-third-octave
-        # bands are averaged, so the octave "500-1000 Hz" label would be
-        # false; the extended note names the bands (the long label does not
+        # One-third-octave data: 9.1's other route, the six bands from
+        # 400 Hz to 1 250 Hz, so the octave "500-1000 Hz" label would be
+        # false; the extended note names the range (the long label does not
         # fit the boxed statement).
         statement = t("T<sub>mid</sub> = <b>{value} s</b>", language).format(
             value=_cell(t_value, 2, language)
@@ -407,7 +420,8 @@ def _statement(
     if (t_is_mid or edt_is_mid) and fraction == _THIRD_OCTAVE_FRACTION:
         extended.append(
             t(
-                "Mid-frequency mean over the 500 Hz and 1 kHz one-third-octave bands.",
+                "Mid-frequency mean over the six one-third-octave bands "
+                "from 400 Hz to 1250 Hz.",
                 language,
             )
         )
