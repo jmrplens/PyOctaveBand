@@ -226,7 +226,8 @@ print(room.minimum_reliable_reverberation_time(710.0, 0.05))              # 0.1 
 ```
 
 La octava de 125 Hz es la que más aprieta, por ser la más estrecha: 16
-partido por 88,75 Hz son 180 ms, y a una sala más seca que eso no se le puede
+partido por 88,75 Hz son 180 ms, y es una cota que la caída tiene que
+superar, no igualar, así que a una sala de 180 ms o menos no se le puede
 medir el tiempo de reverberación a 125 Hz por análisis directo. La NOTA de
 7.3 de la ISO 3382-2:2008 relaja el producto a `B T > 4` cuando el filtrado
 es de tiempo invertido, que es lo que hace

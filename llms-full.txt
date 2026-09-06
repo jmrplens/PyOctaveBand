@@ -13668,7 +13668,8 @@ print(room.minimum_reliable_reverberation_time(710.0, 0.05))              # 0.1 
 ```
 
 The 125 Hz octave binds hardest, because it is the narrowest: 16 over
-88,75 Hz is 180 ms, and a room drier than that cannot have its 125 Hz
+88,75 Hz is 180 ms, and that is a bound the decay has to clear rather than
+one it may equal, so a room at or below 180 ms cannot have its 125 Hz
 reverberation time measured by forward analysis at all. ISO 3382-2:2008,
 7.3 NOTE relaxes the product to `B T > 4` when the filtering is
 time-reversed, which is what

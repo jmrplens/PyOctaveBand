@@ -38,6 +38,7 @@ from a straight line.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -648,7 +649,7 @@ def filter_bandwidth(centre: ArrayLike, fraction: int = 1) -> np.ndarray | float
         one-third-octave one.
     :return: The bandwidth in Hz, in the shape of ``centre``.
     :raises ValueError: If ``fraction`` is not one the clause prints a
-        coefficient for.
+        coefficient for, or a centre frequency is not positive and finite.
     """
     if fraction not in FILTER_BANDWIDTH_FRACTION:
         msg = (
@@ -658,8 +659,8 @@ def filter_bandwidth(centre: ArrayLike, fraction: int = 1) -> np.ndarray | float
         )
         raise ValueError(msg)
     frequencies = np.asarray(centre, dtype=np.float64)
-    if np.any(frequencies <= 0.0):
-        msg = "'centre' must be a positive frequency in Hz."
+    if not np.all(np.isfinite(frequencies)) or np.any(frequencies <= 0.0):
+        msg = "'centre' must be a positive, finite frequency in Hz."
         raise ValueError(msg)
     width = np.asarray(
         FILTER_BANDWIDTH_FRACTION[fraction] * frequencies, dtype=np.float64
@@ -710,8 +711,9 @@ def reverberation_time_standard_deviation(
         the rest, so a sweep over survey sizes is one call.
     :return: The standard deviation in seconds, of the broadcast shape.
     :raises ValueError: If ``evaluation_range`` is not one the clause prints
-        coefficients for, if ``decays`` or ``positions`` is not positive, or
-        if a reverberation time or bandwidth is not positive.
+        coefficients for, if ``decays`` or ``positions`` is below one, or if a
+        reverberation time or bandwidth is not positive and finite. An
+        infinite ``decays`` is taken: it is the limit 7.2 declines to use.
     """
     key = float(evaluation_range)
     if key not in DECAY_UNCERTAINTY_COEFFICIENTS:
@@ -724,13 +726,14 @@ def reverberation_time_standard_deviation(
         raise ValueError(msg)
     counted = np.asarray(decays, dtype=np.float64)
     places = np.asarray(positions, dtype=np.float64)
-    if np.any(counted < 1.0) or np.any(places < 1.0):
+    if np.any(np.isnan(counted)) or np.any(counted < 1.0) or np.any(places < 1.0):
         msg = "'decays' and 'positions' count measurements, so both must be at least 1."
         raise ValueError(msg)
     times = np.asarray(reverberation_time, dtype=np.float64)
     width = np.asarray(bandwidth, dtype=np.float64)
-    if np.any(times <= 0.0) or np.any(width <= 0.0):
-        msg = "'reverberation_time' and 'bandwidth' must be positive."
+    finite = np.all(np.isfinite(times)) and np.all(np.isfinite(width))
+    if not finite or np.any(times <= 0.0) or np.any(width <= 0.0):
+        msg = "'reverberation_time' and 'bandwidth' must be positive and finite."
         raise ValueError(msg)
     prefactor, decay_term = DECAY_UNCERTAINTY_COEFFICIENTS[key]
     sigma = np.asarray(
@@ -759,7 +762,10 @@ def minimum_reliable_reverberation_time(
     faster than its own impulse response. The second is the averaging
     detector's, and it drops out when the analysis has no detector, which is
     the case for the backward integration of 5.3.3. This function returns the
-    larger of the two, which is the limit that binds.
+    larger of the two, which is the limit that binds. Both relations are
+    strict, so the value returned is a bound the decay time has to clear and
+    not one it may equal: a room whose decay time is exactly this long is
+    already outside what a forward analysis can be trusted with.
 
     ISO 3382-2:2008, 7.3 NOTE relaxes the first to ``B T > 4`` when the
     filtering is time-reversed, which is what
@@ -769,17 +775,17 @@ def minimum_reliable_reverberation_time(
         :func:`filter_bandwidth` gives the clause's own figure for it.
     :param detector_time: Reverberation time of the averaging detector, in
         seconds. Zero, the default, for an analysis with no detector.
-    :return: The shortest reliable reverberation time in seconds, of the
-        shape of ``bandwidth``.
-    :raises ValueError: If a bandwidth is not positive, or the detector time
-        is negative.
+    :return: The exclusive lower bound on a reliable reverberation time, in
+        seconds, of the shape of ``bandwidth``.
+    :raises ValueError: If a bandwidth is not positive and finite, or the
+        detector time is not a finite time of zero seconds or more.
     """
     width = np.asarray(bandwidth, dtype=np.float64)
-    if np.any(width <= 0.0):
-        msg = "'bandwidth' must be positive, in Hz."
+    if not np.all(np.isfinite(width)) or np.any(width <= 0.0):
+        msg = "'bandwidth' must be a positive, finite bandwidth in Hz."
         raise ValueError(msg)
-    if detector_time < 0.0:
-        msg = "'detector_time' must not be negative."
+    if not math.isfinite(detector_time) or detector_time < 0.0:
+        msg = "'detector_time' must be a finite time of zero seconds or more."
         raise ValueError(msg)
     limit = np.asarray(
         np.maximum(

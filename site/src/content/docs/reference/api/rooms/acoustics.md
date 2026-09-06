@@ -145,7 +145,7 @@ those two figures sit against the exact IEC 61260 band edges.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If `fraction` is not one the clause prints a coefficient for. |
+| ValueError | If `fraction` is not one the clause prints a coefficient for, or a centre frequency is not positive and finite. |
 
 ## FILTER_BANDWIDTH_FRACTION
 
@@ -202,7 +202,10 @@ The first is the filter's: a band of width `B` cannot resolve a decay
 faster than its own impulse response. The second is the averaging
 detector's, and it drops out when the analysis has no detector, which is
 the case for the backward integration of 5.3.3. This function returns the
-larger of the two, which is the limit that binds.
+larger of the two, which is the limit that binds. Both relations are
+strict, so the value returned is a bound the decay time has to clear and
+not one it may equal: a room whose decay time is exactly this long is
+already outside what a forward analysis can be trusted with.
 
 ISO 3382-2:2008, 7.3 NOTE relaxes the first to `B T > 4` when the
 filtering is time-reversed, which is what
@@ -215,13 +218,13 @@ filtering is time-reversed, which is what
 | `bandwidth` | Bandwidth of the analysis filter, in Hz; [`filter_bandwidth`](/phonometry/reference/api/rooms/acoustics/#filter_bandwidth) gives the clause's own figure for it. |
 | `detector_time` | Reverberation time of the averaging detector, in seconds. Zero, the default, for an analysis with no detector. |
 
-**Returns:** The shortest reliable reverberation time in seconds, of the shape of `bandwidth`.
+**Returns:** The exclusive lower bound on a reliable reverberation time, in seconds, of the shape of `bandwidth`.
 
 **Raises**
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If a bandwidth is not positive, or the detector time is negative. |
+| ValueError | If a bandwidth is not positive and finite, or the detector time is not a finite time of zero seconds or more. |
 
 ## reverberation_time_standard_deviation
 
@@ -272,7 +275,7 @@ larger absolute uncertainty and a smaller relative one.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If `evaluation_range` is not one the clause prints coefficients for, if `decays` or `positions` is not positive, or if a reverberation time or bandwidth is not positive. |
+| ValueError | If `evaluation_range` is not one the clause prints coefficients for, if `decays` or `positions` is below one, or if a reverberation time or bandwidth is not positive and finite. An infinite `decays` is taken: it is the limit 7.2 declines to use. |
 
 ## room_parameters
 

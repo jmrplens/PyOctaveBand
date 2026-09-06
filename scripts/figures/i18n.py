@@ -3858,7 +3858,7 @@ _ES_EXACT = {
     "late support, 100 to 1 000 ms": "soporte tardío, de 100 a 1 000 ms",
     "Time from the direct sound (ms)": "Tiempo desde el sonido directo (ms)",
     "Energy envelope re the direct sound (dB)": (
-        "Envolvente de energía re el sonido directo (dB)"
+        "Envolvente de energía respecto al sonido directo (dB)"
     ),
     "10 ms to 20 ms counts for neither,\n"
     "and past 1 000 ms counts for neither:\n"

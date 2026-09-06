@@ -207,6 +207,24 @@ class TestReverberationTimeUncertainty:
         with pytest.raises(ValueError, match="at least 1"):
             room.reverberation_time_standard_deviation(2.0, 710.0, positions=0)
 
+    @pytest.mark.parametrize("bad", [np.nan, np.inf])
+    def test_it_refuses_a_time_or_bandwidth_that_is_not_a_number(
+        self, bad: float
+    ) -> None:
+        # A NaN used to come back as a NaN standard deviation, and an
+        # infinite bandwidth as a zero one, which reads as certainty.
+        with pytest.raises(ValueError, match="positive and finite"):
+            room.reverberation_time_standard_deviation(bad, 710.0)
+        with pytest.raises(ValueError, match="positive and finite"):
+            room.reverberation_time_standard_deviation(2.0, bad)
+
+    def test_an_infinite_decay_count_is_the_limit_7_2_declines_to_use(self) -> None:
+        # 7.2 values the integrated response at ten decays, not at infinity;
+        # the infinity is still a legitimate thing to ask this function for.
+        many = room.reverberation_time_standard_deviation(2.0, 710.0, decays=np.inf)
+        assert np.isfinite(many)
+        assert many < room.reverberation_time_standard_deviation(2.0, 710.0)
+
 
 class TestFilterBandwidth:
     """Clause 7.1's two printed bandwidths."""
@@ -238,6 +256,11 @@ class TestFilterBandwidth:
         with pytest.raises(ValueError, match="must be one of"):
             room.filter_bandwidth(1000.0, 6)
 
+    @pytest.mark.parametrize("bad", [np.nan, np.inf, 0.0, -125.0])
+    def test_it_refuses_a_centre_that_is_not_a_frequency(self, bad: float) -> None:
+        with pytest.raises(ValueError, match="positive, finite frequency"):
+            room.filter_bandwidth(bad)
+
 
 class TestMinimumReliableReverberationTime:
     """Clause 7.3, Equations (6) and (7)."""
@@ -260,5 +283,15 @@ class TestMinimumReliableReverberationTime:
         assert low == pytest.approx(16.0 / 88.75, abs=1e-12)
 
     def test_it_refuses_a_negative_detector_time(self) -> None:
-        with pytest.raises(ValueError, match="must not be negative"):
+        with pytest.raises(ValueError, match="zero seconds or more"):
             room.minimum_reliable_reverberation_time(710.0, -0.1)
+
+    @pytest.mark.parametrize("bad", [np.nan, np.inf])
+    def test_it_refuses_a_bandwidth_that_is_not_a_number(self, bad: float) -> None:
+        with pytest.raises(ValueError, match="positive, finite bandwidth"):
+            room.minimum_reliable_reverberation_time(bad)
+
+    @pytest.mark.parametrize("bad", [np.nan, np.inf])
+    def test_it_refuses_a_detector_time_that_is_not_a_number(self, bad: float) -> None:
+        with pytest.raises(ValueError, match="zero seconds or more"):
+            room.minimum_reliable_reverberation_time(710.0, bad)
