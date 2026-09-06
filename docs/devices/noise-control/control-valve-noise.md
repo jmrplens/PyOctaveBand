@@ -194,6 +194,7 @@ where a valve's noise gets out. $f_g$ is the external one, where the bending
 waves match the air outside.
 
 ```python
+import numpy as np
 from phonometry import noise_control
 
 bands = np.array([200.0, 1000.0, 2500.0])

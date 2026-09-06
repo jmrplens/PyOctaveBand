@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**807/807 conformance checks pass** across 67 domains and 395 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**815/815 conformance checks pass** across 68 domains and 396 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -1329,6 +1329,22 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Norton & Karczub 2e 4.6/4.9 (problem 4.18 answer) | Blower in a plant room to the operator room -> 72.3/60.4/41.4/41.0/33.8/30.7 dB | 0 dB +/-0.1 (max \|diff\| over the 6 bands) | 0.0682 dB | 0.0682 dB | 68 % | ![Pass][cv-pass] Pass |
 | Norton & Karczub 2e Eq. (4.115) (problem 4.16 answer) | Lined compressor enclosure against NC-45 -> required TL 14.4/25.2/28.9/34.4/35.2/34.7/34.7/31.6 dB | 0 dB +/-0.15 (max \|diff\| over the 8 bands) | 0.1099 dB | 0.1099 dB | 73 % | ![Pass][cv-pass] Pass |
 | Norton & Karczub 2e Table 4.5 (constant-volume source power) | Source in the intersection of two flat surfaces (Q = 4) -> +10 lg 4 = 6.02 dB | 6.0206 dB (+/-0 dB) | 6.0206 dB | 0 dB | 0 % | ![Pass][cv-pass] Pass |
+
+</details>
+
+<details>
+<summary><b>Control valve noise (IEC 60534-8-3)</b>: 100% (8/8)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
+|:---|:---|:---|:---|:---|:---:|:---:|
+| IEC 60534-8-3:2010 | Regime, examples 1 to 6 (Table A.1) | I, II, III, IV, V, V | example 1 = 1; example 2 = 2; example 3 = 3; example 4 = 4; example 5 = 5; example 6 = 5 | exact | 0 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-3:2010 | Valve style modifier F_d (Eqs. (8a) to (8c)) | 0.3 (+/-0.005) | 0.296 | -0.004 | 80 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-3:2010 | Jet diameter D_j, example 1 (Eq. (9)) | 0.012 m (+/-0.0005 m) | 0.0116 m | -0.0004 m | 80 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-3:2010 | Vena contracta pressure, examples 1 to 6 (Eq. (2)) | example 4, the worst of the six | 104702 Pa | -0.439 Pa | 22 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-3:2010 | Sound power W_a, examples 1 to 6 (Eq. (11)) | example 1 = 22.3 W; example 2 = 30.4 W; example 3 = 141.3 W; example 4 = 86.1 W; example 5 = 291.9 W; example 6 = 218.3 W | example 1 = 22.3 W; example 2 = 30.4 W; example 3 = 141.3 W; example 4 = 86.1 W; example 5 = 291.9 W; example 6 = 218.3 W | exact | 0 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-3:2010 | Internal level at the pipe wall, examples 1 to 6 (Eq. (18)) | example 1 = 155.3 dB; example 2 = 156.5 dB; example 3 = 161.7 dB; example 4 = 158.8 dB; example 5 = 157 dB; example 6 = 158.4 dB | example 1 = 155.3 dB; example 2 = 156.5 dB; example 3 = 161.7 dB; example 4 = 158.8 dB; example 5 = 157 dB; example 6 = 158.4 dB | exact | 0 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-3:2010 | Ring and coincidence frequencies, example 7 (Eqs. (21) to (23)) | f_r = 7958 Hz; f_o = 2366 Hz; f_g = 1622 Hz | f_r = 7958 Hz; f_o = 2366 Hz; f_g = 1622 Hz | exact | 0 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-3:2010 | Pipe transmission loss, example 7, 24 bands (Eq. (20a)) | band 17 at 500 Hz, the worst of 24 | -62.67 dB | -0.066 dB | 66 % | ![Pass][cv-pass] Pass |
 
 </details>
 
