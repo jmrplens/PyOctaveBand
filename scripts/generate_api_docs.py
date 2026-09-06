@@ -95,6 +95,10 @@ _MATH_ROLE_RE = re.compile(r":math:`([^`]+)`")
 #: A rendered inline-math span, once the role has become ``$...$``.
 _INLINE_MATH_RE = re.compile(r"\$[^$]+\$")
 _DIRECTIVE_RE = re.compile(r"^\s*\.\. \w+::")
+#: Any reST role that survived rendering. ``ROLE_RE`` and ``_MATH_ROLE_RE``
+#: consume the ones this generator understands, so whatever still matches is a
+#: role no converter claims and it reaches the published page as literal text.
+_LEAKED_ROLE_RE = re.compile(r":[a-z]+:`")
 _HEX_ADDR_RE = re.compile(r"0x[0-9a-fA-F]+")
 
 _MAX_CONST_REPR = 1500
@@ -1292,6 +1296,20 @@ def render_sidebar(pages: list[ModuleDoc]) -> str:
 # --------------------------------------------------------------------------
 
 
+def leaked_roles(relpath: str, rendered: str) -> list[str]:
+    """Report every reST role this generator left standing in one page.
+
+    A role it does not convert reaches the published page verbatim, prefix
+    and all, which is how ``:doc:`` and ``:sup:`` once shipped. Nothing but
+    a docstring can put one there, so the fix is always in the docstring.
+    """
+    return [
+        f"{relpath}:{number}: {line.strip()}"
+        for number, line in enumerate(rendered.splitlines(), start=1)
+        if _LEAKED_ROLE_RE.search(line)
+    ]
+
+
 @dataclasses.dataclass
 class Report:
     """What a generation run produced (printed by main, asserted by tests)."""
@@ -1301,6 +1319,7 @@ class Report:
     stats: RoleStats
     failures: list[str]
     issues: list[str]
+    leaked_roles: list[str]
 
 
 def generate(content_dir: Path, sidebar_path: Path) -> Report:
@@ -1309,20 +1328,20 @@ def generate(content_dir: Path, sidebar_path: Path) -> Report:
     stats = RoleStats()
     failures: list[str] = []
 
+    leaked: list[str] = []
+
     if content_dir.exists():
         shutil.rmtree(content_dir)
     content_dir.mkdir(parents=True)
-    (content_dir / "index.md").write_text(
-        render_index(pages, xref, stats), encoding="utf-8", newline="\n"
-    )
+    index = render_index(pages, xref, stats)
+    leaked += leaked_roles("index.md", index)
+    (content_dir / "index.md").write_text(index, encoding="utf-8", newline="\n")
     for page in pages:
         path = content_dir / page.relpath
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(
-            render_module_page(page, xref, stats, failures),
-            encoding="utf-8",
-            newline="\n",
-        )
+        rendered = render_module_page(page, xref, stats, failures)
+        leaked += leaked_roles(page.relpath, rendered)
+        path.write_text(rendered, encoding="utf-8", newline="\n")
     sidebar_path.parent.mkdir(parents=True, exist_ok=True)
     sidebar_path.write_text(render_sidebar(pages), encoding="utf-8", newline="\n")
     members = sum(len(page.members) for page in pages)
@@ -1332,6 +1351,7 @@ def generate(content_dir: Path, sidebar_path: Path) -> Report:
         stats=stats,
         failures=failures,
         issues=issues,
+        leaked_roles=leaked,
     )
 
 
@@ -1348,6 +1368,11 @@ def main() -> int:
         print("Docstrings degraded to verbatim blocks:")
         for failure in report.failures:
             print(f"  - {failure}")
+    if report.leaked_roles:
+        print("reST roles this generator does not convert, so they ship as text:")
+        for leak in report.leaked_roles:
+            print(f"  - {leak}")
+        return 1
     return 0
 
 

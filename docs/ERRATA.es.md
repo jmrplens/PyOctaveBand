@@ -4650,7 +4650,7 @@ dos ediciones con las mismas entradas y en el mismo orden.
   elección no se mueva.
 - **Estado:** sin comunicar.
 
-## ISO 3382-1:2009, A.2.1 (el mismo símbolo nombra dos niveles distintos, con cinco ecuaciones de por medio)
+## ISO 3382-1:2009, A.2.1 (el mismo símbolo nombra dos niveles distintos, con una página de por medio)
 
 - **Ubicación:** anexo A (informativo), A.2.1. La lista «where» bajo las
   Ecuaciones (A.2) y (A.3) en el folio impreso 13 (página 21 del PDF), y la

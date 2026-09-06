@@ -2818,11 +2818,13 @@ Source: https://jmrplens.github.io/phonometry/buildings/rooms/sound-strength/
 Reverberation time says what a hall does to energy over time. It says
 nothing about how **loud** the hall is: two rooms with the same T30 can sit
 20 dB apart at the same seat. Sound strength, $G$, is the quantity that
-closes that gap, and it is the only measure in ISO 3382-1 Table A.1 that a
-calibrated source is needed for. Everything else on the
+closes that gap, and it is one of only two measures in ISO 3382-1 Table A.1
+that a calibrated source is needed for, the other being the late lateral
+sound level. Everything else on the
 [room acoustic parameters page](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/)
-— EDT, T20, T30, C50, C80, D50, $T_\mathrm{s}$ — is a ratio of energies inside one
-recording and survives any gain you put in front of it. $G$ does not.
+— EDT, T20, T30, C50, C80, D50, $T_\mathrm{s}$ — is a decay time, a ratio of
+energies or a centre time read from one recording alone, and survives any
+gain you put in front of it. $G$ does not.
 
 ## 1. What G is
 

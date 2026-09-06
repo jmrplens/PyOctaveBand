@@ -42,9 +42,9 @@ forms: a library that quietly used 30,9921 dB would disagree with every
 hand calculation done from the printed page.
 
 Both closed forms hold at a characteristic impedance of exactly
-400 N s m\ :sup:`-3`, which is the value that makes the three reference
+$400~\text{N s/m}^3$, which is the value that makes the three reference
 quantities consistent: $p_0^2 S_0 / \rho c = (20\ \mu\mathrm{Pa})^2 / 400 = 1$ pW, the reference sound power. Neither equation prints that
-caveat. Air at 20 degrees and 101,325 kPa is nearer 413 N s m\ :sup:`-3`,
+caveat. Air at 20 degrees and 101,325 kPa is nearer $413~\text{N s/m}^3$,
 worth 0,14 dB, an order of magnitude more than either rounding: the offsets
 are a convention of the decibel scales, not a property of the air in the
 hall, and this module does not make them follow the weather.
@@ -227,7 +227,7 @@ reproduces the method rather than quietly improving it.
 
 | Name | Description |
 | :--- | :--- |
-| `reverberation_room_level` | Spatial-average sound pressure exposure level measured in the reverberation room, in dB. The standard calls this $L_{pE}$ too, which is the same symbol it gave the level measured in the hall under test five equations earlier; substituting (A.5) into (A.1) as printed would cancel the hall out of G altogether. The two roles get different names here, and :doc:`the errata register </reference/errata>` carries the rest. |
+| `reverberation_room_level` | Spatial-average sound pressure exposure level measured in the reverberation room, in dB. The standard calls this $L_{pE}$ too, which is the same symbol it gave the level measured in the hall under test a page earlier; substituting (A.5) into (A.1) as printed would cancel the hall out of G altogether. The two roles get different names here, and `docs/ERRATA.md` carries the rest. |
 | `absorption_area` | Equivalent sound absorption area of that room, in m², broadcast against `reverberation_room_level`. |
 
 **Returns:** The reference exposure level at 10 m, in dB.
@@ -236,7 +236,7 @@ reproduces the method rather than quietly improving it.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If the absorption area is not positive. |
+| ValueError | If the absorption area is not a positive, finite area. |
 
 ## sound_pressure_exposure_level
 

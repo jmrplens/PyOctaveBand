@@ -71,7 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   Seven conformance rows against the printed equations, and two errata. The
   first is a symbol the annex reuses: `L_pE` is the level measured in the hall
   under Equations (A.2) and (A.3), and the level measured in the calibration
-  reverberation room under Equation (A.5), five equations later and with no
+  reverberation room under Equation (A.5), a page later and with no
   distinguishing subscript; substituting one into the other as printed removes
   the hall from `G` altogether. The second is the note that asks for a
   directivity survey "at every 12,5 degrees", which does not divide 360.

@@ -300,6 +300,34 @@ def test_no_docstring_parse_failures() -> None:
     assert failures == []
 
 
+def test_leaked_roles_finds_a_role_the_generator_does_not_convert() -> None:
+    """The detector has to fire, or it guards nothing."""
+    rendered = "\n".join(
+        [
+            "plain prose",
+            "an area of :sup:`2` square metres",
+            "and :doc:`the errata register </reference/errata>` too",
+        ]
+    )
+    leaks = gad.leaked_roles("rooms/auditorium.md", rendered)
+    assert len(leaks) == 2
+    assert leaks[0].startswith("rooms/auditorium.md:2:")
+    assert ":doc:" in leaks[1]
+
+
+def test_no_role_reaches_a_published_page() -> None:
+    """``:doc:`` and ``:sup:`` once shipped verbatim; nothing may again."""
+    pages, xref, _ = gad.build_model()
+    stats = gad.RoleStats()
+    failures: list[str] = []
+    leaks = gad.leaked_roles("index.md", gad.render_index(pages, xref, stats))
+    for page in pages:
+        leaks += gad.leaked_roles(
+            page.relpath, gad.render_module_page(page, xref, stats, failures)
+        )
+    assert leaks == []
+
+
 def test_generated_pages_have_valid_frontmatter(
     generated: pathlib.Path,
 ) -> None:

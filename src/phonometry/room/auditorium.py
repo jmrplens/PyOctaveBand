@@ -36,10 +36,10 @@ forms: a library that quietly used 30,9921 dB would disagree with every
 hand calculation done from the printed page.
 
 Both closed forms hold at a characteristic impedance of exactly
-400 N s m\ :sup:`-3`, which is the value that makes the three reference
+:math:`400~\text{N s/m}^3`, which is the value that makes the three reference
 quantities consistent: :math:`p_0^2 S_0 / \rho c = (20\ \mu\mathrm{Pa})^2
 / 400 = 1` pW, the reference sound power. Neither equation prints that
-caveat. Air at 20 degrees and 101,325 kPa is nearer 413 N s m\ :sup:`-3`,
+caveat. Air at 20 degrees and 101,325 kPa is nearer :math:`413~\text{N s/m}^3`,
 worth 0,14 dB, an order of magnitude more than either rounding: the offsets
 are a convention of the decibel scales, not a property of the air in the
 hall, and this module does not make them follow the weather.
@@ -461,19 +461,19 @@ def reverberation_room_reference_level(
     :param reverberation_room_level: Spatial-average sound pressure exposure
         level measured in the reverberation room, in dB. The standard calls
         this :math:`L_{pE}` too, which is the same symbol it gave the level
-        measured in the hall under test five equations earlier; substituting
+        measured in the hall under test a page earlier; substituting
         (A.5) into (A.1) as printed would cancel the hall out of G
         altogether. The two roles get different names here, and
-        :doc:`the errata register </reference/errata>` carries the rest.
+        ``docs/ERRATA.md`` carries the rest.
     :param absorption_area: Equivalent sound absorption area of that room,
         in m², broadcast against ``reverberation_room_level``.
     :return: The reference exposure level at 10 m, in dB.
-    :raises ValueError: If the absorption area is not positive.
+    :raises ValueError: If the absorption area is not a positive, finite area.
     """
     levels = np.asarray(reverberation_room_level, dtype=np.float64)
     area = np.asarray(absorption_area, dtype=np.float64)
-    if np.any(area <= 0.0):
-        msg = "'absorption_area' must be positive, in m^2."
+    if not np.all(np.isfinite(area)) or np.any(area <= 0.0):
+        msg = "'absorption_area' must be a positive, finite area in m^2."
         raise ValueError(msg)
     reference = np.asarray(
         levels + 10.0 * np.log10(area) - DIFFUSE_FIELD_REFERENCE_OFFSET_DB,

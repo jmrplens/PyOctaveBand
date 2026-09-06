@@ -346,9 +346,9 @@ ISO 12999-1, ISO 10052, ANSI/ASA S12.2 and ASTM E413/E1414.
 - [Room Acoustics](/phonometry/buildings/rooms/room-acoustics/): the room parameters
   EDT, $T_{20}$, $T_{30}$, $C_{50}$, $C_{80}$, $D_{50}$ and $T_\mathrm{s}$ derived from
   that impulse response.
-- [Sound strength G (ISO 3382-1)](/phonometry/buildings/rooms/sound-strength/): the
-  one auditorium measure that needs a calibrated source, and the three printed
-  routes to its free-field reference at 10 m.
+- [Sound strength G (ISO 3382-1)](/phonometry/buildings/rooms/sound-strength/): one
+  of the two auditorium measures that need a calibrated source, and the three
+  printed routes to its free-field reference at 10 m.
 - [Open-Plan Office Acoustics (ISO 3382-3)](/phonometry/buildings/rooms/open-plan-acoustics/):
   the spatial decay rate of speech and the distraction and privacy distances
   of an open-plan floor.

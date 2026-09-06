@@ -4343,7 +4343,7 @@ in the same order.
   drift.
 - **Status:** unreported.
 
-## ISO 3382-1:2009, A.2.1 (the same symbol names two different levels, five equations apart)
+## ISO 3382-1:2009, A.2.1 (the same symbol names two different levels, a page apart)
 
 - **Location:** Annex A (informative), A.2.1. The "where" list under
   Equations (A.2) and (A.3) on printed folio 13 (PDF page 21), and the "where"

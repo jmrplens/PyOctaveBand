@@ -311,9 +311,14 @@ class TestReverberationRoomReferenceLevel:
         out = room.reverberation_room_reference_level([80.0, 80.0], [10.0, 100.0])
         assert np.asarray(out) == pytest.approx([53.0, 63.0], abs=1e-12)
 
-    def test_it_refuses_a_non_positive_absorption_area(self) -> None:
-        with pytest.raises(ValueError, match="must be positive"):
-            room.reverberation_room_reference_level(80.0, 0.0)
+    @pytest.mark.parametrize("area", [0.0, -1.0, np.nan, np.inf])
+    def test_it_refuses_an_area_that_is_not_a_positive_finite_one(
+        self, area: float
+    ) -> None:
+        # A NaN area used to come back as a NaN reference level, and an
+        # infinite one as an infinite level: neither is an absorption area.
+        with pytest.raises(ValueError, match="positive, finite area"):
+            room.reverberation_room_reference_level(80.0, area)
 
 
 class TestSoundStrengthFromPower:

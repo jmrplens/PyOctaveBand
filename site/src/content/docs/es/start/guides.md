@@ -362,9 +362,9 @@ ANSI/ASA S12.2 y ASTM E413/E1414.
 - [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/): los parámetros de
   sala EDT, $T_{20}$, $T_{30}$, $C_{50}$, $C_{80}$, $D_{50}$ y $T_\mathrm{s}$ derivados
   de esa respuesta al impulso.
-- [Fuerza sonora G (ISO 3382-1)](/phonometry/es/buildings/rooms/sound-strength/): la
-  única medida de auditorio que necesita una fuente calibrada, y las tres rutas
-  impresas hasta su referencia en campo libre a 10 m.
+- [Fuerza sonora G (ISO 3382-1)](/phonometry/es/buildings/rooms/sound-strength/): una
+  de las dos medidas de auditorio que necesitan una fuente calibrada, y las
+  tres rutas impresas hasta su referencia en campo libre a 10 m.
 - [Acústica de oficinas diáfanas (ISO 3382-3)](/phonometry/es/buildings/rooms/open-plan-acoustics/):
   la tasa de decaimiento espacial del habla y las distancias de distracción y
   de privacidad de una planta diáfana.
