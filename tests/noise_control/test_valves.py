@@ -426,6 +426,25 @@ class TestWholeChain:
         result = _run(1)
         assert result.external_level < result.internal_level - 40.0
 
+    @pytest.mark.parametrize(
+        ("index", "expected"),
+        [(1, 92), (2, 93), (3, 98), (4, 94), (5, 97)],
+    )
+    def test_the_level_at_one_metre_matches_the_printed_answer(
+        self, index: int, expected: int
+    ) -> None:
+        # Equation (25), the end of the chain. The sixth column is missing on
+        # purpose: its valve outlet is narrower than its pipe, so the annex
+        # adds the expander noise of Clause 7 to it, which Clause 5 does not
+        # know about and this module does not implement.
+        assert round(_run(index).external_level) == expected
+
+    def test_the_sixth_example_is_the_one_with_an_expander(self) -> None:
+        # 93 dB(A) from the valve alone against the 94 the annex prints, which
+        # is the valve and the expander together.
+        assert round(_run(6).external_level) == 93
+        assert EXAMPLES[5]["valve_outlet_diameter"] < EXAMPLES[5]["internal_diameter"]
+
     def test_the_pipe_wall_is_what_the_level_outside_depends_on(self) -> None:
         thin = valves.valve_aerodynamic_noise(
             **{**COMMON, "wall_thickness": 0.004},

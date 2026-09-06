@@ -109,6 +109,12 @@ _EXAMPLE_7_PIPE: dict[str, Any] = {
     "pipe_density": 8000.0,
 }
 
+#: Equation (25), the A-weighted level 1 m from the pipe wall, in dB. The
+#: sixth column is not here: it is the only one whose valve outlet is smaller
+#: than its pipe, so the annex adds the expander noise of Clause 7 to it and
+#: this module does not implement that yet.
+_PRINTED_EXTERNAL_LEVEL = {1: 92.0, 2: 93.0, 3: 98.0, 4: 94.0, 5: 97.0}
+
 #: Equations (21), (22) and (23) of example 7, in Hz.
 _PRINTED_PIPE_FREQUENCIES = {"f_r": 7958.0, "f_o": 2365.0, "f_g": 1622.0}
 
@@ -276,3 +282,24 @@ def _chk_transmission_loss() -> Outcome:
         places=2,
         expected_label=f"band {index + 1} at {bands[index]:g} Hz, the worst of 24",
     )
+
+
+@register(
+    _IEC60534,
+    "IEC 60534-8-3:2010",
+    "A-weighted level 1 m from the pipe wall, examples 1 to 5 (Eq. (25))",
+)
+def _chk_external_level() -> Outcome:
+    """The end of the chain, on the five columns that end there.
+
+    Everything the method does is behind this number: the regime, the
+    efficiency, the internal level, the spectrum of Equation (19), the
+    transmission loss of Equation (20a) and the A weighting of Table 7. The
+    annex prints it to the decibel.
+    """
+    computed = {
+        f"example {i}": round(_example(i).external_level)
+        for i in _PRINTED_EXTERNAL_LEVEL
+    }
+    expected = {f"example {i}": v for i, v in _PRINTED_EXTERNAL_LEVEL.items()}
+    return record(expected, computed, unit="dB")

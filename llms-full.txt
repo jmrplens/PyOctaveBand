@@ -20959,9 +20959,13 @@ print(round(result.peak_frequency))                 # 7778  Hz
 print(round(result.external_level, 1))              # 91.7  dB
 ```
 
-Every one of those but the last is a printed value of Annex A's example 1, and
-the result carries the rest of the printed intermediates too, so a calculation
-can be read against the standard row by row rather than trusted.
+Every one of those is a printed value of Annex A's example 1, including the
+last: the annex prints $L_{pAe,1m} = 92$ dB(A) for it. Five of the six columns
+end in a number Clause 5 alone reaches, and the library reproduces all five;
+the sixth is the one whose valve outlet is narrower than its pipe, so the annex
+adds the expander noise of Clause 7 to it, and Clause 5 by itself lands a
+decibel low. The result also carries the rest of the printed intermediates, so
+a calculation can be read against the standard row by row rather than trusted.
 
 The last two arguments are the only ones a data sheet may not give.
 $A_\eta$ is the exponent of the acoustical efficiency and $St_p$ the Strouhal
@@ -21014,6 +21018,7 @@ where a valve's noise gets out. $f_g$ is the external one, where the bending
 waves match the air outside.
 
 ```python
+import numpy as np
 from phonometry import noise_control
 
 bands = np.array([200.0, 1000.0, 2500.0])
@@ -54101,7 +54106,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 807 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 815 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -54470,7 +54475,7 @@ sample from the metrology core:
 | IEC 61252:1993 | The personal sound exposure quantities, `sound_exposure()` and the normalized 8 h level `lex_8h()`; IEC 61252:2025 has since superseded this print, and the transcription still targets the 1993+A2 text | `tests/signals/test_levels.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-807 numerical conformance checks across 67 domains and 395 standards, covering
+815 numerical conformance checks across 68 domains and 396 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise

@@ -139,9 +139,13 @@ print(round(result.peak_frequency))                 # 7778  Hz
 print(round(result.external_level, 1))              # 91.7  dB
 ```
 
-Every one of those but the last is a printed value of Annex A's example 1, and
-the result carries the rest of the printed intermediates too, so a calculation
-can be read against the standard row by row rather than trusted.
+Every one of those is a printed value of Annex A's example 1, including the
+last: the annex prints $L_{pAe,1m} = 92$ dB(A) for it. Five of the six columns
+end in a number Clause 5 alone reaches, and the library reproduces all five;
+the sixth is the one whose valve outlet is narrower than its pipe, so the annex
+adds the expander noise of Clause 7 to it, and Clause 5 by itself lands a
+decibel low. The result also carries the rest of the printed intermediates, so
+a calculation can be read against the standard row by row rather than trusted.
 
 The last two arguments are the only ones a data sheet may not give.
 $A_\eta$ is the exponent of the acoustical efficiency and $St_p$ the Strouhal

@@ -172,9 +172,14 @@ print(round(result.peak_frequency))                 # 7778  Hz
 print(round(result.external_level, 1))              # 91.7  dB
 ```
 
-Todos menos el último son valores impresos del ejemplo 1 del anexo A, y el
-resultado lleva además el resto de intermedios impresos, así que un cálculo se
-puede contrastar con la norma fila a fila en vez de darlo por bueno.
+Todos son valores impresos del ejemplo 1 del anexo A, incluido el último: el
+anexo imprime $L_{pAe,1m} = 92$ dB(A). Cinco de las seis columnas acaban en un
+número al que llega el apartado 5 por sí solo, y la biblioteca reproduce las
+cinco; la sexta es la que tiene la salida de válvula más estrecha que la
+tubería, así que el anexo le suma el ruido del difusor del apartado 7, y el
+apartado 5 por sí solo se queda un decibelio corto. El resultado lleva además
+el resto de intermedios impresos, así que un cálculo se puede contrastar con la
+norma fila a fila en vez de darlo por bueno.
 
 Los dos últimos argumentos son los únicos que una hoja de datos puede no dar.
 $A_\eta$ es el exponente de la eficiencia acústica y $St_p$ el número de

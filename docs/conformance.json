@@ -3,8 +3,8 @@
   "library": "3.3.0",
   "generator": "scripts/conformance_report.py",
   "counts": {
-    "checks": 815,
-    "passing": 815,
+    "checks": 816,
+    "passing": 816,
     "failing": 0,
     "domains": 68,
     "standards": 396,
@@ -468,8 +468,8 @@
     {
       "id": "control-valve-noise-iec-60534-8-3",
       "title": "Control valve noise (IEC 60534-8-3)",
-      "checks": 8,
-      "passing": 8
+      "checks": 9,
+      "passing": 9
     },
     {
       "id": "hvac-noise-vdi-2081",
@@ -21751,6 +21751,48 @@
         "value": -0.066
       },
       "precision": 2,
+      "verdict": "pass"
+    },
+    {
+      "id": "control-valve-noise-iec-60534-8-3/iec-60534-8-3-2010/a-weighted-level-1-m-from-the-pipe-wall-examples-1-to-5-eq-25",
+      "domain": "control-valve-noise-iec-60534-8-3",
+      "reference": {
+        "kind": "standard",
+        "designation": "IEC 60534-8-3",
+        "edition": "2010",
+        "cite": "IEC 60534-8-3:2010"
+      },
+      "quantity": "A-weighted level 1 m from the pipe wall, examples 1 to 5 (Eq. (25))",
+      "kind": "record",
+      "expected": {
+        "label": "example 1 = 92 dB; example 2 = 93 dB; example 3 = 98 dB; example 4 = 94 dB; example 5 = 97 dB",
+        "record": {
+          "example 1": 92.0,
+          "example 2": 93.0,
+          "example 3": 98.0,
+          "example 4": 94.0,
+          "example 5": 97.0
+        }
+      },
+      "computed": {
+        "label": "example 1 = 92 dB; example 2 = 93 dB; example 3 = 98 dB; example 4 = 94 dB; example 5 = 97 dB",
+        "record": {
+          "example 1": 92.0,
+          "example 2": 93.0,
+          "example 3": 98.0,
+          "example 4": 94.0,
+          "example 5": 97.0
+        }
+      },
+      "unit": "dB",
+      "tolerance": {
+        "mode": "absolute",
+        "value": 0.0
+      },
+      "deviation": {
+        "value": 0.0
+      },
+      "precision": 0,
       "verdict": "pass"
     },
     {

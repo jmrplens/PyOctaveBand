@@ -19,7 +19,7 @@
 
 ## Numerical conformance report
 
-**815/815 conformance checks pass** across 68 domains and 396 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+**816/816 conformance checks pass** across 68 domains and 396 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub><b>&#916;</b> is the difference between the computed value and the one the standard publishes. <b>Used</b> is how much of that clause's published tolerance the difference consumes: 100 % means it sits exactly on the limit, 5 % means it uses a twentieth of the allowance, and a dash means the clause states no two-sided tolerance for the quantity, so there is no budget to spend. It is reported and never used to decide a verdict, which is settled at full precision before any rounding.</sub>
 
@@ -1333,7 +1333,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary><b>Control valve noise (IEC 60534-8-3)</b>: 100% (8/8)</summary>
+<summary><b>Control valve noise (IEC 60534-8-3)</b>: 100% (9/9)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Used | Status |
 |:---|:---|:---|:---|:---|:---:|:---:|
@@ -1345,6 +1345,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | IEC 60534-8-3:2010 | Internal level at the pipe wall, examples 1 to 6 (Eq. (18)) | example 1 = 155.3 dB; example 2 = 156.5 dB; example 3 = 161.7 dB; example 4 = 158.8 dB; example 5 = 157 dB; example 6 = 158.4 dB | example 1 = 155.3 dB; example 2 = 156.5 dB; example 3 = 161.7 dB; example 4 = 158.8 dB; example 5 = 157 dB; example 6 = 158.4 dB | exact | 0 % | ![Pass][cv-pass] Pass |
 | IEC 60534-8-3:2010 | Ring and coincidence frequencies, example 7 (Eqs. (21) to (23)) | f_r = 7958 Hz; f_o = 2366 Hz; f_g = 1622 Hz | f_r = 7958 Hz; f_o = 2366 Hz; f_g = 1622 Hz | exact | 0 % | ![Pass][cv-pass] Pass |
 | IEC 60534-8-3:2010 | Pipe transmission loss, example 7, 24 bands (Eq. (20a)) | band 17 at 500 Hz, the worst of 24 | -62.67 dB | -0.066 dB | 66 % | ![Pass][cv-pass] Pass |
+| IEC 60534-8-3:2010 | A-weighted level 1 m from the pipe wall, examples 1 to 5 (Eq. (25)) | example 1 = 92 dB; example 2 = 93 dB; example 3 = 98 dB; example 4 = 94 dB; example 5 = 97 dB | example 1 = 92 dB; example 2 = 93 dB; example 3 = 98 dB; example 4 = 94 dB; example 5 = 97 dB | exact | 0 % | ![Pass][cv-pass] Pass |
 
 </details>
 
